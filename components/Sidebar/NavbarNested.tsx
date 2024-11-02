@@ -24,6 +24,7 @@ import {
   ThemeIcon,
   useMantineColorScheme,
 } from '@mantine/core';
+import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
 
@@ -91,7 +92,7 @@ export function NavbarNested({ sidebar, setSidebar }: NavbarNestedProps) {
                 width={40}
                 height={40}
                 style={{ width: '40px' }}
-                src="https://squarers.org/api/image?name=SUSS"
+                src={`${SERVER_ADDRESS}/api/image?name=SUSS`}
               />
               <h1>This is a test</h1>
               <Code fw={700}>v0.0.1</Code>

@@ -4,7 +4,7 @@ import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 export default function HomePage() {
   return (
     <SidebarLayout>
-      <h1 style={{textAlign: 'center'}}>Title</h1>
+      <h1 style={{ textAlign: 'center' }}>Title</h1>
       <p>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sodales ultrices lacus vel
         laoreet. Pellentesque sed massa non leo venenatis rutrum at non ligula. Etiam ac suscipit
