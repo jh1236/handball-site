@@ -1,12 +1,13 @@
 import '@mantine/core/styles.css';
+import './global.css';
 
 import React from 'react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
-import { theme } from '../theme';
+import { theme } from '@/theme';
 
 export const metadata = {
-  title: 'Mantine Next.js template',
-  description: 'I am using Mantine with Next.js!',
+  title: 'Squarers United Sporting',
+  description: 'The competitive sporting league we all love.',
 };
 
 export default function RootLayout({ children }: { children: any }) {

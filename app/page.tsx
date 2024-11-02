@@ -1,11 +1,11 @@
-import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
-import { Welcome } from '../components/Welcome/Welcome';
+import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
 export default function HomePage() {
   return (
     <>
-      <Welcome />
-      <ColorSchemeToggle />
+      <SidebarLayout>
+        <p>This is a WIP</p>
+      </SidebarLayout>
     </>
   );
 }
