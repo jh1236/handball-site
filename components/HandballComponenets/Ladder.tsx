@@ -22,10 +22,10 @@ export default function Ladder() {
     `${SERVER_ADDRESS}/api/teams/ladder?includeStats=true&formatData=true/`,
     fetcher
   );
-  const [chartData, setchartData] = React.useState<TeamStructure[]>([]);
+  const [chartData, setChartData] = React.useState<TeamStructure[]>([]);
   const [sortIndex, setSortIndex] = React.useState<number>(0);
   useEffect(() => {
-    setchartData((data?.pooled ?? false) ? (data?.ladder ?? []) : (data?.ladder ?? []));
+    setChartData((data?.pooled ?? false) ? (data?.ladder ?? []) : (data?.ladder ?? []));
   }, [data]);
   if (error) return `An error has occurred: ${error.message}`;
   if (isLoading) return 'Loading...';
@@ -51,6 +51,11 @@ export default function Ladder() {
     (d![name] as string) || d!.stats![name];
 
   const sortData = (idx: number) => {
+    if ((-idx === sortIndex && sortIndex !== -1) || (idx === sortIndex && idx === 1)) {
+      setChartData(data?.ladder ?? []);
+      setSortIndex(0);
+      return;
+    }
     let factor = idx === sortIndex ? -1 : 1;
     if (idx === 1 && idx !== Math.abs(sortIndex)) {
       factor *= -1;
@@ -74,7 +79,7 @@ export default function Ladder() {
       }
     });
     setSortIndex(factor * idx);
-    setchartData(sort);
+    setChartData(sort);
   };
   const SortDirection = sortIndex > 0 ? IconCaretDown : IconCaretUp;
   return (
