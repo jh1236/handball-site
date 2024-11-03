@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { IconCaretDown, IconCaretUp } from '@tabler/icons-react';
 import useSWR from 'swr';
 import { Image, Table } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
@@ -16,10 +17,16 @@ interface LadderResults {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Ladder() {
+  // const [sort, setSort] = React.useState<number>(-1);
   const { data, error, isLoading } = useSWR<LadderResults>(
     `${SERVER_ADDRESS}/api/teams/ladder?includeStats=true&formatData=true/`,
     fetcher
   );
+  const [chartData, setchartData] = React.useState<TeamStructure[]>([]);
+  const [sortIndex, setSortIndex] = React.useState<number>(0);
+  useEffect(() => {
+    setchartData((data?.pooled ?? false) ? (data?.ladder ?? []) : (data?.ladder ?? []));
+  }, [data]);
   if (error) return `An error has occurred: ${error.message}`;
   if (isLoading) return 'Loading...';
 
@@ -40,37 +47,58 @@ export default function Ladder() {
     { title: 'Elo', rank: 1, width: 10 },
   ];
 
-  // let sum = Number.MAX_SAFE_INTEGER;
-  // let rank = 5;
-  //
-  // while (sum > width) {
-  //   sum = 0;
-  //   for (let i = 0; i < headers.length; i += 1) {
-  //     const item = headers[i];
-  //     if (item.rank > rank) {
-  //       headers.splice(i, 1);
-  //     } else {
-  //       sum += item.width;
-  //     }
-  //   }
-  //   rank -= 1;
-  // }
+  const getHeader = (d: TeamStructure, name: string): number | string =>
+    (d![name] as string) || d!.stats![name];
 
+  const sortData = (idx: number) => {
+    let factor = idx === sortIndex ? -1 : 1;
+    if (idx === 1 && idx !== Math.abs(sortIndex)) {
+      factor *= -1;
+    }
+    const sort = chartData.toSorted((a, b) => {
+      const valueA = getHeader(a, headers[idx - 1].title);
+      const valueB = getHeader(b, headers[idx - 1].title);
+      switch (typeof valueA) {
+        case 'number':
+          return factor * ((valueB as number) - valueA);
+        case 'string':
+          if (valueA.endsWith('%')) {
+            return (
+              factor *
+              (Number((valueB as string).replace('%', '')) - Number(valueA.replace('%', '')))
+            );
+          }
+          return factor * (valueB as string).localeCompare(valueA);
+        default:
+          return 0;
+      }
+    });
+    setSortIndex(factor * idx);
+    setchartData(sort);
+  };
+  const SortDirection = sortIndex > 0 ? IconCaretDown : IconCaretUp;
   return (
     <div>
       <Table>
         <thead style={{ color: 'var(--mantine-color-green-8)' }}>
           <tr>
-            <th width="30px"></th>
+            <th style={{ width: '30px' }}></th>
             {headers.map((value, index) => (
-              <th key={index} width={value.width}>
-                {toTitleCase(value.title)}
+              <th key={index} style={{ width: value.width }} onClick={() => sortData(index + 1)}>
+                {index + 1 === Math.abs(sortIndex) ? (
+                  <>
+                    <i>{toTitleCase(value.title)}</i> <br></br>
+                    <SortDirection></SortDirection>
+                  </>
+                ) : (
+                  toTitleCase(value.title)
+                )}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {data!.ladder!.map((value, index) => (
+          {chartData.map((value, index) => (
             <tr key={index} style={{ textAlign: 'center' }}>
               <td>
                 <Image
@@ -79,8 +107,8 @@ export default function Ladder() {
                   alt={`The team logo for ${value.name}`}
                 ></Image>
               </td>
-              {headers.map((value2, index) => (
-                <td key={index}>{value![value2.title] || value!.stats![value2.title]}</td>
+              {headers.map((value2, idx) => (
+                <td key={idx}>{getHeader(value, value2.title)}</td>
               ))}
             </tr>
           ))}
