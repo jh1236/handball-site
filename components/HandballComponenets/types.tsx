@@ -6,6 +6,7 @@ interface TeamStructure {
     nonCaptain?: PersonStructure;
     substitute?: PersonStructure;
     stats?: { [key: string]: number };
+    [k: string]: any
 }
 
 interface PersonStructure {
@@ -14,6 +15,7 @@ interface PersonStructure {
     imageUrl: string;
     isAdmin?: boolean;
     stats?: { [key: string]: number };
+    [k: string]: any
 }
 
 interface TournamentStructure {
@@ -30,10 +32,12 @@ interface TournamentStructure {
     notes: string;
     imageUrl: string;
     usingBadmintonServes: boolean;
+    [k: string]: any
 }
 
 interface OfficialStructure extends PersonStructure {
     stats?: { [key: string]: number };
+    [k: string]: any
 }
 
 interface PlayerGameStatsStructure extends PersonStructure {
@@ -60,6 +64,7 @@ interface PlayerGameStatsStructure extends PersonStructure {
     startSide: string;
     elo: number;
     eloDelta: number;
+    [k: string]: any
 }
 
 interface GameEventStructure {
@@ -76,6 +81,7 @@ interface GameEventStructure {
     teamOneRight: PersonStructure;
     teamTwoLeft: PersonStructure;
     teamTwoRight: PersonStructure;
+    [k: string]: any
 }
 
 interface GameStructure {
@@ -113,4 +119,5 @@ interface GameStructure {
     adminStatus?: string;
     noteableStatus?: string;
     notes?: string;
+    [k: string]: any
 }

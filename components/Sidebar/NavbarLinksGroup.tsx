@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ElementType, Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IconChevronRight } from '@tabler/icons-react';
 import {
@@ -40,7 +40,6 @@ export function LinksGroup({
       className={classes.link}
       href={l.link}
       key={l.label}
-      onClick={(event) => event.preventDefault()}
     >
       {l.label}
     </Text>

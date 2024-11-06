@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react';
 import useSWR from 'swr';
 import { Image, Table } from '@mantine/core';
-import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 import { toTitleCase } from '@/tools/tools';
 
 interface LadderResults {
@@ -14,14 +14,20 @@ interface LadderResults {
   pool_two?: TeamStructure[];
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const numberToSize = ['', 'xs', 'sm', 'md', 'lg', 'xl'];
 
-export default function Ladder() {
+interface LadderProps {
+  maxRows?: number;
+  tournament?: string;
+}
+
+export default function Ladder({ maxRows = -1, tournament }: LadderProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  const { data, error, isLoading } = useSWR<LadderResults>(
-    `${SERVER_ADDRESS}/api/teams/ladder?includeStats=true&formatData=true/`,
-    fetcher
-  );
+  let url = `${SERVER_ADDRESS}/api/teams/ladder/?includeStats=true&formatData=true`;
+  if (tournament) {
+    url = `${url}&tournament=${tournament}`;
+  }
+  const { data, error, isLoading } = useSWR<LadderResults>(url, fetcher);
   const [chartData, setChartData] = React.useState<TeamStructure[]>([]);
   const [sortIndex, setSortIndex] = React.useState<number>(0);
   useEffect(() => {
@@ -31,9 +37,9 @@ export default function Ladder() {
   if (isLoading) return 'Loading...';
 
   const headers = [
-    { title: 'name', rank: 1, width: 20 },
-    { title: 'Percentage', rank: 2, width: 10 },
-    { title: 'Games Won', rank: 1, width: 10 },
+    { title: 'name', rank: 0, width: 20 },
+    { title: 'Games Won', rank: 0, width: 10 },
+    { title: 'Percentage', rank: 1, width: 10 },
     { title: 'Games Played', rank: 2, width: 10 },
     { title: 'Games Lost', rank: 3, width: 10 },
     { title: 'Green Cards', rank: 5, width: 10 },
@@ -44,11 +50,11 @@ export default function Ladder() {
     { title: 'Points Scored', rank: 2, width: 10 },
     { title: 'Points Against', rank: 3, width: 10 },
     { title: 'Point Difference', rank: 2, width: 10 },
-    { title: 'Elo', rank: 1, width: 10 },
+    { title: 'Elo', rank: 0, width: 10 },
   ];
 
   const getHeader = (d: TeamStructure, name: string): number | string =>
-    (d![name] as string) || d!.stats![name];
+    d![name] || d!.stats![name];
 
   const sortData = (idx: number) => {
     if ((-idx === sortIndex && sortIndex !== -1) || (idx === sortIndex && idx === 1)) {
@@ -60,7 +66,7 @@ export default function Ladder() {
     if (idx === 1 && idx !== Math.abs(sortIndex)) {
       factor *= -1;
     }
-    const sort = chartData.toSorted((a, b) => {
+    const sort = data!.ladder!.toSorted((a, b) => {
       const valueA = getHeader(a, headers[idx - 1].title);
       const valueB = getHeader(b, headers[idx - 1].title);
       switch (typeof valueA) {
@@ -84,12 +90,17 @@ export default function Ladder() {
   const SortDirection = sortIndex > 0 ? IconCaretDown : IconCaretUp;
   return (
     <div>
-      <Table>
-        <thead style={{ color: 'var(--mantine-color-green-8)' }}>
-          <tr>
-            <th style={{ width: '30px' }}></th>
+      <Table striped stickyHeader>
+        <Table.Thead style={{ color: 'var(--mantine-color-green-8)' }}>
+          <Table.Tr>
+            <Table.Th style={{ width: '20px' }}></Table.Th>
             {headers.map((value, index) => (
-              <th key={index} style={{ width: value.width }} onClick={() => sortData(index + 1)}>
+              <Table.Th
+                visibleFrom={numberToSize[value.rank]}
+                key={index}
+                style={{ width: value.width, textAlign: 'center' }}
+                onClick={() => sortData(index + 1)}
+              >
                 {index + 1 === Math.abs(sortIndex) ? (
                   <>
                     <i>{toTitleCase(value.title)}</i> <br></br>
@@ -98,26 +109,31 @@ export default function Ladder() {
                 ) : (
                   toTitleCase(value.title)
                 )}
-              </th>
+              </Table.Th>
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {chartData.map((value, index) => (
-            <tr key={index} style={{ textAlign: 'center' }}>
-              <td>
-                <Image
-                  style={{ width: '50px', height: '50px' }}
-                  src={value.imageUrl}
-                  alt={`The team logo for ${value.name}`}
-                ></Image>
-              </td>
-              {headers.map((value2, idx) => (
-                <td key={idx}>{getHeader(value, value2.title)}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {chartData.map((value, index) => {
+            if (index > maxRows && maxRows > 0) return null;
+            return (
+              <Table.Tr key={index} style={{ textAlign: 'center' }}>
+                <Table.Td>
+                  <Image
+                    style={{ width: '50px', height: '50px' }}
+                    src={value.imageUrl}
+                    alt={`The team logo for ${value.name}`}
+                  ></Image>
+                </Table.Td>
+                {headers.map((value2, idx) => (
+                  <Table.Td visibleFrom={numberToSize[value2.rank]} key={idx}>
+                    {getHeader(value, value2.title)}
+                  </Table.Td>
+                ))}
+              </Table.Tr>
+            );
+          })}
+        </Table.Tbody>
       </Table>
     </div>
   );

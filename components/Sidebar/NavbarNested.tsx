@@ -1,19 +1,21 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import {
+  IconAB,
+  IconAddressBook,
   IconAdjustments,
   IconCalendarStats,
   IconFileAnalytics,
-  IconGauge,
+  IconHome,
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
   IconLock,
   IconMoon,
-  IconNotes,
   IconPresentationAnalytics,
   IconSun,
   IconUser,
 } from '@tabler/icons-react';
+import useSWR from 'swr';
 import {
   Box,
   Code,
@@ -24,52 +26,88 @@ import {
   ThemeIcon,
   useMantineColorScheme,
 } from '@mantine/core';
-import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
 
-const mockdata = [
-  { label: 'Dashboard', icon: IconGauge, link: '/home' },
-  {
-    label: 'Market news',
-    icon: IconNotes,
-    links: [
-      { label: 'Overview', link: '/' },
-      { label: 'Forecasts', link: '/' },
-      { label: 'Outlook', link: '/' },
-      { label: 'Real time', link: '/' },
-    ],
-  },
-  {
-    label: 'Releases',
-    icon: IconCalendarStats,
-    links: [
-      { label: 'Upcoming releases', link: '/' },
-      { label: 'Previous releases', link: '/' },
-      { label: 'Releases schedule', link: '/' },
-    ],
-  },
-  { label: 'Analytics', icon: IconPresentationAnalytics },
-  { label: 'Contracts', icon: IconFileAnalytics },
-  { label: 'Settings', icon: IconAdjustments },
-  {
-    label: 'Security',
-    icon: IconLock,
-    links: [
-      { label: 'Enable 2FA', link: '/' },
-      { label: 'Change password', link: '/' },
-      { label: 'Recovery codes', link: '/' },
-    ],
-  },
-];
+function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament?: string) {
+  const out: {
+    label: string;
+    icon: React.ForwardRefExoticComponent<any>;
+    links?: { label: string; link: string }[];
+    link?: string;
+  }[] = [
+    { label: 'Home', icon: IconHome, link: '/home' },
+    {
+      label: 'Tournaments',
+      icon: IconAddressBook,
+      links: tournaments.map((t) => ({ link: `/${t.searchableName}`, label: t.name })),
+    },
+  ];
+  if (currentTournament) {
+    out.push({
+      label: 'Current Tournament',
+      icon: IconAB,
+      links: [
+        { label: 'Fixtures', link: `/${currentTournament}/fixtures` },
+        { label: 'Ladder', link: `/${currentTournament}/ladder` },
+        { label: 'Players', link: `/${currentTournament}/players` },
+        { label: 'Officials', link: `/${currentTournament}/officials` },
+      ],
+    });
+  }
+  out.push(
+    {
+      label: 'Releases',
+      icon: IconCalendarStats,
+      links: [
+        { label: 'Upcoming releases', link: '/' },
+        { label: 'Previous releases', link: '/' },
+        { label: 'Releases schedule', link: '/' },
+      ],
+    },
+    { label: 'Analytics', icon: IconPresentationAnalytics },
+    { label: 'Contracts', icon: IconFileAnalytics },
+    { label: 'Settings', icon: IconAdjustments },
+    {
+      label: 'Security',
+      icon: IconLock,
+      links: [
+        { label: 'Enable 2FA', link: '/' },
+        { label: 'Change password', link: '/' },
+        { label: 'Recovery codes', link: '/' },
+      ],
+    }
+  );
+  return out;
+}
 
 interface NavbarNestedProps {
   sidebar?: boolean;
   setSidebar: (value: boolean) => void;
+  tournamentName?: string;
 }
 
-export function NavbarNested({ sidebar, setSidebar }: NavbarNestedProps) {
-  const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
+export function NavbarNested({ sidebar, setSidebar, tournamentName }: NavbarNestedProps) {
+  const [myTournament, setMyTournament] = React.useState<TournamentStructure | undefined>(
+    undefined
+  );
+  const [tournaments, setTournaments] = React.useState<TournamentStructure[]>([]);
+  const links = makeSidebarLayout(tournaments, tournamentName).map((item) => (
+    <LinksGroup {...item} key={item.label} />
+  ));
+
+  const url = `${SERVER_ADDRESS}/api/tournaments/`;
+  const { data } = useSWR<{ tournaments: TournamentStructure[] }>(url, fetcher);
+
+  useEffect(() => {
+    if (data) {
+      setTournaments(data.tournaments);
+      if (tournamentName) {
+        setMyTournament(data.tournaments.find((t) => t.searchableName === tournamentName));
+      }
+    }
+  }, [data]);
 
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
@@ -89,12 +127,12 @@ export function NavbarNested({ sidebar, setSidebar }: NavbarNestedProps) {
           <Link href="/" className="hideLink">
             <Group justify="space-between">
               <Image
-                width={40}
-                height={40}
-                style={{ width: '40px' }}
-                src={`${SERVER_ADDRESS}/api/image?name=SUSS`}
+                width={60}
+                height={60}
+                style={{ width: '60px' }}
+                src={myTournament?.imageUrl || `${SERVER_ADDRESS}/api/image?name=SUSS`}
               />
-              <h1>This is a test</h1>
+              <h1>{myTournament?.name || 'Squarers United Sporting Syndicate'}</h1>
               <Code fw={700}>v0.0.1</Code>
             </Group>
           </Link>

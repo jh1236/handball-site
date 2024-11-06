@@ -10,11 +10,21 @@ export const metadata = {
   description: 'I am using Mantine with Next.js!',
 };
 
-export default function SidebarLayout({ children }: { children: any }) {
+export default function SidebarLayout({
+  children,
+  tournamentName,
+}: {
+  children: any;
+  tournamentName?: string;
+}) {
   const [sidebarVisible, setSidebarVisible] = React.useState<boolean>(true);
   return (
     <div>
-      <NavbarNested sidebar={sidebarVisible} setSidebar={setSidebarVisible}></NavbarNested>
+      <NavbarNested
+        sidebar={sidebarVisible}
+        setSidebar={setSidebarVisible}
+        tournamentName={tournamentName}
+      ></NavbarNested>
       <div
         style={{
           overflowY: 'scroll',

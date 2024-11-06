@@ -1,4 +1,3 @@
-
 # TYPES
 
 ## Games Data structure
@@ -272,17 +271,17 @@ if include_stats: (default false)
 {
     name: "str",
     searchableName: "str",
-    fixturesType:  "str",
+    fixturesType: "str",
     finalsType: "str",
-    ranked:  "bool",
+    ranked: "bool",
     twoCourts: "bool",
-    hasScorer:  "bool",
+    hasScorer: "bool",
     finished: "bool",
-    inFinals:  "bool",
+    inFinals: "bool",
     isPooled: "bool",
-    notes:  "str",
+    notes: "str",
     imageUrl: "srt",
-    usingBadmintonServes:  "bool",
+    usingBadmintonServes: "bool",
 }
 ```
 
@@ -332,7 +331,7 @@ This endpoint is open to the public
 
 #### Return Structure
 
-- Game(includeGameEvents=includeGameEvents)
+- game: Game(includeGameEvents=includeGameEvents)
 
 <hr>
 
@@ -362,10 +361,14 @@ This endpoint is open to the public
     - True if the events of the games should be included
 - includePlayerStats (bool) (Optional)(**admin** only)
     - True if the stats of each player should be included
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- list\[Game(includeGameEvents=includeGameEvents)\]
+- games: list\[Game(includeGameEvents=includeGameEvents)\]
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -395,10 +398,14 @@ This endpoint is open to the public
     - True if the events of the games should be included
 - includePlayerStats
     - True if the stats of each player should be included
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- list\[Game(includeGameEvents=includeGameEvents)\]
+- fixtures: list\[Game(includeGameEvents=includeGameEvents)\]
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 <hr>
@@ -866,10 +873,18 @@ This endpoint is open to the public.
     - The searchable name of the player that must be in the team
 - includeStats: bool (Optional)
     - True if the stats of each team should be included
+- formatData: bool (Optional)
+    - True if the server should format the data before it is sent.
+- includePlayerStats: bool (Optional)
+    - if the stats for each player should be included
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- list\[Team\]
+- teams: list\[Team\]
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -877,8 +892,7 @@ This endpoint is open to the public.
 
 #### Description
 
-Returns the details of a single player, with the option to filter stats from a certain tournament
-or game. If the game is passed, a PlayerGameStats is returned, otherwise a Player is returned
+Returns the details of a single team, with the option to filter stats from a certain tournament.
 
 #### Permissions:
 
@@ -890,6 +904,10 @@ This endpoint is open to the public.
     - The searchable name of the team to get stats for
 - tournament: str (Optional)
     - The searchable name of the tournament to get stats from
+- formatData: bool (Optional)
+    - True if the server should format the data before it is sent.
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
@@ -913,6 +931,10 @@ This endpoint is open to the public.
     - The searchable name of the team to get the ladder for
 - includeStats: bool (Optional)
     - The searchable name of the tournament to get stats from
+- formatData: bool (Optional)
+    - True if the server should format the data before it is sent.
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
@@ -924,6 +946,8 @@ This endpoint is open to the public.
     - The list of teams in order in pool 1 if the tournament is pooled
 - pool_two: list\[Team\]
     - The list of teams in order in pool 2 if the tournament is pooled
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -969,10 +993,16 @@ This endpoint is open to the public.
     - The searchable name of the team that the players play on
 - includeStats: bool (Optional)
     - True if the stats of each player should be included
+- formatData: bool (Optional)
+    - True if the server should format the data before it is sent.
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- list\[Person\]
+- players: list\[Person\]
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -981,7 +1011,7 @@ This endpoint is open to the public.
 #### Description
 
 Returns the details of a single player, with the option to filter stats from a certain tournament
-or game.  If the game is passed, a PlayerGameStats is returned, otherwise a Player is returned
+or game. If the game is passed, a PlayerGameStats is returned, otherwise a Player is returned
 
 #### Permissions:
 
@@ -995,10 +1025,16 @@ This endpoint is open to the public.
     - The searchable name of the tournament to get stats from
 - game: str (Optional)
     - The searchable name of the tournament to get stats from
+- formatData: bool (Optional)
+    - True if the server should format the data before it is sent.
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- Person | PlayerGameStats   (See description)
+- player: Person | PlayerGameStats   (See description)
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -1025,6 +1061,47 @@ This endpoint is open to the public.
 # TOURNAMENTS API REFERENCE
 
 ## GET endpoints
+
+### /api/tournaments/<searchable>
+
+#### Description
+
+Returns a single Tournament
+
+#### Permissions:
+
+This endpoint is open to the public.
+
+#### Arguments:
+
+- searchable: str
+    - The searchable name of the tournament to get stats for
+
+#### Return Structure
+
+- tournament: Tournament
+
+<hr>
+
+### /api/tournaments/
+
+#### Description
+
+Returns all Tournaments
+
+#### Permissions:
+
+This endpoint is open to the public.
+
+#### Arguments:
+
+- N/A
+
+#### Return Structure
+
+- tournaments: list\[Tournament\]
+
+<hr>
 
 ### /api/tournaments/image
 
@@ -1113,10 +1190,14 @@ This endpoint is open to the public.
 
 - tournament: str (Optional)
     - The searchable name of the tournament to get officials from
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
-- Official
+- official: Official
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
@@ -1134,10 +1215,14 @@ This endpoint is open to the public.
 
 - tournament: str (Optional)
     - The searchable name of the tournament to get stats from
+- returnTournament: bool (Optional)
+    - If the tournament is to be returned in the response
 
 #### Return Structure
 
 - Official
+- tournament: Tournament
+    - The tournament that was passed in
 
 <hr>
 
