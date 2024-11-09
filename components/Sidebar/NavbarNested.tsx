@@ -24,7 +24,9 @@ import {
   rem,
   ScrollArea,
   ThemeIcon,
+  Title,
   useMantineColorScheme,
+  useMatches,
 } from '@mantine/core';
 import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
@@ -83,12 +85,18 @@ function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament
 }
 
 interface NavbarNestedProps {
-  sidebar?: boolean;
-  setSidebar: (value: boolean) => void;
+  sidebarVisible?: boolean;
   tournamentName?: string;
+  setSidebarVisible: (prevState: boolean) => void;
+  mobile?: boolean;
 }
 
-export function NavbarNested({ sidebar, setSidebar, tournamentName }: NavbarNestedProps) {
+export function NavbarNested({
+  sidebarVisible,
+  tournamentName,
+  setSidebarVisible,
+  mobile = false,
+}: NavbarNestedProps) {
   const [myTournament, setMyTournament] = React.useState<TournamentStructure | undefined>(
     undefined
   );
@@ -116,30 +124,73 @@ export function NavbarNested({ sidebar, setSidebar, tournamentName }: NavbarNest
   const flipColorScheme = () => {
     setColorScheme(colorScheme === 'light' ? 'dark' : 'light');
   };
+  const ref = React.createRef<HTMLElement>();
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.style.transition = '0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+    }
+  }, [ref.current]);
   useEffect(() => {
     IconColorScheme = colorScheme === 'light' ? IconMoon : IconSun;
   }, [colorScheme]);
 
+  const w = mobile ? '100vw' : '300px';
+
   return (
-    <div style={{ float: 'left' }}>
-      <nav className={classes.navbar} style={{ marginLeft: sidebar ? 0 : '-300px', float: 'left' }}>
+    <div style={{ float: 'left', marginRight: '5px' }}>
+      <nav
+        className={classes.navbar}
+        ref={ref}
+        style={{ width: w, marginLeft: sidebarVisible !== mobile ? 0 : `-${w}`, float: 'left' }}
+      >
+        {mobile && (
+          <Box
+            style={{
+              alignItems: 'center',
+              margin: '5px',
+            }}
+            onClick={() => setSidebarVisible(!sidebarVisible)}
+          >
+            <ThemeIcon
+              color="green"
+              variant={colorScheme ? 'light' : undefined}
+              size={30}
+              style={{
+                float: 'right',
+              }}
+            >
+              {sidebarVisible !== mobile ? (
+                <IconLayoutSidebarLeftCollapse style={{ width: rem(18), height: rem(18) }} />
+              ) : (
+                <IconLayoutSidebarLeftExpand
+                  style={{ width: rem(18), height: rem(18) }}
+                ></IconLayoutSidebarLeftExpand>
+              )}
+            </ThemeIcon>
+          </Box>
+        )}
         <div className={classes.header}>
           <Link href="/" className="hideLink">
             <Group justify="space-between">
               <Image
-                width={60}
-                height={60}
-                style={{ width: '60px' }}
+                width={40}
+                height={40}
+                style={{ width: '40px', margin: 0 }}
                 src={myTournament?.imageUrl || `${SERVER_ADDRESS}/api/image?name=SUSS`}
               />
-              <h1>{myTournament?.name || 'Squarers United Sporting Syndicate'}</h1>
-              <Code fw={700}>v0.0.1</Code>
+              <Box style={{ overflowWrap: 'break-word', width: '70%', margin: 0 }}>
+                <Title order={4}>
+                  {myTournament?.name || 'Squarers United Sporting Syndicate'}
+                </Title>
+              </Box>
             </Group>
           </Link>
         </div>
 
         <ScrollArea className={classes.links}>
-          <div className={classes.linksInner}>{links}</div>
+          <div className={classes.linksInner} style={{ overflowY: 'scroll' }}>
+            {links}
+          </div>
         </ScrollArea>
 
         <div className={classes.footer}>
@@ -151,29 +202,6 @@ export function NavbarNested({ sidebar, setSidebar, tournamentName }: NavbarNest
           </div>
         </div>
       </nav>
-      <div
-        style={{
-          display: 'flex',
-        }}
-      >
-        <Box
-          style={{
-            alignItems: 'center',
-            margin: '10px',
-          }}
-          onClick={() => setSidebar(!sidebar)}
-        >
-          <ThemeIcon color="green" variant={colorScheme ? 'light' : undefined} size={30}>
-            {sidebar ? (
-              <IconLayoutSidebarLeftCollapse style={{ width: rem(18), height: rem(18) }} />
-            ) : (
-              <IconLayoutSidebarLeftExpand
-                style={{ width: rem(18), height: rem(18) }}
-              ></IconLayoutSidebarLeftExpand>
-            )}
-          </ThemeIcon>
-        </Box>
-      </div>
     </div>
   );
 }
