@@ -5,26 +5,26 @@ import useSWR from 'swr';
 import { Text, Title } from '@mantine/core';
 import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 
-interface TeamResults {
-  team: TeamStructure;
+interface PlayerResults {
+  player: PersonStructure;
 }
 
-interface TeamsProps {
+interface PlayersProps {
   tournament: string;
-  team: string;
+  player: string;
 }
 
-export default function IndividualTeam({ tournament, team }: TeamsProps) {
+export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  let url = `${SERVER_ADDRESS}/api/teams/${team}?formatData=true`;
+  let url = `${SERVER_ADDRESS}/api/players/${player}?formatData=true`;
   if (tournament) {
     url = `${url}&tournament=${tournament}`;
   }
-  const { data, error, isLoading } = useSWR<TeamResults>(url, fetcher);
-  const [chartData, setchartData] = React.useState<TeamStructure | undefined>(undefined);
+  const { data, error, isLoading } = useSWR<PlayerResults>(url, fetcher);
+  const [chartData, setchartData] = React.useState<PersonStructure | undefined>(undefined);
   useEffect(() => {
     if (data) {
-      setchartData(data?.team);
+      setchartData(data?.player);
     }
   }, [data]);
   if (error) return `An error has occurred: ${error.message}`;

@@ -5,3 +5,7 @@ export interface TournamentPageArgs {
 export interface TeamPageArgs {
   params: Promise<{ tournament: string; team: string }>;
 }
+
+export interface PlayerPageArgs {
+  params: Promise<{ tournament: string; player: string }>;
+}

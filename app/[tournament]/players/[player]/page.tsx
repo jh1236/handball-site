@@ -1,13 +1,14 @@
 import React from 'react';
-import { TournamentPageArgs } from '@/app/[tournament]/types';
+import { PlayerPageArgs } from '@/app/[tournament]/types';
+import IndividualPlayer from '@/components/HandballComponenets/IndividualPlayer';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
-export default async function IndividualPlayerPage({ params }: TournamentPageArgs) {
-  const { tournament } = await params;
+export default async function IndividualPlayerPage({ params }: PlayerPageArgs) {
+  const { tournament, player } = await params;
   return (
     <>
       <SidebarLayout tournamentName={tournament}>
-        <h1>This page is still a WIP!</h1>
+        <IndividualPlayer tournament={tournament} player={player}></IndividualPlayer>
       </SidebarLayout>
     </>
   );
