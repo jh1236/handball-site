@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import Link from 'next/link';
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react';
 import useSWR from 'swr';
 import { Image, Table } from '@mantine/core';
 import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 import { toTitleCase } from '@/tools/tools';
-
 
 interface PlayersResults {
   pooled: boolean;
@@ -18,6 +18,13 @@ const numberToSize = ['', 'xs', 'sm', 'md', 'lg', 'xl'];
 interface LadderProps {
   maxRows?: number;
   tournament?: string;
+}
+
+function linkTo(player: PersonStructure, tournament?: string): string {
+  if (tournament) {
+    return `/${tournament}/players/${player.searchableName}`;
+  }
+  return `/players/${player.searchableName}`;
 }
 
 export default function Players({ maxRows = -1, tournament }: LadderProps) {
@@ -119,15 +126,19 @@ export default function Players({ maxRows = -1, tournament }: LadderProps) {
             return (
               <Table.Tr key={index} style={{ textAlign: 'center' }}>
                 <Table.Td>
-                  <Image
-                    style={{ width: '50px', height: '50px' }}
-                    src={value.imageUrl}
-                    alt={`The team logo for ${value.name}`}
-                  ></Image>
+                  <Link className="hideLink" href={linkTo(value, tournament)}>
+                    <Image
+                      style={{ width: '50px', height: '50px' }}
+                      src={value.imageUrl}
+                      alt={`The team logo for ${value.name}`}
+                    ></Image>
+                  </Link>
                 </Table.Td>
                 {headers.map((value2, idx) => (
                   <Table.Td visibleFrom={numberToSize[value2.rank]} key={idx}>
-                    {getHeader(value, value2.title)}
+                    <Link className="hideLink" href={linkTo(value, tournament)}>
+                      {getHeader(value, value2.title)}
+                    </Link>
                   </Table.Td>
                 ))}
               </Table.Tr>

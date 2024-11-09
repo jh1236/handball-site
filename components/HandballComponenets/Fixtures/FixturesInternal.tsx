@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import Link from 'next/link';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import useSWR from 'swr';
 import { Table, Text } from '@mantine/core';
 import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
-import Link from 'next/link';
 
 interface FixturesResults {
   fixtures: { games: GameStructure[]; finals: boolean }[];
@@ -118,36 +118,47 @@ export default function FixturesInternal({
                 {value.games.map((game, index2) => (
                   <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
                     <Table.Td>
-                      {/* eslint-disable-next-line react/jsx-no-undef */}
-                      <Link href={`/games/${game.id}`}>
+                      <Link className="hideLink" href={`/games/${game.id}`}>
                         <Text size="sm">{game.teamOne.name}</Text>
                       </Link>
                     </Table.Td>
                     <Table.Td>
-                      <Text size="sm">VS</Text>
+                      <Link className="hideLink" href={`/games/${game.id}`}>
+                        <Text size="sm">VS</Text>
+                      </Link>
                     </Table.Td>
                     <Table.Td>
-                      <Text size="sm">{game.teamTwo.name}</Text>
+                      <Link className="hideLink" href={`/games/${game.id}`}>
+                        <Text size="sm">{game.teamTwo.name}</Text>
+                      </Link>
                     </Table.Td>
 
                     <Table.Td>
-                      <Text size="sm">
-                        {game.started ? `${game.teamOneScore} - ${game.teamTwoScore}` : '-'}
-                      </Text>
+                      <Link className="hideLink" href={`/games/${game.id}`}>
+                        <Text size="sm">
+                          {game.started ? `${game.teamOneScore} - ${game.teamTwoScore}` : '-'}
+                        </Text>
+                      </Link>
                     </Table.Td>
 
                     {expanded && (
                       <>
                         <Table.Td>
-                          <Text size="sm">{game.official?.name ?? '-'}</Text>
+                          <Link className="hideLink" href={`/games/${game.id}`}>
+                            <Text size="sm">{game.official?.name ?? '-'}</Text>
+                          </Link>
                         </Table.Td>
                         {(data?.tournament.hasScorer ?? false) && (
                           <Table.Td>
-                            <Text size="sm">{game.scorer?.name ?? '-'}</Text>
+                            <Link className="hideLink" href={`/games/${game.id}`}>
+                              <Text size="sm">{game.scorer?.name ?? '-'}</Text>
+                            </Link>
                           </Table.Td>
                         )}
                         <Table.Td>
-                          <Text size="sm">{game.court + 1 > 0 ? game.court + 1 : '-'}</Text>
+                          <Link className="hideLink" href={`/games/${game.id}`}>
+                            <Text size="sm">{game.court + 1 > 0 ? game.court + 1 : '-'}</Text>
+                          </Link>
                         </Table.Td>
                       </>
                     )}

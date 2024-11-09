@@ -22,7 +22,7 @@ export default function Teams({ tournament }: TeamsProps) {
   const { data, error, isLoading } = useSWR<TeamsResults>(url, fetcher);
   const [chartData, setchartData] = React.useState<TeamStructure[]>([]);
   useEffect(() => {
-      setchartData(data?.teams ?? []);
+    setchartData(data?.teams ?? []);
   }, [data]);
   if (error) return `An error has occurred: ${error.message}`;
   if (isLoading) return 'Loading...';

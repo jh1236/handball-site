@@ -18,7 +18,6 @@ import {
 import useSWR from 'swr';
 import {
   Box,
-  Code,
   Group,
   Image,
   rem,
@@ -26,7 +25,6 @@ import {
   ThemeIcon,
   Title,
   useMantineColorScheme,
-  useMatches,
 } from '@mantine/core';
 import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
@@ -55,6 +53,7 @@ function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament
         { label: 'Ladder', link: `/${currentTournament}/ladder` },
         { label: 'Players', link: `/${currentTournament}/players` },
         { label: 'Officials', link: `/${currentTournament}/officials` },
+        { label: 'Teams', link: `/${currentTournament}/teams` },
       ],
     });
   }

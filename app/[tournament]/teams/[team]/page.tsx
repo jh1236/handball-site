@@ -7,7 +7,7 @@ export default async function IndividualTeamPage({ params }: TournamentPageArgs)
   return (
     <>
       <SidebarLayout tournamentName={tournament}>
-        <h1>This page is still a WIP!</h1>
+        <IndividualTeam tournament={tournament}></IndividualTeam>
       </SidebarLayout>
     </>
   );
