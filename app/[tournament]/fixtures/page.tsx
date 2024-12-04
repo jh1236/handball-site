@@ -1,6 +1,6 @@
 import React from 'react';
-import { TournamentPageArgs } from '@/app/[tournament]/types';
-import Fixtures from '@/components/HandballComponenets/Fixtures/Fixtures';
+import { TournamentPageArgs } from '@/app/types';
+import Fixtures from '@/components/HandballComponenets/StatsComponents/Fixtures/Fixtures';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
 export default async function FixturesPage({ params }: TournamentPageArgs) {
@@ -9,7 +9,7 @@ export default async function FixturesPage({ params }: TournamentPageArgs) {
     <>
       <SidebarLayout tournamentName={tournament}>
         <h1>Fixtures</h1>
-        <Fixtures tournament={tournament}></Fixtures>
+        <Fixtures tournament={tournament!}></Fixtures>
       </SidebarLayout>
     </>
   );

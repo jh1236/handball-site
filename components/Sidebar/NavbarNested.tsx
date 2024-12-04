@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import {
-  IconAB,
   IconAddressBook,
   IconAdjustments,
-  IconCalendarStats,
+  IconChartPie,
   IconFileAnalytics,
+  IconGraph,
   IconHome,
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
@@ -26,7 +26,7 @@ import {
   Title,
   useMantineColorScheme,
 } from '@mantine/core';
-import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { SERVER_ADDRESS, tokenFetcher } from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
 
@@ -37,7 +37,7 @@ function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament
     links?: { label: string; link: string }[];
     link?: string;
   }[] = [
-    { label: 'Home', icon: IconHome, link: '/home' },
+    { label: 'Home', icon: IconHome, link: '/' },
     {
       label: 'Tournaments',
       icon: IconAddressBook,
@@ -47,7 +47,7 @@ function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament
   if (currentTournament) {
     out.push({
       label: 'Current Tournament',
-      icon: IconAB,
+      icon: IconChartPie,
       links: [
         { label: 'Fixtures', link: `/${currentTournament}/fixtures` },
         { label: 'Ladder', link: `/${currentTournament}/ladder` },
@@ -59,12 +59,13 @@ function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament
   }
   out.push(
     {
-      label: 'Releases',
-      icon: IconCalendarStats,
+      label: 'Lifetime Statistics',
+      icon: IconGraph,
       links: [
-        { label: 'Upcoming releases', link: '/' },
-        { label: 'Previous releases', link: '/' },
-        { label: 'Releases schedule', link: '/' },
+        { label: 'Ladder', link: '/ladder' },
+        { label: 'Players', link: '/players' },
+        { label: 'Officials', link: '/officials' },
+        { label: 'Teams', link: '/teams' },
       ],
     },
     { label: 'Analytics', icon: IconPresentationAnalytics },
@@ -104,8 +105,8 @@ export function NavbarNested({
     <LinksGroup {...item} key={item.label} />
   ));
 
-  const url = `${SERVER_ADDRESS}/api/tournaments/`;
-  const { data } = useSWR<{ tournaments: TournamentStructure[] }>(url, fetcher);
+  const url = '/api/tournaments/';
+  const { data } = useSWR<{ tournaments: TournamentStructure[] }>(url, tokenFetcher);
 
   useEffect(() => {
     if (data) {
@@ -163,7 +164,8 @@ export function NavbarNested({
               ) : (
                 <IconLayoutSidebarLeftExpand
                   style={{ width: rem(18), height: rem(18) }}
-                ></IconLayoutSidebarLeftExpand>
+                >
+                </IconLayoutSidebarLeftExpand>
               )}
             </ThemeIcon>
           </Box>

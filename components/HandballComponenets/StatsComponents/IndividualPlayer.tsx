@@ -3,28 +3,28 @@
 import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import { Text, Title } from '@mantine/core';
-import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
 
 interface PlayerResults {
   player: PersonStructure;
 }
 
 interface PlayersProps {
-  tournament: string;
+  tournament?: string;
   player: string;
 }
 
 export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  let url = `${SERVER_ADDRESS}/api/players/${player}?formatData=true`;
+  let url = `/api/players/${player}?formatData=true`;
   if (tournament) {
     url = `${url}&tournament=${tournament}`;
   }
-  const { data, error, isLoading } = useSWR<PlayerResults>(url, fetcher);
-  const [chartData, setchartData] = React.useState<PersonStructure | undefined>(undefined);
+  const { data, error, isLoading } = useSWR<PlayerResults>(url, tokenFetcher);
+  const [chartData, setChartData] = React.useState<PersonStructure | undefined>(undefined);
   useEffect(() => {
     if (data) {
-      setchartData(data?.player);
+      setChartData(data?.player);
     }
   }, [data]);
   if (error) return `An error has occurred: ${error.message}`;

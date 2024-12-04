@@ -1,4 +1,4 @@
-/** @type {import("@ianvs/prettier-plugin-sort-imports").PrettierConfig} */
+/** @type {import('@ianvs/prettier-plugin-sort-imports').PrettierConfig} */
 const config = {
   printWidth: 100,
   singleQuote: true,

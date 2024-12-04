@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import useSWR from 'swr';
 import { Table, Text } from '@mantine/core';
-import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
 
 interface FixturesResults {
   fixtures: { games: GameStructure[]; finals: boolean }[];
@@ -27,8 +27,8 @@ export default function FixturesInternal({
   setExpanded,
 }: FixturesProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  const url = `${SERVER_ADDRESS}/api/games/fixtures?returnTournament=true&tournament=${tournament}&separateFinals=true`;
-  const { data, error, isLoading } = useSWR<FixturesResults>(url, fetcher);
+  const url = `/api/games/fixtures?returnTournament=true&tournament=${tournament}&separateFinals=true`;
+  const { data, error, isLoading } = useSWR<FixturesResults>(url, tokenFetcher);
   const [chartData, setChartData] = React.useState<{ games: GameStructure[]; finals: boolean }[]>(
     []
   );
@@ -165,7 +165,8 @@ export default function FixturesInternal({
                     <Table.Td
                       visibleFrom="md"
                       style={{ maxWidth: '15px', width: '15px' }}
-                    ></Table.Td>
+                    >
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </>

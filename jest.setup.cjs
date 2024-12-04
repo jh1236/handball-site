@@ -20,7 +20,9 @@ Object.defineProperty(window, 'matchMedia', {
 
 class ResizeObserver {
   observe() {}
+
   unobserve() {}
+
   disconnect() {}
 }
 

@@ -3,24 +3,24 @@
 import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import { Text, Title } from '@mantine/core';
-import { fetcher, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
 
 interface TeamResults {
   team: TeamStructure;
 }
 
 interface TeamsProps {
-  tournament: string;
+  tournament?: string;
   team: string;
 }
 
 export default function IndividualTeam({ tournament, team }: TeamsProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  let url = `${SERVER_ADDRESS}/api/teams/${team}?formatData=true`;
+  let url = `/api/teams/${team}?formatData=true`;
   if (tournament) {
     url = `${url}&tournament=${tournament}`;
   }
-  const { data, error, isLoading } = useSWR<TeamResults>(url, fetcher);
+  const { data, error, isLoading } = useSWR<TeamResults>(url, tokenFetcher);
   const [chartData, setchartData] = React.useState<TeamStructure | undefined>(undefined);
   useEffect(() => {
     if (data) {

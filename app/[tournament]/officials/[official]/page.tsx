@@ -1,6 +1,6 @@
 import React from 'react';
-import { TournamentPageArgs } from '@/app/[tournament]/types';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
+import { TournamentPageArgs } from '@/app/types';
 
 export default async function OfficialsPage({ params }: TournamentPageArgs) {
   const { tournament } = await params;

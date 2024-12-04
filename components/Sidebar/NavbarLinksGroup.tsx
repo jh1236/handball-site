@@ -35,12 +35,7 @@ export function LinksGroup({
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
   const items = (hasLinks ? links : []).map((l) => (
-    <Text<'a'>
-      component="a"
-      className={classes.link}
-      href={l.link}
-      key={l.label}
-    >
+    <Text<'a'> component="a" className={classes.link} href={l.link} key={l.label}>
       {l.label}
     </Text>
   ));

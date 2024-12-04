@@ -29,14 +29,16 @@ export default function SidebarLayout({
           setSidebarVisible={setSidebarVisible}
           tournamentName={tournamentName}
           mobile
-        ></NavbarNested>
+        >
+        </NavbarNested>
       </Box>
       <Box visibleFrom="md">
         <NavbarNested
           sidebarVisible={sidebarVisible}
           setSidebarVisible={setSidebarVisible}
           tournamentName={tournamentName}
-        ></NavbarNested>
+        >
+        </NavbarNested>
       </Box>
       <div
         style={{
@@ -64,7 +66,8 @@ export default function SidebarLayout({
             ) : (
               <IconLayoutSidebarLeftExpand
                 style={{ width: rem(18), height: rem(18) }}
-              ></IconLayoutSidebarLeftExpand>
+              >
+              </IconLayoutSidebarLeftExpand>
             )}
           </ThemeIcon>
         </Box>

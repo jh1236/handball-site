@@ -1,16 +1,17 @@
-interface TeamStructure {
+export interface TeamStructure {
   name: string;
   searchableName: string;
   imageUrl: string;
-  captain: PersonStructure;
-  nonCaptain?: PersonStructure;
-  substitute?: PersonStructure;
-  stats?: { [key: string]: number };
+  captain: PersonStructure | PlayerGameStatsStructure;
+  nonCaptain?: PersonStructure | PlayerGameStatsStructure;
+  substitute?: PersonStructure | PlayerGameStatsStructure;
+  servedFromLeft?: boolean;
+  stats?: { [key: string]: any };
 
   [k: string]: any;
 }
 
-interface PersonStructure {
+export interface PersonStructure {
   name: string;
   searchableName: string;
   imageUrl: string;
@@ -20,7 +21,7 @@ interface PersonStructure {
   [k: string]: any;
 }
 
-interface TournamentStructure {
+export interface TournamentStructure {
   name: string;
   searchableName: string;
   fixturesType: string;
@@ -38,13 +39,13 @@ interface TournamentStructure {
   [k: string]: any;
 }
 
-interface OfficialStructure extends PersonStructure {
+export interface OfficialStructure extends PersonStructure {
   stats?: { [key: string]: number };
 
   [k: string]: any;
 }
 
-interface PlayerGameStatsStructure extends PersonStructure {
+export interface PlayerGameStatsStructure extends PersonStructure {
   team: TeamStructure;
   roundsOnCourt: number;
   roundsCarded: number;
@@ -65,14 +66,15 @@ interface PlayerGameStatsStructure extends PersonStructure {
   redCards: number;
   cardTime: number;
   cardTimeRemaining: number;
-  startSide: string;
+  startSide: 'Left' | 'Right' | 'Substitute';
   elo: number;
   eloDelta: number;
+  sideOfCourt: 'Left' | 'Right' | 'Substitute';
 
   [k: string]: any;
 }
 
-interface GameEventStructure {
+export interface GameEventStructure {
   eventType: string;
   firstTeam: boolean;
   player: PersonStructure;
@@ -90,16 +92,23 @@ interface GameEventStructure {
   [k: string]: any;
 }
 
-interface GameStructure {
+export type GameTeamStructure = TeamStructure & {
+  captain: PlayerGameStatsStructure;
+  nonCaptain?: PlayerGameStatsStructure;
+  substitute?: PlayerGameStatsStructure;
+};
+
+export interface GameStructure {
   id: number;
   tournament: TournamentStructure;
-  teamOne: TeamStructure;
-  teamTwo: TeamStructure;
+  teamOne: GameTeamStructure;
+  teamTwo: GameTeamStructure;
   teamOneScore: number;
   teamTwoScore: number;
   teamOneTimeouts: number;
   teamTwoTimeouts: number;
   firstTeamWinning: boolean;
+  faulted: boolean;
   started: boolean;
   someoneHasWon: boolean;
   ended: boolean;

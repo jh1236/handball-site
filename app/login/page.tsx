@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text } from '@mantine/core';
-import { TournamentPageArgs } from '@/app/types';
+import { TournamentPageArgs } from '@/app/[tournament]/types';
+import { AuthenticationTitle } from '@/components/Authentication/AuthenticationTitle';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
 export default async function GamesPage({ params }: TournamentPageArgs) {
@@ -8,7 +8,7 @@ export default async function GamesPage({ params }: TournamentPageArgs) {
   return (
     <>
       <SidebarLayout tournamentName={tournament}>
-        <Text>I am a WIP!!</Text>
+        <AuthenticationTitle></AuthenticationTitle>
       </SidebarLayout>
     </>
   );

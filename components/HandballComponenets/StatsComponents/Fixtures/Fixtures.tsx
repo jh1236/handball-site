@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Text } from '@mantine/core';
-import FixturesInternal from '@/components/HandballComponenets/Fixtures/FixturesInternal';
+import FixturesInternal from '@/components/HandballComponenets/StatsComponents/Fixtures/FixturesInternal';
 
 interface FixturesProps {
   maxRounds?: number;

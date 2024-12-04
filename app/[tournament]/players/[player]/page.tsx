@@ -1,6 +1,6 @@
 import React from 'react';
-import { PlayerPageArgs } from '@/app/[tournament]/types';
-import IndividualPlayer from '@/components/HandballComponenets/IndividualPlayer';
+import { PlayerPageArgs } from '@/app/types';
+import IndividualPlayer from '@/components/HandballComponenets/StatsComponents/IndividualPlayer';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
 export default async function IndividualPlayerPage({ params }: PlayerPageArgs) {

@@ -1,7 +1,7 @@
 import React from 'react';
-import { TournamentPageArgs } from '@/app/[tournament]/types';
-import Ladder from '@/components/HandballComponenets/Ladder';
+import Ladder from '@/components/HandballComponenets/StatsComponents/Ladder';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
+import { TournamentPageArgs } from '@/app/types';
 
 export default async function LadderPage({ params }: TournamentPageArgs) {
   const { tournament } = await params;

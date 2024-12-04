@@ -1,4 +1,3 @@
-import { Text } from '@mantine/core';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
 export default function HomePage() {

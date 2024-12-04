@@ -1,6 +1,6 @@
 import React from 'react';
-import { TeamPageArgs } from '@/app/[tournament]/types';
-import IndividualTeam from '@/components/HandballComponenets/IndividualTeam';
+import { TeamPageArgs } from '@/app/types';
+import IndividualTeam from '@/components/HandballComponenets/StatsComponents/IndividualTeam';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
 export default async function IndividualTeamPage({ params }: TeamPageArgs) {
