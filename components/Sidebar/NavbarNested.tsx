@@ -15,7 +15,6 @@ import {
   IconSun,
   IconUser,
 } from '@tabler/icons-react';
-import useSWR from 'swr';
 import {
   Box,
   Group,
@@ -26,9 +25,11 @@ import {
   Title,
   useMantineColorScheme,
 } from '@mantine/core';
-import { SERVER_ADDRESS, tokenFetcher } from '@/components/HandballComponenets/ServerActions';
+import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { TournamentStructure } from '@/components/HandballComponenets/StatsComponents/types';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
+import { getTournaments } from '@/ServerActions/TournamentActions';
 
 function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament?: string) {
   const out: {
@@ -104,18 +105,16 @@ export function NavbarNested({
   const links = makeSidebarLayout(tournaments, tournamentName).map((item) => (
     <LinksGroup {...item} key={item.label} />
   ));
-
-  const url = '/api/tournaments/';
-  const { data } = useSWR<{ tournaments: TournamentStructure[] }>(url, tokenFetcher);
-
   useEffect(() => {
-    if (data) {
-      setTournaments(data.tournaments);
+    getTournaments().then(setTournaments);
+  }, []);
+  useEffect(() => {
+    if (tournaments.length > 0) {
       if (tournamentName) {
-        setMyTournament(data.tournaments.find((t) => t.searchableName === tournamentName));
+        setMyTournament(tournaments.find((t) => t.searchableName === tournamentName));
       }
     }
-  }, [data]);
+  }, [tournaments]);
 
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
@@ -133,6 +132,8 @@ export function NavbarNested({
   useEffect(() => {
     IconColorScheme = colorScheme === 'light' ? IconMoon : IconSun;
   }, [colorScheme]);
+
+  const userName = localStorage.getItem('username') ?? 'Login';
 
   const w = mobile ? '100vw' : '300px';
 
@@ -164,8 +165,7 @@ export function NavbarNested({
               ) : (
                 <IconLayoutSidebarLeftExpand
                   style={{ width: rem(18), height: rem(18) }}
-                >
-                </IconLayoutSidebarLeftExpand>
+                ></IconLayoutSidebarLeftExpand>
               )}
             </ThemeIcon>
           </Box>
@@ -177,7 +177,7 @@ export function NavbarNested({
                 width={40}
                 height={40}
                 style={{ width: '40px', margin: 0 }}
-                src={myTournament?.imageUrl || `${SERVER_ADDRESS}/api/image?name=SUSS`}
+                src={myTournament?.imageUrl || `${SERVER_ADDRESS}/image?name=SUSS`}
               />
               <Box style={{ overflowWrap: 'break-word', width: '70%', margin: 0 }}>
                 <Title order={4}>
@@ -196,7 +196,7 @@ export function NavbarNested({
 
         <div className={classes.footer}>
           <div style={{ width: '60%', float: 'left' }}>
-            <LinksGroup label="User" icon={IconUser} key="User" />
+            <LinksGroup label={userName} icon={IconUser} key="User" link="/login" />
           </div>
           <div style={{ width: '40%', float: 'right' }}>
             <LinksGroup label="Theme" icon={IconColorScheme} key="Theme" action={flipColorScheme} />

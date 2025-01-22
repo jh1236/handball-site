@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: any }) {
     <html lang="en">
       <head>
         <ColorSchemeScript />
-        <link rel="shortcut icon" href={`${SERVER_ADDRESS}/api/image?name=SUSS`} />
+        <link rel="shortcut icon" href={`${SERVER_ADDRESS}/image?name=SUSS`} />
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"

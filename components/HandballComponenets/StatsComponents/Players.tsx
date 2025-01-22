@@ -1,19 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
 import { DynamicTable } from '@/components/HandballComponenets/StatsComponents/DynamicTable';
-
-interface PlayersResults {
-  players: PersonStructure[];
-}
+import { PersonStructure } from '@/components/HandballComponenets/StatsComponents/types';
+import { getPlayer, getPlayers } from '@/ServerActions/PlayerActions';
 
 interface LadderProps {
   maxRows?: number;
   tournament?: string;
   columns?: string[];
   editable?: boolean;
+  sortIndex?: number;
 }
 
 function linkTo(player: PersonStructure, tournament?: string): string {
@@ -27,29 +26,23 @@ export default function Players({
   maxRows = -1,
   tournament,
   columns = ['B&F Votes', 'Elo'],
+  sortIndex,
   editable = true,
 }: LadderProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  let url = '/api/players?includeStats=true&formatData=true';
-  if (tournament) {
-    url = `${url}&tournament=${tournament}`;
-  }
-  const { data, error, isLoading } = useSWR<PlayersResults>(url, tokenFetcher);
-  if (error) {
-    return `An error has occurred: ${error.message}`;
-  }
-  if (isLoading) {
-    return 'Loading...';
-  }
+  const [players, setPlayers] = React.useState<PersonStructure[]>();
 
+  useEffect(() => {
+    getPlayers(tournament, undefined, true, true).then((o) => setPlayers(o.players));
+  }, [tournament]);
   return (
     <DynamicTable
       columns={columns}
       objToLink={(o) => linkTo(o, tournament)}
-      data={data?.players ?? []}
+      sortIndexIn={sortIndex}
+      data={players ?? []}
       editable={editable}
       maxRows={maxRows}
-    >
-    </DynamicTable>
+    ></DynamicTable>
   );
 }

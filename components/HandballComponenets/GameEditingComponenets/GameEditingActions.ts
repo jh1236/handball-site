@@ -1,9 +1,14 @@
-import { getURL } from 'next/dist/shared/lib/utils';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { mutate } from 'swr';
 import { getUrlForID } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
-import { tokenFetch } from '@/components/HandballComponenets/ServerActions';
 import { PlayerGameStatsStructure } from '@/components/HandballComponenets/StatsComponents/types';
+import {
+  aceForGame,
+  cardForGame,
+  faultForGame,
+  scoreForGame,
+  undoForGame,
+} from '@/ServerActions/GameActions';
 
 type Team = {
   score: {
@@ -81,24 +86,11 @@ function nextPoint(game: GameState, swap?: boolean) {
 export function score(game: GameState, firstTeam: boolean, leftPlayer: boolean): void {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   team.score.set(team.score.get + 1);
+  const needsSwap = firstTeam === game.firstTeamServes.get;
   team.servedFromLeft.set(!team.servedFromLeft.get);
   game.firstTeamServes.set(firstTeam);
-  nextPoint(game, firstTeam);
-  tokenFetch('/api/games/update/score', {
-    method: 'POST',
-    body: JSON.stringify({
-      id: game.id,
-      firstTeam,
-      leftPlayer,
-    }),
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8',
-    },
-  }).then((response) => {
-    if (!response.ok) {
-      useRouter().refresh();
-    }
-  });
+  nextPoint(game, needsSwap ? firstTeam : undefined);
+  scoreForGame(game.id, firstTeam, leftPlayer).catch(() => useRouter().refresh());
 }
 
 export function ace(game: GameState): void {
@@ -106,19 +98,7 @@ export function ace(game: GameState): void {
   team.score.set(team.score.get + 1);
   nextPoint(game, game.firstTeamServes.get);
   team.servedFromLeft.set(!team.servedFromLeft.get);
-  tokenFetch('/api/games/update/ace', {
-    method: 'POST',
-    body: JSON.stringify({
-      id: game.id,
-    }),
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8',
-    },
-  }).then((response) => {
-    if (!response.ok) {
-      alert('Something went wrong!');
-    }
-  });
+  aceForGame(game.id).catch(() => useRouter().refresh());
 }
 
 export function fault(game: GameState): void {
@@ -131,19 +111,7 @@ export function fault(game: GameState): void {
   } else {
     game.faulted.set(true);
   }
-  tokenFetch('/api/games/update/fault', {
-    method: 'POST',
-    body: JSON.stringify({
-      id: game.id,
-    }),
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8',
-    },
-  }).then((response) => {
-    if (!response.ok) {
-      alert('Something went wrong!');
-    }
-  });
+  faultForGame(game.id).catch(() => useRouter().refresh());
 }
 
 export function warning(
@@ -199,37 +167,12 @@ export function card(
     temp.cardTimeRemaining = temp.cardTime;
   }
   player.set(temp);
-  tokenFetch('/api/games/update/card', {
-    method: 'POST',
-    body: JSON.stringify({
-      id: game.id,
-      firstTeam,
-      leftPlayer,
-      color,
-      duration,
-      reason,
-    }),
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8',
-    },
-  }).then((response) => {
-    if (!response.ok) {
-      alert('Something went wrong!');
-    }
-  });
+  cardForGame(game.id, firstTeam, leftPlayer, color, duration, reason);
 }
 
 export function undo(game: GameState): void {
   if (!game) return;
-  tokenFetch('/api/games/update/undo', {
-    method: 'POST',
-    body: JSON.stringify({
-      id: game.id,
-    }),
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8',
-    },
-  }).then((response) => {
+  undoForGame(game.id).then(() => {
     sync(game);
   });
 }

@@ -3,15 +3,12 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
-import useSWR from 'swr';
 import { Table, Text } from '@mantine/core';
-import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
-
-interface FixturesResults {
-  fixtures: { games: GameStructure[]; finals: boolean }[];
-  finals: { games: GameStructure[]; finals: true }[];
-  tournament: TournamentStructure;
-}
+import {
+  GameStructure,
+  TournamentStructure,
+} from '@/components/HandballComponenets/StatsComponents/types';
+import { getFixtures } from '@/ServerActions/GameActions';
 
 interface FixturesProps {
   maxRounds?: number;
@@ -27,23 +24,33 @@ export default function FixturesInternal({
   setExpanded,
 }: FixturesProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  const url = `/api/games/fixtures?returnTournament=true&tournament=${tournament}&separateFinals=true`;
-  const { data, error, isLoading } = useSWR<FixturesResults>(url, tokenFetcher);
-  const [chartData, setChartData] = React.useState<{ games: GameStructure[]; finals: boolean }[]>(
+  const [chartData, setChartData] = React.useState<{ games: GameStructure[]; final: boolean }[]>(
     []
   );
+  const [tournamentState, setTournamentState] = React.useState<TournamentStructure>(undefined);
   useEffect(() => {
-    if (maxRounds > 0) {
-      const t = data?.fixtures.toReversed() ?? [];
-      t.length = Math.min(maxRounds, t.length);
-      t.reverse();
-      setChartData(t ?? []);
-    } else {
-      setChartData(data?.fixtures ?? []);
-    }
-  }, [data]);
-  if (error) return `An error has occurred: ${error.message}`;
-  if (isLoading) return 'Loading...';
+    getFixtures(
+      tournament,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      false,
+      false,
+      true, //js is fucked up and has no keyword args
+      true
+    ).then((data) => {
+      if (maxRounds > 0) {
+        const t = data?.fixtures.toReversed() ?? [];
+        t.length = Math.min(maxRounds, t.length);
+        t.reverse();
+        setChartData(t ?? []);
+      } else {
+        setChartData(data?.fixtures ?? []);
+      }
+      setTournamentState(data.tournament!);
+    });
+  }, [maxRounds, tournament]);
 
   return (
     <div>
@@ -74,12 +81,12 @@ export default function FixturesInternal({
                 <Table.Th style={{ width: '20px', textAlign: 'center' }}>
                   <Text size="sm">Official</Text>
                 </Table.Th>
-                {(data?.tournament.hasScorer ?? false) && (
+                {(tournamentState?.hasScorer ?? false) && (
                   <Table.Th style={{ width: '20px', textAlign: 'center' }}>
                     <Text size="sm">Scorer</Text>
                   </Table.Th>
                 )}
-                {(data?.tournament.twoCourts ?? false) && (
+                {(tournamentState?.twoCourts ?? false) && (
                   <Table.Th style={{ width: '20px', textAlign: 'center' }}>
                     <Text size="sm">Court</Text>
                   </Table.Th>
@@ -148,25 +155,26 @@ export default function FixturesInternal({
                             <Text size="sm">{game.official?.name ?? '-'}</Text>
                           </Link>
                         </Table.Td>
-                        {(data?.tournament.hasScorer ?? false) && (
+                        {(tournamentState?.hasScorer ?? false) && (
                           <Table.Td>
                             <Link className="hideLink" href={`/games/${game.id}`}>
                               <Text size="sm">{game.scorer?.name ?? '-'}</Text>
                             </Link>
                           </Table.Td>
                         )}
-                        <Table.Td>
-                          <Link className="hideLink" href={`/games/${game.id}`}>
-                            <Text size="sm">{game.court + 1 > 0 ? game.court + 1 : '-'}</Text>
-                          </Link>
-                        </Table.Td>
+                        {(tournamentState?.twoCourts ?? false) && (
+                          <Table.Td>
+                            <Link className="hideLink" href={`/games/${game.id}`}>
+                              <Text size="sm">{game.court + 1 > 0 ? game.court + 1 : '-'}</Text>
+                            </Link>
+                          </Table.Td>
+                        )}
                       </>
                     )}
                     <Table.Td
                       visibleFrom="md"
                       style={{ maxWidth: '15px', width: '15px' }}
-                    >
-                    </Table.Td>
+                    ></Table.Td>
                   </Table.Tr>
                 ))}
               </>

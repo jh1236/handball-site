@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
-import useSWR from 'swr';
+import React, { useMemo } from 'react';
 import { Box, Button, Text, Title } from '@mantine/core';
 import {
   GameState,
@@ -9,19 +8,17 @@ import {
   undo,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
-import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
 import {
   GameStructure,
   PlayerGameStatsStructure,
 } from '@/components/HandballComponenets/StatsComponents/types';
+import { getGame } from '@/ServerActions/GameActions';
 
 export function getUrlForID(id: number) {
   return `/api/games/${id}?includePlayerStats=true`;
 }
 
 export function EditGame({ game }: { game: number }) {
-  const url = getUrlForID(game);
-  const { data, error, isLoading } = useSWR<{ game: GameStructure }>(url, tokenFetcher);
   const [gameObj, setGameObj] = React.useState<GameStructure | null>(null);
   const [rounds, setRounds] = React.useState<number>(0);
   const [faulted, setFaulted] = React.useState<boolean>(false);
@@ -55,18 +52,16 @@ export function EditGame({ game }: { game: number }) {
     [firstTeamServes, teamOneServedLeft, teamTwoServedLeft]
   );
 
-  useEffect(() => {
-    if (!data) return;
-    console.log(data.game);
-    setGameObj(data.game);
-    setFirstTeamServes(data.game.firstTeamToServe);
-    setRounds(data.game.teamOneScore + data.game.teamTwoScore);
-    setFaulted(data.game.faulted);
+  getGame(game).then((gameIn) => {
+    setGameObj(gameIn);
+    setFirstTeamServes(gameIn.firstTeamToServe);
+    setRounds(gameIn.teamOneScore + gameIn.teamTwoScore);
+    setFaulted(gameIn.faulted);
     //Team Specific
-    setTeamOneTimeouts(data.game.teamOneTimeouts);
-    setTeamOneScore(data.game.teamOneScore);
-    setTeamOneServedLeft(data.game.teamOne.servedFromLeft! !== data.game.firstTeamToServe);
-    const { teamOne } = data.game;
+    setTeamOneTimeouts(gameIn.teamOneTimeouts);
+    setTeamOneScore(gameIn.teamOneScore);
+    setTeamOneServedLeft(gameIn.teamOne.servedFromLeft! !== gameIn.firstTeamToServe);
+    const { teamOne } = gameIn;
     for (const i of [teamOne.captain, teamOne.nonCaptain, teamOne.substitute]) {
       if (i?.sideOfCourt === 'Left') {
         setTeamOneLeft(i);
@@ -78,10 +73,10 @@ export function EditGame({ game }: { game: number }) {
         setTeamOneSub(i);
       }
     }
-    setTeamTwoTimeouts(data.game.teamTwoTimeouts);
-    setTeamTwoScore(data.game.teamTwoScore);
-    setTeamTwoServedLeft(data.game.teamTwo.servedFromLeft! === data.game.firstTeamToServe);
-    const { teamTwo } = data.game;
+    setTeamTwoTimeouts(gameIn.teamTwoTimeouts);
+    setTeamTwoScore(gameIn.teamTwoScore);
+    setTeamTwoServedLeft(gameIn.teamTwo.servedFromLeft! === gameIn.firstTeamToServe);
+    const { teamTwo } = gameIn;
     for (const i of [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute]) {
       if (i?.sideOfCourt === 'Left') {
         setTeamTwoLeft(i);
@@ -93,10 +88,8 @@ export function EditGame({ game }: { game: number }) {
         setTeamTwoSub(i);
       }
     }
-  }, [data]);
-  if (error || isLoading) {
-    return `Error: ${error}`;
-  }
+  });
+
   const gameState: GameState = {
     firstTeamServes: {
       get: firstTeamServes,
@@ -209,15 +202,11 @@ export function EditGame({ game }: { game: number }) {
             flex: '5',
           }}
         >
-          <Text size="lg">
-            {gameObj?.teamOne.name}
-          </Text>
+          <Text size="lg">{gameObj?.teamOne.name}</Text>
           <Title order={1}>{gameState.teamOne.score.get}</Title>
           <Title order={1}>-</Title>
           <Title order={1}>{teamTwoScore}</Title>
-          <Text size="lg">
-            {gameObj?.teamTwo.name}
-          </Text>
+          <Text size="lg">{gameObj?.teamTwo.name}</Text>
         </Box>
 
         <Box

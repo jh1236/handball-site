@@ -1,13 +1,9 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import useSWR from 'swr';
 import { Table, Text } from '@mantine/core';
-import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
-
-interface TeamsResults {
-  teams: TeamStructure[];
-}
+import { TeamStructure } from '@/components/HandballComponenets/StatsComponents/types';
+import { getTeams } from '@/ServerActions/TeamActions';
 
 interface TeamsProps {
   tournament?: string;
@@ -15,17 +11,10 @@ interface TeamsProps {
 
 export default function Teams({ tournament }: TeamsProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  let url = '/api/teams';
-  if (tournament) {
-    url = `${url}?tournament=${tournament}`;
-  }
-  const { data, error, isLoading } = useSWR<TeamsResults>(url, tokenFetcher);
+
   const [chartData, setchartData] = React.useState<TeamStructure[]>([]);
-  useEffect(() => {
-    setchartData(data?.teams ?? []);
-  }, [data]);
-  if (error) return `An error has occurred: ${error.message}`;
-  if (isLoading) return 'Loading...';
+  getTeams(tournament).then((o) => setchartData(o.teams));
+
 
   return (
     <div>

@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { useRouter } from 'next/navigation';
 import {
   Anchor,
   Button,
@@ -13,32 +15,30 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { searchableOf } from '@/components/HandballComponenets/ServerActions';
+import { loginAction } from '@/ServerActions/LoginActions';
 import classes from './AuthenticationTitle.module.css';
 
-async function authenticate(id: string, pwd: string): Promise<void> {
-  return tokenFetch('/api/login/', {
-    method: 'POST',
-    body: JSON.stringify({
-      userId: id,
-      password: pwd,
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => {
-    if (!response.ok) {
-      Error('Invalid login credential');
-    }
-    response.json().then((data) => {
-      localStorage.setItem('token', data.token);
-    });
+function authenticate(id: string, pwd: string, router: AppRouterInstance): Promise<void> {
+  return loginAction(id, pwd).then((data) => {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('username', data.username);
+    localStorage.setItem('permissionLevel', `${data.permissionLevel}`);
+    router.push(`/players/${searchableOf(localStorage.getItem('username'))}`);
   });
 }
 
 export function AuthenticationTitle() {
   const id = React.useRef<HTMLInputElement>(null);
   const pwd = React.useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const username = localStorage.getItem('username');
+
+  if (username) {
+    location.href = `/players/${searchableOf(username)}`;
+    return <></>;
+  }
+
   return (
     <Container size={420} my={40}>
       <Title ta="center" className={classes.title}>
@@ -63,7 +63,7 @@ export function AuthenticationTitle() {
         <Button
           fullWidth
           mt="xl"
-          onClick={() => authenticate(id.current!.value, pwd.current!.value)}
+          onClick={() => authenticate(id.current!.value, pwd.current!.value, router)}
         >
           Sign in
         </Button>

@@ -1,16 +1,9 @@
 'use client';
 
-import React from 'react';
-import useSWR from 'swr';
-import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
+import React, { useEffect } from 'react';
 import { DynamicTable } from '@/components/HandballComponenets/StatsComponents/DynamicTable';
-
-interface LadderResults {
-  pooled: boolean;
-  ladder?: TeamStructure[];
-  pool_one?: TeamStructure[];
-  pool_two?: TeamStructure[];
-}
+import { TeamStructure } from '@/components/HandballComponenets/StatsComponents/types';
+import { getLadder } from '@/ServerActions/TeamActions';
 
 function linkTo(team: TeamStructure, tournament?: string): string {
   if (tournament) {
@@ -23,6 +16,7 @@ interface LadderProps {
   maxRows?: number;
   tournament?: string;
   columns?: string[];
+  sortIndex?: number;
   editable?: boolean;
 }
 
@@ -31,24 +25,23 @@ export default function Ladder({
   tournament,
   columns = ['Percentage', 'Elo'],
   editable = true,
+  sortIndex,
 }: LadderProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  let url = '/api/teams/ladder/?includeStats=true&formatData=true';
-  if (tournament) {
-    url = `${url}&tournament=${tournament}`;
-  }
-  const { data, error, isLoading } = useSWR<LadderResults>(url, tokenFetcher);
-  if (error) return `An error has occurred: ${error.message}`;
-  if (isLoading) return 'Loading...';
-
+  const [ladder, setLadder] = React.useState<TeamStructure[]>();
+  useEffect(() => {
+    getLadder(tournament, true, true).then((o) => {
+      setLadder(o.ladder);
+    });
+  }, [tournament]);
   return (
     <DynamicTable
       columns={columns}
+      sortIndexIn={sortIndex}
       objToLink={(o) => linkTo(o, tournament)}
-      data={data?.ladder ?? []}
+      data={ladder ?? []}
       editable={editable}
       maxRows={maxRows}
-    >
-    </DynamicTable>
+    ></DynamicTable>
   );
 }

@@ -40,6 +40,7 @@ interface TableProps<T extends InputType> {
   editable?: boolean;
   data?: T[];
   objToLink: (t: T) => string;
+  sortIndexIn?: number;
 }
 
 export function DynamicTable<T extends InputType>({
@@ -48,6 +49,7 @@ export function DynamicTable<T extends InputType>({
   data,
   maxRows = -1,
   objToLink,
+  sortIndexIn,
 }: TableProps<T>) {
   const [chartData, setChartData] = React.useState<T[]>([]);
   const [sortIndex, setSortIndex] = React.useState<number>(0);
@@ -56,8 +58,11 @@ export function DynamicTable<T extends InputType>({
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    setChartData(data ?? []);
+    if (data) {
+      setChartData(sortData(data, sortIndexIn ?? 0, 0));
+    }
   }, [data]);
+
   useEffect(() => {
     const count = Number(searchParams.get('cols') ?? -1);
     if (
@@ -82,17 +87,16 @@ export function DynamicTable<T extends InputType>({
 
   const getHeader = (d: T, name: string): number | string => d![name] || d!.stats![name];
 
-  const sortData = (idx: number) => {
-    if ((-idx === sortIndex && sortIndex !== -1) || (idx === sortIndex && idx === 1)) {
-      setChartData(data ?? []);
+  const sortData = (dataIn: T[], idx: number, oldFactor: number = sortIndex): T[] => {
+    if ((-idx === oldFactor && oldFactor !== -1) || (idx === oldFactor && idx === 1)) {
       setSortIndex(0);
-      return;
+      return dataIn ?? [];
     }
-    let factor = idx === sortIndex ? -1 : 1;
-    if (idx === 1 && idx !== Math.abs(sortIndex)) {
+    let factor = idx === oldFactor ? -1 : 1;
+    if (idx === 1 && idx !== Math.abs(oldFactor)) {
       factor *= -1;
     }
-    const sort = data!.toSorted((a, b) => {
+    const sort = dataIn!.toSorted((a, b) => {
       const valueA = getHeader(a, ['name'].concat(selectedHeaders)[idx - 1]);
       const valueB = getHeader(b, ['name'].concat(selectedHeaders)[idx - 1]);
       switch (typeof valueA) {
@@ -111,7 +115,7 @@ export function DynamicTable<T extends InputType>({
       }
     });
     setSortIndex(factor * idx);
-    setChartData(sort);
+    return sort;
   };
   const SortDirection = sortIndex > 0 ? IconCaretDown : IconCaretUp;
   return (
@@ -154,7 +158,7 @@ export function DynamicTable<T extends InputType>({
               <Table.Th
                 key={index}
                 style={{ width: '200px', textAlign: 'center' }}
-                onClick={() => sortData(index + 1)}
+                onClick={() => setChartData(sortData(index + 1))}
               >
                 {index + 1 === Math.abs(sortIndex) ? (
                   <>
@@ -179,8 +183,7 @@ export function DynamicTable<T extends InputType>({
                       style={{ width: '50px', height: '50px' }}
                       src={value.imageUrl}
                       alt={`The team logo for ${value.name}`}
-                    >
-                    </Image>
+                    ></Image>
                   </Link>
                 </Table.Td>
                 {['name'].concat(selectedHeaders).map((value2, idx) => (
