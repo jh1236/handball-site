@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Title } from '@mantine/core';
 import Ladder from '@/components/HandballComponenets/StatsComponents/Ladder';
+import Players from '@/components/HandballComponenets/StatsComponents/Players';
 import { TournamentStructure } from '@/components/HandballComponenets/StatsComponents/types';
 import { getTournament } from '@/ServerActions/TournamentActions';
-import Players from '@/components/HandballComponenets/StatsComponents/Players';
 
 interface TournamentLandingProps {
   tournament: string;
@@ -13,10 +13,11 @@ interface TournamentLandingProps {
 
 export function TournamentLanding({ tournament }: TournamentLandingProps) {
   const [tournamentObj, setTournamentObj] = React.useState<TournamentStructure>();
-
-  getTournament(tournament!).then((t) => {
-    setTournamentObj(t);
-  });
+  useEffect(() => {
+    getTournament(tournament!).then((t) => {
+      setTournamentObj(t);
+    });
+  }, [tournament]);
 
   if (!tournament) {
     return 'Loading...';

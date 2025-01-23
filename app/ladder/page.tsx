@@ -1,6 +1,6 @@
 import LadderPage from '@/app/[tournament]/ladder/page';
-import { TournamentPageArgs } from '@/app/types';
+import { noTournament } from '@/app/types';
 
-export default async function UniversalLadderPage(args: TournamentPageArgs) {
-  return LadderPage(args);
+export default async function UniversalLadderPage() {
+  return LadderPage(noTournament);
 }

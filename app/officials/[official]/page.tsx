@@ -1,6 +1,6 @@
-import OfficialsPage from '@/app/[tournament]/officials/[official]/page';
-import { TournamentPageArgs } from '@/app/types';
+import IndividualOfficialPage from '@/app/[tournament]/officials/page';
+import { OfficialPageArgs } from '@/app/types';
 
-export default async function UniversalOfficialsPage(args: TournamentPageArgs) {
-  return OfficialsPage(args);
+export default async function UniversalIndividualOfficialPage(args: OfficialPageArgs) {
+  return IndividualOfficialPage(args);
 }
