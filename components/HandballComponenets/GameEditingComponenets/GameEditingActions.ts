@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { mutate } from 'swr';
 import { getUrlForID } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
-import { PlayerGameStatsStructure } from '@/components/HandballComponenets/StatsComponents/types';
+import { PlayerGameStatsStructure } from '@/ServerActions/types';
 import {
   aceForGame,
   cardForGame,

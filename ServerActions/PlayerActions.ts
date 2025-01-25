@@ -2,17 +2,25 @@ import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/Ser
 import {
   PersonStructure,
   PlayerGameStatsStructure,
+  SearchableName,
   TournamentStructure,
-} from '@/components/HandballComponenets/StatsComponents/types';
-import { SearchableName } from '@/ServerActions/types';
+} from '@/ServerActions/types';
 
-export function getPlayers(
-  tournament?: SearchableName,
-  team?: SearchableName,
-  includeStats?: boolean,
-  formatData?: boolean,
-  returnTournament: boolean = false
-): Promise<{
+interface GetPlayersArgs {
+  tournament?: SearchableName;
+  team?: SearchableName;
+  includeStats?: boolean;
+  formatData?: boolean;
+  returnTournament?: boolean;
+}
+
+export function getPlayers({
+  tournament,
+  team,
+  includeStats,
+  formatData,
+  returnTournament = false,
+}: GetPlayersArgs): Promise<{
   players: PersonStructure[];
   tournament?: TournamentStructure;
 }> {
@@ -42,13 +50,21 @@ export function getPlayers(
   });
 }
 
-export function getPlayer(
-  player: SearchableName,
-  tournament?: SearchableName,
-  game?: number,
-  formatData?: boolean,
-  returnTournament = false
-): Promise<{
+interface GetPlayerArgs {
+  player: SearchableName;
+  tournament?: SearchableName;
+  game?: number;
+  formatData?: boolean;
+  returnTournament?: boolean;
+}
+
+export function getPlayer({
+  player,
+  tournament,
+  game,
+  formatData,
+  returnTournament = false,
+}: GetPlayerArgs): Promise<{
   player: PersonStructure | PlayerGameStatsStructure;
   tournament?: TournamentStructure;
 }> {

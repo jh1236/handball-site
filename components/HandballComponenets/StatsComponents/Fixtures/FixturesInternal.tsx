@@ -4,17 +4,15 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { Table, Text } from '@mantine/core';
-import {
-  GameStructure,
-  TournamentStructure,
-} from '@/components/HandballComponenets/StatsComponents/types';
 import { getFixtures } from '@/ServerActions/GameActions';
+import { GameStructure, TournamentStructure } from '@/ServerActions/types';
 
 interface FixturesProps {
   maxRounds?: number;
   tournament: string;
   expanded?: boolean;
   setExpanded?: (value: boolean) => void;
+  expandable?: boolean;
 }
 
 export default function FixturesInternal({
@@ -22,6 +20,7 @@ export default function FixturesInternal({
   tournament,
   expanded,
   setExpanded,
+  expandable,
 }: FixturesProps) {
   // const [sort, setSort] = React.useState<number>(-1);
   const [chartData, setChartData] = React.useState<{ games: GameStructure[]; final: boolean }[]>(
@@ -29,17 +28,11 @@ export default function FixturesInternal({
   );
   const [tournamentState, setTournamentState] = React.useState<TournamentStructure>(undefined);
   useEffect(() => {
-    getFixtures(
+    getFixtures({
       tournament,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      false,
-      false,
-      true, //js is fucked up and has no keyword args
-      true
-    ).then((data) => {
+      returnTournament: true,
+      separateFinals: true,
+    }).then((data) => {
       if (maxRounds > 0) {
         const t = data?.fixtures.toReversed() ?? [];
         t.length = Math.min(maxRounds, t.length);
@@ -57,7 +50,7 @@ export default function FixturesInternal({
       <Table stickyHeader>
         <Table.Thead style={{ color: 'var(--mantine-color-green-8)' }}>
           <Table.Tr>
-            <Table.Th visibleFrom="md" style={{ width: '10px' }}></Table.Th>
+            {maxRounds !== 1 && <Table.Th visibleFrom="md" style={{ width: '10px' }}></Table.Th>}
             <Table.Th style={{ width: '50px', textAlign: 'center' }}>
               <Text size="sm">Team One</Text>
             </Table.Th>
@@ -68,7 +61,7 @@ export default function FixturesInternal({
             <Table.Th style={{ width: '20px', textAlign: 'center', alignItems: 'center' }}>
               <Text size="sm">Score</Text>
             </Table.Th>
-            {!expanded && (
+            {!expanded && expandable && (
               <Table.Th
                 visibleFrom="md"
                 style={{ maxWidth: '2px', width: '2px', textAlign: 'center', alignItems: 'center' }}
@@ -91,12 +84,14 @@ export default function FixturesInternal({
                     <Text size="sm">Court</Text>
                   </Table.Th>
                 )}
-                <Table.Th
-                  style={{ maxWidth: '2px', width: '2px', textAlign: 'center' }}
-                  visibleFrom="md"
-                >
-                  <IconChevronLeft onClick={() => setExpanded!(false)}></IconChevronLeft>
-                </Table.Th>
+                {expandable && (
+                  <Table.Th
+                    style={{ maxWidth: '2px', width: '2px', textAlign: 'center' }}
+                    visibleFrom="md"
+                  >
+                    <IconChevronLeft onClick={() => setExpanded!(false)}></IconChevronLeft>
+                  </Table.Th>
+                )}
               </>
             )}
           </Table.Tr>
@@ -106,22 +101,24 @@ export default function FixturesInternal({
             if (index > maxRounds && maxRounds > 0) return null;
             return (
               <>
-                <Table.Tr key={100 * index - 1}>
-                  <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
-                    <Text size="sm">
-                      <b>Round {index + 1}</b>
-                    </Text>
-                  </Table.Th>
-                  <Table.Th
-                    visibleFrom="md"
-                    style={{ textAlign: 'center' }}
-                    rowSpan={value.games.length + 1}
-                  >
-                    <Text size="sm">
-                      <b>Round {index + 1}</b>
-                    </Text>
-                  </Table.Th>
-                </Table.Tr>
+                {maxRounds !== 1 && (
+                  <Table.Tr key={100 * index - 1}>
+                    <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
+                      <Text size="sm">
+                        <b>Round {index + 1}</b>
+                      </Text>
+                    </Table.Th>
+                    <Table.Th
+                      visibleFrom="md"
+                      style={{ textAlign: 'center' }}
+                      rowSpan={value.games.length + 1}
+                    >
+                      <Text size="sm">
+                        <b>Round {index + 1}</b>
+                      </Text>
+                    </Table.Th>
+                  </Table.Tr>
+                )}
                 {value.games.map((game, index2) => (
                   <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
                     <Table.Td>
@@ -171,10 +168,12 @@ export default function FixturesInternal({
                         )}
                       </>
                     )}
-                    <Table.Td
-                      visibleFrom="md"
-                      style={{ maxWidth: '15px', width: '15px' }}
-                    ></Table.Td>
+                    {expandable && (
+                      <Table.Td
+                        visibleFrom="md"
+                        style={{ maxWidth: '15px', width: '15px' }}
+                      ></Table.Td>
+                    )}
                   </Table.Tr>
                 ))}
               </>

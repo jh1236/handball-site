@@ -11,7 +11,7 @@ import { PlayerButton } from '@/components/HandballComponenets/GameEditingCompon
 import {
   GameStructure,
   PlayerGameStatsStructure,
-} from '@/components/HandballComponenets/StatsComponents/types';
+} from '@/ServerActions/types';
 import { getGame } from '@/ServerActions/GameActions';
 
 export function getUrlForID(id: number) {
@@ -52,7 +52,7 @@ export function EditGame({ game }: { game: number }) {
     [firstTeamServes, teamOneServedLeft, teamTwoServedLeft]
   );
 
-  getGame(game).then((gameIn) => {
+  getGame({ gameID: game }).then((gameIn) => {
     setGameObj(gameIn);
     setFirstTeamServes(gameIn.firstTeamToServe);
     setRounds(gameIn.teamOneScore + gameIn.teamTwoScore);

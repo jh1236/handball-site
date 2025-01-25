@@ -2,13 +2,14 @@ import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/Ser
 import {
   OfficialStructure,
   TournamentStructure,
-} from '@/components/HandballComponenets/StatsComponents/types';
-import { SearchableName } from '@/ServerActions/types';
+ SearchableName } from '@/ServerActions/types';
 
-export function getOfficials(
-  tournament?: SearchableName,
-  returnTournament: boolean = false
-): Promise<{
+interface GetOfficialsArgs {
+  tournament?: SearchableName;
+  returnTournament?: boolean;
+}
+
+export function getOfficials({ tournament, returnTournament = false }: GetOfficialsArgs): Promise<{
   officials: OfficialStructure[];
   tournament?: TournamentStructure;
 }> {
@@ -29,11 +30,17 @@ export function getOfficials(
   });
 }
 
-export function getOfficial(
-  official: SearchableName,
-  tournament?: SearchableName,
-  returnTournament = false
-): Promise<{
+interface GetOfficialArgs {
+  official: SearchableName;
+  tournament?: SearchableName;
+  returnTournament?: boolean;
+}
+
+export function getOfficial({
+  official,
+  tournament,
+  returnTournament = false,
+}: GetOfficialArgs): Promise<{
   official: OfficialStructure;
   tournament?: TournamentStructure;
 }> {

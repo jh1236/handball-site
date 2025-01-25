@@ -258,7 +258,8 @@ export function PlayerButton({ game, firstTeam, leftSide }: PlayerButtonProps) {
           style={{ height: '5%' }}
           color={player!.cardTimeRemaining < 0 ? 'red' : player!.cardTime > 2 ? 'yellow' : 'green'}
           value={100 * (player!.cardTimeRemaining >= 0 ? (player!.cardTimeRemaining / player!.cardTime) : 1)}
-        ></Progress>
+        >
+        </Progress>
       )}
     </>
   );

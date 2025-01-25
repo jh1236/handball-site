@@ -1,6 +1,5 @@
 import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
-import { TournamentStructure } from '@/components/HandballComponenets/StatsComponents/types';
-import { SearchableName } from '@/ServerActions/types';
+import { TournamentStructure, SearchableName } from '@/ServerActions/types';
 
 export function getTournaments(): Promise<TournamentStructure[]> {
   const url = new URL('/tournaments/', SERVER_ADDRESS);

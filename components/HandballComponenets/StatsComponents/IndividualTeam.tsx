@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Text, Title } from '@mantine/core';
-import { TeamStructure } from '@/components/HandballComponenets/StatsComponents/types';
+import { TeamStructure } from '@/ServerActions/types';
 import { getTeam } from '@/ServerActions/TeamActions';
 
 interface TeamsProps {
@@ -13,7 +13,7 @@ interface TeamsProps {
 export default function IndividualTeam({ tournament, team }: TeamsProps) {
   const [chartData, setChartData] = React.useState<TeamStructure | undefined>(undefined);
   useEffect(() => {
-    getTeam(team, tournament, true).then((o) => setChartData(o.team));
+    getTeam({ team, tournament, formatData: true }).then((o) => setChartData(o.team));
   }, [team, tournament]);
 
   return (

@@ -2,18 +2,26 @@ import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/Ser
 import {
   PersonStructure,
   PlayerGameStatsStructure,
+  SearchableName,
   TeamStructure,
   TournamentStructure,
-} from '@/components/HandballComponenets/StatsComponents/types';
-import { SearchableName } from '@/ServerActions/types';
+} from '@/ServerActions/types';
 
-export function getTeams(
-  tournament?: SearchableName,
-  player?: SearchableName,
-  includeStats?: SearchableName,
-  formatData?: SearchableName,
-  returnTournament: boolean = false
-): Promise<{
+interface GetTeamsArgs {
+  tournament?: SearchableName;
+  player?: SearchableName;
+  includeStats?: SearchableName;
+  formatData?: SearchableName;
+  returnTournament?: boolean;
+}
+
+export function getTeams({
+  tournament,
+  player,
+  includeStats,
+  formatData,
+  returnTournament = false,
+}: GetTeamsArgs): Promise<{
   teams: TeamStructure[];
   tournament?: TournamentStructure;
 }> {
@@ -43,12 +51,19 @@ export function getTeams(
   });
 }
 
-export function getTeam(
-  team: SearchableName,
-  tournament?: SearchableName,
-  formatData?: boolean,
-  returnTournament = false
-): Promise<{
+interface GetTeamArgs {
+  team: SearchableName;
+  tournament?: SearchableName;
+  formatData?: boolean;
+  returnTournament?: boolean;
+}
+
+export function getTeam({
+  team,
+  tournament,
+  formatData,
+  returnTournament = false,
+}: GetTeamArgs): Promise<{
   team: TeamStructure;
   tournament?: TournamentStructure;
 }> {
@@ -72,12 +87,19 @@ export function getTeam(
   });
 }
 
-export function getLadder(
-  tournament?: SearchableName,
-  includeStats: boolean = false,
-  formatData: boolean = false,
-  returnTournament = false
-): Promise<{
+interface GetLadderArgs {
+  tournament?: SearchableName;
+  includeStats?: boolean;
+  formatData?: boolean;
+  returnTournament?: boolean;
+}
+
+export function getLadder({
+  tournament,
+  includeStats = false,
+  formatData = false,
+  returnTournament = false,
+}: GetLadderArgs): Promise<{
   pooled: boolean;
   ladder?: TeamStructure[];
   poolOne?: TeamStructure[];

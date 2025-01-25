@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Text, Title } from '@mantine/core';
-import { PersonStructure } from '@/components/HandballComponenets/StatsComponents/types';
+import { PersonStructure } from '@/ServerActions/types';
 import { getPlayer } from '@/ServerActions/PlayerActions';
 
 interface PlayersProps {
@@ -15,7 +15,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
 
   const [chartData, setChartData] = React.useState<PersonStructure | undefined>(undefined);
   useEffect(() => {
-    getPlayer(player, tournament, undefined, true).then((o) => setChartData(o.player));
+    getPlayer({ player, tournament, game: undefined, formatData: true }).then((o) => setChartData(o.player));
   }, [player, tournament]);
   return (
     <>

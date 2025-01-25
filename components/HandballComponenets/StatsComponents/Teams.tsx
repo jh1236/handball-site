@@ -3,11 +3,8 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Box, Container, Grid, Image, Text } from '@mantine/core';
-import {
-  TeamStructure,
-  TournamentStructure,
-} from '@/components/HandballComponenets/StatsComponents/types';
 import { getTeams } from '@/ServerActions/TeamActions';
+import { TeamStructure, TournamentStructure } from '@/ServerActions/types';
 
 //TODO: - Uniform Box Size
 
@@ -52,7 +49,7 @@ interface TeamsProps {
 export default function Teams({ tournament }: TeamsProps) {
   const [chartData, setchartData] = React.useState<TeamStructure[]>([]);
   useEffect(() => {
-    getTeams(tournament).then((o) => setchartData(o.teams));
+    getTeams({ tournament }).then((o) => setchartData(o.teams));
   }, [tournament]);
 
   if (chartData.length === 0) {

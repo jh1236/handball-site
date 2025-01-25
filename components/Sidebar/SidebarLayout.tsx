@@ -71,7 +71,9 @@ export default function SidebarLayout({
             )}
           </ThemeIcon>
         </Box>
+        <Box>
         {children}
+        </Box>
       </div>
     </div>
   );

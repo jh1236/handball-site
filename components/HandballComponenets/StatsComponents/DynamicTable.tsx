@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react';
 import { Image, MultiSelect, Table } from '@mantine/core';
 import { toTitleCase } from '@/tools/tools';
+import { c } from 'tinyrainbow/dist/index-c1cfc5e9';
 
 function selectedToNumber(all: string[], selected: string[]): number {
   let out = 0;
@@ -73,7 +74,7 @@ export function DynamicTable<T extends InputType>({
     ) {
       setSelectedHeaders(numberToSelected(Object.keys(chartData[0]?.stats! ?? {}), count));
     }
-  }, [searchParams, chartData]);
+  }, [searchParams, chartData, editable, selectedHeaders]);
   useEffect(() => {
     if (selectedHeaders.length === 0) {
       setSelectedHeaders(columns);
@@ -83,7 +84,7 @@ export function DynamicTable<T extends InputType>({
         `${window.location.href.split('?')[0]}?cols=${selectedToNumber(Object.keys(chartData[0]?.stats! ?? {}), selectedHeaders)}`
       );
     }
-  }, [selectedHeaders]);
+  }, [chartData, columns, editable, router, selectedHeaders]);
 
   const getHeader = (d: T, name: string): number | string => d![name] || d!.stats![name];
 
@@ -158,7 +159,7 @@ export function DynamicTable<T extends InputType>({
               <Table.Th
                 key={index}
                 style={{ width: '200px', textAlign: 'center' }}
-                onClick={() => setChartData(sortData(index + 1))}
+                onClick={() => setChartData(sortData(data ?? [], index + 1))}
               >
                 {index + 1 === Math.abs(sortIndex) ? (
                   <>
@@ -183,7 +184,8 @@ export function DynamicTable<T extends InputType>({
                       style={{ width: '50px', height: '50px' }}
                       src={value.imageUrl}
                       alt={`The team logo for ${value.name}`}
-                    ></Image>
+                    >
+                    </Image>
                   </Link>
                 </Table.Td>
                 {['name'].concat(selectedHeaders).map((value2, idx) => (

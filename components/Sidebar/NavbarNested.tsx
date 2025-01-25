@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import {
@@ -26,10 +28,10 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
-import { TournamentStructure } from '@/components/HandballComponenets/StatsComponents/types';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
 import { getTournaments } from '@/ServerActions/TournamentActions';
+import { TournamentStructure } from '@/ServerActions/types';
 
 function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament?: string) {
   const out: {
@@ -114,7 +116,7 @@ export function NavbarNested({
         setMyTournament(tournaments.find((t) => t.searchableName === tournamentName));
       }
     }
-  }, [tournaments]);
+  }, [tournamentName, tournaments]);
 
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 

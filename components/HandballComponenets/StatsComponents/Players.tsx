@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
 import { DynamicTable } from '@/components/HandballComponenets/StatsComponents/DynamicTable';
-import { PersonStructure } from '@/components/HandballComponenets/StatsComponents/types';
+import { PersonStructure } from '@/ServerActions/types';
 import { getPlayer, getPlayers } from '@/ServerActions/PlayerActions';
 
 interface LadderProps {
@@ -33,7 +33,7 @@ export default function Players({
   const [players, setPlayers] = React.useState<PersonStructure[]>();
 
   useEffect(() => {
-    getPlayers(tournament, undefined, true, true).then((o) => setPlayers(o.players));
+    getPlayers({ tournament, team: undefined, includeStats: true, formatData: true }).then((o) => setPlayers(o.players));
   }, [tournament]);
   return (
     <DynamicTable
@@ -43,6 +43,7 @@ export default function Players({
       data={players ?? []}
       editable={editable}
       maxRows={maxRows}
-    ></DynamicTable>
+    >
+    </DynamicTable>
   );
 }

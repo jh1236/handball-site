@@ -1,15 +1,13 @@
 import React from 'react';
-import { Text } from '@mantine/core';
-import { TournamentPageArgs } from '@/app/types';
-import SidebarLayout from '@/components/Sidebar/SidebarLayout';
+import { GamePageArgs } from '@/app/types';
+import { GamePage } from '@/components/HandballComponenets/GamePage';
 
-export default async function GamesPage({ params }: TournamentPageArgs) {
-  const { tournament } = await params;
+export default async function GamesPage({ params }: GamePageArgs) {
+  const { game } = await params;
+
   return (
     <>
-      <SidebarLayout tournamentName={tournament}>
-        <Text>I am a WIP!!</Text>
-      </SidebarLayout>
+      <GamePage gameID={+game}></GamePage>
     </>
   );
 }

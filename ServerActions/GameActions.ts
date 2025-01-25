@@ -1,9 +1,5 @@
 import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
-import {
-  GameStructure,
-  TournamentStructure,
-} from '@/components/HandballComponenets/StatsComponents/types';
-import { RealName, SearchableName } from '@/ServerActions/types';
+import { GameStructure, TournamentStructure, RealName, SearchableName } from '@/ServerActions/types';
 
 export function getChangeCode(gameID: number): Promise<number> {
   return tokenFetch(`/games/change_code?gameID=${gameID}`, {
@@ -16,11 +12,17 @@ export function getChangeCode(gameID: number): Promise<number> {
   });
 }
 
-export function getGame(
-  gameID: number,
-  includeGameEvents: boolean = false,
-  includePlayerStats: boolean = false
-): Promise<GameStructure> {
+interface GetGameArgs {
+  gameID: number;
+  includeGameEvents?: boolean;
+  includePlayerStats?: boolean;
+}
+
+export function getGame({
+  gameID,
+  includeGameEvents = false,
+  includePlayerStats = false,
+}: GetGameArgs): Promise<GameStructure> {
   const url = new URL(`/games/${gameID}`, SERVER_ADDRESS);
   if (includeGameEvents) {
     url.searchParams.set('includeGameEvents', 'true');
@@ -41,16 +43,27 @@ export function getGame(
   });
 }
 
-export function getGames(
-  tournament?: SearchableName,
-  team?: SearchableName,
-  player?: SearchableName,
-  official?: SearchableName,
-  court?: number,
-  includeGameEvents: boolean = false,
-  includePlayerStats: boolean = false,
-  returnTournament: boolean = false
-): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
+interface GetGamesArgs {
+  tournament?: SearchableName;
+  team?: SearchableName;
+  player?: SearchableName;
+  official?: SearchableName;
+  court?: number;
+  includeGameEvents?: boolean;
+  includePlayerStats?: boolean;
+  returnTournament?: boolean;
+}
+
+export function getGames({
+  tournament,
+  team,
+  player,
+  official,
+  court,
+  includeGameEvents = false,
+  includePlayerStats = false,
+  returnTournament = false,
+}: GetGamesArgs): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
   const url = new URL('/games', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
@@ -92,22 +105,34 @@ export function getGames(
   });
 }
 
-export function getFixtures(
-  tournament?: SearchableName,
-  team?: SearchableName,
-  player?: SearchableName,
-  official?: SearchableName,
-  court?: number,
-  includeGameEvents: boolean = false,
-  includePlayerStats: boolean = false,
-  returnTournament: boolean = false,
-  separateFinals: boolean = false
-): Promise<{
+interface GetFixturesArgs {
+  tournament?: SearchableName;
+  team?: SearchableName;
+  player?: SearchableName;
+  official?: SearchableName;
+  court?: number;
+  includeGameEvents?: boolean;
+  includePlayerStats?: boolean;
+  returnTournament?: boolean;
+  separateFinals?: boolean;
+}
+
+export function getFixtures({
+  tournament,
+  team,
+  player,
+  official,
+  court,
+  includeGameEvents = false,
+  includePlayerStats = false,
+  returnTournament = false,
+  separateFinals = false,
+}: GetFixturesArgs): Promise<{
   fixtures: { games: GameStructure[]; final: boolean }[];
   finals?: { games: GameStructure[]; final: true }[];
   tournament?: TournamentStructure;
 }> {
-  const url = new URL('/games', SERVER_ADDRESS);
+  const url = new URL('/games/fixtures', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
