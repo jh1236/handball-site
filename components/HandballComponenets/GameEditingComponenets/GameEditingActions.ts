@@ -62,6 +62,24 @@ export interface GameState {
   servedFromLeft: boolean;
 }
 
+function largerCardTime(
+  playerOne: { get?: PlayerGameStatsStructure },
+  playerTwo: { get?: PlayerGameStatsStructure }
+) {
+  if ((playerOne.get?.cardTime ?? 0) === -1) return playerOne;
+  if ((playerTwo.get?.cardTime ?? 0) === -1) return playerTwo;
+  return (playerOne.get?.cardTime ?? 0) > (playerTwo.get?.cardTime ?? 0) ? playerOne : playerTwo;
+}
+
+function smallerCardTime(
+  playerOne: { get?: PlayerGameStatsStructure },
+  playerTwo: { get?: PlayerGameStatsStructure }
+) {
+  if ((playerOne.get?.cardTime ?? 0) === -1) return playerTwo;
+  if ((playerTwo.get?.cardTime ?? 0) === -1) return playerOne;
+  return (playerOne.get?.cardTime ?? 0) > (playerTwo.get?.cardTime ?? 0) ? playerOne : playerTwo;
+}
+
 function nextPoint(game: GameState, swap?: boolean) {
   for (const i of [
     game.teamOne.left,
@@ -177,7 +195,24 @@ export function card(
   duration: number = 2
 ): void {
   const team = firstTeam ? game.teamOne : game.teamTwo;
+  const otherTeam = firstTeam ? game.teamOne : game.teamTwo;
   const player = leftPlayer ? team.left : team.right;
+  const teammate = !leftPlayer ? team.left : team.right;
+  if (teammate.get?.cardTime !== 0) {
+    const maxScore = Math.min(11, team.score.get + 2);
+    if (teammate.get?.cardTime === -1 && player.get?.cardTime === -1) {
+      otherTeam.score.set(maxScore);
+    } else {
+      const bigPlayer = largerCardTime(player, teammate);
+      if (teammate.get?.cardTime === -1 || player.get?.cardTime === -1) {
+        const delta = Math.max(teammate.get?.cardTime || -1, player.get?.cardTime || -1);
+        otherTeam.score.set(Math.min(otherTeam.score.get + delta, maxScore));
+      } else {
+        const delta = Math.min(teammate.get?.cardTime || -1, player.get?.cardTime || -1);
+        otherTeam.score.set(Math.min(otherTeam.score.get + delta, maxScore));
+      }
+    }
+  }
   const temp = player.get!;
   if (temp.cardTimeRemaining >= 0) {
     temp.cardTime += duration;

@@ -1,0 +1,7 @@
+.gradientBackground {
+    background:
+                radial-gradient(ellipse 40% 100% at 100% 50%, rgba(20,150,50,0.7),rgba(0,0,0,0)),
+                radial-gradient(ellipse 40% 100% at 0% 50%, rgba(125,25,25,0.7),rgba(0,0,0,0)),
+                linear-gradient(#FFF, #FFF);
+
+}
