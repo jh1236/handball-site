@@ -137,7 +137,9 @@ export interface GameStructure {
   adminStatus?: string;
   noteableStatus?: string;
   notes?: string;
-  timeoutStartTime?: number;
+  timeoutExpirationTime: number;
+  cardsTeamOne?: GameEventStructure[];
+  cardsTeamTwo?: GameEventStructure[];
 
   [k: string]: any;
 }

@@ -1,14 +1,15 @@
 import { useRouter } from 'next/navigation';
 import { mutate } from 'swr';
 import { getUrlForID } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
-import { PlayerGameStatsStructure } from '@/ServerActions/types';
 import {
   aceForGame,
-  cardForGame,
+  cardForGame, endTimeoutForGame,
   faultForGame,
   scoreForGame,
+  timeoutForGame,
   undoForGame,
 } from '@/ServerActions/GameActions';
+import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 type Team = {
   score: {
@@ -39,6 +40,10 @@ type Team = {
 };
 
 export interface GameState {
+  timeoutExpirationTime: {
+    get: number;
+    set: (v: number) => void;
+  };
   id: number;
   rounds: {
     get: number;
@@ -99,6 +104,18 @@ export function ace(game: GameState): void {
   nextPoint(game, game.firstTeamServes.get);
   team.servedFromLeft.set(!team.servedFromLeft.get);
   aceForGame(game.id).catch(() => useRouter().refresh());
+}
+
+export function timeout(game: GameState, firstTeam): void {
+  const team = game.firstTeamServes.get ? game.teamOne : game.teamTwo;
+  team.timeouts.set(team.timeouts.get - 1);
+  game.timeoutExpirationTime.set(Date.now() + 30_000);
+  timeoutForGame(game.id, firstTeam).catch(() => useRouter().refresh()).then();
+}
+
+export function endTimeout(game: GameState): void {
+  game.timeoutExpirationTime.set(-1);
+  endTimeoutForGame(game.id).catch(() => useRouter().refresh()).then();
 }
 
 export function fault(game: GameState): void {
@@ -178,5 +195,5 @@ export function undo(game: GameState): void {
 }
 
 export function sync(game: GameState): void {
-  mutate(getUrlForID(game.id));
+  location.reload();
 }

@@ -3,6 +3,7 @@ import {
   IconBallTennis,
   IconBallVolleyball,
   IconCircleFilled,
+  IconClock,
   IconExclamationMark,
   IconSkull,
   IconSquareFilled,
@@ -16,10 +17,11 @@ import {
   GameState,
   greenCard,
   redCard,
-  score,
+  score, timeout,
   warning,
   yellowCard,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { timeoutForGame } from '@/ServerActions/GameActions';
 
 interface PlayerButtonProps {
   game: GameState;
@@ -64,7 +66,7 @@ function getActions(
   firstTeam: boolean,
   leftSide: boolean,
   serving: boolean,
-  close: () => void,
+  close: () => void
 ) {
   const out = [
     {
@@ -99,6 +101,22 @@ function getActions(
           {reason}
         </Button>
       )),
+    },
+    {
+      Icon: IconClock,
+      value: 'Timeout',
+      color: 'blue',
+      content: (
+        <Button
+          size="lg"
+          onClick={() => {
+            timeout(game, firstTeam);
+            close();
+          }}
+        >
+          Timeout
+        </Button>
+      ),
     },
     {
       Icon: IconTriangleInvertedFilled,
@@ -191,7 +209,7 @@ function getActions(
             Fault
           </Button>
         ),
-      },
+      }
     );
   }
   return out;
@@ -213,14 +231,14 @@ export function PlayerButton({ game, firstTeam, leftSide }: PlayerButtonProps) {
   ]);
   const serving = useMemo(
     () => game.servedFromLeft === leftSide && game.firstTeamServes.get === firstTeam,
-    [firstTeam, game.firstTeamServes.get, game.servedFromLeft, leftSide],
+    [firstTeam, game.firstTeamServes.get, game.servedFromLeft, leftSide]
   );
   const carded = useMemo(() => player?.cardTimeRemaining !== 0, [player]);
   const [opened, { open, close }] = useDisclosure(false);
   const items = useMemo(
     () =>
-      getActions(game, firstTeam, leftSide, serving, close).map((item) => (
-        <Accordion.Item key={item.value} value={item.value}>
+      getActions(game, firstTeam, leftSide, serving, close).map((item, i) => (
+        <Accordion.Item key={i} value={item.value}>
           <Accordion.Control>
             <item.Icon color={item.color}></item.Icon>
             {item.value}
@@ -228,7 +246,7 @@ export function PlayerButton({ game, firstTeam, leftSide }: PlayerButtonProps) {
           <Accordion.Panel>{item.content}</Accordion.Panel>
         </Accordion.Item>
       )),
-    [close, firstTeam, game, leftSide, serving],
+    [close, firstTeam, game, leftSide, serving]
   );
   const name = player ? player.name : 'Loading...';
   return (
@@ -243,7 +261,7 @@ export function PlayerButton({ game, firstTeam, leftSide }: PlayerButtonProps) {
       </Modal>
       <Button
         size="lg"
-        color={`${serving ? 'teal' : 'green'}.${leftSide ? 7 : 9}`}
+        color={`${serving ? 'teal' : 'blue'}.${leftSide ? 7 : 9}`}
         style={{
           width: '100%',
           height: carded ? '95%' : '100%',
@@ -257,9 +275,11 @@ export function PlayerButton({ game, firstTeam, leftSide }: PlayerButtonProps) {
         <Progress
           style={{ height: '5%' }}
           color={player!.cardTimeRemaining < 0 ? 'red' : player!.cardTime > 2 ? 'yellow' : 'green'}
-          value={100 * (player!.cardTimeRemaining >= 0 ? (player!.cardTimeRemaining / player!.cardTime) : 1)}
-        >
-        </Progress>
+          value={
+            100 *
+            (player!.cardTimeRemaining >= 0 ? player!.cardTimeRemaining / player!.cardTime : 1)
+          }
+        ></Progress>
       )}
     </>
   );

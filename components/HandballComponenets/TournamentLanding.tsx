@@ -43,7 +43,7 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
             ></Ladder>
           </Box>
           <Box style={{ textAlign: 'center' }}>
-            <Link className="hideLink" href={`/${tournament}/ladder`}>
+            <Link className="hideLink" href={`/${tournament}/fixtures`}>
               <Title order={2}>Current Round</Title>
             </Link>
             <Fixtures tournament={tournament} expandable={false} maxRounds={1}></Fixtures>

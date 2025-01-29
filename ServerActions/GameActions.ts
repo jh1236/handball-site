@@ -1,5 +1,10 @@
 import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
-import { GameStructure, TournamentStructure, RealName, SearchableName } from '@/ServerActions/types';
+import {
+  GameStructure,
+  RealName,
+  SearchableName,
+  TournamentStructure,
+} from '@/ServerActions/types';
 
 export function getChangeCode(gameID: number): Promise<number> {
   return tokenFetch(`/games/change_code?gameID=${gameID}`, {
@@ -15,20 +20,30 @@ export function getChangeCode(gameID: number): Promise<number> {
 interface GetGameArgs {
   gameID: number;
   includeGameEvents?: boolean;
-  includePlayerStats?: boolean;
+  includeStats?: boolean;
+  formatData?: boolean;
+  includePreviousCards?: boolean;
 }
 
 export function getGame({
   gameID,
   includeGameEvents = false,
-  includePlayerStats = false,
+  includeStats = false,
+  includePreviousCards = false,
+  formatData = true,
 }: GetGameArgs): Promise<GameStructure> {
   const url = new URL(`/games/${gameID}`, SERVER_ADDRESS);
   if (includeGameEvents) {
     url.searchParams.set('includeGameEvents', 'true');
   }
-  if (includePlayerStats) {
-    url.searchParams.set('includePlayerStats', 'true');
+  if (includePreviousCards) {
+    url.searchParams.set('includePreviousCards', 'true');
+  }
+  if (includeStats) {
+    url.searchParams.set('includeStats', 'true');
+  }
+  if (formatData) {
+    url.searchParams.set('formatData', 'true');
   }
   return tokenFetch(url, {
     method: 'GET',
@@ -45,9 +60,9 @@ export function getGame({
 
 interface GetGamesArgs {
   tournament?: SearchableName;
-  team?: SearchableName;
-  player?: SearchableName;
-  official?: SearchableName;
+  team?: SearchableName[];
+  player?: SearchableName[];
+  official?: SearchableName[];
   court?: number;
   includeGameEvents?: boolean;
   includePlayerStats?: boolean;
@@ -56,9 +71,9 @@ interface GetGamesArgs {
 
 export function getGames({
   tournament,
-  team,
-  player,
-  official,
+  team = [],
+  player = [],
+  official = [],
   court,
   includeGameEvents = false,
   includePlayerStats = false,
@@ -68,17 +83,14 @@ export function getGames({
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
-  if (team) {
-    url.searchParams.set('team', team);
+  for (const i of team) {
+    url.searchParams.append('team', i);
   }
-  if (player) {
-    url.searchParams.set('player', player);
+  for (const i of player) {
+    url.searchParams.append('player', i);
   }
-  if (player) {
-    url.searchParams.set('player', player);
-  }
-  if (official) {
-    url.searchParams.set('official', official);
+  for (const i of official) {
+    url.searchParams.append('official', i);
   }
   if (court) {
     url.searchParams.set('court', `${court}`);
@@ -213,11 +225,15 @@ export function startGame(
   });
 }
 
-export function scoreForGame(gameId: number, firstTeam: boolean, leftSide: boolean): Promise<void> {
+export function scoreForGame(
+  gameId: number,
+  firstTeam: boolean,
+  leftPlayer: boolean
+): Promise<void> {
   const body: any = {
     id: gameId,
     firstTeam,
-    leftSide,
+    leftPlayer,
   };
 
   return tokenFetch('/games/update/score', {
@@ -316,7 +332,7 @@ export function endTimeoutForGame(gameId: number): Promise<void> {
     id: gameId,
   };
 
-  return tokenFetch('/games/update/end/timeout', {
+  return tokenFetch('/games/update/endTimeout', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -392,7 +408,7 @@ export function undoForGame(gameId: number): Promise<void> {
 export function cardForGame(
   gameId: number,
   firstTeam: boolean,
-  leftSide: boolean,
+  leftPlayer: boolean,
   color: 'Warning' | 'Green' | 'Yellow' | 'Red',
   duration: number,
   reason: string
@@ -400,7 +416,7 @@ export function cardForGame(
   const body: any = {
     id: gameId,
     firstTeam,
-    leftSide,
+    leftPlayer,
     color,
     duration,
     reason,
@@ -423,12 +439,12 @@ export function cardForGame(
 export function substituteForGame(
   gameId: number,
   firstTeam: boolean,
-  leftSide: boolean
+  leftPlayer: boolean
 ): Promise<void> {
   const body: any = {
     id: gameId,
     firstTeam,
-    leftSide,
+    leftPlayer,
   };
 
   return tokenFetch('/games/update/substitute', {
@@ -448,12 +464,12 @@ export function substituteForGame(
 export function pardonForGame(
   gameId: number,
   firstTeam: boolean,
-  leftSide: boolean
+  leftPlayer: boolean
 ): Promise<void> {
   const body: any = {
     id: gameId,
     firstTeam,
-    leftSide,
+    leftPlayer,
   };
 
   return tokenFetch('/games/update/pardon', {

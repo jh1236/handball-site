@@ -29,23 +29,29 @@ export default function SidebarLayout({
           setSidebarVisible={setSidebarVisible}
           tournamentName={tournamentName}
           mobile
-        >
-        </NavbarNested>
+        ></NavbarNested>
       </Box>
       <Box visibleFrom="md">
         <NavbarNested
           sidebarVisible={sidebarVisible}
           setSidebarVisible={setSidebarVisible}
           tournamentName={tournamentName}
-        >
-        </NavbarNested>
+        ></NavbarNested>
       </Box>
-      <div
+      <Box
         style={{
           overflowY: 'scroll',
           height: '100vh',
           marginLeft: '20px',
           transition: '0.6s cubic-bezier(0.25, 1, 0.5, 1)',
+        }}
+        display={{
+          base: !sidebarVisible ? 'none' : 'block',
+          md: 'block',
+        }}
+        w={{
+          base: !sidebarVisible ? '0' : 'auto',
+          md: 'auto',
         }}
       >
         <Box
@@ -66,15 +72,12 @@ export default function SidebarLayout({
             ) : (
               <IconLayoutSidebarLeftExpand
                 style={{ width: rem(18), height: rem(18) }}
-              >
-              </IconLayoutSidebarLeftExpand>
+              ></IconLayoutSidebarLeftExpand>
             )}
           </ThemeIcon>
         </Box>
-        <Box>
         {children}
-        </Box>
-      </div>
+      </Box>
     </div>
   );
 }

@@ -52,10 +52,11 @@ export default function FixturesInternal({
           <Table.Tr>
             {maxRounds !== 1 && <Table.Th visibleFrom="md" style={{ width: '10px' }}></Table.Th>}
             <Table.Th style={{ width: '50px', textAlign: 'center' }}>
-              <Text size="sm">Team One</Text>
+              <Text size="sm" visibleFrom="md">Team One</Text>
+              <Text size="sm" hiddenFrom="md">Fixture</Text>
             </Table.Th>
-            <Table.Th style={{ width: '2px', maxWidth: '2px', textAlign: 'center' }}></Table.Th>
-            <Table.Th style={{ width: '50px', textAlign: 'center' }}>
+            <Table.Th visibleFrom="md" style={{ width: '2px', maxWidth: '2px', textAlign: 'center' }}></Table.Th>
+            <Table.Th visibleFrom="md" style={{ width: '50px', textAlign: 'center' }}>
               <Text size="sm">Team One</Text>
             </Table.Th>
             <Table.Th style={{ width: '20px', textAlign: 'center', alignItems: 'center' }}>
@@ -123,15 +124,15 @@ export default function FixturesInternal({
                   <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
                     <Table.Td>
                       <Link className="hideLink" href={`/games/${game.id}`}>
-                        <Text size="sm">{game.teamOne.name}</Text>
+                        <Text size="sm">{game.teamOne.name}</Text> <Text hiddenFrom="md"> vs {game.teamTwo.name}</Text>
                       </Link>
                     </Table.Td>
-                    <Table.Td>
+                    <Table.Td visibleFrom="md">
                       <Link className="hideLink" href={`/games/${game.id}`}>
                         <Text size="sm">VS</Text>
                       </Link>
                     </Table.Td>
-                    <Table.Td>
+                    <Table.Td visibleFrom="md">
                       <Link className="hideLink" href={`/games/${game.id}`}>
                         <Text size="sm">{game.teamTwo.name}</Text>
                       </Link>
@@ -172,7 +173,8 @@ export default function FixturesInternal({
                       <Table.Td
                         visibleFrom="md"
                         style={{ maxWidth: '15px', width: '15px' }}
-                      ></Table.Td>
+                      >
+                      </Table.Td>
                     )}
                   </Table.Tr>
                 ))}

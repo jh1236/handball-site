@@ -1,18 +1,17 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { Box, Button, Text, Title } from '@mantine/core';
+import React, { useEffect, useMemo } from 'react';
+import { Box, Button, LoadingOverlay, Text, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import {
+  endTimeout,
   GameState,
   sync,
   undo,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
-import {
-  GameStructure,
-  PlayerGameStatsStructure,
-} from '@/ServerActions/types';
 import { getGame } from '@/ServerActions/GameActions';
+import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 export function getUrlForID(id: number) {
   return `/api/games/${id}?includePlayerStats=true`;
@@ -20,9 +19,11 @@ export function getUrlForID(id: number) {
 
 export function EditGame({ game }: { game: number }) {
   const [gameObj, setGameObj] = React.useState<GameStructure | null>(null);
+  const [visible, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
   const [rounds, setRounds] = React.useState<number>(0);
   const [faulted, setFaulted] = React.useState<boolean>(false);
   const [firstTeamServes, setFirstTeamServes] = React.useState<boolean>(false);
+  const [timeoutExpirationTime, setTimeoutExpirationTime] = React.useState<number>(-1);
   const [teamOneTimeouts, setTeamOneTimeouts] = React.useState<number>(0);
   const [teamOneServedLeft, setTeamOneServedLeft] = React.useState<boolean>(true);
   const [teamOneScore, setTeamOneScore] = React.useState<number>(0);
@@ -51,46 +52,60 @@ export function EditGame({ game }: { game: number }) {
     () => (firstTeamServes ? teamOneServedLeft : teamTwoServedLeft),
     [firstTeamServes, teamOneServedLeft, teamTwoServedLeft]
   );
+  useEffect(() => {
+    getGame({ gameID: game, includeStats: true }).then((gameIn) => {
+      setGameObj(gameIn);
+      setFirstTeamServes(gameIn.firstTeamToServe);
+      setRounds(gameIn.teamOneScore + gameIn.teamTwoScore);
+      setFaulted(gameIn.faulted);
+      setTimeoutExpirationTime(gameIn.timeoutExpirationTime);
+      //Team Specific
+      setTeamOneTimeouts(gameIn.teamOneTimeouts);
+      setTeamOneScore(gameIn.teamOneScore);
+      setTeamOneServedLeft(gameIn.teamOne.servedFromLeft! !== gameIn.firstTeamToServe);
+      const { teamOne } = gameIn;
+      for (const i of [teamOne.captain, teamOne.nonCaptain, teamOne.substitute]) {
+        if (!i) {
+          continue;
+        } else if (i.sideOfCourt === 'Left') {
+          setTeamOneLeft(i);
+        } else if (i.sideOfCourt === 'Right') {
+          setTeamOneRight(i);
+        } else if (i.sideOfCourt === 'Substitute') {
+          setTeamOneSub(i);
+        }
+      }
+      setTeamTwoTimeouts(gameIn.teamTwoTimeouts);
+      setTeamTwoScore(gameIn.teamTwoScore);
+      setTeamTwoServedLeft(gameIn.teamTwo.servedFromLeft! === gameIn.firstTeamToServe);
+      const { teamTwo } = gameIn;
+      for (const i of [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute]) {
+        if (i?.sideOfCourt === 'Left') {
+          setTeamTwoLeft(i);
+        }
+        if (i?.sideOfCourt === 'Right') {
+          setTeamTwoRight(i);
+        }
+        if (i?.sideOfCourt === 'Substitute') {
+          setTeamTwoSub(i);
+        }
+      }
+    });
+  }, []);
 
-  getGame({ gameID: game }).then((gameIn) => {
-    setGameObj(gameIn);
-    setFirstTeamServes(gameIn.firstTeamToServe);
-    setRounds(gameIn.teamOneScore + gameIn.teamTwoScore);
-    setFaulted(gameIn.faulted);
-    //Team Specific
-    setTeamOneTimeouts(gameIn.teamOneTimeouts);
-    setTeamOneScore(gameIn.teamOneScore);
-    setTeamOneServedLeft(gameIn.teamOne.servedFromLeft! !== gameIn.firstTeamToServe);
-    const { teamOne } = gameIn;
-    for (const i of [teamOne.captain, teamOne.nonCaptain, teamOne.substitute]) {
-      if (i?.sideOfCourt === 'Left') {
-        setTeamOneLeft(i);
-      }
-      if (i?.sideOfCourt === 'Right') {
-        setTeamOneRight(i);
-      }
-      if (i?.sideOfCourt === 'Substitute') {
-        setTeamOneSub(i);
-      }
+  useEffect(() => {
+    if (timeoutExpirationTime > 0) {
+      openTimeout();
+    } else {
+      closeTimeout();
     }
-    setTeamTwoTimeouts(gameIn.teamTwoTimeouts);
-    setTeamTwoScore(gameIn.teamTwoScore);
-    setTeamTwoServedLeft(gameIn.teamTwo.servedFromLeft! === gameIn.firstTeamToServe);
-    const { teamTwo } = gameIn;
-    for (const i of [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute]) {
-      if (i?.sideOfCourt === 'Left') {
-        setTeamTwoLeft(i);
-      }
-      if (i?.sideOfCourt === 'Right') {
-        setTeamTwoRight(i);
-      }
-      if (i?.sideOfCourt === 'Substitute') {
-        setTeamTwoSub(i);
-      }
-    }
-  });
+  }, [timeoutExpirationTime]);
 
   const gameState: GameState = {
+    timeoutExpirationTime: {
+      get: timeoutExpirationTime,
+      set: setTimeoutExpirationTime,
+    },
     firstTeamServes: {
       get: firstTeamServes,
       set: setFirstTeamServes,
@@ -158,8 +173,19 @@ export function EditGame({ game }: { game: number }) {
       },
     },
   };
+  const timeoutKids = (
+    <>
+      {Math.floor((timeoutExpirationTime - Date.now()) / 100) / 10} Seconds
+      <br />
+      <br />
+      <Button size="lg" onClick={() => endTimeout(gameState)}>
+        End Timeout
+      </Button>
+    </>
+  );
   return (
     <Box style={{ width: '100%', height: '100vh' }}>
+      <LoadingOverlay visible={visible} loaderProps={{ children: timeoutKids }} />
       <Box style={{ width: '100%', height: '40%' }}>
         <Box style={{ width: '50%', height: '100%', float: 'left' }}>
           <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
