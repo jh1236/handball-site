@@ -188,19 +188,29 @@ export function getFixtures({
   });
 }
 
-export function startGame(
-  gameId: number,
-  swapService: boolean,
-  teamOneIga: boolean,
-  teamOne: SearchableName[],
-  teamTwo: SearchableName[],
-  official?: SearchableName,
-  scorer?: SearchableName
-): Promise<void> {
+interface StartGameArgs {
+  gameId: number;
+  swapService: boolean;
+  teamOneIGA: boolean;
+  teamOne: SearchableName[];
+  teamTwo: SearchableName[];
+  official?: SearchableName;
+  scorer?: SearchableName;
+}
+
+export function startGame({
+  gameId,
+  swapService,
+  teamOneIGA,
+  teamOne,
+  teamTwo,
+  official,
+  scorer,
+}: StartGameArgs): Promise<void> {
   const body: any = {
     id: gameId,
     swapService,
-    teamOneIga,
+    teamOneIGA,
     teamOne,
     teamTwo,
   };

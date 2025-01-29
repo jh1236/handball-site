@@ -7,8 +7,12 @@ export async function tokenFetcher(url: string, args: any = {}) {
   return res.json();
 }
 
+export function loggedIn() {
+  return localStorage.getItem('token') !== null;
+}
+
 export function tokenFetch(url: string | URL, args: any = {}) {
-  if (localStorage.getItem('token') !== null) {
+  if (loggedIn()) {
     if (!args.headers) {
       args.headers = {};
     }

@@ -167,7 +167,8 @@ export function NavbarNested({
               ) : (
                 <IconLayoutSidebarLeftExpand
                   style={{ width: rem(18), height: rem(18) }}
-                ></IconLayoutSidebarLeftExpand>
+                >
+                </IconLayoutSidebarLeftExpand>
               )}
             </ThemeIcon>
           </Box>

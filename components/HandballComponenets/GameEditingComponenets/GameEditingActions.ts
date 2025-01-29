@@ -1,17 +1,23 @@
 import { useRouter } from 'next/navigation';
-import { mutate } from 'swr';
-import { getUrlForID } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
+import {
+  reloadGame,
+  startLoading,
+} from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
 import {
   aceForGame,
-  cardForGame, endTimeoutForGame,
+  cardForGame,
+  deleteGame,
+  endTimeoutForGame,
   faultForGame,
   scoreForGame,
+  startGame,
   timeoutForGame,
   undoForGame,
 } from '@/ServerActions/GameActions';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 type Team = {
+  name: string;
   score: {
     get: number;
     set: (v: number) => void;
@@ -55,29 +61,19 @@ export interface GameState {
     get: boolean;
     set: (v: boolean) => void;
   };
+  started: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
+  teamOneIGA: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
   faulted: {
     get: boolean;
     set: (v: boolean) => void;
   };
   servedFromLeft: boolean;
-}
-
-function largerCardTime(
-  playerOne: { get?: PlayerGameStatsStructure },
-  playerTwo: { get?: PlayerGameStatsStructure }
-) {
-  if ((playerOne.get?.cardTime ?? 0) === -1) return playerOne;
-  if ((playerTwo.get?.cardTime ?? 0) === -1) return playerTwo;
-  return (playerOne.get?.cardTime ?? 0) > (playerTwo.get?.cardTime ?? 0) ? playerOne : playerTwo;
-}
-
-function smallerCardTime(
-  playerOne: { get?: PlayerGameStatsStructure },
-  playerTwo: { get?: PlayerGameStatsStructure }
-) {
-  if ((playerOne.get?.cardTime ?? 0) === -1) return playerTwo;
-  if ((playerTwo.get?.cardTime ?? 0) === -1) return playerOne;
-  return (playerOne.get?.cardTime ?? 0) > (playerTwo.get?.cardTime ?? 0) ? playerOne : playerTwo;
 }
 
 function nextPoint(game: GameState, swap?: boolean) {
@@ -106,6 +102,29 @@ function nextPoint(game: GameState, swap?: boolean) {
   game.rounds.set(game.rounds.get + 1);
 }
 
+export function begin(game: GameState) {
+  startLoading();
+  startGame({
+    gameId: game.id,
+    swapService: !game.firstTeamServes.get,
+    teamOneIGA: game.teamOneIGA.get,
+    teamOne: [
+      game.teamOne.left.get?.searchableName,
+      game.teamOne.right.get?.searchableName,
+      game.teamOne.sub.get?.searchableName,
+    ].filter((a) => typeof a === 'string'),
+    teamTwo: [
+      game.teamTwo.left.get?.searchableName,
+      game.teamTwo.right.get?.searchableName,
+      game.teamTwo.sub.get?.searchableName,
+    ].filter((a) => typeof a === 'string'),
+  }).then(() => sync(game));
+}
+
+export function del(game: GameState) {
+  deleteGame(game.id).then(() => location.href = '/');
+}
+
 export function score(game: GameState, firstTeam: boolean, leftPlayer: boolean): void {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   team.score.set(team.score.get + 1);
@@ -113,7 +132,7 @@ export function score(game: GameState, firstTeam: boolean, leftPlayer: boolean):
   team.servedFromLeft.set(!team.servedFromLeft.get);
   game.firstTeamServes.set(firstTeam);
   nextPoint(game, needsSwap ? firstTeam : undefined);
-  scoreForGame(game.id, firstTeam, leftPlayer).catch(() => useRouter().refresh());
+  scoreForGame(game.id, firstTeam, leftPlayer).catch(() => sync(game));
 }
 
 export function ace(game: GameState): void {
@@ -121,19 +140,23 @@ export function ace(game: GameState): void {
   team.score.set(team.score.get + 1);
   nextPoint(game, game.firstTeamServes.get);
   team.servedFromLeft.set(!team.servedFromLeft.get);
-  aceForGame(game.id).catch(() => useRouter().refresh());
+  aceForGame(game.id).catch(() => sync(game));
 }
 
-export function timeout(game: GameState, firstTeam): void {
+export function timeout(game: GameState, firstTeam: boolean): void {
   const team = game.firstTeamServes.get ? game.teamOne : game.teamTwo;
   team.timeouts.set(team.timeouts.get - 1);
   game.timeoutExpirationTime.set(Date.now() + 30_000);
-  timeoutForGame(game.id, firstTeam).catch(() => useRouter().refresh()).then();
+  timeoutForGame(game.id, firstTeam)
+    .catch(() => sync(game))
+    .then();
 }
 
 export function endTimeout(game: GameState): void {
   game.timeoutExpirationTime.set(-1);
-  endTimeoutForGame(game.id).catch(() => useRouter().refresh()).then();
+  endTimeoutForGame(game.id)
+    .catch(() => sync(game))
+    .then();
 }
 
 export function fault(game: GameState): void {
@@ -146,7 +169,7 @@ export function fault(game: GameState): void {
   } else {
     game.faulted.set(true);
   }
-  faultForGame(game.id).catch(() => useRouter().refresh());
+  faultForGame(game.id).catch(() => sync(game));
 }
 
 export function warning(
@@ -195,40 +218,59 @@ export function card(
   duration: number = 2
 ): void {
   const team = firstTeam ? game.teamOne : game.teamTwo;
-  const otherTeam = firstTeam ? game.teamOne : game.teamTwo;
+  const otherTeam = firstTeam ? game.teamTwo : game.teamOne;
   const player = leftPlayer ? team.left : team.right;
-  const teammate = !leftPlayer ? team.left : team.right;
-  if (teammate.get?.cardTime !== 0) {
-    const maxScore = Math.min(11, team.score.get + 2);
-    if (teammate.get?.cardTime === -1 && player.get?.cardTime === -1) {
-      otherTeam.score.set(maxScore);
-    } else {
-      const bigPlayer = largerCardTime(player, teammate);
-      if (teammate.get?.cardTime === -1 || player.get?.cardTime === -1) {
-        const delta = Math.max(teammate.get?.cardTime || -1, player.get?.cardTime || -1);
-        otherTeam.score.set(Math.min(otherTeam.score.get + delta, maxScore));
+  const otherPlayer = leftPlayer ? team.right : team.left;
+  if (otherPlayer.get?.cardTimeRemaining) {
+    const otherTeamWins = Math.max(11, team.score.get + 2);
+    if (otherPlayer.get.cardTimeRemaining === -1) {
+      if (duration === -1) {
+        otherTeam.score.set(otherTeamWins);
       } else {
-        const delta = Math.min(teammate.get?.cardTime || -1, player.get?.cardTime || -1);
-        otherTeam.score.set(Math.min(otherTeam.score.get + delta, maxScore));
+        otherTeam.score.set(Math.min(otherTeamWins, otherTeam.score.get + duration));
       }
+    } else if (duration === -1) {
+      otherTeam.score.set(
+        Math.min(otherTeamWins, otherTeam.score.get + otherPlayer.get.cardTimeRemaining)
+      );
+      const temp = otherPlayer.get;
+      temp.cardTimeRemaining = 0;
+      otherPlayer.set(temp);
+    } else {
+      const stillCardedPlayer =
+        otherPlayer.get.cardTimeRemaining > player.get!.cardTimeRemaining ? otherPlayer : player;
+      const notCardedPlayer =
+        otherPlayer.get.cardTimeRemaining <= player.get!.cardTimeRemaining ? otherPlayer : player;
+      let temp = stillCardedPlayer.get!;
+      const diff =
+        stillCardedPlayer.get!.cardTimeRemaining - notCardedPlayer.get!.cardTimeRemaining;
+      temp.cardTimeRemaining -= diff;
+      otherTeam.score.set(Math.min(otherTeamWins, otherTeam.score.get + diff));
+      stillCardedPlayer.set(temp);
+      temp = notCardedPlayer.get!;
+      temp.cardTimeRemaining = 0;
+      notCardedPlayer.set(temp);
     }
+  } else {
+    const temp = player.get!;
+    if (temp.cardTimeRemaining !== -1) {
+      temp.cardTime += duration;
+      temp.cardTimeRemaining = temp.cardTime;
+    }
+    player.set(temp);
   }
-  const temp = player.get!;
-  if (temp.cardTimeRemaining >= 0) {
-    temp.cardTime += duration;
-    temp.cardTimeRemaining = temp.cardTime;
-  }
-  player.set(temp);
-  cardForGame(game.id, firstTeam, leftPlayer, color, duration, reason);
+  cardForGame(game.id, firstTeam, leftPlayer, color, duration, reason).catch(() => sync(game));
 }
 
 export function undo(game: GameState): void {
   if (!game) return;
+  startLoading();
   undoForGame(game.id).then(() => {
     sync(game);
   });
 }
 
 export function sync(game: GameState): void {
-  location.reload();
+  startLoading();
+  reloadGame(game.id);
 }

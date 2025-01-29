@@ -40,7 +40,8 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
               sortIndex={2}
               columns={['Percentage', 'Games Won']}
               editable={false}
-            ></Ladder>
+            >
+            </Ladder>
           </Box>
           <Box style={{ textAlign: 'center' }}>
             <Link className="hideLink" href={`/${tournament}/fixtures`}>
@@ -60,7 +61,8 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
               sortIndex={2}
               columns={['Percentage', 'Games Won']}
               editable={false}
-            ></Ladder>
+            >
+            </Ladder>
           </Box>
           <Box style={{ textAlign: 'center' }}>
             <Link className="hideLink" href={`/${tournament}/players`}>
@@ -72,7 +74,8 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
               sortIndex={2}
               columns={['B&F Votes', 'Points Scored']}
               editable={false}
-            ></Players>
+            >
+            </Players>
           </Box>
         </Grid.Col>
       </Grid>

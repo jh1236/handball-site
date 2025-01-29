@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import {
+  IconArrowsUpDown,
   IconBallTennis,
   IconBallVolleyball,
   IconCircleFilled,
@@ -17,7 +18,8 @@ import {
   GameState,
   greenCard,
   redCard,
-  score, timeout,
+  score,
+  timeout,
   warning,
   yellowCard,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
@@ -33,31 +35,31 @@ const CARDS = {
   warning: [
     'Audible Swearing',
     'Delay of Game',
-    'Did not follow the end of game process',
+    'Missed Post-game Handshake',
     'Unreasonable Carry',
   ],
   green: [
-    'Disrespect Towards Officials',
+    'Disrespect',
     'Audible Swearing',
     'Dangerous Play (James)',
     'Deliberate Delay of Game',
-    'Deliberately Hindering another Player',
-    'Not Meeting the Uniform Requirements',
+    'Hindering another Player',
+    'Inappropriate Uniform',
   ],
   yellow: [
-    'Continuous Disrespect Towards Officials',
+    'Continuous Disrespect',
     'Equipment Abuse',
-    'Aggressively Dangerous Play (James)',
+    'Aggressive Play (James)',
     'Misconduct Whilst Carded',
-    'Displays of Aggression towards Anyone',
-    'Trying to get around swearing rules',
+    'Displays of Aggression',
+    'Trying to circumvent swearing rules',
   ],
   red: [
-    'Violence Towards Any Person',
-    'Disruptive Disrespect Towards Officials',
-    'Equipment Abuse in a Violent Manner',
+    'Violence',
+    'Disruptive Disrespect',
+    'Violent Equipment Abuse',
     'Accusations Of Cheating',
-    'Any Form of Discrimination',
+    'Discrimination',
   ],
 };
 
@@ -68,6 +70,30 @@ function getActions(
   serving: boolean,
   close: () => void
 ) {
+  if (!game.started.get) {
+    const team = firstTeam ? game.teamOne : game.teamTwo;
+    let players = [team.left, team.right, team.sub].filter((a) => a.get);
+    const currentPlayer = players[leftSide ? 0 : 1];
+    players = players.filter((a) => a.get?.searchableName !== currentPlayer.get?.searchableName);
+    return players.map((a) => ({
+        Icon: IconArrowsUpDown,
+        value: `Set ${a.get?.name}`,
+        color: 'white',
+        content: (
+          <Button
+            size="lg"
+            onClick={() => {
+              const temp = a.get!;
+              a.set(currentPlayer.get!);
+              currentPlayer.set(temp);
+              close();
+            }}
+          >
+            Swap
+          </Button>
+        ),
+      }));
+  }
   const out = [
     {
       Icon: IconBallTennis,
@@ -91,8 +117,8 @@ function getActions(
       color: 'grey',
       content: CARDS.warning.map((reason) => (
         <Button
-          style={{ margin: '5px' }}
-          size="lg"
+          style={{ margin: '3px' }}
+          size="sm"
           onClick={() => {
             warning(game, firstTeam, leftSide, reason);
             close();
@@ -103,29 +129,13 @@ function getActions(
       )),
     },
     {
-      Icon: IconClock,
-      value: 'Timeout',
-      color: 'blue',
-      content: (
-        <Button
-          size="lg"
-          onClick={() => {
-            timeout(game, firstTeam);
-            close();
-          }}
-        >
-          Timeout
-        </Button>
-      ),
-    },
-    {
       Icon: IconTriangleInvertedFilled,
       color: 'green',
       value: 'Green Card',
       content: CARDS.green.map((reason) => (
         <Button
-          style={{ margin: '5px' }}
-          size="lg"
+          style={{ margin: '3px' }}
+          size="sm"
           onClick={() => {
             greenCard(game, firstTeam, leftSide, reason);
             close();
@@ -143,8 +153,8 @@ function getActions(
         <Box>
           {CARDS.yellow.map((reason) => (
             <Button
-              style={{ margin: '5px' }}
-              size="lg"
+              style={{ margin: '3px' }}
+              size="sm"
               onClick={() => {
                 yellowCard(game, firstTeam, leftSide, reason);
                 close();
@@ -162,8 +172,8 @@ function getActions(
       value: 'Red Card',
       content: CARDS.red.map((reason) => (
         <Button
-          style={{ margin: '5px' }}
-          size="lg"
+          style={{ margin: '3px' }}
+          size="sm"
           onClick={() => {
             redCard(game, firstTeam, leftSide, reason);
             close();
@@ -215,29 +225,40 @@ function getActions(
   return out;
 }
 
-export function PlayerButton({ game, firstTeam, leftSide }: PlayerButtonProps) {
-  const player = useMemo(() => {
-    if (firstTeam) {
-      return leftSide ? game.teamOne.left.get : game.teamOne.right.get;
-    }
-    return leftSide ? game.teamTwo.left.get : game.teamTwo.right.get;
-  }, [
-    firstTeam,
-    leftSide,
-    game.teamOne.left.get,
-    game.teamOne.right.get,
-    game.teamTwo.left.get,
-    game.teamTwo.right.get,
-  ]);
+export function PlayerButton({
+  game,
+  firstTeam: trueFirstTeam,
+  leftSide: trueLeftSide,
+}: PlayerButtonProps) {
+  const firstTeam = trueFirstTeam === game.teamOneIGA.get;
   const serving = useMemo(
-    () => game.servedFromLeft === leftSide && game.firstTeamServes.get === firstTeam,
-    [firstTeam, game.firstTeamServes.get, game.servedFromLeft, leftSide]
+    () =>
+      game.started.get &&
+      game.servedFromLeft === trueLeftSide &&
+      game.firstTeamServes.get === firstTeam,
+    [firstTeam, game.firstTeamServes.get, game.servedFromLeft, game.started.get, trueLeftSide]
   );
-  const carded = useMemo(() => player?.cardTimeRemaining !== 0, [player]);
+  const player = useMemo(() => {
+    const team = firstTeam ? game.teamOne : game.teamTwo;
+    const cardedTeammates = [team.left.get, team.right.get].filter(
+      (a) => a?.cardTimeRemaining !== 0
+    );
+    const uncardedTeammates = [team.left.get, team.right.get].filter(
+      (a) => a?.cardTimeRemaining === 0
+    );
+    if (cardedTeammates.length) {
+      if (game.servedFromLeft === trueLeftSide) {
+        return uncardedTeammates[0];
+      }
+      return cardedTeammates[0];
+    }
+    return trueLeftSide ? team.left.get : team.right.get;
+  }, [firstTeam, game.teamOne, game.teamTwo, game.servedFromLeft, trueLeftSide]);
+  const leftSide = useMemo(() => player?.sideOfCourt === 'Left', [player?.sideOfCourt]);
   const [opened, { open, close }] = useDisclosure(false);
   const items = useMemo(
     () =>
-      getActions(game, firstTeam, leftSide, serving, close).map((item, i) => (
+      getActions(game, trueFirstTeam, leftSide, serving, close).map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
           <Accordion.Control>
             <item.Icon color={item.color}></item.Icon>
@@ -251,35 +272,40 @@ export function PlayerButton({ game, firstTeam, leftSide }: PlayerButtonProps) {
   const name = player ? player.name : 'Loading...';
   return (
     <>
-      <Modal hiddenFrom="md" opened={opened} centered fullScreen onClose={close} title="Action">
-        <Title> {player?.name ?? 'Placeholder'}</Title>
-        <Accordion defaultValue="Score">{items}</Accordion>
-      </Modal>
-      <Modal visibleFrom="md" opened={opened} centered onClose={close} title="Action">
+      <Modal opened={opened} centered onClose={close} title="Action">
         <Title> {player?.name ?? 'Placeholder'}</Title>
         <Accordion defaultValue="Score">{items}</Accordion>
       </Modal>
       <Button
         size="lg"
-        color={`${serving ? 'teal' : 'blue'}.${leftSide ? 7 : 9}`}
+        radius={0}
+        color={`${serving ? 'teal' : 'blue'}.${trueLeftSide ? 7 : 9}`}
         style={{
           width: '100%',
-          height: carded ? '95%' : '100%',
+          height: player?.cardTimeRemaining !== 0 ? '95%' : '100%',
           fontWeight: serving ? 'bold' : 'normal',
         }}
         onClick={open}
       >
-        {carded ? <s>{name}</s> : game.faulted.get && serving ? <i>{name}</i> : name}
+        {player?.cardTimeRemaining !== 0 ? (
+          <s>{name}</s>
+        ) : game.faulted.get && serving ? (
+          <i>{name}</i>
+        ) : (
+          name
+        )}
       </Button>
-      {carded && player && (
+      {player?.cardTimeRemaining !== 0 && player && (
         <Progress
+          radius={0}
           style={{ height: '5%' }}
           color={player!.cardTimeRemaining < 0 ? 'red' : player!.cardTime > 2 ? 'yellow' : 'green'}
           value={
             100 *
             (player!.cardTimeRemaining >= 0 ? player!.cardTimeRemaining / player!.cardTime : 1)
           }
-        ></Progress>
+        >
+        </Progress>
       )}
     </>
   );

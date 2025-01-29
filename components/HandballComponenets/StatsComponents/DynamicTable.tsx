@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react';
 import { Image, MultiSelect, Table } from '@mantine/core';
-import { toTitleCase } from '@/tools/tools';
 import { c } from 'tinyrainbow/dist/index-c1cfc5e9';
+import { toTitleCase } from '@/tools/tools';
 
 function selectedToNumber(all: string[], selected: string[]): number {
   let out = 0;

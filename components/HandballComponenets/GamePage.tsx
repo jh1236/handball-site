@@ -5,11 +5,11 @@ import { linearGradient } from 'polished';
 import { toLocaleString } from 'postcss-preset-mantine';
 import { ReactFitty } from 'react-fitty';
 import { Box, Button, Grid, ScrollArea, Text, Title } from '@mantine/core';
+import { switchStatement } from '@babel/types';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
 import { GameStructure } from '@/ServerActions/types';
-import {switchStatement} from "@babel/types";
 
 interface GamePageProps {
   gameID: number;

@@ -56,7 +56,8 @@ export default function Ladder({
           data={ladder ?? []}
           editable={editable}
           maxRows={Math.floor(maxRows / 2)}
-        ></DynamicTable>
+        >
+        </DynamicTable>
         <Title order={3}>Pool Two</Title>
         <DynamicTable
           columns={columns}
@@ -65,7 +66,8 @@ export default function Ladder({
           data={poolTwo ?? []}
           editable={false}
           maxRows={Math.floor(maxRows / 2)}
-        ></DynamicTable>
+        >
+        </DynamicTable>
       </Box>
     );
   }
@@ -77,6 +79,7 @@ export default function Ladder({
       data={ladder ?? []}
       editable={editable}
       maxRows={maxRows}
-    ></DynamicTable>
+    >
+    </DynamicTable>
   );
 }
