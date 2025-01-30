@@ -55,6 +55,7 @@ export interface PlayerGameStatsStructure extends PersonStructure {
   pointsScored: number;
   acesScored: number;
   isBestPlayer: boolean;
+  isCaptain: boolean;
   faults: number;
   doubleFaults: number;
   servedPoints: number;

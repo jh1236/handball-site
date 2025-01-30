@@ -11,6 +11,14 @@ export function loggedIn() {
   return localStorage.getItem('token') !== null;
 }
 
+export function isAdmin() {
+  return loggedIn() && +localStorage.getItem('permissionLevel')! === 5;
+}
+
+export function isOfficial() {
+  return loggedIn() && +localStorage.getItem('permissionLevel')! >= 2;
+}
+
 export function tokenFetch(url: string | URL, args: any = {}) {
   if (loggedIn()) {
     if (!args.headers) {

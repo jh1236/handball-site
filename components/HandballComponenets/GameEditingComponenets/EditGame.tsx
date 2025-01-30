@@ -14,11 +14,13 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
-import { loggedIn } from '@/components/HandballComponenets/ServerActions';
+import { isAdmin, isOfficial, loggedIn } from '@/components/HandballComponenets/ServerActions';
 import { getGame } from '@/ServerActions/GameActions';
 import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 let setGameFn: (game: GameStructure) => void;
+//necessary to reveal the state from the React component
+// eslint-disable-next-line import/no-mutable-exports
 export let startLoading: () => void;
 
 export function reloadGame(gameID: number) {
@@ -33,9 +35,9 @@ export function EditGame({ game }: { game: number }) {
   const [visibleLoading, { open: openLoading, close: closeLoading }] = useDisclosure(false);
   startLoading = openLoading;
   const [visibleTimeout, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-  const [rounds, setRounds] = React.useState<number>(0);
   const [faulted, setFaulted] = React.useState<boolean>(false);
   const [started, setStarted] = React.useState<boolean>(true);
+  const [ended, setEnded] = React.useState<boolean>(false);
   const [firstTeamServes, setFirstTeamServes] = React.useState<boolean>(false);
   const [timeoutExpirationTime, setTimeoutExpirationTime] = React.useState<number>(-1);
   const [currentTime, setCurrentTime] = React.useState<number>(300);
@@ -84,11 +86,11 @@ export function EditGame({ game }: { game: number }) {
   useEffect(() => {
     if (!gameObj) return;
     setFirstTeamServes(gameObj.firstTeamToServe);
-    setRounds(gameObj.teamOneScore + gameObj.teamTwoScore);
     setFaulted(gameObj.faulted);
     setTeamOneIGA(gameObj.firstTeamIga ?? true);
     setTimeoutExpirationTime(gameObj.timeoutExpirationTime);
     setStarted(gameObj.started);
+    setEnded(gameObj.ended);
     //Team Specific
     setTeamOneTimeouts(gameObj.teamOneTimeouts);
     setTeamOneScore(gameObj.teamOneScore);
@@ -107,9 +109,10 @@ export function EditGame({ game }: { game: number }) {
         }
       }
     } else {
+      //trick i stole from python, if nonCaptain is null it will be replaced with undefined
       setTeamOneLeft(teamOne.captain);
-      setTeamOneRight(teamOne.nonCaptain);
-      setTeamOneSub(teamOne.substitute);
+      setTeamOneRight(teamOne.nonCaptain || undefined);
+      setTeamOneSub(teamOne.substitute || undefined);
     }
     setTeamOneName(gameObj.teamOne.name);
     setTeamTwoName(gameObj.teamTwo.name);
@@ -130,8 +133,9 @@ export function EditGame({ game }: { game: number }) {
       }
     } else {
       setTeamTwoLeft(teamTwo.captain);
-      setTeamTwoRight(teamTwo.nonCaptain);
-      setTeamTwoSub(teamTwo.substitute);
+      //trick i stole from python, if nonCaptain is null it will be replaced with undefined
+      setTeamTwoRight(teamTwo.nonCaptain || undefined);
+      setTeamTwoSub(teamTwo.substitute || undefined);
     }
     closeLoading();
   }, [closeLoading, gameObj]);
@@ -157,6 +161,10 @@ export function EditGame({ game }: { game: number }) {
       get: started,
       set: setStarted,
     },
+    ended: {
+      get: ended,
+      set: setEnded,
+    },
     firstTeamServes: {
       get: firstTeamServes,
       set: setFirstTeamServes,
@@ -166,10 +174,6 @@ export function EditGame({ game }: { game: number }) {
       set: setFaulted,
     },
     id: gameObj?.id ?? -1,
-    rounds: {
-      get: rounds,
-      set: setRounds,
-    },
     servedFromLeft,
     teamOne: {
       name: teamOneName,
@@ -250,6 +254,16 @@ export function EditGame({ game }: { game: number }) {
       </Link>
     </>
   );
+  const officialProps = (
+    <>
+      This game has been set to official, only an admin can edit it!
+      <br />
+      <br />
+      <Link href={`/games/${game}`}>
+        <Button size="lg">To Game page</Button>
+      </Link>
+    </>
+  );
   return (
     <Box style={{ width: '100%', height: '100vh' }}>
       <LoadingOverlay
@@ -258,7 +272,14 @@ export function EditGame({ game }: { game: number }) {
         loaderProps={{ color: 'pink', type: 'bars' }}
       />
       <LoadingOverlay visible={visibleTimeout} loaderProps={{ children: timeoutKids }} />
-      <LoadingOverlay visible={!loggedIn()} loaderProps={{ children: loginProps }} />
+      <LoadingOverlay
+        overlayProps={{
+          color: '#222',
+          blur: 15,
+        }}
+        visible={!isOfficial() || (gameObj?.status === 'Official' && !isAdmin())}
+        loaderProps={{ children: gameObj?.status === 'Official' ? officialProps : loginProps }}
+      />
       <Box style={{ width: '100%', height: '40%' }}>
         <Box style={{ width: '50%', height: '90%', float: 'left' }}>
           <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>

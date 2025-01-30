@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import {
+  IconArrowsLeftRight,
   IconArrowsUpDown,
   IconBallTennis,
   IconBallVolleyball,
@@ -9,6 +10,7 @@ import {
   IconSkull,
   IconSquareFilled,
   IconTriangleInvertedFilled,
+  IconTrophy,
 } from '@tabler/icons-react';
 import { Accordion, Box, Button, Modal, Progress, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -19,6 +21,7 @@ import {
   greenCard,
   redCard,
   score,
+  sub,
   timeout,
   warning,
   yellowCard,
@@ -72,28 +75,51 @@ function getActions(
 ) {
   if (!game.started.get) {
     const team = firstTeam ? game.teamOne : game.teamTwo;
-    let players = [team.left, team.right, team.sub].filter((a) => a.get);
+    let players = [team.left, team.right, team.sub];
     const currentPlayer = players[leftSide ? 0 : 1];
-    players = players.filter((a) => a.get?.searchableName !== currentPlayer.get?.searchableName);
+    players = players.filter(
+      (a) => a.get && a.get.searchableName !== currentPlayer.get?.searchableName
+    );
     return players.map((a) => ({
-        Icon: IconArrowsUpDown,
-        value: `Set ${a.get?.name}`,
+      Icon: IconArrowsUpDown,
+      value: `Swap with ${a.get?.name}`,
+      color: 'white',
+      content: (
+        <Button
+          size="lg"
+          onClick={() => {
+            const temp = a.get!;
+            a.set(currentPlayer.get!);
+            currentPlayer.set(temp);
+            close();
+          }}
+        >
+          Swap
+        </Button>
+      ),
+    }));
+  }
+  if (game.ended.get) {
+    return [
+      {
+        Icon: IconTrophy,
+        value: 'Set Best Player',
         color: 'white',
         content: (
           <Button
             size="lg"
             onClick={() => {
-              const temp = a.get!;
-              a.set(currentPlayer.get!);
-              currentPlayer.set(temp);
+              score(game, firstTeam, leftSide);
               close();
             }}
           >
-            Swap
+            Score
           </Button>
         ),
-      }));
+      },
+    ];
   }
+  const team = firstTeam ? game.teamOne : game.teamTwo;
   const out = [
     {
       Icon: IconBallTennis,
@@ -184,6 +210,24 @@ function getActions(
       )),
     },
   ];
+  if (team.sub.get && game.teamOne.score.get + game.teamTwo.score.get < 9) {
+    out.splice(1, 0, {
+      Icon: IconArrowsLeftRight,
+      value: `Substitute (${9 - (game.teamOne.score.get + game.teamTwo.score.get)} points remaining)`,
+      color: 'white',
+      content: (
+        <Button
+          size="lg"
+          onClick={() => {
+            sub(game, firstTeam, leftSide);
+            close();
+          }}
+        >
+          Swap with {team.sub.get.name}
+        </Button>
+      ),
+    });
+  }
   if (serving) {
     out.splice(
       1,
@@ -222,6 +266,7 @@ function getActions(
       }
     );
   }
+
   return out;
 }
 
@@ -258,18 +303,20 @@ export function PlayerButton({
   const [opened, { open, close }] = useDisclosure(false);
   const items = useMemo(
     () =>
-      getActions(game, trueFirstTeam, leftSide, serving, close).map((item, i) => (
-        <Accordion.Item key={i} value={item.value}>
-          <Accordion.Control>
-            <item.Icon color={item.color}></item.Icon>
-            {item.value}
-          </Accordion.Control>
-          <Accordion.Panel>{item.content}</Accordion.Panel>
-        </Accordion.Item>
-      )),
-    [close, firstTeam, game, leftSide, serving]
+      getActions(game, firstTeam, game.started.get ? leftSide : trueLeftSide, serving, close).map(
+        (item, i) => (
+          <Accordion.Item key={i} value={item.value}>
+            <Accordion.Control>
+              <item.Icon color={item.color}></item.Icon>
+              {item.value}
+            </Accordion.Control>
+            <Accordion.Panel>{item.content}</Accordion.Panel>
+          </Accordion.Item>
+        )
+      ),
+    [close, firstTeam, game, leftSide, serving, trueLeftSide]
   );
-  const name = player ? player.name : 'Loading...';
+  const name = player ? (player.isCaptain ? `${player.name} (c)` : player.name) : 'Loading...';
   return (
     <>
       <Modal opened={opened} centered onClose={close} title="Action">
@@ -282,8 +329,9 @@ export function PlayerButton({
         color={`${serving ? 'teal' : 'blue'}.${trueLeftSide ? 7 : 9}`}
         style={{
           width: '100%',
-          height: player?.cardTimeRemaining !== 0 ? '95%' : '100%',
+          height: (player?.cardTimeRemaining ?? 0) !== 0 ? '95%' : '100%',
           fontWeight: serving ? 'bold' : 'normal',
+          margin: 0,
         }}
         onClick={open}
       >
@@ -304,8 +352,7 @@ export function PlayerButton({
             100 *
             (player!.cardTimeRemaining >= 0 ? player!.cardTimeRemaining / player!.cardTime : 1)
           }
-        >
-        </Progress>
+        ></Progress>
       )}
     </>
   );
