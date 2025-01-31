@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { linearGradient } from 'polished';
-import { toLocaleString } from 'postcss-preset-mantine';
-import { ReactFitty } from 'react-fitty';
-import { Box, Button, Grid, ScrollArea, Text, Title } from '@mantine/core';
-import { switchStatement } from '@babel/types';
+import { Box, Center, Divider, Grid, Paper, Table, Tabs, Text, Title } from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
@@ -17,10 +13,12 @@ interface GamePageProps {
 
 export function GamePage({ gameID }: GamePageProps) {
   const [game, setGame] = React.useState<GameStructure>();
-  const [openDrawer, setOpenDrawer] = React.useState<number>(0);
   localStorage.getItem('permissions');
   useEffect(() => {
-    getGame({ gameID }).then(setGame);
+    getGame({
+      gameID,
+      includeStats: true,
+    }).then(setGame);
   }, [gameID]);
   if (!game) {
     return <SidebarLayout>Loading...</SidebarLayout>;
@@ -35,12 +33,82 @@ export function GamePage({ gameID }: GamePageProps) {
   localeDate.push(date.toLocaleDateString().slice(0, LocaleDateIndex + 1));
   localeDate.push(date.toLocaleTimeString().slice(LocaleDateIndex + 1));
 
+  function generateStatTable(): any {
+    if (!game || !game.teamOne || !game.teamTwo || !game.teamOne.stats || !game.teamTwo.stats) {
+      return <p> error </p>;
+    }
+    const statsTable: any[] = [];
+    for (const k of Object.keys(game.teamOne.stats)) {
+      if (k !== 'Elo Delta') {
+        statsTable.push({
+          teamOneStat: game.teamOne.stats[k],
+          stat: k,
+          teamTwoStat: game.teamTwo.stats[k],
+        });
+      }
+    }
+    const rows = statsTable.map((s) => (
+      <Table.Tr key={s.stat}>
+        <Table.Td>
+          {s.teamOneStat} {/*handles the displaying the delta elo*/ ' '}
+          {s.stat === 'Elo' && (
+            <Text
+              fz="sm"
+              fw="bold"
+              display="inline"
+              c={Number(game.teamOne.stats['Elo Delta']) < 0 ? 'red' : 'green'}
+            >
+              {game.teamOne.stats['Elo Delta'] > 0
+                ? `+${game.teamOne.stats['Elo Delta']}`
+                : game.teamOne.stats['Elo Delta']}
+            </Text>
+          )}
+        </Table.Td>
+        <Table.Td>{s.stat}</Table.Td>
+        <Table.Td>
+          {s.teamTwoStat}{' '}
+          {s.stat === 'Elo' && (
+            <Text
+              fw="bold"
+              display="inline"
+              c={Number(game.teamTwo.stats['Elo Delta']) < 0 ? 'red' : 'green'}
+            >
+              {game.teamTwo.stats['Elo Delta'] > 0
+                ? `+${game.teamTwo.stats['Elo Delta']}`
+                : game.teamTwo.stats['Elo Delta']}
+            </Text>
+          )}
+        </Table.Td>
+      </Table.Tr>
+    ));
+    return (
+      <Table stripedColor="#f0fff0" striped="odd" withColumnBorders>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th w="37.5%" style={{ textAlign: 'center' }}>
+              {game.teamOne.name}
+            </Table.Th>
+            <Table.Th w="25%" style={{ textAlign: 'center' }}>
+              Statistic
+            </Table.Th>
+            <Table.Th w="37.5%" style={{ textAlign: 'center' }}>
+              {game.teamTwo.name}
+            </Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
+      </Table>
+    );
+  }
+
   return (
-    <SidebarLayout tournamentName={game?.tournament.searchableName}>
-      <Box ta="center" w="95vw">
+    <SidebarLayout tournamentName={game.tournament.searchableName}>
+      <Box ta="center" w="100%">
         {/* does the Gradient area*/}
         <Box
-          className={classes.gradientBackground}
+          className={
+            game.teamOneScore > game.teamTwoScore ? classes.teamOneWin : classes.teamTwoWin
+          }
           w="100%"
           h="300px"
           pos="relative"
@@ -55,7 +123,7 @@ export function GamePage({ gameID }: GamePageProps) {
             align="center"
             mb={20}
             mah={250}
-            w="95%"
+            w="100%"
             style={{
               verticalAlign: 'middle',
               fontWeight: 'bold',
@@ -64,21 +132,13 @@ export function GamePage({ gameID }: GamePageProps) {
             }}
           >
             <Grid.Col span={5}>
-              <ReactFitty wrapText minSize={20}>
-                {game.teamOne.name.length > 30
-                  ? `${game.teamOne.name.substring(0, 30)}...`
-                  : game.teamOne.name}
-              </ReactFitty>
+              <Title lineClamp={2}>{game.teamOne.name}</Title>
             </Grid.Col>
             <Grid.Col span={2} style={{ fontSize: 30 }}>
               vs
             </Grid.Col>
             <Grid.Col span={5}>
-              <ReactFitty wrapText minSize={20}>
-                {game.teamTwo.name.length > 30
-                  ? `${game.teamTwo.name.substring(0, 30)}...`
-                  : game.teamTwo.name}
-              </ReactFitty>
+              <Title lineClamp={2}>{game.teamTwo.name}</Title>
             </Grid.Col>
           </Grid>
           <Grid columns={5} pos="relative" top={-25}>
@@ -100,22 +160,55 @@ export function GamePage({ gameID }: GamePageProps) {
               {(game.length / 60).toFixed(0)} Minutes
             </Grid.Col>
           </Grid>
-          <Grid style={{ fontSize: '100px' }} pos="relative" top={-50}>
-            <Grid.Col span={5}>{game.teamOneScore}</Grid.Col>
-            <Grid.Col span={2}>-</Grid.Col>
-            <Grid.Col span={5}>{game.teamTwoScore}</Grid.Col>
+          <Grid
+            style={{ fontSize: '80px' }}
+            pos="relative"
+            top={-50}
+            columns={13}
+            overflow="hidden"
+            h="150px"
+          >
+            <Grid.Col span={3}>
+              <img
+                src={game.teamOne.imageUrl}
+                alt="a"
+                style={{
+                  margin: 'auto',
+                  width: '100%',
+                }}
+              ></img>
+            </Grid.Col>
+            <Grid.Col span={3}>{game.teamOneScore}</Grid.Col>
+            <Grid.Col span={1}>-</Grid.Col>
+            <Grid.Col span={3}>{game.teamTwoScore}</Grid.Col>
+            <Grid.Col span={3}>
+              <img
+                src={game.teamTwo.imageUrl}
+                alt="a"
+                style={{
+                  margin: 'auto',
+                  width: '90%',
+                }}
+              ></img>
+            </Grid.Col>
           </Grid>
+          <Text pos="relative" bottom={50}>
+            Scored by {game.official.name}
+          </Text>
         </Box>
-        <Box pos="relative" top={500}>
-          <Box>
-            <Button id="test1" onClick={() => setOpenDrawer(0)} disabled={openDrawer === 0}>Test 1</Button>
-            <Button id="test2" onClick={() => setOpenDrawer(1)}>Test 2</Button>
-          </Box>
-          <Box>
-            <Text>asyfgbakvhb</Text>
-            {openDrawer === 0 ? <Text>Some cursed shit!!</Text> : null}
-            {openDrawer === 1 && <Text>Some other cursed shit!!</Text>}
-          </Box>
+        <Divider></Divider>
+        <Box pos="relative">
+          <Tabs defaultValue="teamStats" color="#B2F2BB">
+            <Paper component={Tabs.List} grow bg="#fcfffc" shadow="xs" justify="center">
+              <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
+              <Tabs.Tab value="2">Test 2</Tabs.Tab>
+              <Tabs.Tab value="3">Test 3</Tabs.Tab>
+            </Paper>
+            <Tabs.Panel value="teamStats">{generateStatTable()}</Tabs.Panel>
+            <Tabs.Panel value="2">this is number 2</Tabs.Panel>
+            <Tabs.Panel value="3">this is 3</Tabs.Panel>
+          </Tabs>
+          <Box></Box>
         </Box>
       </Box>
     </SidebarLayout>

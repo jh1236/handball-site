@@ -8,7 +8,10 @@ export function toTitleCase(str: string): string {
 }
 
 export const useContainerDimensions = (myRef: React.RefObject<HTMLElement>) => {
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [dimensions, setDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
 
   useEffect(() => {
     const getDimensions = () => ({
