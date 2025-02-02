@@ -1,12 +1,16 @@
 import { useMemo } from 'react';
 import {
+  IconAlertTriangle,
   IconArrowsUpDown,
   IconBallTennis,
   IconClock,
+  IconNote,
+  IconNotes,
+  IconTrophy,
   IconUser,
   IconUsersGroup,
 } from '@tabler/icons-react';
-import { Accordion, Button, List, Modal, Text, Title } from '@mantine/core';
+import { Accordion, Button, List, Modal, Text, Textarea, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   GameState,
@@ -99,6 +103,64 @@ function getActions(game: GameState, firstTeam: boolean, serving: boolean, close
     );
     return out;
   }
+  if (game.ended.get) {
+    const allPlayers = [
+      game.teamOne.left,
+      game.teamOne.right,
+      game.teamOne.sub,
+      game.teamTwo.left,
+      game.teamTwo.right,
+      game.teamTwo.sub,
+    ].filter((a) => typeof a.get !== 'undefined');
+    if (team.sub.get) {
+      out.splice(1, 0, {
+        Icon: IconTrophy,
+        value: `Set ${team.sub.get.name} as Best Player`,
+        color: 'white',
+        content: (
+          <Button
+            color={team.sub.get?.isBestPlayer ? 'orange' : 'blue'}
+            size="lg"
+            onClick={() => {
+              allPlayers.forEach((p) => {
+                const t = p.get!;
+                t.isBestPlayer = t.searchableName === team.sub?.get?.searchableName;
+                p.set(t);
+              });
+              close();
+            }}
+          >
+            Best
+          </Button>
+        ),
+      });
+    }
+    out.splice(
+      1,
+      0,
+      {
+        Icon: IconAlertTriangle,
+        value: 'Protest reason',
+        color: 'yellow',
+        content: (
+          <Textarea
+            value={team.protest.get}
+            onChange={(v) => team.protest.set(v.currentTarget.value)}
+          ></Textarea>
+        ),
+      },
+      {
+        Icon: IconNote,
+        value: 'Notes',
+        color: 'white',
+        content: <Textarea
+          value={team.notes.get}
+          onChange={(v) => team.notes.set(v.currentTarget.value)}
+        ></Textarea>,
+      }
+    );
+    return out;
+  }
   const timeoutsRemaining = 1 - team.timeouts.get;
   out.splice(1, 0, {
     Icon: IconClock,
@@ -126,9 +188,13 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
   );
+  const otherTeam = useMemo(
+    () => (firstTeam ? game.teamTwo : game.teamOne),
+    [firstTeam, game.teamOne, game.teamTwo]
+  );
   const serving = useMemo(
-    () => game.firstTeamServes.get === firstTeam,
-    [firstTeam, game.firstTeamServes.get]
+    () => !game.ended.get && game.firstTeamServes.get === firstTeam,
+    [firstTeam, game.ended.get, game.firstTeamServes.get]
   );
   const [opened, { open, close }] = useDisclosure(false);
   const items = useMemo(
@@ -142,7 +208,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
           <Accordion.Panel>{item.content}</Accordion.Panel>
         </Accordion.Item>
       )),
-    [close, trueFirstTeam, game, serving]
+    [game, firstTeam, serving, close]
   );
   const name = team ? team.name : 'Loading...';
   return (
@@ -154,7 +220,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
       <Button
         radius={0}
         size="lg"
-        color={`${serving ? 'teal' : 'blue'}.5`}
+        color={`${game.ended.get && team.score.get > otherTeam.score.get ? 'orange' : serving ? 'teal' : 'blue'}.5`}
         style={{
           width: '100%',
           height: '100%',
@@ -163,7 +229,8 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
         onClick={open}
       >
         <b>
-          {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'})
+          {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'}){' '}
+          {game.ended.get && team.score.get > otherTeam.score.get && <IconTrophy></IconTrophy>}
         </b>
       </Button>
     </>

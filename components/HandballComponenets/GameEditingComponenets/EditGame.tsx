@@ -2,16 +2,18 @@
 
 import React, { useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Box, Button, LoadingOverlay, Title } from '@mantine/core';
+import { Box, Button, LoadingOverlay, Textarea, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   begin,
   del,
+  end,
   endTimeout,
   GameState,
   sync,
   undo,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { GameScore } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { isAdmin, isOfficial, loggedIn } from '@/components/HandballComponenets/ServerActions';
@@ -41,11 +43,15 @@ export function EditGame({ game }: { game: number }) {
   const [firstTeamServes, setFirstTeamServes] = React.useState<boolean>(false);
   const [timeoutExpirationTime, setTimeoutExpirationTime] = React.useState<number>(-1);
   const [currentTime, setCurrentTime] = React.useState<number>(300);
-  const [teamOneTimeouts, setTeamOneTimeouts] = React.useState<number>(0);
-  const [teamOneServedLeft, setTeamOneServedLeft] = React.useState<boolean>(true);
   const [teamOneIGA, setTeamOneIGA] = React.useState<boolean>(true);
+  const [notes, setNotes] = React.useState<string>('');
+
+  //team one state
+  const [teamOneTimeouts, setTeamOneTimeouts] = React.useState<number>(0);
+  const [teamOneNotes, setTeamOneNotes] = React.useState<string>('');
+  const [teamOneProtest, setTeamOneProtest] = React.useState<string>('');
+  const [teamOneServedLeft, setTeamOneServedLeft] = React.useState<boolean>(true);
   const [teamOneName, setTeamOneName] = React.useState<string>('Loading...');
-  const [teamTwoName, setTeamTwoName] = React.useState<string>('Loading...');
   const [teamOneScore, setTeamOneScore] = React.useState<number>(0);
   const [teamOneLeft, setTeamOneLeft] = React.useState<PlayerGameStatsStructure | undefined>(
     undefined
@@ -56,8 +62,13 @@ export function EditGame({ game }: { game: number }) {
   const [teamOneSub, setTeamOneSub] = React.useState<PlayerGameStatsStructure | undefined>(
     undefined
   );
+  //team two state
   const [teamTwoTimeouts, setTeamTwoTimeouts] = React.useState<number>(0);
+
+  const [teamTwoNotes, setTeamTwoNotes] = React.useState<string>('');
+  const [teamTwoProtest, setTeamTwoProtest] = React.useState<string>('');
   const [teamTwoServedLeft, setTeamTwoServedLeft] = React.useState<boolean>(true);
+  const [teamTwoName, setTeamTwoName] = React.useState<string>('Loading...');
   const [teamTwoScore, setTeamTwoScore] = React.useState<number>(0);
   const [teamTwoLeft, setTeamTwoLeft] = React.useState<PlayerGameStatsStructure | undefined>(
     undefined
@@ -80,6 +91,16 @@ export function EditGame({ game }: { game: number }) {
   }, []);
 
   useEffect(() => {
+    if (teamOneScore || teamTwoScore) {
+      const bigScore = Math.max(teamOneScore, teamTwoScore);
+      const lilScore = Math.min(teamOneScore, teamTwoScore);
+      if (bigScore < 11) return;
+      if (bigScore - lilScore <= 1) return;
+      setEnded(true);
+    }
+  }, [teamOneScore, teamTwoScore]);
+
+  useEffect(() => {
     reloadGame(game);
   }, [game]);
 
@@ -90,7 +111,7 @@ export function EditGame({ game }: { game: number }) {
     setTeamOneIGA(gameObj.firstTeamIga ?? true);
     setTimeoutExpirationTime(gameObj.timeoutExpirationTime);
     setStarted(gameObj.started);
-    setEnded(gameObj.ended);
+    setEnded(gameObj.someoneHasWon);
     //Team Specific
     setTeamOneTimeouts(gameObj.teamOneTimeouts);
     setTeamOneScore(gameObj.teamOneScore);
@@ -175,11 +196,23 @@ export function EditGame({ game }: { game: number }) {
     },
     id: gameObj?.id ?? -1,
     servedFromLeft,
+    notes: {
+      get: notes,
+      set: setNotes,
+    },
     teamOne: {
       name: teamOneName,
       score: {
         get: teamOneScore,
         set: setTeamOneScore,
+      },
+      notes: {
+        get: teamOneNotes,
+        set: setTeamOneNotes,
+      },
+      protest: {
+        get: teamOneProtest,
+        set: setTeamOneProtest,
       },
       timeouts: {
         get: teamOneTimeouts,
@@ -207,6 +240,14 @@ export function EditGame({ game }: { game: number }) {
       score: {
         get: teamTwoScore,
         set: setTeamTwoScore,
+      },
+      notes: {
+        get: teamTwoNotes,
+        set: setTeamTwoNotes,
+      },
+      protest: {
+        get: teamTwoProtest,
+        set: setTeamTwoProtest,
       },
       timeouts: {
         get: teamTwoTimeouts,
@@ -325,17 +366,7 @@ export function EditGame({ game }: { game: number }) {
             flex: '5',
           }}
         >
-          {gameState.started.get ? (
-            <>
-              <Title order={1}>{gameState.teamOne.score.get}</Title>
-              <Title order={1}>-</Title>
-              <Title order={1}>{teamTwoScore}</Title>
-            </>
-          ) : (
-            <Button size="lg" onClick={() => begin(gameState)}>
-              Start
-            </Button>
-          )}
+          <GameScore game={gameState}></GameScore>
         </Box>
 
         <Box
