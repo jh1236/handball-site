@@ -107,9 +107,11 @@ function nextPoint(game: GameState, swap?: boolean) {
   }
   if (swap !== undefined) {
     const team = swap ? game.teamOne : game.teamTwo;
-    const temp = team.left?.get;
-    team.left?.set(team.right?.get);
-    team.right?.set(temp);
+    if (team.right.get && team.left.get) {
+      const temp = team.left?.get;
+      team.left.set(team.right?.get);
+      team.right.set(temp);
+    }
   }
   game.faulted.set(false);
 }
@@ -258,8 +260,16 @@ export function card(
   const otherTeam = firstTeam ? game.teamTwo : game.teamOne;
   const player = leftPlayer ? team.left : team.right;
   const otherPlayer = leftPlayer ? team.right : team.left;
-  if (player.get && otherPlayer.get?.cardTimeRemaining) {
-    const otherTeamWins = Math.max(11, team.score.get + 2);
+  const otherTeamWins = Math.max(11, team.score.get + 2);
+  if (!player.get || !otherPlayer.get) {
+    if (duration === -1) {
+      otherTeam.score.set(otherTeamWins);
+    } else {
+      otherTeam.score.set(Math.min(otherTeamWins, duration));
+    }
+    game.firstTeamServes.set(!firstTeam);
+
+  } else if (player.get && otherPlayer.get?.cardTimeRemaining) {
     if (otherPlayer.get.cardTimeRemaining === -1) {
       if (duration === -1) {
         otherTeam.score.set(otherTeamWins);

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { b } from '@storybook/react/dist/public-types-1083bc5a';
 import { Box, Title } from '@mantine/core';
 import { DynamicTable } from '@/components/HandballComponenets/StatsComponents/DynamicTable';
 import { getLadder } from '@/ServerActions/TeamActions';
@@ -58,8 +57,7 @@ export default function Ladder({
           data={ladder ?? []}
           editable={editable}
           maxRows={Math.floor(maxRows / 2)}
-        >
-        </DynamicTable>
+        ></DynamicTable>
         <Title order={3}>Pool Two</Title>
         <DynamicTable
           columns={columnState}
@@ -80,7 +78,6 @@ export default function Ladder({
       data={ladder ?? []}
       editable={editable}
       maxRows={maxRows}
-    >
-    </DynamicTable>
+    ></DynamicTable>
   );
 }

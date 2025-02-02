@@ -627,7 +627,7 @@ export function createGameWithPlayers(
   scorer?: SearchableName,
   teamOneName?: string,
   teamTwoName?: string
-): Promise<void> {
+): Promise<{ id: number }> {
   const body: any = {
     tournament,
     official,
@@ -644,7 +644,8 @@ export function createGameWithPlayers(
   if (teamTwoName) {
     body.teamTwo = teamTwoName;
   }
-  return tokenFetch('/games/update/end', {
+  console.log(JSON.stringify(body));
+  return tokenFetch('/games/update/create', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -654,6 +655,6 @@ export function createGameWithPlayers(
     if (!response.ok) {
       return Promise.reject(response.text());
     }
-    return Promise.resolve();
+    return response.json();
   });
 }

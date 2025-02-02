@@ -275,8 +275,7 @@ export function EditGame({ game }: { game: number }) {
   const timeoutKids = (
     <>
       <Title style={{ color: timeoutExpirationTime > currentTime ? '' : 'red' }} order={2}>
-        {(Math.floor((timeoutExpirationTime - currentTime) / 100) / 10).toFixed(1)}{' '}
-        Seconds
+        {(Math.floor((timeoutExpirationTime - currentTime) / 100) / 10).toFixed(1)} Seconds
       </Title>
       <br />
       <br />
@@ -322,12 +321,21 @@ export function EditGame({ game }: { game: number }) {
         loaderProps={{ children: gameObj?.status === 'Official' ? officialProps : loginProps }}
       />
       <Box style={{ width: '100%', height: '40%' }}>
-        <Box style={{ width: '50%', height: '90%', float: 'left' }}>
-          <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
-        </Box>
-        <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-          <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
-        </Box>
+        {teamOneRight || !teamOneLeft ? (
+          <>
+            <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+              <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
+            </Box>
+            <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+              <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
+            </Box>
+          </>
+        ) : (
+          <Box style={{ width: '100%', height: '90%', float: 'left' }}>
+            <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
+          </Box>
+        )}
+
         <Box style={{ width: '100%', height: '10%', float: 'right' }}>
           <TeamButton firstTeam={true} game={gameState}></TeamButton>
         </Box>
@@ -396,13 +404,22 @@ export function EditGame({ game }: { game: number }) {
         <Box style={{ width: '100%', height: '10%', float: 'right' }}>
           <TeamButton firstTeam={false} game={gameState}></TeamButton>
         </Box>
-        <Box style={{ width: '50%', height: '90%', float: 'left' }}>
-          <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
-        </Box>
-        <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-          <PlayerButton game={gameState} firstTeam={false} leftSide={false}></PlayerButton>
-        </Box>
+        {teamTwoRight || !teamOneLeft ? (
+          <>
+            <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+              <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
+            </Box>
+            <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+              <PlayerButton game={gameState} firstTeam={false} leftSide={false}></PlayerButton>
+            </Box>
+          </>
+        ) : (
+          <Box style={{ width: '100%', height: '90%', float: 'left' }}>
+            <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
+          </Box>
+        )}
       </Box>
+      ; ;
     </Box>
   );
 }
