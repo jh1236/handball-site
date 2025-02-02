@@ -44,7 +44,6 @@ export default function SidebarLayout({
         style={{
           overflowY: 'scroll',
           height: '100vh',
-          marginLeft: '20px',
           transition: '0.6s cubic-bezier(0.25, 1, 0.5, 1)',
         }}
         display={{

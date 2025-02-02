@@ -9,6 +9,7 @@ export interface TeamStructure {
   nonCaptain: PersonStructure | PlayerGameStatsStructure | null;
   substitute: PersonStructure | PlayerGameStatsStructure | null;
   teamColor: string | null;
+  teamColorAsRGBABecauseDigbyIsLazy: number[];
   servedFromLeft?: boolean;
   stats?: { [key: string]: any };
 
@@ -39,6 +40,7 @@ export interface TournamentStructure {
   notes: string;
   imageUrl: string;
   usingBadmintonServes: boolean;
+  editable: boolean;
 
   [k: string]: any;
 }
