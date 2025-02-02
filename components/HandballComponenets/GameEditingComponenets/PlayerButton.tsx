@@ -3,7 +3,6 @@ import {
   IconArrowsLeftRight,
   IconArrowsUpDown,
   IconBallTennis,
-  IconBallVolleyball,
   IconCircleFilled,
   IconExclamationMark,
   IconPlayHandball,
@@ -11,7 +10,17 @@ import {
   IconTriangleInvertedFilled,
   IconTrophy,
 } from '@tabler/icons-react';
-import { Accordion, Box, Button, Divider, Modal, Progress, Slider, Title } from '@mantine/core';
+import {
+  Accordion,
+  Box,
+  Button,
+  Collapse,
+  Group,
+  Modal,
+  Progress,
+  Slider,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   ace,
@@ -30,6 +39,16 @@ interface PlayerButtonProps {
   leftSide: boolean;
   firstTeam: boolean;
 }
+
+const SCORE_METHODS = [
+  'Double Bounce',
+  'Straight',
+  'Out of Court',
+  'Double Touch',
+  'Grabs',
+  'Illegal Body Part',
+  'Obstruction',
+];
 
 const CARDS = {
   warning: [
@@ -70,7 +89,9 @@ function getActions(
   serving: boolean,
   close: () => void,
   cardTime: number,
-  setCardTime: (v: number) => void
+  setCardTime: (v: number) => void,
+  openMore: boolean,
+  toggleOpenMore: () => void
 ) {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const allPlayers = [
@@ -132,21 +153,59 @@ function getActions(
       },
     ];
   }
+  let toggle = true;
   const out = [
     {
       Icon: IconBallTennis,
       value: 'Score',
       color: 'white',
       content: (
-        <Button
-          size="lg"
-          onClick={() => {
-            score(game, firstTeam, leftSide);
-            close();
-          }}
-        >
-          Score
-        </Button>
+        <>
+          {SCORE_METHODS.slice(0, 3).map((method) => {
+            toggle = !toggle;
+            return (
+              <>
+                <Button
+                  style={{ margin: '3px' }}
+                  size="sm"
+                  onClick={() => {
+                    score(game, firstTeam, leftSide, method);
+                    close();
+                  }}
+                >
+                  {method}
+                </Button>
+                <br />
+              </>
+            );
+          })}
+          <Box>
+            <Button style={{ margin: '3px' }} color="gray" onClick={toggleOpenMore}>
+              Show {openMore ? 'Less' : 'More'}
+            </Button>
+
+            <Collapse in={openMore}>
+              {SCORE_METHODS.slice(3).map((method) => {
+                toggle = !toggle;
+                return (
+                  <>
+                    <Button
+                      style={{ margin: '3px' }}
+                      size="sm"
+                      onClick={() => {
+                        score(game, firstTeam, leftSide, method);
+                        close();
+                      }}
+                    >
+                      {method}
+                    </Button>
+                    <br />
+                  </>
+                );
+              })}
+            </Collapse>
+          </Box>
+        </>
       ),
     },
     {
@@ -250,7 +309,8 @@ function getActions(
       color: 'white',
       content: (
         <Button
-          size="lg"
+          size="sm"
+          style={{ margin: '3px' }}
           onClick={() => {
             sub(game, firstTeam, leftSide);
             close();
@@ -269,7 +329,8 @@ function getActions(
       content: (
         <>
           <Button
-            size="lg"
+            style={{ margin: '3px' }}
+            size="sm"
             onClick={() => {
               ace(game);
               close();
@@ -278,9 +339,9 @@ function getActions(
             Ace
           </Button>
           <br />
-          <br />
           <Button
-            size="lg"
+            style={{ margin: '3px' }}
+            size="sm"
             onClick={() => {
               fault(game);
               close();
@@ -303,24 +364,26 @@ export function PlayerButton({
 }: PlayerButtonProps) {
   const firstTeam = trueFirstTeam === game.teamOneIGA.get;
   const [cardTime, setCardTime] = React.useState<number>(6);
-  const serving = useMemo(() => {
-    const team = firstTeam ? game.teamOne : game.teamTwo;
-    return (
+  const team = useMemo(() => (firstTeam ? game.teamOne : game.teamTwo), [game.teamOne.left.get]);
+  const [openMore, { toggle: toggleMore }] = useDisclosure(false);
+  const serving = useMemo(
+    () =>
       game.started.get &&
       !game.ended.get &&
       (game.servedFromLeft === trueLeftSide || !team.left.get || !team.right.get) &&
-      game.firstTeamServes.get === firstTeam
-    );
-  }, [
-    firstTeam,
-    game.ended.get,
-    game.firstTeamServes.get,
-    game.servedFromLeft,
-    game.started.get,
-    trueLeftSide,
-  ]);
+      game.firstTeamServes.get === firstTeam,
+    [
+      firstTeam,
+      game.ended.get,
+      game.firstTeamServes.get,
+      game.servedFromLeft,
+      game.started.get,
+      team.left.get,
+      team.right.get,
+      trueLeftSide,
+    ]
+  );
   const player = useMemo(() => {
-    const team = firstTeam ? game.teamOne : game.teamTwo;
     if (team.right.get === undefined) {
       return team.left.get;
     }
@@ -358,7 +421,9 @@ export function PlayerButton({
         serving,
         close,
         cardTime,
-        setCardTime
+        setCardTime,
+        openMore,
+        toggleMore
       ).map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
           <Accordion.Control>
@@ -395,7 +460,8 @@ export function PlayerButton({
           <i>{name}*</i>
         ) : (
           name
-        )}
+        )}{' '}
+        {(!team.left.get || !team.right.get) && serving && (trueLeftSide ? ' (Left)' : ' (Right)')}
       </Button>
       {player?.cardTimeRemaining !== 0 && player && !game.ended.get && (
         <Progress

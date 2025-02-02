@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import { IconCloudUpload, IconNote, IconTrophy } from '@tabler/icons-react';
-import { Accordion, Button, List, Modal, Textarea, Title } from '@mantine/core';
+import React, { useMemo, useState } from 'react';
+import { IconCheckbox, IconCloudUpload, IconNote, IconTrophy } from '@tabler/icons-react';
+import { Accordion, Button, Checkbox, List, Modal, Textarea, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   begin,
@@ -16,7 +16,9 @@ interface GameScoreArgs {
 function getActions(
   game: GameState,
   bestPlayer: PlayerGameStatsStructure | undefined,
-  close: () => void
+  close: () => void,
+  reviewReqd: boolean,
+  setReviewReqd: (value: ((prevState: boolean) => boolean) | boolean) => void
 ) {
   if (!bestPlayer) return [];
   const winningTeam =
@@ -36,6 +38,10 @@ function getActions(
             <List.Item>
               <strong>Best Player: </strong>
               {bestPlayer.name}
+            </List.Item>
+            <List.Item>
+              <strong>Review Required: </strong>
+              {reviewReqd ? 'Yes' : 'No'}
             </List.Item>
             <List.Item>
               <strong>Team One: </strong>
@@ -79,6 +85,19 @@ function getActions(
       ),
     },
     {
+      Icon: IconCheckbox,
+      value: 'Mark For Review',
+      color: 'orange',
+      content: (
+        <Checkbox
+          value={reviewReqd}
+          onChange={(e) => setReviewReqd(e.currentTarget.checked)}
+          label="Mark this game as requiring action"
+          description="This will notify the Umpire Manager"
+        />
+      ),
+    },
+    {
       Icon: IconCloudUpload,
       value: 'Finalise Game',
       color: 'white',
@@ -87,7 +106,7 @@ function getActions(
           size="lg"
           color="red"
           onClick={() => {
-            end(game, bestPlayer.searchableName);
+            end(game, bestPlayer.searchableName, reviewReqd);
             close();
           }}
         >
@@ -107,10 +126,11 @@ export function GameScore({ game }: GameScoreArgs) {
     game.teamTwo.right,
     game.teamTwo.sub,
   ].filter((a) => a.get && a.get.isBestPlayer);
+  const [reviewReqd, setReviewReqd] = useState<boolean>(false);
   const [opened, { open, close }] = useDisclosure(false);
   const items = useMemo(
     () =>
-      getActions(game, bestPlayer[0]?.get, close).map((item, i) => (
+      getActions(game, bestPlayer[0]?.get, close, reviewReqd, setReviewReqd).map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
           <Accordion.Control>
             <item.Icon color={item.color}></item.Icon>

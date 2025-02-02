@@ -35,6 +35,7 @@ export function EditGame({ game }: { game: number }) {
   const [gameObj, setGameObj] = React.useState<GameStructure | null>(null);
   setGameFn = setGameObj;
   const [visibleLoading, { open: openLoading, close: closeLoading }] = useDisclosure(false);
+  const [editOfficialGame, { close: iKnowWhatImDoing }] = useDisclosure(true);
   startLoading = openLoading;
   const [visibleTimeout, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
   const [faulted, setFaulted] = React.useState<boolean>(false);
@@ -294,7 +295,17 @@ export function EditGame({ game }: { game: number }) {
       </Link>
     </>
   );
-  const officialProps = (
+  const warnAdminAboutEditing = (
+    <>
+      This game has been set to official, are you sure you want to edit it?
+      <br />
+      <br />
+      <Button size="lg" onClick={iKnowWhatImDoing} color="orange">
+        I know what I&apos;m doing!
+      </Button>
+    </>
+  );
+  const OfficialCantEdit = (
     <>
       This game has been set to official, only an admin can edit it!
       <br />
@@ -317,8 +328,15 @@ export function EditGame({ game }: { game: number }) {
           color: '#222',
           blur: 15,
         }}
-        visible={!isOfficial() || (gameObj?.status === 'Official' && !isAdmin())}
-        loaderProps={{ children: gameObj?.status === 'Official' ? officialProps : loginProps }}
+        visible={!isOfficial() || (gameObj?.status === 'Official' && editOfficialGame)}
+        loaderProps={{
+          children:
+            gameObj?.status === 'Official'
+              ? isAdmin()
+                ? warnAdminAboutEditing
+                : OfficialCantEdit
+              : loginProps,
+        }}
       />
       <Box style={{ width: '100%', height: '40%' }}>
         {teamOneRight || !teamOneLeft ? (

@@ -31,7 +31,7 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
       <Grid w="98.5%">
         <Grid.Col span={{ base: 12, lg: 6 }}>
           <Box style={{ textAlign: 'center' }}>
-            <Link className="hideLink" href={`/${tournament}/players`}>
+            <Link className="hideLink" href={`/${tournament}/ladder`}>
               <Title order={2}>Ladder</Title>
             </Link>
             <Ladder

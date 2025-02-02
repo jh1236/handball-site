@@ -228,13 +228,24 @@ export function startGame(
 export function scoreForGame(
   gameId: number,
   firstTeam: boolean,
-  leftPlayer: boolean
+  leftPlayer: boolean,
+  method?:
+    | 'Double Bounce'
+    | 'Straight'
+    | 'Out of Court'
+    | 'Double Touch'
+    | 'Grabs'
+    | 'Illegal Body Part'
+    | 'Obstruction'
 ): Promise<void> {
   const body: any = {
     id: gameId,
     firstTeam,
     leftPlayer,
   };
+  if (method) {
+    body.method = method;
+  }
 
   return tokenFetch('/games/update/score', {
     method: 'POST',
@@ -551,7 +562,8 @@ export function endGame(
   protestTeamOne?: string,
   protestTeamTwo?: string,
   notesTeamOne?: string,
-  notesTeamTwo?: string
+  notesTeamTwo?: string,
+  markedForReview?: boolean
 ): Promise<void> {
   const body: any = {
     id: gameId,
@@ -572,6 +584,9 @@ export function endGame(
   }
   if (notesTeamTwo) {
     body.notesTeamTwo = notesTeamTwo;
+  }
+  if (markedForReview) {
+    body.markedForReview = 'true';
   }
 
   return tokenFetch('/games/update/end', {
