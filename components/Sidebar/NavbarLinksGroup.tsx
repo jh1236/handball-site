@@ -52,9 +52,19 @@ export function LinksGroup({
     <>
       <UnstyledButton onClick={() => setOpened((o) => !o)} className={classes.control}>
         <Group justify="space-between" gap={0}>
-          <Box style={{ display: 'flex', alignItems: 'center' }}>
+          <Box
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
             <ThemeIcon color="green" variant={colorScheme ? 'light' : undefined} size={30}>
-              <Icon style={{ width: rem(18), height: rem(18) }} />
+              <Icon
+                style={{
+                  width: rem(18),
+                  height: rem(18),
+                }}
+              />
             </ThemeIcon>
             <Box ml="md">{label}</Box>
           </Box>
