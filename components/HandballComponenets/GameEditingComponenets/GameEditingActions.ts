@@ -268,7 +268,6 @@ export function card(
       otherTeam.score.set(Math.min(otherTeamWins, duration));
     }
     game.firstTeamServes.set(!firstTeam);
-
   } else if (player.get && otherPlayer.get?.cardTimeRemaining) {
     if (otherPlayer.get.cardTimeRemaining === -1) {
       if (duration === -1) {
