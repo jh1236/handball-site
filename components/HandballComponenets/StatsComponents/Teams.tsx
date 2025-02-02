@@ -2,16 +2,16 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Box, Container, Grid, Image, Text } from '@mantine/core';
+import { Container, Grid, Image, Text } from '@mantine/core';
 import { getTeams } from '@/ServerActions/TeamActions';
-import { TeamStructure, TournamentStructure } from '@/ServerActions/types';
+import { TeamStructure } from '@/ServerActions/types';
 
 //TODO: - Uniform Box Size
 
 function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
   return (
     <Container
-      bg="red.5"
+      bg={team.teamColor ? team.teamColor : 'red.5'}
       w="auto"
       p={20}
       m={10}

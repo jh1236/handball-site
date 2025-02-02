@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react';
-import { Image, MultiSelect, Table } from '@mantine/core';
 import { c } from 'tinyrainbow/dist/index-c1cfc5e9';
+import { Image, MultiSelect, Table } from '@mantine/core';
 import { toTitleCase } from '@/tools/tools';
 
 function selectedToNumber(all: string[], selected: string[]): number {
@@ -38,10 +38,12 @@ type InputType = {
 interface TableProps<T extends InputType> {
   maxRows?: number;
   columns: string[];
+  setColumns?: (v: string[]) => void;
   editable?: boolean;
   data?: T[];
   objToLink: (t: T) => string;
   sortIndexIn?: number;
+  setSortIndexIn?: (v: number) => void;
 }
 
 export function DynamicTable<T extends InputType>({
@@ -51,6 +53,8 @@ export function DynamicTable<T extends InputType>({
   maxRows = -1,
   objToLink,
   sortIndexIn,
+  setColumns,
+  setSortIndexIn,
 }: TableProps<T>) {
   const [chartData, setChartData] = React.useState<T[]>([]);
   const [sortIndex, setSortIndex] = React.useState<number>(0);
@@ -62,7 +66,19 @@ export function DynamicTable<T extends InputType>({
     if (data) {
       setChartData(sortData(data, sortIndexIn ?? 0, 0));
     }
-  }, [data]);
+  }, [data, sortIndexIn]);
+
+  useEffect(() => {
+    if (setColumns) {
+      setColumns(selectedHeaders);
+    }
+  }, [selectedHeaders, setColumns]);
+
+  useEffect(() => {
+    if (setSortIndexIn) {
+      setSortIndexIn(sortIndex);
+    }
+  }, [sortIndex, setSortIndexIn]);
 
   useEffect(() => {
     const count = Number(searchParams.get('cols') ?? -1);
@@ -74,9 +90,10 @@ export function DynamicTable<T extends InputType>({
     ) {
       setSelectedHeaders(numberToSelected(Object.keys(chartData[0]?.stats! ?? {}), count));
     }
-  }, [searchParams, chartData, editable, selectedHeaders]);
+  }, [chartData]);
+
   useEffect(() => {
-    if (selectedHeaders.length === 0) {
+    if (selectedHeaders.length === 0 || !editable) {
       setSelectedHeaders(columns);
     }
     if (editable && JSON.stringify(selectedHeaders) !== JSON.stringify(columns)) {
@@ -184,8 +201,7 @@ export function DynamicTable<T extends InputType>({
                       style={{ width: '50px', height: '50px' }}
                       src={value.imageUrl}
                       alt={`The team logo for ${value.name}`}
-                    >
-                    </Image>
+                    ></Image>
                   </Link>
                 </Table.Td>
                 {['name'].concat(selectedHeaders).map((value2, idx) => (

@@ -8,7 +8,7 @@ export default async function TeamsPage({ params }: TournamentPageArgs) {
   return (
     <>
       <SidebarLayout tournamentName={tournament}>
-        <h1>Ladder</h1>
+        <h1>Teams</h1>
         <div>
           <Teams tournament={tournament}></Teams>
         </div>

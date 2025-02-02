@@ -274,8 +274,8 @@ export function EditGame({ game }: { game: number }) {
 
   const timeoutKids = (
     <>
-      <Title style={{ color: timeoutExpirationTime > currentTime ? 'white' : 'red' }} order={2}>
-        {(Math.floor(Math.max(timeoutExpirationTime - currentTime, 0) / 100) / 10).toFixed(1)}{' '}
+      <Title style={{ color: timeoutExpirationTime > currentTime ? '' : 'red' }} order={2}>
+        {(Math.floor((timeoutExpirationTime - currentTime) / 100) / 10).toFixed(1)}{' '}
         Seconds
       </Title>
       <br />

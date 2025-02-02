@@ -30,6 +30,7 @@ export default function Ladder({
   sortIndex,
 }: LadderProps) {
   // const [sort, setSort] = React.useState<number>(-1);
+  const [columnState, setColumnState] = React.useState<string[]>(columns);
   const [ladder, setLadder] = React.useState<TeamStructure[]>();
   const [isPooled, setIsPooled] = React.useState<boolean>(false);
   const [poolTwo, setPoolTwo] = React.useState<TeamStructure[]>();
@@ -50,7 +51,8 @@ export default function Ladder({
       <Box style={{ textAlign: 'center' }}>
         <Title order={3}>Pool One</Title>
         <DynamicTable
-          columns={columns}
+          columns={columnState}
+          setColumns={setColumnState}
           sortIndexIn={sortIndex}
           objToLink={(o) => linkTo(o, tournament)}
           data={ladder ?? []}
@@ -60,7 +62,7 @@ export default function Ladder({
         </DynamicTable>
         <Title order={3}>Pool Two</Title>
         <DynamicTable
-          columns={columns}
+          columns={columnState}
           sortIndexIn={sortIndex}
           objToLink={(o) => linkTo(o, tournament)}
           data={poolTwo ?? []}
