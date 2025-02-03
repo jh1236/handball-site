@@ -20,3 +20,8 @@
     text-overflow: ellipsis;
     line-clamp: 2;
 }
+
+.secretLink {
+    text-decoration: none;
+    color: black
+}

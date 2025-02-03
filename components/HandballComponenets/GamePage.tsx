@@ -1,13 +1,23 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Box, Divider, Grid, Image, Paper, Table, Tabs, Text, Title } from '@mantine/core';
-import { Box, Center, Divider, Grid, Paper, Select, Table, Tabs, Text, Title } from '@mantine/core';
+import {
+  Select,
+  Box,
+  Divider,
+  Grid,
+  Image,
+  Paper,
+  Table,
+  Tabs,
+  Text,
+  Title,
+} from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
-import {GameStructure, PersonStructure, PlayerGameStatsStructure} from '@/ServerActions/types';
-import {isAdmin} from "@/components/HandballComponenets/ServerActions";
+import { GameStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import { isAdmin } from '@/components/HandballComponenets/ServerActions';
 
 interface GamePageProps {
   gameID: number;
@@ -35,6 +45,7 @@ export function GamePage({ gameID }: GamePageProps) {
   const localeDate: string[] = [];
   localeDate.push(date.toLocaleDateString().slice(0, LocaleDateIndex + 1));
   localeDate.push(date.toLocaleTimeString().slice(LocaleDateIndex + 1));
+  const teamGradient = `linear-gradient(to right, rgba(${game.teamOne.teamColorAsRGBABecauseDigbyIsLazy ? game.teamOne.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'}), rgba(0,0,0,0), rgba(${game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy ? game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'})`;
 
   function generatePlayerStats(playerName: string) {
     if (!game) { return (<p>error</p>); }
@@ -46,19 +57,19 @@ export function GamePage({ gameID }: GamePageProps) {
       game.teamTwo.nonCaptain,
       game.teamTwo.substitute,
     ].filter(a => typeof a !== 'undefined' && a !== null);
-    console.log(`${allPlayers}`);
     const player: PersonStructure = allPlayers.find((p: PlayerGameStatsStructure) =>
         (p.name === playerName)
     )!;
-    if (!player) { return (<p>could not find {playerName} </p>); }
+    if (!player) { return (<p> Select a player to see their stats :)</p>); }
     const statsTable = [];
-    for (const k of Object.keys(player)) {
+    if (!player.stats) { return (<p> could not find {playerName}&#39;s stats</p>); }
+    for (const k of Object.keys(player.stats)) {
       statsTable.push({
         stat: k,
-        playerStat: player[k],
+        playerStat: player.stats[k],
       });
     }
-    const rows = statsTable.map((s) =>(
+    const rows = statsTable.map((s) => (
         <Table.Tr key={s.stat}>
           <Table.Td>{s.stat}</Table.Td>
           <Table.Td>{s.playerStat}</Table.Td>
@@ -127,7 +138,7 @@ export function GamePage({ gameID }: GamePageProps) {
       </Table.Tr>
     ));
     return (
-      <Table stripedColor="#f0fff0" striped="odd" withColumnBorders>
+      <Table stripedColor="green" striped="odd" withColumnBorders>
         <Table.Thead>
           <Table.Tr>
             <Table.Th w="37.5%" style={{ textAlign: 'center' }}>
@@ -149,11 +160,8 @@ export function GamePage({ gameID }: GamePageProps) {
   return (
     <SidebarLayout tournamentName={game.tournament.searchableName}>
       <Box ta="center" w="100%">
-        {/* does the Gradient area*/}
         <Box
-          className={
-            game.teamOneScore > game.teamTwoScore ? classes.teamOneWin : classes.teamTwoWin
-          }
+          style={{ background: teamGradient }}
           w="100%"
           h="300px"
           pos="relative"
@@ -177,13 +185,29 @@ export function GamePage({ gameID }: GamePageProps) {
             }}
           >
             <Grid.Col span={5}>
-              <Title lineClamp={2}>{game.teamOne.name}</Title>
+              <Title
+                order={2}
+                lineClamp={2}
+                component="a"
+                className={classes.secretLink}
+                href={`../teams/${game.teamOne.searchableName}`}
+              >
+                {game.teamOne.name}
+              </Title>
             </Grid.Col>
             <Grid.Col span={2} style={{ fontSize: 30 }}>
               vs
             </Grid.Col>
             <Grid.Col span={5}>
-              <Title lineClamp={2}>{game.teamTwo.name}</Title>
+              <Title
+                component="a"
+                className={classes.secretLink}
+                order={2}
+                lineClamp={2}
+                href={`../teams/${game.teamTwo.searchableName}`}
+              >
+                {game.teamTwo.name}
+              </Title>
             </Grid.Col>
           </Grid>
           <Grid columns={5} pos="relative" top={-25}>
@@ -206,49 +230,72 @@ export function GamePage({ gameID }: GamePageProps) {
             </Grid.Col>
           </Grid>
           <Grid
-            style={{ fontSize: '80px' }}
+            style={{
+              fontSize: '80px',
+              overflow: 'hidden',
+            }}
             pos="relative"
             top={-50}
             columns={13}
-            overflow="hidden"
-            h="150px"
           >
-            <Grid.Col span={3}>
-              <Image
-                src={game.teamOne.imageUrl}
-                alt="the team logo for team one"
+            <Grid.Col span={3} pos="relative" h={150}>
+              <Box
+                w="150px"
+                h="150px"
                 style={{
-                  margin: 'auto',
-                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'flex-start', // Align to the left
+                  alignItems: 'center',
+                  overflow: 'hidden', // Ensure overflow is hidden
+                  position: 'absolute',
+                  right: 0,
+                  top: 0,
                 }}
-              ></Image>
+              >
+                <Image
+                  src={game.teamOne.imageUrl}
+                  fit="cover"
+                  style={{
+                    width: '150px',
+                    height: '150px',
+                    objectFit: 'cover', // Ensure the image fills the container
+                    position: 'absolute',
+                  }}
+                />
+              </Box>
             </Grid.Col>
             <Grid.Col span={3}>{game.teamOneScore}</Grid.Col>
             <Grid.Col span={1}>-</Grid.Col>
             <Grid.Col span={3}>{game.teamTwoScore}</Grid.Col>
             <Grid.Col span={3}>
-              <Image
-                src={game.teamTwo.imageUrl}
-                alt="The team logo for team two"
+              <Box
+                w="150px"
+                h="150px"
                 style={{
-                  margin: 'auto',
-                  width: '90%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
-              ></Image>
+              >
+                <Image
+                  src={game.teamTwo.imageUrl}
+                  fit="fill"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                  }}
+                ></Image>
+              </Box>
             </Grid.Col>
           </Grid>
-          <Text pos="relative" bottom={50}>
-            Scored by {game.official.name}
-          </Text>
+          <Text pos="relative" bottom={20} style={{ background: 'rgba(100, 100, 100, 0.1)' }}> Status: {game.status} | Officiated by {game.official.name}</Text>
         </Box>
         <Divider></Divider>
         <Box pos="relative">
           <Tabs defaultValue="teamStats" color="#B2F2BB">
-            <Paper component={Tabs.List} grow bg="#fcfffc" shadow="xs" justify="center">
+            <Paper component={Tabs.List} grow bg="#fcfffc" shadow="xs" justify="space-between">
               <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
               <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
-              <Tabs.Tab value="3">Test 3</Tabs.Tab>
-              {true && <Tabs.Tab value="admin"></Tabs.Tab>}
+              {isAdmin() && <Tabs.Tab value="admin"> ADMIN TAB </Tabs.Tab>}
             </Paper>
             <Tabs.Panel value="teamStats">{generateTeamStatsTable()}</Tabs.Panel>
             <Tabs.Panel value="playerStats">
@@ -267,7 +314,6 @@ export function GamePage({ gameID }: GamePageProps) {
               <p>{playerSelect}</p>
               <div>{generatePlayerStats(playerSelect)}</div>
             </Tabs.Panel>
-            <Tabs.Panel value="3">this is 3</Tabs.Panel>
           </Tabs>
           <Box></Box>
         </Box>
