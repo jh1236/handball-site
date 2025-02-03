@@ -54,6 +54,7 @@ export function EditGame({ game }: { game: number }) {
   const [teamOneServedLeft, setTeamOneServedLeft] = React.useState<boolean>(true);
   const [teamOneName, setTeamOneName] = React.useState<string>('Loading...');
   const [teamOneScore, setTeamOneScore] = React.useState<number>(0);
+  const [teamOneRating, setTeamOneRating] = React.useState<number>(0);
   const [teamOneLeft, setTeamOneLeft] = React.useState<PlayerGameStatsStructure | undefined>(
     undefined
   );
@@ -65,12 +66,13 @@ export function EditGame({ game }: { game: number }) {
   );
   //team two state
   const [teamTwoTimeouts, setTeamTwoTimeouts] = React.useState<number>(0);
-
   const [teamTwoNotes, setTeamTwoNotes] = React.useState<string>('');
+
   const [teamTwoProtest, setTeamTwoProtest] = React.useState<string>('');
   const [teamTwoServedLeft, setTeamTwoServedLeft] = React.useState<boolean>(true);
   const [teamTwoName, setTeamTwoName] = React.useState<string>('Loading...');
   const [teamTwoScore, setTeamTwoScore] = React.useState<number>(0);
+  const [teamTwoRating, setTeamTwoRating] = React.useState<number>(0);
   const [teamTwoLeft, setTeamTwoLeft] = React.useState<PlayerGameStatsStructure | undefined>(
     undefined
   );
@@ -207,6 +209,10 @@ export function EditGame({ game }: { game: number }) {
         get: teamOneScore,
         set: setTeamOneScore,
       },
+      rating: {
+        get: teamOneRating,
+        set: setTeamOneRating,
+      },
       notes: {
         get: teamOneNotes,
         set: setTeamOneNotes,
@@ -241,6 +247,10 @@ export function EditGame({ game }: { game: number }) {
       score: {
         get: teamTwoScore,
         set: setTeamTwoScore,
+      },
+      rating: {
+        get: teamTwoRating,
+        set: setTeamTwoRating,
       },
       notes: {
         get: teamTwoNotes,
@@ -339,7 +349,9 @@ export function EditGame({ game }: { game: number }) {
         }}
       />
       <Box style={{ width: '100%', height: '40%' }}>
-        {teamOneRight || !teamOneLeft ? (
+        {(
+          gameState.teamOneIGA.get ? !teamTwoLeft || !teamTwoRight : !teamOneLeft || !teamOneRight
+          ) ? (
           <>
             <Box style={{ width: '50%', height: '90%', float: 'left' }}>
               <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
@@ -422,7 +434,9 @@ export function EditGame({ game }: { game: number }) {
         <Box style={{ width: '100%', height: '10%', float: 'right' }}>
           <TeamButton firstTeam={false} game={gameState}></TeamButton>
         </Box>
-        {teamTwoRight || !teamOneLeft ? (
+        {(
+          gameState.teamOneIGA.get ? !teamOneLeft || !teamOneRight : !teamTwoLeft || !teamTwoRight
+        ) ? (
           <>
             <Box style={{ width: '50%', height: '90%', float: 'left' }}>
               <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
@@ -437,7 +451,6 @@ export function EditGame({ game }: { game: number }) {
           </Box>
         )}
       </Box>
-      ; ;
     </Box>
   );
 }

@@ -35,9 +35,13 @@ export default function FixturesInternal({
       if (maxRounds > 0) {
         if ((data?.finals?.length ?? 0) > maxRounds) {
           setFixtures([]);
-          const temp = data.finals!.toReversed();
-          temp.length = maxRounds;
-          setFinals(temp.toReversed());
+          if (maxRounds === 1) {
+            setFinals([{ games: data.finals!.map((a) => a.games).flat(), final: true }]);
+          } else {
+            const temp = data.finals!.toReversed();
+            temp.length = maxRounds;
+            setFinals(temp.toReversed());
+          }
         } else {
           setFinals(data?.finals ?? []);
           const temp = data.fixtures!.toReversed();

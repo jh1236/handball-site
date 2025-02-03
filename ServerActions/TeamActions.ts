@@ -1,17 +1,11 @@
 import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
-import {
-  PersonStructure,
-  PlayerGameStatsStructure,
-  SearchableName,
-  TeamStructure,
-  TournamentStructure,
-} from '@/ServerActions/types';
+import { SearchableName, TeamStructure, TournamentStructure } from '@/ServerActions/types';
 
 interface GetTeamsArgs {
   tournament?: SearchableName;
   player?: SearchableName;
-  includeStats?: SearchableName;
-  formatData?: SearchableName;
+  includeStats?: boolean;
+  formatData?: boolean;
   returnTournament?: boolean;
 }
 

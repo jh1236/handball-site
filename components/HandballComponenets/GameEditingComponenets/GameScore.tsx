@@ -1,5 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { IconCheckbox, IconCloudUpload, IconNote, IconTrophy } from '@tabler/icons-react';
+import {
+  IconCheckbox,
+  IconCloudUpload,
+  IconNote,
+  IconStarHalfFilled,
+  IconTrophy,
+} from '@tabler/icons-react';
 import { Accordion, Button, Checkbox, List, Modal, Textarea, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -44,7 +50,7 @@ function getActions(
               {reviewReqd ? 'Yes' : 'No'}
             </List.Item>
             <List.Item>
-              <strong>Team One: </strong>
+              <strong>Team One: </strong> {game.teamOne.name}
               <List>
                 <List.Item>
                   <strong>Protest Reason: </strong>
@@ -54,14 +60,22 @@ function getActions(
                   <strong>Notes: </strong>
                   {game.teamOne.notes.get ? game.teamOne.notes.get : <i>None</i>}
                 </List.Item>
+                <List.Item>
+                  <strong>Rating: </strong>
+                  {game.teamOne.rating.get} / 5
+                </List.Item>
               </List>
             </List.Item>
             <List.Item>
-              <strong>Team Two: </strong>
+              <strong>Team Two: </strong> {game.teamTwo.name}
               <List>
                 <List.Item>
                   <strong>Protest Reason: </strong>
                   {game.teamTwo.protest.get ? game.teamTwo.protest.get : <i>None</i>}
+                </List.Item>
+                <List.Item>
+                  <strong>Rating: </strong>
+                  {game.teamTwo.rating.get} / 5
                 </List.Item>
                 <List.Item>
                   <strong>Notes: </strong>
@@ -154,7 +168,15 @@ export function GameScore({ game }: GameScoreArgs) {
       {game.started.get ? (
         game.ended.get ? (
           <>
-            <Button size="lg" onClick={open} disabled={bestPlayer.length === 0}>
+            <Button
+              size="lg"
+              onClick={open}
+              disabled={
+                bestPlayer.length === 0 ||
+                game.teamOne.rating.get === 0 ||
+                game.teamTwo.rating.get === 0
+              }
+            >
               End
             </Button>
           </>

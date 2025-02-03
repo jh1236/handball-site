@@ -20,12 +20,16 @@ import { loginAction } from '@/ServerActions/LoginActions';
 import classes from './AuthenticationTitle.module.css';
 
 function authenticate(id: string, pwd: string, router: AppRouterInstance): Promise<void> {
-  return loginAction(id, pwd).then((data) => {
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('username', data.username);
-    localStorage.setItem('permissionLevel', `${data.permissionLevel}`);
-    router.push(`/players/${searchableOf(localStorage.getItem('username'))}`);
-  });
+  return loginAction(id, pwd)
+    .then((data) => {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('permissionLevel', `${data.permissionLevel}`);
+      router.push(`/players/${searchableOf(localStorage.getItem('username'))}`);
+    })
+    .catch((error) => {
+      alert('wrong details!');
+    });
 }
 
 export function AuthenticationTitle() {

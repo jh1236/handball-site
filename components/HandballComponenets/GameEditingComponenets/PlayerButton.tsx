@@ -362,9 +362,15 @@ export function PlayerButton({
   firstTeam: trueFirstTeam,
   leftSide: trueLeftSide,
 }: PlayerButtonProps) {
-  const firstTeam = trueFirstTeam === game.teamOneIGA.get;
+  const firstTeam = useMemo(
+    () => trueFirstTeam === game.teamOneIGA.get,
+    [game.teamOneIGA.get, trueFirstTeam]
+  );
   const [cardTime, setCardTime] = React.useState<number>(6);
-  const team = useMemo(() => (firstTeam ? game.teamOne : game.teamTwo), [game.teamOne.left.get]);
+  const team = useMemo(
+    () => (firstTeam ? game.teamOne : game.teamTwo),
+    [firstTeam, game.teamOne, game.teamTwo]
+  );
   const [openMore, { toggle: toggleMore }] = useDisclosure(false);
   const serving = useMemo(
     () =>

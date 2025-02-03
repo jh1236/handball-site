@@ -558,6 +558,8 @@ export function deleteGame(gameId: number): Promise<void> {
 export function endGame(
   gameId: number,
   bestPlayer: SearchableName,
+  teamOneRating: number,
+  teamTwoRating: number,
   notes?: string,
   protestTeamOne?: string,
   protestTeamTwo?: string,
@@ -568,6 +570,8 @@ export function endGame(
   const body: any = {
     id: gameId,
     bestPlayer,
+    teamOneRating,
+    teamTwoRating
   };
 
   if (notes) {

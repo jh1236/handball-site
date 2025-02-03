@@ -18,6 +18,7 @@ import {
   List,
   Modal,
   Popover,
+  Rating,
   Text,
   Textarea,
   Title,
@@ -170,13 +171,16 @@ function getActions(
       },
       {
         Icon: IconNote,
-        value: 'Notes',
+        value: 'Feedback',
         color: 'white',
         content: (
-          <Textarea
-            value={team.notes.get}
-            onChange={(v) => team.notes.set(v.currentTarget.value)}
-          ></Textarea>
+          <>
+            <Rating value={team.rating.get} size="lg" onChange={team.rating.set}></Rating>
+            <Textarea
+              value={team.notes.get}
+              onChange={(v) => team.notes.set(v.currentTarget.value)}
+            ></Textarea>
+          </>
         ),
       }
     );

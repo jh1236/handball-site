@@ -21,6 +21,7 @@ export interface PersonStructure {
   searchableName: string;
   imageUrl: string;
   isAdmin?: boolean;
+  team?: TeamStructure;
   stats?: { [key: string]: number };
 
   [k: string]: any;

@@ -29,16 +29,14 @@ export default function SidebarLayout({
           setSidebarVisible={setSidebarVisible}
           tournamentName={tournamentName}
           mobile
-        >
-        </NavbarNested>
+        ></NavbarNested>
       </Box>
       <Box visibleFrom="md">
         <NavbarNested
           sidebarVisible={sidebarVisible}
           setSidebarVisible={setSidebarVisible}
           tournamentName={tournamentName}
-        >
-        </NavbarNested>
+        ></NavbarNested>
       </Box>
       <Box
         style={{
@@ -64,21 +62,21 @@ export default function SidebarLayout({
         >
           <ThemeIcon
             color="green"
-            variant={colorScheme ? 'light' : undefined}
+            variant="filled"
             size={30}
-            style={{ marginTop: '20px' }}
+            style={{ marginTop: '10px', zIndex: 9999 }}
+            pos="absolute"
           >
             {sidebarVisible ? (
               <IconLayoutSidebarLeftCollapse style={{ width: rem(18), height: rem(18) }} />
             ) : (
               <IconLayoutSidebarLeftExpand
                 style={{ width: rem(18), height: rem(18) }}
-              >
-              </IconLayoutSidebarLeftExpand>
+              ></IconLayoutSidebarLeftExpand>
             )}
           </ThemeIcon>
         </Box>
-        {children}
+        <Box mt={40}>{children}</Box>
       </Box>
     </div>
   );

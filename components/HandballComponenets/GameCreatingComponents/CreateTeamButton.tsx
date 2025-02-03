@@ -52,8 +52,11 @@ export function CreateTeamButton({
     if (!teamName || teamName === 'New Team') return;
     const t = teams.find((t) => t.name === teamName);
     if (!t) return;
-    setLeftPlayer(t!.captain.name);
-    setRightPlayer(t!.nonCaptain?.name);
+    const players = getPlayersFromTeam(t);
+    if (players.includes(leftPlayer) && players.includes(rightPlayer)) {
+      setLeftPlayer(t!.captain.name);
+      setRightPlayer(t!.nonCaptain?.name);
+    }
     close();
   }, [teamName]);
 
@@ -63,7 +66,7 @@ export function CreateTeamButton({
       <Modal opened={opened} centered onClose={close} title="Action">
         <Title>{team ? 'Select Team' : 'Choose Team Name'}</Title>
         <Autocomplete
-          label="Player"
+          label="Team Name"
           placeholder="New Team"
           data={[...new Set(teams.map((a) => a.name))]}
           value={teamName}

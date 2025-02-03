@@ -24,6 +24,10 @@ type Team = {
     get: number;
     set: (v: number) => void;
   };
+  rating: {
+    get: number;
+    set: (v: number) => void;
+  };
   notes: {
     get: string;
     set: (v: string) => void;
@@ -140,6 +144,8 @@ export function end(game: GameState, bestPlayer: SearchableName, reviewRequired:
   endGame(
     game.id,
     bestPlayer,
+    game.teamOne.rating.get,
+    game.teamTwo.rating.get,
     game.notes.get,
     game.teamOne.protest.get,
     game.teamTwo.protest.get,
