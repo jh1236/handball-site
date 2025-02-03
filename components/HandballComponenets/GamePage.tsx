@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { Box, Divider, Grid, Image, Paper, Table, Tabs, Text, Title } from '@mantine/core';
 import { Box, Center, Divider, Grid, Paper, Select, Table, Tabs, Text, Title } from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
@@ -213,27 +214,27 @@ export function GamePage({ gameID }: GamePageProps) {
             h="150px"
           >
             <Grid.Col span={3}>
-              <img
+              <Image
                 src={game.teamOne.imageUrl}
-                alt="a"
+                alt="the team logo for team one"
                 style={{
                   margin: 'auto',
                   width: '100%',
                 }}
-              ></img>
+              ></Image>
             </Grid.Col>
             <Grid.Col span={3}>{game.teamOneScore}</Grid.Col>
             <Grid.Col span={1}>-</Grid.Col>
             <Grid.Col span={3}>{game.teamTwoScore}</Grid.Col>
             <Grid.Col span={3}>
-              <img
+              <Image
                 src={game.teamTwo.imageUrl}
-                alt="a"
+                alt="The team logo for team two"
                 style={{
                   margin: 'auto',
                   width: '90%',
                 }}
-              ></img>
+              ></Image>
             </Grid.Col>
           </Grid>
           <Text pos="relative" bottom={50}>

@@ -7,6 +7,10 @@ export async function tokenFetcher(url: string, args: any = {}) {
   return res.json();
 }
 
+export function getUsername(): string | null {
+  return loggedIn() ? localStorage.getItem('username') : null;
+}
+
 export function loggedIn() {
   return localStorage.getItem('token') !== null;
 }

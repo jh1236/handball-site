@@ -188,25 +188,15 @@ export function getFixtures({
   });
 }
 
-interface StartGameArgs {
-  gameId: number;
-  swapService: boolean;
-  teamOneIGA: boolean;
-  teamOne: SearchableName[];
-  teamTwo: SearchableName[];
-  official?: SearchableName;
-  scorer?: SearchableName;
-}
-
-export function startGame({
-  gameId,
-  swapService,
-  teamOneIGA,
-  teamOne,
-  teamTwo,
-  official,
-  scorer,
-}: StartGameArgs): Promise<void> {
+export function startGame(
+  gameId: number,
+  swapService: boolean,
+  teamOneIGA: boolean,
+  teamOne: SearchableName[],
+  teamTwo: SearchableName[],
+  official?: SearchableName,
+  scorer?: SearchableName
+): Promise<void> {
   const body: any = {
     id: gameId,
     swapService,
@@ -238,13 +228,24 @@ export function startGame({
 export function scoreForGame(
   gameId: number,
   firstTeam: boolean,
-  leftPlayer: boolean
+  leftPlayer: boolean,
+  method?:
+    | 'Double Bounce'
+    | 'Straight'
+    | 'Out of Court'
+    | 'Double Touch'
+    | 'Grabs'
+    | 'Illegal Body Part'
+    | 'Obstruction'
 ): Promise<void> {
   const body: any = {
     id: gameId,
     firstTeam,
     leftPlayer,
   };
+  if (method) {
+    body.method = method;
+  }
 
   return tokenFetch('/games/update/score', {
     method: 'POST',
@@ -557,22 +558,37 @@ export function deleteGame(gameId: number): Promise<void> {
 export function endGame(
   gameId: number,
   bestPlayer: SearchableName,
-  notes: string,
+  notes?: string,
   protestTeamOne?: string,
-  protestTeamTwo?: string
+  protestTeamTwo?: string,
+  notesTeamOne?: string,
+  notesTeamTwo?: string,
+  markedForReview?: boolean
 ): Promise<void> {
   const body: any = {
     id: gameId,
     bestPlayer,
-    notes,
   };
 
+  if (notes) {
+    body.notes = notes;
+  }
   if (protestTeamOne) {
     body.protestTeamOne = protestTeamOne;
   }
   if (protestTeamTwo) {
     body.protestTeamOne = protestTeamTwo;
   }
+  if (notesTeamOne) {
+    body.notesTeamOne = notesTeamOne;
+  }
+  if (notesTeamTwo) {
+    body.notesTeamTwo = notesTeamTwo;
+  }
+  if (markedForReview) {
+    body.markedForReview = 'true';
+  }
+
   return tokenFetch('/games/update/end', {
     method: 'POST',
     body: JSON.stringify(body),
@@ -626,7 +642,7 @@ export function createGameWithPlayers(
   scorer?: SearchableName,
   teamOneName?: string,
   teamTwoName?: string
-): Promise<void> {
+): Promise<{ id: number }> {
   const body: any = {
     tournament,
     official,
@@ -643,7 +659,8 @@ export function createGameWithPlayers(
   if (teamTwoName) {
     body.teamTwo = teamTwoName;
   }
-  return tokenFetch('/games/update/end', {
+  console.log(JSON.stringify(body));
+  return tokenFetch('/games/update/create', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -653,6 +670,6 @@ export function createGameWithPlayers(
     if (!response.ok) {
       return Promise.reject(response.text());
     }
-    return Promise.resolve();
+    return response.json();
   });
 }

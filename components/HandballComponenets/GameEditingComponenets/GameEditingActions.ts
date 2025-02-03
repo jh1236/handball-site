@@ -6,21 +6,31 @@ import {
   aceForGame,
   cardForGame,
   deleteGame,
+  endGame,
   endTimeoutForGame,
   faultForGame,
+  forfeitGame,
   scoreForGame,
   startGame,
   substituteForGame,
   timeoutForGame,
   undoForGame,
 } from '@/ServerActions/GameActions';
-import { PlayerGameStatsStructure } from '@/ServerActions/types';
+import { PlayerGameStatsStructure, SearchableName } from '@/ServerActions/types';
 
 type Team = {
   name: string;
   score: {
     get: number;
     set: (v: number) => void;
+  };
+  notes: {
+    get: string;
+    set: (v: string) => void;
+  };
+  protest: {
+    get: string;
+    set: (v: string) => void;
   };
   timeouts: {
     get: number;
@@ -49,6 +59,10 @@ export interface GameState {
   timeoutExpirationTime: {
     get: number;
     set: (v: number) => void;
+  };
+  notes: {
+    get: string;
+    set: (v: string) => void;
   };
   id: number;
   teamOne: Team;
@@ -94,30 +108,45 @@ function nextPoint(game: GameState, swap?: boolean) {
   }
   if (swap !== undefined) {
     const team = swap ? game.teamOne : game.teamTwo;
-    const temp = team.left?.get;
-    team.left?.set(team.right?.get);
-    team.right?.set(temp);
+    if (team.right.get && team.left.get) {
+      const temp = team.left?.get;
+      team.left.set(team.right?.get);
+      team.right.set(temp);
+    }
   }
   game.faulted.set(false);
 }
 
 export function begin(game: GameState) {
   startLoading();
-  startGame({
-    gameId: game.id,
-    swapService: !game.firstTeamServes.get,
-    teamOneIGA: game.teamOneIGA.get,
-    teamOne: [
+  startGame(
+    game.id,
+    !game.firstTeamServes.get,
+    game.teamOneIGA.get,
+    [
       game.teamOne.left.get?.searchableName,
       game.teamOne.right.get?.searchableName,
       game.teamOne.sub.get?.searchableName,
     ].filter((a) => typeof a === 'string'),
-    teamTwo: [
+    [
       game.teamTwo.left.get?.searchableName,
       game.teamTwo.right.get?.searchableName,
       game.teamTwo.sub.get?.searchableName,
-    ].filter((a) => typeof a === 'string'),
-  }).then(() => sync(game));
+    ].filter((a) => typeof a === 'string')
+  ).then(() => sync(game));
+}
+
+export function end(game: GameState, bestPlayer: SearchableName, reviewRequired: boolean) {
+  endGame(
+    game.id,
+    bestPlayer,
+    game.notes.get,
+    game.teamOne.protest.get,
+    game.teamTwo.protest.get,
+    game.teamOne.notes.get,
+    game.teamTwo.notes.get,
+    reviewRequired
+  ).then(() => (location.href = `/games/${game.id}`));
 }
 
 export function del(game: GameState) {
@@ -127,14 +156,26 @@ export function del(game: GameState) {
   });
 }
 
-export function score(game: GameState, firstTeam: boolean, leftPlayer: boolean): void {
+export function score(
+  game: GameState,
+  firstTeam: boolean,
+  leftPlayer: boolean,
+  method?:
+    | 'Double Bounce'
+    | 'Straight'
+    | 'Out of Court'
+    | 'Double Touch'
+    | 'Grabs'
+    | 'Illegal Body Part'
+    | 'Obstruction'
+): void {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   team.score.set(team.score.get + 1);
   const needsSwap = firstTeam === game.firstTeamServes.get;
   team.servedFromLeft.set(!team.servedFromLeft.get);
   game.firstTeamServes.set(firstTeam);
   nextPoint(game, needsSwap ? firstTeam : undefined);
-  scoreForGame(game.id, firstTeam, leftPlayer).catch(() => sync(game));
+  scoreForGame(game.id, firstTeam, leftPlayer, method).catch(() => sync(game));
 }
 
 export function ace(game: GameState): void {
@@ -146,12 +187,19 @@ export function ace(game: GameState): void {
 }
 
 export function timeout(game: GameState, firstTeam: boolean): void {
-  const team = game.firstTeamServes.get ? game.teamOne : game.teamTwo;
+  const team = firstTeam ? game.teamOne : game.teamTwo;
   team.timeouts.set(team.timeouts.get + 1);
   game.timeoutExpirationTime.set(Date.now() + 30_000);
   timeoutForGame(game.id, firstTeam)
     .catch(() => sync(game))
     .then();
+}
+
+export function forfeit(game: GameState, firstTeam: boolean) {
+  const otherTeam = firstTeam ? game.teamTwo : game.teamOne;
+  otherTeam.score.set(Math.max(11, otherTeam.score.get + 2));
+
+  forfeitGame(game.id, firstTeam).catch(() => sync(game));
 }
 
 export function endTimeout(game: GameState): void {
@@ -233,8 +281,15 @@ export function card(
   const otherTeam = firstTeam ? game.teamTwo : game.teamOne;
   const player = leftPlayer ? team.left : team.right;
   const otherPlayer = leftPlayer ? team.right : team.left;
-  if (otherPlayer.get?.cardTimeRemaining) {
-    const otherTeamWins = Math.max(11, team.score.get + 2);
+  const otherTeamWins = Math.max(11, team.score.get + 2);
+  if (!player.get || !otherPlayer.get) {
+    if (duration === -1) {
+      otherTeam.score.set(otherTeamWins);
+    } else {
+      otherTeam.score.set(Math.min(otherTeamWins, otherTeam.score.get + duration));
+    }
+    game.firstTeamServes.set(!firstTeam);
+  } else if (player.get && otherPlayer.get?.cardTimeRemaining) {
     if (otherPlayer.get.cardTimeRemaining === -1) {
       if (duration === -1) {
         otherTeam.score.set(otherTeamWins);
@@ -249,15 +304,17 @@ export function card(
       temp.cardTimeRemaining = 0;
       otherPlayer.set(temp);
     } else {
+      player.get.cardTimeRemaining += duration;
+      player.get.cardTime = player.get.cardTimeRemaining;
       const stillCardedPlayer =
-        otherPlayer.get.cardTimeRemaining > player.get!.cardTimeRemaining ? otherPlayer : player;
+        otherPlayer.get.cardTimeRemaining > player.get.cardTimeRemaining ? otherPlayer : player;
       const notCardedPlayer =
-        otherPlayer.get.cardTimeRemaining <= player.get!.cardTimeRemaining ? otherPlayer : player;
+        otherPlayer.get.cardTimeRemaining <= player.get.cardTimeRemaining ? otherPlayer : player;
       let temp = stillCardedPlayer.get!;
-      const diff =
-        stillCardedPlayer.get!.cardTimeRemaining - notCardedPlayer.get!.cardTimeRemaining;
-      temp.cardTimeRemaining -= diff;
-      otherTeam.score.set(Math.min(otherTeamWins, otherTeam.score.get + diff));
+      otherTeam.score.set(
+        Math.min(otherTeamWins, otherTeam.score.get + notCardedPlayer.get!.cardTimeRemaining)
+      );
+      temp.cardTimeRemaining -= notCardedPlayer.get!.cardTimeRemaining;
       stillCardedPlayer.set(temp);
       temp = notCardedPlayer.get!;
       temp.cardTimeRemaining = 0;
@@ -265,7 +322,7 @@ export function card(
     }
     if (game.firstTeamServes.get === firstTeam) {
       const temp = otherTeam.left?.get;
-      otherTeam.left?.set(team.right?.get);
+      otherTeam.left?.set(otherTeam.right?.get);
       otherTeam.right?.set(temp);
       game.firstTeamServes.set(!firstTeam);
     }

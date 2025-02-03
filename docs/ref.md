@@ -1,3 +1,4 @@
+
 # TYPES
 
 ## Games Data structure
@@ -32,7 +33,11 @@
     isFinal: "bool",
     round: "int",
     isBye: "bool",
-    status: "str"
+    status: "str",
+    faulted: "bool",
+    changeCode: "int",
+    timeoutExpirationTime: "float",
+    isOfficialTimeout: "bool"
 }
 ```
 
@@ -55,12 +60,7 @@ if include_game_event: (default False)
 ```
 
 if include_player_stats: (default False)
-
-```json lines
-{
-  players: "list[PlayerGameStats<include_game=False>]"
-}
-```
+- Each team will have its captain and non-captain populated with the relevant `PlayerGameStats` statistics
 
 ## GameEvents Data Structure
 
@@ -86,7 +86,7 @@ if include_game: (default True)
 
 ```json lines
 {
-  game: "Game"
+    game: "Game"
 }
 ```
 
@@ -112,48 +112,48 @@ if include_stats: (default false)
 
 ```json lines
 {
-  stats: {
-    "B&F Votes": "int",
-    "Elo": "float",
-    "Games Won": "int",
-    "Games Lost": "int",
-    "Games Played": "int",
-    "Percentage": "float",
-    "Points Scored": "int",
-    "Points Served": "int",
-    "Aces Scored": "int",
-    "Faults": "int",
-    "Double Faults": "int",
-    "Green Cards": "int",
-    "Yellow Cards": "int",
-    "Red Cards": "int",
-    "Rounds on Court": "int",
-    "Rounds Carded": "int",
-    "Net Elo Delta": "float",
-    "Average Elo Delta": "float",
-    "Points per Game": "float",
-    "Points per Loss": "float",
-    "Cards": "int",
-    "Cards per Game": "float",
-    "Points per Card": "float",
-    "Serves per Game": "float",
-    "Serves per Ace": "float",
-    "Serves per Fault": "float",
-    "Serve Ace Rate": "float",
-    "Serve Fault Rate": "float",
-    "Percentage of Points Scored": "float",
-    "Percentage of Points Scored For Team": "float",
-    "Percentage of Games Starting Left": "float",
-    "Percentage of Points Served Won": "float",
-    "Serves Received": "int",
-    "Serves Returned": "int",
-    "Max Serve Streak": "int",
-    "Average Serve Streak": "int",
-    "Max Ace Streak": "int",
-    "Average Ace Streak": "int",
-    "Serve Return Rate": "float",
-    "Votes per 100 games": "float",
-  }
+    stats: {
+        "B&F Votes": "int",
+        "Elo": "float",
+        "Games Won": "int",
+        "Games Lost": "int",
+        "Games Played": "int",
+        "Percentage": "float",
+        "Points Scored": "int",
+        "Points Served": "int",
+        "Aces Scored": "int",
+        "Faults": "int",
+        "Double Faults": "int",
+        "Green Cards": "int",
+        "Yellow Cards": "int",
+        "Red Cards": "int",
+        "Rounds on Court": "int",
+        "Rounds Carded": "int",
+        "Net Elo Delta": "float",
+        "Average Elo Delta": "float",
+        "Points per Game": "float",
+        "Points per Loss": "float",
+        "Cards": "int",
+        "Cards per Game": "float",
+        "Points per Card": "float",
+        "Serves per Game": "float",
+        "Serves per Ace": "float",
+        "Serves per Fault": "float",
+        "Serve Ace Rate": "float",
+        "Serve Fault Rate": "float",
+        "Percentage of Points Scored": "float",
+        "Percentage of Points Scored For Team": "float",
+        "Percentage of Games Starting Left": "float",
+        "Percentage of Points Served Won": "float",
+        "Serves Received": "int",
+        "Serves Returned": "int",
+        "Max Serve Streak": "int",
+        "Average Serve Streak": "int",
+        "Max Ace Streak": "int",
+        "Average Ace Streak": "int",
+        "Serve Return Rate": "float",
+        "Votes per 100 games": "float",
+    }
 }
 ```
 
@@ -174,18 +174,18 @@ everything from `Person` plus
 
 ```json lines
 {
-  stats: {
-    "Green Cards Given": "int",
-    "Yellow Cards Given": "int",
-    "Red Cards Given": "int",
-    "Cards Given": "int",
-    "Cards Per Game": "float",
-    "Faults Called": "int",
-    "Faults Per Game": "float",
-    "Games Umpired": "int",
-    "Games Scored": "int",
-    "Rounds Umpired": "int",
-  }
+    stats: {
+        "Green Cards Given": "int",
+        "Yellow Cards Given": "int",
+        "Red Cards Given": "int",
+        "Cards Given": "int",
+        "Cards Per Game": "float",
+        "Faults Called": "int",
+        "Faults Per Game": "float",
+        "Games Umpired": "int",
+        "Games Scored": "int",
+        "Rounds Umpired": "int",
+    }
 }
 ```
 
@@ -218,6 +218,8 @@ everything from `Person` plus
     startSide: "str",
     elo: "float",
     eloDelta: "float",
+    sideOfCourt: "str",
+    isCaptain: "bool"
 }
 ```
 
@@ -225,7 +227,7 @@ if include_game: (default true)
 
 ```json lines
 {
-  game: "Game"
+    game: "Game",
 }
 ```
 
@@ -237,8 +239,18 @@ if include_game: (default true)
     searchableName: "str",
     imageUrl: "str",
     captain: "Person",
-    nonCaptain: "Person | null",
-    substitute: "Person | null",
+    nonCaptain: "Person | PlayerGameStats | null",
+    substitute: "Person | PlayerGameStats | null",
+    teamColor: "str",
+    elo: "float"
+}
+```
+
+if game_id:
+```json lines
+{
+    servedFromLeft: "bool",
+    eloDelta: "float"
 }
 ```
 
@@ -271,17 +283,18 @@ if include_stats: (default false)
 {
     name: "str",
     searchableName: "str",
-    fixturesType: "str",
+    editable: "bool",
+    fixturesType:  "str",
     finalsType: "str",
-    ranked: "bool",
+    ranked:  "bool",
     twoCourts: "bool",
-    hasScorer: "bool",
+    hasScorer:  "bool",
     finished: "bool",
-    inFinals: "bool",
+    inFinals:  "bool",
     isPooled: "bool",
-    notes: "str",
+    notes:  "str",
     imageUrl: "srt",
-    usingBadmintonServes: "bool",
+    usingBadmintonServes:  "bool",
 }
 ```
 
@@ -326,8 +339,10 @@ This endpoint is open to the public
     - The id of the game
 - includeGameEvents: bool
     - True if the events of the game should be included
-- includePlayerStats
+- includeStats
     - True if the stats of each player should be included
+- includePreviousCards: bool (official only)
+    - True if the cards each team has previously received should be included
 
 #### Return Structure
 
@@ -372,7 +387,7 @@ This endpoint is open to the public
 
 <hr>
 
-### /api/fixtures
+### /api/games/fixtures
 
 #### Description
 
@@ -400,10 +415,17 @@ This endpoint is open to the public
     - True if the stats of each player should be included
 - returnTournament: bool (Optional)
     - If the tournament is to be returned in the response
+- separateFinals
+    - True if the finals should be returned in a separate list
 
 #### Return Structure
 
-- fixtures: list\[Game(includeGameEvents=includeGameEvents)\]
+- fixtures: list
+    - games: list\[Games\]
+    - final: boolean
+- finals: list\[Game(includeGameEvents=includeGameEvents)\]?
+    - games: list\[Games\]
+    - final: true
 - tournament: Tournament
     - The tournament that was passed in
 
@@ -574,12 +596,16 @@ The user must be logged in as an official to use this endpoint
     - The id of the game
 - bestPlayer: str
     - The searchable name of the player who played best
-- notes: str
+- notes: str (Optional)
     - Any notes that the umpire would like to leave for the tournament director
 - protestTeamOne: str (Optional)
     - If present, represents the reason that team one wants to protest
 - protestTeamTwo: str (Optional)
     - If present, represents the reason that team two wants to protest
+- notesTeamOne: str (Optional)
+    - If present, represents the notes the umpire left for team one
+- notesTeamTwo: str (Optional)
+    - If present, represents the notes the umpire left for team two
 
 #### Return Structure
 
@@ -587,28 +613,6 @@ The user must be logged in as an official to use this endpoint
 
 <hr>
 
-### /api/games/update/timeout
-
-#### Description
-
-Starts a timeout for a given team
-
-#### Permissions:
-
-The user must be logged in as an official to use this endpoint
-
-#### Arguments:
-
-- id: int
-    - The id of the game
-- firstTeam: bool
-    - True if the team listed first called the timeout
-
-#### Return Structure
-
-- N/A
-
-<hr>
 
 ### /api/games/update/forfeit
 
@@ -722,7 +726,7 @@ The user must be logged in as an official to use this endpoint
 
 <hr>
 
-### /api/games/update/official_timeout
+### /api/games/update/officialTimeout
 
 #### Description
 
@@ -942,9 +946,9 @@ This endpoint is open to the public.
     - True if the data is pooled
 - ladder: list\[Team\]
     - The list of teams in order if the tournament is _not_ pooled
-- pool_one: list\[Team\]
+- poolOne: list\[Team\]
     - The list of teams in order in pool 1 if the tournament is pooled
-- pool_two: list\[Team\]
+- poolTwo: list\[Team\]
     - The list of teams in order in pool 2 if the tournament is pooled
 - tournament: Tournament
     - The tournament that was passed in
@@ -1023,8 +1027,10 @@ This endpoint is open to the public.
     - The searchable name of the player to get stats for
 - tournament: str (Optional)
     - The searchable name of the tournament to get stats from
-- game: str (Optional)
-    - The searchable name of the tournament to get stats from
+- game: int (Optional)
+    - The id of the game that was played
+- includeCourtStats: bool (Optional)
+    - True if the stats of the player on each court are to be included.
 - formatData: bool (Optional)
     - True if the server should format the data before it is sent.
 - returnTournament: bool (Optional)
@@ -1050,7 +1056,7 @@ This endpoint is open to the public.
 
 #### Arguments:
 
-- name: str (Optional)
+- name: str
     - The searchable name of the user to get an image from
 
 #### Return Structure
@@ -1123,6 +1129,34 @@ This endpoint is open to the public.
 - image
 
 <hr>
+
+### /api/tournaments/\<tournament\>/winners
+
+#### Description
+
+Returns the image for a given tournament.
+
+#### Permissions:
+
+This endpoint is open to the public.
+
+#### Arguments:
+
+- tournament: str
+    - The searchable name of the tournament to get the winners for
+
+#### Return Structure
+
+- first: Team
+  - the team that came in first
+- second: Team
+  - the team that came in second
+- third: Team
+  - the team that came in third
+- podium: List\[Team\]
+  - a list of the top 3 teams in order 
+
+<hr>
 <hr>
 
 ## POST endpoints
@@ -1139,8 +1173,11 @@ The user must be logged in as an **admin** to use this endpoint
 
 #### Arguments:
 
-- tournament: str (Optional)
+- tournament: str
     - The searchable name of the tournament to set the note for
+
+- note: str
+    - the note for the front page of the tournament
 
 #### Return Structure
 
@@ -1148,7 +1185,7 @@ The user must be logged in as an **admin** to use this endpoint
 
 <hr>
 
-### /api/tournaments/serve_style
+### /api/tournaments/serveStyle
 
 #### Description
 
@@ -1160,9 +1197,9 @@ The user must be logged in as an **admin** to use this endpoint
 
 #### Arguments:
 
-- tournament: str (Optional)
+- tournament: str
     - The searchable name of the tournament to set the note for
-- badminton_serves: bool (Optional)
+- badmintonServes: bool (Optional)
     - True if the tournament should use badminton serves. If omitted, it will toggle the state of the badminton serve
       data
 
@@ -1195,10 +1232,9 @@ This endpoint is open to the public.
 
 #### Return Structure
 
-- official: Official
+- officials: Official
 - tournament: Tournament
-    - The tournament that was passed in
-
+  - The tournament that was passed in
 <hr>
 
 ### /api/officials/<searchable>
@@ -1217,18 +1253,17 @@ This endpoint is open to the public.
     - The searchable name of the tournament to get stats from
 - returnTournament: bool (Optional)
     - If the tournament is to be returned in the response
-
 #### Return Structure
 
 - Official
 - tournament: Tournament
-    - The tournament that was passed in
-
+  - The tournament that was passed in
 <hr>
 
 # USERS API REFERENCE
 
-## GET endpoints
+## POST endpoints
+
 
 ### /api/login
 
@@ -1243,19 +1278,15 @@ This endpoint is open to the public.
 #### Arguments:
 
 - userId: int
-    - the ID of the user attempting to log in
+  - the ID of the user attempting to log in
 - password: str
-    - the password of the user attempting to log in
+  - the password of the user attempting to log in
 
 #### Return Structure
 
 - token: str
-    - the token that the user received
+  - the token that the user received
 
-<hr>
-<hr>
-
-## POST endpoints
 
 ### /api/image/
 

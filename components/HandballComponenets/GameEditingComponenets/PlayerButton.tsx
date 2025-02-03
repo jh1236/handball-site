@@ -1,18 +1,26 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   IconArrowsLeftRight,
   IconArrowsUpDown,
   IconBallTennis,
-  IconBallVolleyball,
   IconCircleFilled,
-  IconClock,
   IconExclamationMark,
-  IconSkull,
+  IconPlayHandball,
   IconSquareFilled,
   IconTriangleInvertedFilled,
   IconTrophy,
 } from '@tabler/icons-react';
-import { Accordion, Box, Button, Modal, Progress, Title } from '@mantine/core';
+import {
+  Accordion,
+  Box,
+  Button,
+  Collapse,
+  Group,
+  Modal,
+  Progress,
+  Slider,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   ace,
@@ -22,17 +30,25 @@ import {
   redCard,
   score,
   sub,
-  timeout,
   warning,
   yellowCard,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
-import { timeoutForGame } from '@/ServerActions/GameActions';
 
 interface PlayerButtonProps {
   game: GameState;
   leftSide: boolean;
   firstTeam: boolean;
 }
+
+const SCORE_METHODS = [
+  'Double Bounce',
+  'Straight',
+  'Out of Court',
+  'Double Touch',
+  'Grabs',
+  'Illegal Body Part',
+  'Obstruction',
+];
 
 const CARDS = {
   warning: [
@@ -71,16 +87,29 @@ function getActions(
   firstTeam: boolean,
   leftSide: boolean,
   serving: boolean,
-  close: () => void
+  close: () => void,
+  cardTime: number,
+  setCardTime: (v: number) => void,
+  openMore: boolean,
+  toggleOpenMore: () => void
 ) {
+  const team = firstTeam ? game.teamOne : game.teamTwo;
+  const allPlayers = [
+    game.teamOne.left,
+    game.teamOne.right,
+    game.teamOne.sub,
+    game.teamTwo.left,
+    game.teamTwo.right,
+    game.teamTwo.sub,
+  ].filter((a) => typeof a.get !== 'undefined');
+  const players = [team.left, team.right, team.sub].filter((a) => typeof a.get !== 'undefined');
+  const currentPlayer = players.length > 1 ? players[leftSide ? 0 : 1] : players[0];
+
   if (!game.started.get) {
-    const team = firstTeam ? game.teamOne : game.teamTwo;
-    let players = [team.left, team.right, team.sub];
-    const currentPlayer = players[leftSide ? 0 : 1];
-    players = players.filter(
+    const otherPlayers = players.filter(
       (a) => a.get && a.get.searchableName !== currentPlayer.get?.searchableName
     );
-    return players.map((a) => ({
+    return otherPlayers.map((a) => ({
       Icon: IconArrowsUpDown,
       value: `Swap with ${a.get?.name}`,
       color: 'white',
@@ -107,34 +136,76 @@ function getActions(
         color: 'white',
         content: (
           <Button
+            color={currentPlayer.get?.isBestPlayer ? 'orange' : 'blue'}
             size="lg"
             onClick={() => {
-              score(game, firstTeam, leftSide);
+              allPlayers.forEach((p) => {
+                const t = p.get!;
+                t.isBestPlayer = t.searchableName === currentPlayer?.get?.searchableName;
+                p.set(t);
+              });
               close();
             }}
           >
-            Score
+            Best
           </Button>
         ),
       },
     ];
   }
-  const team = firstTeam ? game.teamOne : game.teamTwo;
+  let toggle = true;
   const out = [
     {
       Icon: IconBallTennis,
       value: 'Score',
       color: 'white',
       content: (
-        <Button
-          size="lg"
-          onClick={() => {
-            score(game, firstTeam, leftSide);
-            close();
-          }}
-        >
-          Score
-        </Button>
+        <>
+          {SCORE_METHODS.slice(0, 3).map((method) => {
+            toggle = !toggle;
+            return (
+              <>
+                <Button
+                  style={{ margin: '3px' }}
+                  size="sm"
+                  onClick={() => {
+                    score(game, firstTeam, leftSide, method);
+                    close();
+                  }}
+                >
+                  {method}
+                </Button>
+                <br />
+              </>
+            );
+          })}
+          <Box>
+            <Button style={{ margin: '3px' }} color="gray" onClick={toggleOpenMore}>
+              Show {openMore ? 'Less' : 'More'}
+            </Button>
+
+            <Collapse in={openMore}>
+              {SCORE_METHODS.slice(3).map((method) => {
+                toggle = !toggle;
+                return (
+                  <>
+                    <Button
+                      style={{ margin: '3px' }}
+                      size="sm"
+                      onClick={() => {
+                        score(game, firstTeam, leftSide, method);
+                        close();
+                      }}
+                    >
+                      {method}
+                    </Button>
+                    <br />
+                  </>
+                );
+              })}
+            </Collapse>
+          </Box>
+        </>
       ),
     },
     {
@@ -142,16 +213,19 @@ function getActions(
       value: 'Warning',
       color: 'grey',
       content: CARDS.warning.map((reason) => (
-        <Button
-          style={{ margin: '3px' }}
-          size="sm"
-          onClick={() => {
-            warning(game, firstTeam, leftSide, reason);
-            close();
-          }}
-        >
-          {reason}
-        </Button>
+        <>
+          <Button
+            style={{ margin: '3px' }}
+            size="sm"
+            onClick={() => {
+              warning(game, firstTeam, leftSide, reason);
+              close();
+            }}
+          >
+            {reason}
+          </Button>
+          <br />
+        </>
       )),
     },
     {
@@ -159,16 +233,19 @@ function getActions(
       color: 'green',
       value: 'Green Card',
       content: CARDS.green.map((reason) => (
-        <Button
-          style={{ margin: '3px' }}
-          size="sm"
-          onClick={() => {
-            greenCard(game, firstTeam, leftSide, reason);
-            close();
-          }}
-        >
-          {reason}
-        </Button>
+        <>
+          <Button
+            style={{ margin: '3px' }}
+            size="sm"
+            onClick={() => {
+              greenCard(game, firstTeam, leftSide, reason);
+              close();
+            }}
+          >
+            {reason}
+          </Button>
+          <br />
+        </>
       )),
     },
     {
@@ -178,17 +255,29 @@ function getActions(
       content: (
         <Box>
           {CARDS.yellow.map((reason) => (
-            <Button
-              style={{ margin: '3px' }}
-              size="sm"
-              onClick={() => {
-                yellowCard(game, firstTeam, leftSide, reason);
-                close();
-              }}
-            >
-              {reason}
-            </Button>
+            <>
+              <Button
+                style={{ margin: '3px' }}
+                size="sm"
+                onClick={() => {
+                  yellowCard(game, firstTeam, leftSide, reason, cardTime);
+                  close();
+                }}
+              >
+                {reason}
+              </Button>
+              <br />
+            </>
           ))}
+          <Title order={2}>Rounds: </Title>
+          <Slider
+            defaultValue={6}
+            min={6}
+            max={12}
+            step={1}
+            value={cardTime}
+            onChange={(value) => setCardTime(value)}
+          />
         </Box>
       ),
     },
@@ -197,16 +286,19 @@ function getActions(
       color: 'red',
       value: 'Red Card',
       content: CARDS.red.map((reason) => (
-        <Button
-          style={{ margin: '3px' }}
-          size="sm"
-          onClick={() => {
-            redCard(game, firstTeam, leftSide, reason);
-            close();
-          }}
-        >
-          {reason}
-        </Button>
+        <>
+          <Button
+            style={{ margin: '3px' }}
+            size="sm"
+            onClick={() => {
+              redCard(game, firstTeam, leftSide, reason);
+              close();
+            }}
+          >
+            {reason}
+          </Button>
+          <br />
+        </>
       )),
     },
   ];
@@ -217,7 +309,8 @@ function getActions(
       color: 'white',
       content: (
         <Button
-          size="lg"
+          size="sm"
+          style={{ margin: '3px' }}
           onClick={() => {
             sub(game, firstTeam, leftSide);
             close();
@@ -229,16 +322,15 @@ function getActions(
     });
   }
   if (serving) {
-    out.splice(
-      1,
-      0,
-      {
-        Icon: IconBallVolleyball,
-        value: 'Ace',
-        color: 'white',
-        content: (
+    out.splice(1, 0, {
+      Icon: IconPlayHandball,
+      value: 'Serving Actions',
+      color: 'white',
+      content: (
+        <>
           <Button
-            size="lg"
+            style={{ margin: '3px' }}
+            size="sm"
             onClick={() => {
               ace(game);
               close();
@@ -246,15 +338,10 @@ function getActions(
           >
             Ace
           </Button>
-        ),
-      },
-      {
-        Icon: IconSkull,
-        value: 'Fault',
-        color: 'white',
-        content: (
+          <br />
           <Button
-            size="lg"
+            style={{ margin: '3px' }}
+            size="sm"
             onClick={() => {
               fault(game);
               close();
@@ -262,9 +349,9 @@ function getActions(
           >
             Fault
           </Button>
-        ),
-      }
-    );
+        </>
+      ),
+    });
   }
 
   return out;
@@ -276,15 +363,36 @@ export function PlayerButton({
   leftSide: trueLeftSide,
 }: PlayerButtonProps) {
   const firstTeam = trueFirstTeam === game.teamOneIGA.get;
+  const [cardTime, setCardTime] = React.useState<number>(6);
+  const team = useMemo(() => (firstTeam ? game.teamOne : game.teamTwo), [game.teamOne.left.get]);
+  const [openMore, { toggle: toggleMore }] = useDisclosure(false);
   const serving = useMemo(
     () =>
       game.started.get &&
-      game.servedFromLeft === trueLeftSide &&
+      !game.ended.get &&
+      (game.servedFromLeft === trueLeftSide || !team.left.get || !team.right.get) &&
       game.firstTeamServes.get === firstTeam,
-    [firstTeam, game.firstTeamServes.get, game.servedFromLeft, game.started.get, trueLeftSide]
+    [
+      firstTeam,
+      game.ended.get,
+      game.firstTeamServes.get,
+      game.servedFromLeft,
+      game.started.get,
+      team.left.get,
+      team.right.get,
+      trueLeftSide,
+    ]
   );
   const player = useMemo(() => {
-    const team = firstTeam ? game.teamOne : game.teamTwo;
+    if (team.right.get === undefined) {
+      return team.left.get;
+    }
+    if (team.left.get === undefined) {
+      return team.right.get;
+    }
+    if (game.ended.get) {
+      return trueLeftSide ? team.left.get : team.right.get;
+    }
     const cardedTeammates = [team.left.get, team.right.get].filter(
       (a) => a?.cardTimeRemaining !== 0
     );
@@ -298,23 +406,34 @@ export function PlayerButton({
       return cardedTeammates[0];
     }
     return trueLeftSide ? team.left.get : team.right.get;
-  }, [firstTeam, game.teamOne, game.teamTwo, game.servedFromLeft, trueLeftSide]);
-  const leftSide = useMemo(() => player?.sideOfCourt === 'Left', [player?.sideOfCourt]);
+  }, [firstTeam, game.teamOne, game.teamTwo, game.ended.get, game.servedFromLeft, trueLeftSide]);
+  const leftSide = useMemo(
+    () => (game.ended.get ? trueLeftSide : player?.sideOfCourt === 'Left'),
+    [game.ended.get, player?.sideOfCourt, trueLeftSide]
+  );
   const [opened, { open, close }] = useDisclosure(false);
   const items = useMemo(
     () =>
-      getActions(game, firstTeam, game.started.get ? leftSide : trueLeftSide, serving, close).map(
-        (item, i) => (
-          <Accordion.Item key={i} value={item.value}>
-            <Accordion.Control>
-              <item.Icon color={item.color}></item.Icon>
-              {item.value}
-            </Accordion.Control>
-            <Accordion.Panel>{item.content}</Accordion.Panel>
-          </Accordion.Item>
-        )
-      ),
-    [close, firstTeam, game, leftSide, serving, trueLeftSide]
+      getActions(
+        game,
+        firstTeam,
+        game.started.get ? leftSide : trueLeftSide,
+        serving,
+        close,
+        cardTime,
+        setCardTime,
+        openMore,
+        toggleMore
+      ).map((item, i) => (
+        <Accordion.Item key={i} value={item.value}>
+          <Accordion.Control>
+            <item.Icon color={item.color}></item.Icon>
+            {item.value}
+          </Accordion.Control>
+          <Accordion.Panel>{item.content}</Accordion.Panel>
+        </Accordion.Item>
+      )),
+    [cardTime, close, firstTeam, game, leftSide, serving, trueLeftSide]
   );
   const name = player ? (player.isCaptain ? `${player.name} (c)` : player.name) : 'Loading...';
   return (
@@ -326,24 +445,25 @@ export function PlayerButton({
       <Button
         size="lg"
         radius={0}
-        color={`${serving ? 'teal' : 'blue'}.${trueLeftSide ? 7 : 9}`}
+        color={`${player?.isBestPlayer && game.ended.get ? 'yellow' : serving ? 'teal' : 'blue'}.${trueLeftSide ? 7 : 9}`}
         style={{
           width: '100%',
-          height: (player?.cardTimeRemaining ?? 0) !== 0 ? '95%' : '100%',
+          height: (player?.cardTimeRemaining ?? 0) !== 0 && !game.ended.get ? '95%' : '100%',
           fontWeight: serving ? 'bold' : 'normal',
           margin: 0,
         }}
         onClick={open}
       >
-        {player?.cardTimeRemaining !== 0 ? (
+        {player?.cardTimeRemaining !== 0 && !game.ended.get ? (
           <s>{name}</s>
         ) : game.faulted.get && serving ? (
-          <i>{name}</i>
+          <i>{name}*</i>
         ) : (
           name
-        )}
+        )}{' '}
+        {(!team.left.get || !team.right.get) && serving && (trueLeftSide ? ' (Left)' : ' (Right)')}
       </Button>
-      {player?.cardTimeRemaining !== 0 && player && (
+      {player?.cardTimeRemaining !== 0 && player && !game.ended.get && (
         <Progress
           radius={0}
           style={{ height: '5%' }}

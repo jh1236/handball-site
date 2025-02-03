@@ -21,5 +21,6 @@ module.exports = {
     'react/jsx-boolean-value': 'off',
     'no-continue': 'off',
     'react/jsx-closing-tag-location': 'off',
+    'linebreak-style': 'off',
   },
 };

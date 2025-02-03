@@ -1,14 +1,30 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
+  IconAlertTriangle,
   IconArrowsUpDown,
   IconBallTennis,
   IconClock,
+  IconFlagFilled,
+  IconNote,
+  IconTrophy,
   IconUser,
   IconUsersGroup,
 } from '@tabler/icons-react';
-import { Accordion, Button, List, Modal, Text, Title } from '@mantine/core';
+import ReCAPTCHA from 'react-google-recaptcha';
+import {
+  Accordion,
+  Button,
+  Group,
+  List,
+  Modal,
+  Popover,
+  Text,
+  Textarea,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
+  forfeit,
   GameState,
   timeout,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
@@ -19,7 +35,14 @@ interface TeamButtonProps {
   firstTeam: boolean;
 }
 
-function getActions(game: GameState, firstTeam: boolean, serving: boolean, close: () => void) {
+function getActions(
+  game: GameState,
+  firstTeam: boolean,
+  serving: boolean,
+  close: () => void,
+  captchaPassed: boolean,
+  setCaptchaPassed: (b: boolean) => void
+) {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const players = [team.left.get, team.right.get, team.sub.get].filter(
     (a) => typeof a !== 'undefined'
@@ -99,50 +122,163 @@ function getActions(game: GameState, firstTeam: boolean, serving: boolean, close
     );
     return out;
   }
+  if (game.ended.get) {
+    const allPlayers = [
+      game.teamOne.left,
+      game.teamOne.right,
+      game.teamOne.sub,
+      game.teamTwo.left,
+      game.teamTwo.right,
+      game.teamTwo.sub,
+    ].filter((a) => typeof a.get !== 'undefined');
+    if (team.sub.get) {
+      out.splice(1, 0, {
+        Icon: IconTrophy,
+        value: `Set ${team.sub.get.name} as Best Player`,
+        color: 'white',
+        content: (
+          <Button
+            color={team.sub.get?.isBestPlayer ? 'orange' : 'blue'}
+            size="lg"
+            onClick={() => {
+              allPlayers.forEach((p) => {
+                const t = p.get!;
+                t.isBestPlayer = t.searchableName === team.sub?.get?.searchableName;
+                p.set(t);
+              });
+              close();
+            }}
+          >
+            Best
+          </Button>
+        ),
+      });
+    }
+    out.splice(
+      1,
+      0,
+      {
+        Icon: IconAlertTriangle,
+        value: 'Protest reason',
+        color: 'yellow',
+        content: (
+          <Textarea
+            value={team.protest.get}
+            onChange={(v) => team.protest.set(v.currentTarget.value)}
+          ></Textarea>
+        ),
+      },
+      {
+        Icon: IconNote,
+        value: 'Notes',
+        color: 'white',
+        content: (
+          <Textarea
+            value={team.notes.get}
+            onChange={(v) => team.notes.set(v.currentTarget.value)}
+          ></Textarea>
+        ),
+      }
+    );
+    return out;
+  }
   const timeoutsRemaining = 1 - team.timeouts.get;
-  out.splice(1, 0, {
-    Icon: IconClock,
-    value: `Timeout (${timeoutsRemaining} remaining)`,
-    color: timeoutsRemaining > 0 ? 'white' : 'grey',
-    content: (
-      <Button
-        size="lg"
-        color={timeoutsRemaining > 0 ? 'blue' : timeoutsRemaining === 0 ? 'grey' : 'red'}
-        onClick={() => {
-          timeout(game, firstTeam);
-          close();
-        }}
-      >
-        Timeout
-      </Button>
-    ),
-  });
+  out.splice(
+    1,
+    0,
+    {
+      Icon: IconClock,
+      value: `Timeout (${timeoutsRemaining} remaining)`,
+      color: timeoutsRemaining > 0 ? 'white' : 'grey',
+      content: (
+        <Button
+          size="lg"
+          color={timeoutsRemaining > 0 ? 'blue' : timeoutsRemaining === 0 ? 'grey' : 'red'}
+          onClick={() => {
+            timeout(game, firstTeam);
+            close();
+          }}
+        >
+          Timeout
+        </Button>
+      ),
+    },
+    {
+      Icon: IconFlagFilled,
+      value: 'Forfeit',
+      color: 'red',
+      content: (
+        <Popover width={200} position="top" withArrow shadow="md">
+          <Popover.Target>
+            <Button size="lg" color="red">
+              <strong>Forfeit</strong>
+            </Button>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Text>Are you sure you want to forfeit?</Text>
+            <Popover width={200} position="top" withArrow shadow="md">
+              <Popover.Target>
+                <Button color="red">Confirm</Button>
+              </Popover.Target>
+              <Popover.Dropdown w={350}>
+                <ReCAPTCHA
+                  theme="dark"
+                  sitekey="6Lcbu8oqAAAAAOo9sSSEPuCY5chDdm-27OcF7zjp"
+                  onChange={() => setCaptchaPassed(true)}
+                />
+                <br />
+                <Group justify="center">
+                  <Button
+                    color="red"
+                    disabled={!captchaPassed}
+                    onClick={() => {
+                      forfeit(game, firstTeam);
+                      close();
+                    }}
+                  >
+                    YES!
+                  </Button>
+                </Group>
+              </Popover.Dropdown>
+            </Popover>
+          </Popover.Dropdown>
+        </Popover>
+      ),
+    }
+  );
   return out;
 }
 
 export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) {
   const firstTeam = trueFirstTeam === game.teamOneIGA.get;
+  const [captchaPassed, setCaptchaPassed] = React.useState<boolean>(false);
   const team = useMemo(
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
   );
+  const otherTeam = useMemo(
+    () => (firstTeam ? game.teamTwo : game.teamOne),
+    [firstTeam, game.teamOne, game.teamTwo]
+  );
   const serving = useMemo(
-    () => game.firstTeamServes.get === firstTeam,
-    [firstTeam, game.firstTeamServes.get]
+    () => !game.ended.get && game.firstTeamServes.get === firstTeam,
+    [firstTeam, game.ended.get, game.firstTeamServes.get]
   );
   const [opened, { open, close }] = useDisclosure(false);
   const items = useMemo(
     () =>
-      getActions(game, firstTeam, serving, close).map((item, i) => (
-        <Accordion.Item key={i} value={item.value}>
-          <Accordion.Control>
-            <item.Icon color={item.color}></item.Icon>
-            {item.value}
-          </Accordion.Control>
-          <Accordion.Panel>{item.content}</Accordion.Panel>
-        </Accordion.Item>
-      )),
-    [close, trueFirstTeam, game, serving]
+      getActions(game, firstTeam, serving, close, captchaPassed, setCaptchaPassed).map(
+        (item, i) => (
+          <Accordion.Item key={i} value={item.value}>
+            <Accordion.Control>
+              <item.Icon color={item.color}></item.Icon>
+              {item.value}
+            </Accordion.Control>
+            <Accordion.Panel>{item.content}</Accordion.Panel>
+          </Accordion.Item>
+        )
+      ),
+    [game, firstTeam, serving, close]
   );
   const name = team ? team.name : 'Loading...';
   return (
@@ -154,7 +290,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
       <Button
         radius={0}
         size="lg"
-        color={`${serving ? 'teal' : 'blue'}.5`}
+        color={`${game.ended.get && team.score.get > otherTeam.score.get ? 'orange' : serving ? 'teal' : 'blue'}.5`}
         style={{
           width: '100%',
           height: '100%',
@@ -163,7 +299,8 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
         onClick={open}
       >
         <b>
-          {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'})
+          {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'}){' '}
+          {game.ended.get && team.score.get > otherTeam.score.get && <IconTrophy></IconTrophy>}
         </b>
       </Button>
     </>

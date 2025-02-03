@@ -6,8 +6,10 @@ export interface TeamStructure {
   searchableName: string;
   imageUrl: string;
   captain: PersonStructure | PlayerGameStatsStructure;
-  nonCaptain?: PersonStructure | PlayerGameStatsStructure;
-  substitute?: PersonStructure | PlayerGameStatsStructure;
+  nonCaptain: PersonStructure | PlayerGameStatsStructure | null;
+  substitute: PersonStructure | PlayerGameStatsStructure | null;
+  teamColor: string | null;
+  teamColorAsRGBABecauseDigbyIsLazy: number[];
   servedFromLeft?: boolean;
   stats?: { [key: string]: any };
 
@@ -38,6 +40,7 @@ export interface TournamentStructure {
   notes: string;
   imageUrl: string;
   usingBadmintonServes: boolean;
+  editable: boolean;
 
   [k: string]: any;
 }
@@ -49,31 +52,15 @@ export interface OfficialStructure extends PersonStructure {
 }
 
 export interface PlayerGameStatsStructure extends PersonStructure {
-  team: TeamStructure;
-  roundsOnCourt: number;
-  roundsCarded: number;
-  pointsScored: number;
-  acesScored: number;
+  team?: TeamStructure;
+  game?: GameStructure;
   isBestPlayer: boolean;
   isCaptain: boolean;
-  faults: number;
-  doubleFaults: number;
-  servedPoints: number;
-  servedPointsWon: number;
-  servesReceived: number;
-  servesReturned: number;
-  aceStreak: number;
-  serveStreak: number;
-  warnings: number;
-  greenCards: number;
-  yellowCards: number;
-  redCards: number;
   cardTime: number;
   cardTimeRemaining: number;
   startSide: 'Left' | 'Right' | 'Substitute';
-  elo: number;
-  eloDelta: number;
   sideOfCourt: 'Left' | 'Right' | 'Substitute';
+  stats: { [key: string]: any };
 
   [k: string]: any;
 }

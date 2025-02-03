@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { b } from '@storybook/react/dist/public-types-1083bc5a';
 import { Box, Title } from '@mantine/core';
 import { DynamicTable } from '@/components/HandballComponenets/StatsComponents/DynamicTable';
 import { getLadder } from '@/ServerActions/TeamActions';
@@ -30,6 +29,7 @@ export default function Ladder({
   sortIndex,
 }: LadderProps) {
   // const [sort, setSort] = React.useState<number>(-1);
+  const [columnState, setColumnState] = React.useState<string[]>(columns);
   const [ladder, setLadder] = React.useState<TeamStructure[]>();
   const [isPooled, setIsPooled] = React.useState<boolean>(false);
   const [poolTwo, setPoolTwo] = React.useState<TeamStructure[]>();
@@ -50,17 +50,17 @@ export default function Ladder({
       <Box style={{ textAlign: 'center' }}>
         <Title order={3}>Pool One</Title>
         <DynamicTable
-          columns={columns}
+          columns={columnState}
+          setColumns={setColumnState}
           sortIndexIn={sortIndex}
           objToLink={(o) => linkTo(o, tournament)}
           data={ladder ?? []}
           editable={editable}
           maxRows={Math.floor(maxRows / 2)}
-        >
-        </DynamicTable>
+        ></DynamicTable>
         <Title order={3}>Pool Two</Title>
         <DynamicTable
-          columns={columns}
+          columns={columnState}
           sortIndexIn={sortIndex}
           objToLink={(o) => linkTo(o, tournament)}
           data={poolTwo ?? []}
@@ -78,7 +78,6 @@ export default function Ladder({
       data={ladder ?? []}
       editable={editable}
       maxRows={maxRows}
-    >
-    </DynamicTable>
+    ></DynamicTable>
   );
 }
