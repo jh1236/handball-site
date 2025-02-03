@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Box, Center, Divider, Grid, Paper, Table, Tabs, Text, Title } from '@mantine/core';
+import { Box, Center, Divider, Grid, Paper, Select, Table, Tabs, Text, Title } from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
-import { GameStructure } from '@/ServerActions/types';
+import {GameStructure, PersonStructure, PlayerGameStatsStructure} from '@/ServerActions/types';
+import {isAdmin} from "@/components/HandballComponenets/ServerActions";
 
 interface GamePageProps {
   gameID: number;
@@ -13,6 +14,7 @@ interface GamePageProps {
 
 export function GamePage({ gameID }: GamePageProps) {
   const [game, setGame] = React.useState<GameStructure>();
+  const [playerSelect, setPlayerSelect] = React.useState('');
   localStorage.getItem('permissions');
   useEffect(() => {
     getGame({
@@ -33,7 +35,49 @@ export function GamePage({ gameID }: GamePageProps) {
   localeDate.push(date.toLocaleDateString().slice(0, LocaleDateIndex + 1));
   localeDate.push(date.toLocaleTimeString().slice(LocaleDateIndex + 1));
 
-  function generateStatTable(): any {
+  function generatePlayerStats(playerName: string) {
+    if (!game) { return (<p>error</p>); }
+    const allPlayers: PlayerGameStatsStructure[] = [
+      game.teamOne.captain,
+      game.teamOne.nonCaptain,
+      game.teamOne.substitute,
+      game.teamTwo.captain,
+      game.teamTwo.nonCaptain,
+      game.teamTwo.substitute,
+    ].filter(a => typeof a !== 'undefined' && a !== null);
+    console.log(`${allPlayers}`);
+    const player: PersonStructure = allPlayers.find((p: PlayerGameStatsStructure) =>
+        (p.name === playerName)
+    )!;
+    if (!player) { return (<p>could not find {playerName} </p>); }
+    const statsTable = [];
+    for (const k of Object.keys(player)) {
+      statsTable.push({
+        stat: k,
+        playerStat: player[k],
+      });
+    }
+    const rows = statsTable.map((s) =>(
+        <Table.Tr key={s.stat}>
+          <Table.Td>{s.stat}</Table.Td>
+          <Table.Td>{s.playerStat}</Table.Td>
+        </Table.Tr>
+        )
+    );
+    return (
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Statistic</Table.Th>
+              <Table.Th>Player Stats (Game)</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{rows}</Table.Tbody>
+        </Table>
+    );
+  }
+
+  function generateTeamStatsTable(): any {
     if (!game || !game.teamOne || !game.teamTwo || !game.teamOne.stats || !game.teamTwo.stats) {
       return <p> error </p>;
     }
@@ -56,11 +100,11 @@ export function GamePage({ gameID }: GamePageProps) {
               fz="sm"
               fw="bold"
               display="inline"
-              c={Number(game.teamOne.stats['Elo Delta']) < 0 ? 'red' : 'green'}
+              c={Number(game.teamOne.stats!['Elo Delta']) < 0 ? 'red' : 'green'}
             >
-              {game.teamOne.stats['Elo Delta'] > 0
-                ? `+${game.teamOne.stats['Elo Delta']}`
-                : game.teamOne.stats['Elo Delta']}
+              {game.teamOne.stats!['Elo Delta'] > 0
+                ? `+${game.teamOne.stats!['Elo Delta']}`
+                : game.teamOne.stats!['Elo Delta']}
             </Text>
           )}
         </Table.Td>
@@ -71,11 +115,11 @@ export function GamePage({ gameID }: GamePageProps) {
             <Text
               fw="bold"
               display="inline"
-              c={Number(game.teamTwo.stats['Elo Delta']) < 0 ? 'red' : 'green'}
+              c={Number(game.teamTwo.stats!['Elo Delta']) < 0 ? 'red' : 'green'}
             >
-              {game.teamTwo.stats['Elo Delta'] > 0
-                ? `+${game.teamTwo.stats['Elo Delta']}`
-                : game.teamTwo.stats['Elo Delta']}
+              {game.teamTwo.stats!['Elo Delta'] > 0
+                ? `+${game.teamTwo.stats!['Elo Delta']}`
+                : game.teamTwo.stats!['Elo Delta']}
             </Text>
           )}
         </Table.Td>
@@ -201,11 +245,27 @@ export function GamePage({ gameID }: GamePageProps) {
           <Tabs defaultValue="teamStats" color="#B2F2BB">
             <Paper component={Tabs.List} grow bg="#fcfffc" shadow="xs" justify="center">
               <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
-              <Tabs.Tab value="2">Test 2</Tabs.Tab>
+              <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
               <Tabs.Tab value="3">Test 3</Tabs.Tab>
+              {true && <Tabs.Tab value="admin"></Tabs.Tab>}
             </Paper>
-            <Tabs.Panel value="teamStats">{generateStatTable()}</Tabs.Panel>
-            <Tabs.Panel value="2">this is number 2</Tabs.Panel>
+            <Tabs.Panel value="teamStats">{generateTeamStatsTable()}</Tabs.Panel>
+            <Tabs.Panel value="playerStats">
+              <Select
+                label="Select Player"
+                placeholder="Select Player"
+                data={[
+                  game.teamOne.captain.name,
+                    game.teamOne.nonCaptain!.name,
+                    game.teamTwo.captain.name,
+                    game.teamTwo.nonCaptain!.name,
+                ]}
+                onSearchChange={setPlayerSelect}
+                searchValue={playerSelect}
+              ></Select>
+              <p>{playerSelect}</p>
+              <div>{generatePlayerStats(playerSelect)}</div>
+            </Tabs.Panel>
             <Tabs.Panel value="3">this is 3</Tabs.Panel>
           </Tabs>
           <Box></Box>
