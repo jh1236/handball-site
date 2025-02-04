@@ -57,12 +57,12 @@ function getActions(
                   {game.teamOne.protest.get ? game.teamOne.protest.get : <i>None</i>}
                 </List.Item>
                 <List.Item>
-                  <strong>Notes: </strong>
-                  {game.teamOne.notes.get ? game.teamOne.notes.get : <i>None</i>}
-                </List.Item>
-                <List.Item>
                   <strong>Rating: </strong>
                   {game.teamOne.rating.get} / 5
+                </List.Item>
+                <List.Item>
+                  <strong>Notes: </strong>
+                  {game.teamOne.notes.get ? game.teamOne.notes.get : <i>None</i>}
                 </List.Item>
               </List>
             </List.Item>
@@ -146,8 +146,7 @@ export function GameScore({ game }: GameScoreArgs) {
     () =>
       getActions(game, bestPlayer[0]?.get, close, reviewReqd, setReviewReqd).map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
-          <Accordion.Control>
-            <item.Icon color={item.color}></item.Icon>
+          <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
             {item.value}
           </Accordion.Control>
           <Accordion.Panel>{item.content}</Accordion.Panel>

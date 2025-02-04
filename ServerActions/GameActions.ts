@@ -581,13 +581,13 @@ export function endGame(
     body.protestTeamOne = protestTeamOne;
   }
   if (protestTeamTwo) {
-    body.protestTeamOne = protestTeamTwo;
+    body.protestTeamTwo = protestTeamTwo;
   }
   if (notesTeamOne) {
-    body.notesTeamOne = notesTeamOne;
+    body.teamOneNotes = notesTeamOne;
   }
   if (notesTeamTwo) {
-    body.notesTeamTwo = notesTeamTwo;
+    body.teamTwoNotes = notesTeamTwo;
   }
   if (markedForReview) {
     body.markedForReview = 'true';

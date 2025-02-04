@@ -432,8 +432,7 @@ export function PlayerButton({
         toggleMore
       ).map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
-          <Accordion.Control>
-            <item.Icon color={item.color}></item.Icon>
+          <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
             {item.value}
           </Accordion.Control>
           <Accordion.Panel>{item.content}</Accordion.Panel>

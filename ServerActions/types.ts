@@ -86,8 +86,8 @@ export interface GameEventStructure {
 
 export type GameTeamStructure = TeamStructure & {
   captain: PlayerGameStatsStructure;
-  nonCaptain?: PlayerGameStatsStructure;
-  substitute?: PlayerGameStatsStructure;
+  nonCaptain: PlayerGameStatsStructure | null;
+  substitute: PlayerGameStatsStructure | null;
 };
 
 export interface GameStructure {
@@ -123,12 +123,21 @@ export interface GameStructure {
   status: string;
   events?: GameEventStructure[];
   players?: PlayerGameStatsStructure[];
-  adminStatus?: string;
-  noteableStatus?: string;
-  notes?: string;
   timeoutExpirationTime: number;
   cardsTeamOne?: GameEventStructure[];
   cardsTeamTwo?: GameEventStructure[];
+  admin?: {
+    notes?: string;
+    cards: GameEventStructure[];
+    adminStatus: string;
+    noteableStatus: string;
+    teamOneRating: number;
+    teamTwoRating: number;
+    teamOneNotes: string | null;
+    teamTwoNotes: string | null;
+    teamOneProtest: string | null;
+    teamTwoProtest: string | null;
+  };
 
   [k: string]: any;
 }

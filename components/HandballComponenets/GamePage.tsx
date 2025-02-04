@@ -1,23 +1,14 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import {
-  Select,
-  Box,
-  Divider,
-  Grid,
-  Image,
-  Paper,
-  Table,
-  Tabs,
-  Text,
-  Title,
-} from '@mantine/core';
+import React, { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Box, Divider, Grid, Image, Paper, Select, Table, Tabs, Text, Title } from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
+import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
+import { isAdmin, isOfficial } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
 import { GameStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
-import { isAdmin } from '@/components/HandballComponenets/ServerActions';
 
 interface GamePageProps {
   gameID: number;
@@ -27,12 +18,25 @@ export function GamePage({ gameID }: GamePageProps) {
   const [game, setGame] = React.useState<GameStructure>();
   const [playerSelect, setPlayerSelect] = React.useState('');
   localStorage.getItem('permissions');
+  const [activeTab, setActiveTab] = useState<string | null>('teamStats');
+  const router = useRouter();
+  const searchParams = useSearchParams();
   useEffect(() => {
     getGame({
       gameID,
       includeStats: true,
+      includeGameEvents: true,
     }).then(setGame);
   }, [gameID]);
+  useEffect(() => {
+    if (activeTab !== 'teamStats') {
+      router.replace(`${window.location.href.split('?')[0]}?tab=${activeTab}`);
+    }
+  }, [activeTab, router]);
+  useEffect(() => {
+    const tab = searchParams.get('tab') === null ? 'teamStats' : searchParams.get('tab');
+    setActiveTab(tab);
+  }, [searchParams]);
   if (!game) {
     return <SidebarLayout>Loading...</SidebarLayout>;
   }
@@ -48,7 +52,9 @@ export function GamePage({ gameID }: GamePageProps) {
   const teamGradient = `linear-gradient(to right, rgba(${game.teamOne.teamColorAsRGBABecauseDigbyIsLazy ? game.teamOne.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'}), rgba(0,0,0,0), rgba(${game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy ? game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'})`;
 
   function generatePlayerStats(playerName: string) {
-    if (!game) { return (<p>error</p>); }
+    if (!game) {
+      return <p>error</p>;
+    }
     const allPlayers: PlayerGameStatsStructure[] = [
       game.teamOne.captain,
       game.teamOne.nonCaptain,
@@ -56,13 +62,17 @@ export function GamePage({ gameID }: GamePageProps) {
       game.teamTwo.captain,
       game.teamTwo.nonCaptain,
       game.teamTwo.substitute,
-    ].filter(a => typeof a !== 'undefined' && a !== null);
-    const player: PersonStructure = allPlayers.find((p: PlayerGameStatsStructure) =>
-        (p.name === playerName)
+    ].filter((a) => typeof a !== 'undefined' && a !== null);
+    const player: PersonStructure = allPlayers.find(
+      (p: PlayerGameStatsStructure) => p.name === playerName
     )!;
-    if (!player) { return (<p> Select a player to see their stats :)</p>); }
+    if (!player) {
+      return <p> Select a player to see their stats :)</p>;
+    }
     const statsTable = [];
-    if (!player.stats) { return (<p> could not find {playerName}&#39;s stats</p>); }
+    if (!player.stats) {
+      return <p> could not find {playerName}&#39;s stats</p>;
+    }
     for (const k of Object.keys(player.stats)) {
       statsTable.push({
         stat: k,
@@ -70,22 +80,21 @@ export function GamePage({ gameID }: GamePageProps) {
       });
     }
     const rows = statsTable.map((s) => (
-        <Table.Tr key={s.stat}>
-          <Table.Td>{s.stat}</Table.Td>
-          <Table.Td>{s.playerStat}</Table.Td>
-        </Table.Tr>
-        )
-    );
+      <Table.Tr key={s.stat}>
+        <Table.Td>{s.stat}</Table.Td>
+        <Table.Td>{s.playerStat}</Table.Td>
+      </Table.Tr>
+    ));
     return (
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Statistic</Table.Th>
-              <Table.Th>Player Stats (Game)</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+      <Table>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Statistic</Table.Th>
+            <Table.Th>Player Stats (Game)</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
+      </Table>
     );
   }
 
@@ -287,15 +296,18 @@ export function GamePage({ gameID }: GamePageProps) {
               </Box>
             </Grid.Col>
           </Grid>
-          <Text pos="relative" bottom={20} style={{ background: 'rgba(100, 100, 100, 0.1)' }}> Status: {game.status} | Officiated by {game.official.name}</Text>
+          <Text pos="relative" bottom={20} style={{ background: 'rgba(100, 100, 100, 0.1)' }}>
+            {' '}
+            Status: {game.status} | Officiated by {game.official.name}
+          </Text>
         </Box>
         <Divider></Divider>
         <Box pos="relative">
-          <Tabs defaultValue="teamStats" color="#B2F2BB">
+          <Tabs value={activeTab} onChange={setActiveTab} color="#B2F2BB">
             <Paper component={Tabs.List} grow bg="#fcfffc" shadow="xs" justify="space-between">
               <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
               <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
-              {isAdmin() && <Tabs.Tab value="admin"> ADMIN TAB </Tabs.Tab>}
+              {isOfficial() && <Tabs.Tab value="admin"> ADMIN TAB </Tabs.Tab>}
             </Paper>
             <Tabs.Panel value="teamStats">{generateTeamStatsTable()}</Tabs.Panel>
             <Tabs.Panel value="playerStats">
@@ -304,16 +316,21 @@ export function GamePage({ gameID }: GamePageProps) {
                 placeholder="Select Player"
                 data={[
                   game.teamOne.captain.name,
-                    game.teamOne.nonCaptain!.name,
-                    game.teamTwo.captain.name,
-                    game.teamTwo.nonCaptain!.name,
-                ]}
+                  game.teamOne.nonCaptain?.name,
+                  game.teamTwo.captain.name,
+                  game.teamTwo.nonCaptain?.name,
+                ].filter((a) => typeof a === 'string')}
                 onSearchChange={setPlayerSelect}
                 searchValue={playerSelect}
               ></Select>
               <p>{playerSelect}</p>
               <div>{generatePlayerStats(playerSelect)}</div>
             </Tabs.Panel>
+            {isOfficial() && (
+              <Tabs.Panel value="admin">
+                <AdminGamePanel game={game}></AdminGamePanel>
+              </Tabs.Panel>
+            )}
           </Tabs>
           <Box></Box>
         </Box>

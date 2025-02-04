@@ -36,6 +36,15 @@ interface TeamButtonProps {
   firstTeam: boolean;
 }
 
+export const FEEDBACK_TEXTS = [
+  <Text c="gray"><i>Unset</i></Text>,
+  <Text c="red">Follow up Required</Text>,
+  <Text c="orange">Disrespectful Behaviour</Text>,
+  <Text>Acceptable Behaviour</Text>,
+  <Text>Polite Behaviour</Text>,
+  <Text c="green">Above and Beyond</Text>,
+];
+
 function getActions(
   game: GameState,
   firstTeam: boolean,
@@ -176,6 +185,7 @@ function getActions(
         content: (
           <>
             <Rating value={team.rating.get} size="lg" onChange={team.rating.set}></Rating>
+            {FEEDBACK_TEXTS[team.rating.get]}
             <Textarea
               value={team.notes.get}
               onChange={(v) => team.notes.set(v.currentTarget.value)}
@@ -274,8 +284,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
       getActions(game, firstTeam, serving, close, captchaPassed, setCaptchaPassed).map(
         (item, i) => (
           <Accordion.Item key={i} value={item.value}>
-            <Accordion.Control>
-              <item.Icon color={item.color}></item.Icon>
+            <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
               {item.value}
             </Accordion.Control>
             <Accordion.Panel>{item.content}</Accordion.Panel>
