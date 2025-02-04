@@ -1,0 +1,1898 @@
+{
+  "teams": [
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=barbenheimer",
+        "name": "Olivia Stronach",
+        "searchableName": "olivia_stronach"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=barbenheimer",
+      "name": "Barbenheimer",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=barbenheimer",
+        "name": "Ethan Dal Molin",
+        "searchableName": "ethan_dal_molin"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "barbenheimer",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+      "name": "IDK",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Vangeli Hajigabriel",
+        "searchableName": "vangeli_hajigabriel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "idk",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ikea_workers",
+        "name": "William Prozerska",
+        "searchableName": "william_prozerska"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=ikea_workers",
+      "name": "IKEA Workers",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "ikea_workers",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+      "name": "The Officials",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "officials",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Nicholas Burvill",
+        "searchableName": "nicholas_burvill"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+      "name": "Satnavs",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "satnavs",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=seanitha",
+        "name": "Sean Robinson",
+        "searchableName": "sean_robinson"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=seanitha",
+      "name": "Seanitha",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=seanitha",
+        "name": "Tabitha Blechynden",
+        "searchableName": "tabitha_blechynden"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "seanitha",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=sleeby",
+        "name": "James Saunders",
+        "searchableName": "james_saunders"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=sleeby",
+      "name": "Sleeby",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=sleeby",
+        "name": "Ruby Farrel",
+        "searchableName": "ruby_farrel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "sleeby",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+      "name": "The Tradies",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "Zebiah Peaker",
+        "searchableName": "zebiah_peaker"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "tradies",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+      "name": "Whipped",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Michael Russ",
+        "searchableName": "michael_russ"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "whipped",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=seanitha",
+        "name": "Sean Robinson",
+        "searchableName": "sean_robinson"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=ac_lads",
+      "name": "AC Lads",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ac_lads",
+        "name": "Declan Holloway",
+        "searchableName": "declan_holloway"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "ac_lads",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQl9ooCDWmADpLvaM7ae7G1MhOquaiNPThAs_nUUmTl4kz82_iHLrh-LKRIqg&s",
+      "name": "Alex Soudure (oh Zaiah is here too ig)",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "alex_soudure_oh_zaiah_is_here_too_ig",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=baes",
+      "name": "The Baes",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "baes",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ball_fondlers",
+        "name": "Charlie Wyatt",
+        "searchableName": "charlie_wyatt"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=ball_fondlers",
+      "name": "Ball Fondlers",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ball_fondlers",
+        "name": "Elizabeth Gover",
+        "searchableName": "elizabeth_gover"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "ball_fondlers",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+      "name": "BCFing Fun",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "bcfing_fun",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=bedwars_besties",
+      "name": "Bedwars Besties",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "bedwars_besties",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxQ_eAjry9j0olHnz-fqB_hY-VovhkC62Gh-3-p_1sVsZlLUOz4yDJzu8Rp0Y&s",
+      "name": "Bench Warmers",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "bench_warmers",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=blaaergh",
+        "name": "Liam Cooper",
+        "searchableName": "liam_cooper"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=blaaergh",
+      "name": "Blaaergh",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "blaaergh",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=breaking_bad_bois",
+        "name": "Brigitte Gredziuk",
+        "searchableName": "brigitte_gredziuk"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=breaking_bad_bois",
+      "name": "Breaking Bad Bois",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "breaking_bad_bois",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=breaking_bad_boys",
+      "name": "Breaking Bad Boys",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=breaking_bad_bois",
+        "name": "Brigitte Gredziuk",
+        "searchableName": "brigitte_gredziuk"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "breaking_bad_boys",
+      "secondaryColor": "None/Unknown",
+      "substitute": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=breaking_bad_boys",
+        "name": "Sophie Lane",
+        "searchableName": "sophie_lane"
+      }
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=bunbury_boys",
+      "name": "Bunbury Boys",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bunbury_boys",
+        "name": "Edward Smith",
+        "searchableName": "edward_smith"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "bunbury_boys",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=ceebs",
+      "name": "Ceebs",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ceebs",
+        "name": "Caitlin Milne",
+        "searchableName": "caitlin_milne"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "ceebs",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLTMD4nqHctj0W0pie07kIV70tQHIadsXO2nfp2x7jxZ-dbkAmW2QKbS7S0lQ&s",
+      "name": "Cringeiana Grande",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "cringeiana_grande",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=enjoyers_of_male_genitalia",
+        "name": "Digby Ross",
+        "searchableName": "digby_ross"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=enjoyers_of_male_genitalia",
+      "name": "Enjoyers of Male Genitalia",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "Zebiah Peaker",
+        "searchableName": "zebiah_peaker"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "enjoyers_of_male_genitalia",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwvs0ZRi-aRccNy4Iu2lDLJVKolprZcbTaJJ5llx2M6YhhIhj-whgRcoeN-Q&s",
+      "name": "The Goblinoids",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "goblinoids",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=gorgon_woobt",
+      "name": "GORGON WOOBT",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=gorgon_woobt",
+        "name": "Sharai Rose",
+        "searchableName": "sharai_rose"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "gorgon_woobt",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bunbury_boys",
+        "name": "Edward Smith",
+        "searchableName": "edward_smith"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=handchester_united",
+      "name": "Handchester United",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=handchester_united",
+        "name": "Liam Cox",
+        "searchableName": "liam_cox"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "handchester_united",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Vangeli Hajigabriel",
+        "searchableName": "vangeli_hajigabriel"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=height_difference",
+      "name": "Height Difference",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "height_difference",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=iggy_squad",
+        "name": "Iggy Kreutz",
+        "searchableName": "iggy_kreutz"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=iggy_squad",
+      "name": "Iggy Squad",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=barbenheimer",
+        "name": "Olivia Stronach",
+        "searchableName": "olivia_stronach"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "iggy_squad",
+      "secondaryColor": "None/Unknown",
+      "substitute": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=seanitha",
+        "name": "Tabitha Blechynden",
+        "searchableName": "tabitha_blechynden"
+      }
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLFFfgfPCBc0jhMNJvDEyaSy3h8olxkhf33PKH09dBoJT3BEbx5S1bJUrgrw&s",
+      "name": "james",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "james",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9-luLa6AKboRnvyloKwtagYY2-Y2hP5EpgSDBtpSTejanJKHSOiFa9i4g1g&s",
+      "name": "Jay-Z",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "jayz",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=breaking_bad_bois",
+        "name": "Brigitte Gredziuk",
+        "searchableName": "brigitte_gredziuk"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5woZttJH4Q6o--ytX3TWxoCdLvZa0NHo54KgcUXVgYKmqpNwxOPR8f84V-74&s",
+      "name": "Jumping Giraffes",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "jumping_giraffes",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdqRG3n-WDu4geqf3B5z2ldjL6jEOypUo8IYbcd9epCJVFZioawEhvBjaKOy8&s",
+      "name": "Laimee",
+      "nonCaptain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdqRG3n-WDu4geqf3B5z2ldjL6jEOypUo8IYbcd9epCJVFZioawEhvBjaKOy8&s",
+        "name": "Aimee Soudure",
+        "searchableName": "aimee_soudure"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "laimee",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOxU-Y7_9tLCpoRq8BpmjKah54io1JjkXFA_zscGcocVxOOZyzWEJtXzGfNA&s",
+      "name": "LAX",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "lax",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5U6HMtrBmBYbZz0Sk4QTfo2NIJNeV_CECrGX8k-4VwB9pgD2naanlnQruQQ&s",
+      "name": "Lovers",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "lovers",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Michael Russ",
+        "searchableName": "michael_russ"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=operation_underkill",
+      "name": "Operation Underkill",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=operation_underkill",
+        "name": "Ed South",
+        "searchableName": "ed_south"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "operation_underkill",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=barbenheimer",
+        "name": "Ethan Dal Molin",
+        "searchableName": "ethan_dal_molin"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=redacted",
+      "name": "*REDACTED*",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "Zebiah Peaker",
+        "searchableName": "zebiah_peaker"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "redacted",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxOcbrHjMCTVNLBZaNzCEj7wewmX-FDn8CNunkk7ZcX_QFFmujhre0gqZ-o4o&s",
+        "name": "Reece Taylor",
+        "searchableName": "reece_taylor"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxOcbrHjMCTVNLBZaNzCEj7wewmX-FDn8CNunkk7ZcX_QFFmujhre0gqZ-o4o&s",
+      "name": "Reece and Digby",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=enjoyers_of_male_genitalia",
+        "name": "Digby Ross",
+        "searchableName": "digby_ross"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "reece_and_digby",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=riders_of_berk",
+        "name": "Naveen Nimilan",
+        "searchableName": "naveen_nimilan"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=riders_of_berk",
+      "name": "Riders Of Berk",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "riders_of_berk",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=breaking_bad_bois",
+        "name": "Brigitte Gredziuk",
+        "searchableName": "brigitte_gredziuk"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=saelmoa",
+      "name": "Saelmoa",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=breaking_bad_boys",
+        "name": "Sophie Lane",
+        "searchableName": "sophie_lane"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "saelmoa",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrnW44OkrPzSnz5frOhDILpHXIC2BLkaMwR1GVkkr2bslmcHvzMOZj_aVrIw&s",
+      "name": "Sharpy",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "sharpy",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "Zebiah Peaker",
+        "searchableName": "zebiah_peaker"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=slurs",
+      "name": "Slurs",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ikea_workers",
+        "name": "William Prozerska",
+        "searchableName": "william_prozerska"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "slurs",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=enjoyers_of_male_genitalia",
+        "name": "Digby Ross",
+        "searchableName": "digby_ross"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbQQxT7n4UD0HvWwA1_OgL-lkd-upBA6kvHGDQ_hpHLWeU2YaKlkk_YzOALQ&s",
+      "name": "(Solo) Digby Ross",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_digby_ross",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUL5HR4zfMLsi7mmdKIbdyOLyTrJlJszqrpSO1NkfBfIvWoZWebvHvnN5In9k&s",
+      "name": "Straight Ones",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "straight_ones",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdqRG3n-WDu4geqf3B5z2ldjL6jEOypUo8IYbcd9epCJVFZioawEhvBjaKOy8&s",
+        "name": "Aimee Soudure",
+        "searchableName": "aimee_soudure"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOX-98D-MtmjzzcboA2GTvp-IP-o654HhTncPnWMHOx-2XdnJj_bkm4MMleLE&s",
+      "name": "Super Officials",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "super_officials",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJjwb9rsAG2UeAhVXh2WaQmGcNQVfifpIPbD7lXSuWJe2XZ4UF1rtjifSzZg&s",
+      "name": "T. Swift Song Inspo",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "t_swift_song_inspo",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_rocket",
+        "name": "Heidi Leow",
+        "searchableName": "heidi_leow"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=team_rocket",
+      "name": "Team Rocket",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_rocket",
+        "name": "James Frayne",
+        "searchableName": "james_frayne"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "team_rocket",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "James Turner",
+        "searchableName": "james_turner"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+      "name": "Team Weezer",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "team_weezer",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuktHessCItMm9kaBwehvaYUGSE0vi3jy9Dqd-TYSL89OK4g7cRq23SK9asA&s",
+      "name": "They Can't Decide",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "they_cant_decide",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=tourism_new_zealand",
+      "name": "Tourism New Zealand",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "tourism_new_zealand",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDBhfQwNlfHhWi0nn9sD-v26HeTvMiS0YXnrTwklzRhajx0yif3TP35XqUU-8&s",
+      "name": "Trouble in Terrace Town",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "trouble_in_terrace_town",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=enjoyers_of_male_genitalia",
+        "name": "Digby Ross",
+        "searchableName": "digby_ross"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=wwbd",
+      "name": "WWBD",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "wwbd",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLJp0u1KtmgD9fphPE81VnaD32ORZGWWCTfWAuhE2AkdWKqTwqpwdzhgAWizk&s",
+      "name": "ZL",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "zl",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbcLq8_soSVusnL_GeVUnOyQ6qkf29KBBFi5tQitYTox7Op-vH8T91EddpKkU&s",
+      "name": "Bitches from Thornlie",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "bitches_from_thornlie",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=breaking_bad_bois",
+        "name": "Brigitte Gredziuk",
+        "searchableName": "brigitte_gredziuk"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_aCmISAsKSYfMwXx4NvlzWjGfDOwjU32-K2gcZ8VU9tpsWB5sKZ9udjvY_w&s",
+      "name": "Bropocalypse",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Nicholas Burvill",
+        "searchableName": "nicholas_burvill"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "bropocalypse",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=chase_ridley",
+      "name": "Chase Ridley",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "chase_ridley",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPLUcJmEnMvPwO0U1l9cjwDG9ot_0wF16zy-ToMurFMMpjVnL_fbGtUCP6q7c&s",
+      "name": "Harry's Mates",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "harrys_mates",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ball_fondlers",
+        "name": "Charlie Wyatt",
+        "searchableName": "charlie_wyatt"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6N0WG4mpAOJFx2IvOnPkNTL94sihqMsQURQ-439w9Mv3HBDK5ISgVJMImYyg&s",
+      "name": "Jared's big toe ",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "jareds_big_toe_",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRViNE0iHKAx8aZggK_nXJj8-QrOebX0CI6XiHoKkZJK8NvjdJRB210cy5LfGc&s",
+      "name": "Joyful Damnation ",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "joyful_damnation_",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTO1XTNqf9weRXme-bmt9C5-vzvk6Ymlzu0vr4e2b_00GBM7F-ciXiA-ScDJg&s",
+      "name": "Lizzie LDShadowLady",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "lizzie_ldshadowlady",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqj5_DR6a5dbhdOJR4jtRX-wCvnOVKSLDpYxqUxCQJ_HsiaL-dI26hlPz0UyI&s",
+      "name": "Loghch",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "loghch",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Nicholas Burvill",
+        "searchableName": "nicholas_burvill"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLBkuAVvXqyyOBHduhwxcM-bixeA-KrooZLCx-sKr82TzmRlWsXGsCNYAfkg&s",
+      "name": "Nick and Jared Palestine",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "nick_and_jared_palestine",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=operation_overkill",
+      "name": "Operation Overkill",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Michael Russ",
+        "searchableName": "michael_russ"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "operation_overkill",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJIduM2VJ23ed6q58pZotPfyOunsCnp_8GOohIEcxMTKej1aOzZ2ctDgGHRb8&s",
+      "name": "Save the whales with four lower case letters, you pick where.",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "save_whales_with_four_lower_case_letters_you_pick_where",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIpg90B4OUvwsM-sfpBJBoVdfKzOwcZCcJEohFYNjGURAphull9hx7RymiDQ&s",
+      "name": "(Solo) Alex Soudure",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_alex_soudure",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bunbury_boys",
+        "name": "Edward Smith",
+        "searchableName": "edward_smith"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLLgSd7U5zT1I0MIX3fouvStrG8tGB_4wkSpE0YFvpBQuAA2uD0XITcpLcow&s",
+      "name": "(Solo) Edward Smith",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_edward_smith",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN3cuDReqw-4As7-PbHP9Z8oa8DYdjuDyNKwTf7x_ExQfNn0tSw89KYZj1Iw&s",
+      "name": "(Solo) Jared Healy",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_jared_healy",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTCc_7AnAotawDKivO9Kc0zAffTUbnbeMyZ35zNodjczW1ONXfnaZIt0ihyWA&s",
+      "name": "(Solo) Lachlan Banks",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_lachlan_banks",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEOPJiTtq4g8RHFR9FMObZf71gCK5CrUyfdAzfM07HLwMDrEQuI8FlYvFe4iE&s",
+      "name": "Tot4l DraMa: World 70ur_!",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "tot4l_drama_world_70ur_",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvy5Qg7MzS9WT7Q2fA2QvJa5nfwrxzPQ6acg4t1Ws7F0upJUrdW_a3kahO5eE&s",
+      "name": "Vigorous Hand Movements",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "vigorous_hand_movements",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrERZ3BvQDyJo6c2Zj-KpDZjWBZQ9n-4i5a3U7Smt_U-F3libjIMVJwCVHxQ&s",
+      "name": "We are bad at hanball <3",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "we_are_bad_at_hanball_3",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxQ_eAjry9j0olHnz-fqB_hY-VovhkC62Gh-3-p_1sVsZlLUOz4yDJzu8Rp0Y&s",
+      "name": "wE are the benChwarMers",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "we_are_benchwarmers",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTODph_5XzJMDAC_GrX3_AiEcE9R5DV3JRNZ9-X291lZ46ZzCu6iswJn7d77fg&s",
+      "name": "Wildcats",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "wildcats",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQU8yKhdCt2sXrd3HuTMdqsIjsCu4tG9r7IMS2blm1qtS3tGTTZzzACV8U7iQ&s",
+      "name": "AAAAAAA",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=gorgon_woobt",
+        "name": "Sharai Rose",
+        "searchableName": "sharai_rose"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "aaaaaaa",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFz8Z8tAEu0kkpiPfjiqFtA5XB7PcOAP-7kz-4qse62D2iuwmapxkSvCFkLbg&s",
+      "name": "Double D's",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=enjoyers_of_male_genitalia",
+        "name": "Digby Ross",
+        "searchableName": "digby_ross"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "double_ds",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQOqJjs8-srmdeN8wJNcnkakDwonKibutfJ8okIKD3r2vNAn4rxkQvPu98Fg&s",
+      "name": "erghhhhhhh ow daddy",
+      "nonCaptain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxOcbrHjMCTVNLBZaNzCEj7wewmX-FDn8CNunkk7ZcX_QFFmujhre0gqZ-o4o&s",
+        "name": "Reece Taylor",
+        "searchableName": "reece_taylor"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "erghhhhhhh_ow_daddy",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4tGBklDq5Bg_VtXaUpbFgjnMkwh-0QqamWWWf7dQDEOJLTQSoWa6AifYgObU&s",
+      "name": "The excess",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "excess",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSWwpjevY0GCUCvT8nGPGK7Zci401-rFR-OOEnenllLaGJCdTKHp4WAaUjCg&s",
+      "name": "F-Slur",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=enjoyers_of_male_genitalia",
+        "name": "Digby Ross",
+        "searchableName": "digby_ross"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "fslur",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=gorgon_woobt",
+        "name": "Sharai Rose",
+        "searchableName": "sharai_rose"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=heteros",
+      "name": "Heteros",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "heteros",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Vangeli Hajigabriel",
+        "searchableName": "vangeli_hajigabriel"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_KEanWuiR9ruEbT-UCq4yXl6L-WvakTottJ26stawGwnk1tkrH6RjB01wEw&s",
+      "name": "Jangeli",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "jangeli",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuNt9CcV5R9DzbJtZVXXcC39xuR6OCtcBsjRQ9xxKM6M72_v9MVanaciBrWw&s",
+      "name": "Pass apple pineapple",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "pass_apple_pineapple",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=gorgon_woobt",
+        "name": "Sharai Rose",
+        "searchableName": "sharai_rose"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4MbSiHIjrFR55WyZqBoZyH7jXTKhlTW2V77i_vCHmqPoH43stWXc1C7XpJE4&s",
+      "name": "PP",
+      "nonCaptain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxOcbrHjMCTVNLBZaNzCEj7wewmX-FDn8CNunkk7ZcX_QFFmujhre0gqZ-o4o&s",
+        "name": "Reece Taylor",
+        "searchableName": "reece_taylor"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "pp",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXqSmDfbFNRKa2vmcy2DPvHhaYMeSH8a6nWzA1L-iOAb9zfCfa_4LdnhWF_g&s",
+      "name": "(Solo) Dora Wan",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_dora_wan",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPrF67DFFKlfArID4AVtb8DSoGbGapkEkxlMi75G1kaaVV5rodOhvvGT4SgA&s",
+      "name": "(Solo) Eva Hajigabriel",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_eva_hajigabriel",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "James Sharpham",
+        "searchableName": "james_sharpham"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwk4NjINtm1wgsv7O_sH2YUujAtNOHXoGX7BU0-pFmj4xYv7U5b2QLp3lYgw&s",
+      "name": "(Solo) James Sharpham",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_james_sharpham",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQNad2NZ_40ihJLkOBS0EHDroUcEA3JCl-Jpku83l7jzWl9KvPPzW9qb4iSjc&s",
+      "name": "(Solo) Tomasz Sakowski",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_tomasz_sakowski",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSySaukR13lguRRsLii_M2EhixKE00eoOJXVkeEjitMbkhRfjAmEdLRnkrOx-o&s",
+      "name": "(Solo) Zaiah Deards",
+      "nonCaptain": null,
+      "primaryColor": "None/Unknown",
+      "searchableName": "solo_zaiah_deards",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQaYrQxdH9ULMBiDquvV4XV3JFxn_NSk5sxsp5gWI0ALM2e3zxobI-WMTd1A&s",
+      "name": "trouble in terrorizz yard",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "trouble_in_terrorizz_yard",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMM58eH88VS2IcgXclqFBULmlqqJqzGsy2ru6kT-YJhORhmf3jrJt3kWMfuA&s",
+      "name": "Shugly",
+      "nonCaptain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMM58eH88VS2IcgXclqFBULmlqqJqzGsy2ru6kT-YJhORhmf3jrJt3kWMfuA&s",
+        "name": "Sophie Chapman",
+        "searchableName": "sophie_chapman"
+      },
+      "primaryColor": "None/Unknown",
+      "searchableName": "shugly",
+      "secondaryColor": "None/Unknown",
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStysFLxrdg4AkaE0STWN0VZiIGFT-YOie7YIKc6pbpomab6af1J2Yg47y6Cw&s",
+      "name": "Dorophie",
+      "nonCaptain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMM58eH88VS2IcgXclqFBULmlqqJqzGsy2ru6kT-YJhORhmf3jrJt3kWMfuA&s",
+        "name": "Sophie Chapman",
+        "searchableName": "sophie_chapman"
+      },
+      "primaryColor": null,
+      "searchableName": "dorophie",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpoxKDHRueLMAaB3kKtHkfTI2wXP4RUkANTuhdvHE_OCHwwLifywkM0W7uhA&s",
+      "name": "Beef",
+      "nonCaptain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMM58eH88VS2IcgXclqFBULmlqqJqzGsy2ru6kT-YJhORhmf3jrJt3kWMfuA&s",
+        "name": "Sophie Chapman",
+        "searchableName": "sophie_chapman"
+      },
+      "primaryColor": null,
+      "searchableName": "beef",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bunbury_boys",
+        "name": "Edward Smith",
+        "searchableName": "edward_smith"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=handchester_united",
+      "name": "Handchester United",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=handchester_united",
+        "name": "Maddie Harvey",
+        "searchableName": "maddie_harvey"
+      },
+      "primaryColor": null,
+      "searchableName": "handchester_united_reborn",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=but_t_buddies",
+      "name": "But T Buddies",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=blaaergh",
+        "name": "Liam Cooper",
+        "searchableName": "liam_cooper"
+      },
+      "primaryColor": null,
+      "searchableName": "but_t_buddies",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=aesthetic_gfs",
+        "name": "Kiara Johnstone",
+        "searchableName": "kiara_johnstone"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=aesthetic_gfs",
+      "name": "Aesthetic Gfs",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=aesthetic_gfs",
+        "name": "Florencia Maccarone",
+        "searchableName": "florencia_maccarone"
+      },
+      "primaryColor": null,
+      "searchableName": "aesthetic_gfs",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=barbenheimer",
+        "name": "Ethan Dal Molin",
+        "searchableName": "ethan_dal_molin"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=team_sealand",
+      "name": "Team Sealand",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=tradies",
+        "name": "Zebiah Peaker",
+        "searchableName": "zebiah_peaker"
+      },
+      "primaryColor": null,
+      "searchableName": "team_sealand",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=rip_brodie",
+        "name": "Kaliha Bhuiyan",
+        "searchableName": "kaliha_bhuiyan"
+      },
+      "imageUrl": "https://squarers.org/api/teams/image?name=rip_brodie",
+      "name": "RIP Brodie",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=rip_brodie",
+        "name": "Benjamin Giles",
+        "searchableName": "benjamin_giles"
+      },
+      "primaryColor": null,
+      "searchableName": "rip_brodie",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=jared_healy",
+        "name": "Jared Healy",
+        "searchableName": "jared_healy"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkzsfSdy7O-P2QvxIW3NfteOysgc1N_wzB9vTjtD7Ju1Q4jdxH8ySd1DYR7A&s",
+      "name": "International Waters",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ikea_workers",
+        "name": "William Prozerska",
+        "searchableName": "william_prozerska"
+      },
+      "primaryColor": null,
+      "searchableName": "international_waters",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ball_fondlers",
+        "name": "Charlie Wyatt",
+        "searchableName": "charlie_wyatt"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKHdrIXeLl961pQHX8UKBPeauqAF86av85fMk5TBE6dylMzHxQ4pcLWZp77Q&s",
+      "name": "Lichtenstein",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "James Turner",
+        "searchableName": "james_turner"
+      },
+      "primaryColor": null,
+      "searchableName": "lichtenstein",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/users/image?name=lachlan_banks",
+        "name": "Lachlan Banks",
+        "searchableName": "lachlan_banks"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEeFxJ8T1tfiUG8fSTbOHKWDfe6eVT8ucjQSM5opZv0K-OZGNyneExTH5ztNg&s",
+      "name": "Mozambique",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=enjoyers_of_male_genitalia",
+        "name": "Digby Ross",
+        "searchableName": "digby_ross"
+      },
+      "primaryColor": null,
+      "searchableName": "mozambique",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=satnavs",
+        "name": "Tristan Nel",
+        "searchableName": "tristan_nel"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZuU1a6a68ipeYkXnlS6V0JuIu88cYskkn_yeBjfAeANXi4YJrgekQ63lhYf0&s",
+      "name": "Saint Vincent and the Grenadines",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Dora Wan",
+        "searchableName": "dora_wan"
+      },
+      "primaryColor": null,
+      "searchableName": "saint_vincent_and_the_grenadines",
+      "secondaryColor": null,
+      "substitute": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ceebs",
+        "name": "Caitlin Milne",
+        "searchableName": "caitlin_milne"
+      }
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgIJbP3Ba88kGVb_v0CDB1m192AttQrn3_vt2THX1HPcI9ah-puz86IAvD_Q&s",
+      "name": "Transcaucasian Socialist Federative Soviet Republic",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=idk",
+        "name": "Eva Hajigabriel",
+        "searchableName": "eva_hajigabriel"
+      },
+      "primaryColor": null,
+      "searchableName": "transcaucasian_socialist_federative_soviet_republic",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=bcfing_fun",
+        "name": "Tomasz Sakowski",
+        "searchableName": "tomasz_sakowski"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVDSQLpVU5iI4GT8Sy_cGmlxRPouGo18nn6XQMcs3k-7XycDJA3z5vOLLHHA&s",
+      "name": "Vatican City",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=gorgon_woobt",
+        "name": "Sharai Rose",
+        "searchableName": "sharai_rose"
+      },
+      "primaryColor": null,
+      "searchableName": "vatican_city",
+      "secondaryColor": null,
+      "substitute": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=barbenheimer",
+        "name": "Ethan Dal Molin",
+        "searchableName": "ethan_dal_molin"
+      }
+    },
+    {
+      "captain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmwZsUvhO1y189puehJnd6RRNzvh_pOqT4DD6SDKJLoYkGI-OaJ65OfW6yWA&s",
+        "name": "Jamie Farago",
+        "searchableName": "jamie_farago"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmwZsUvhO1y189puehJnd6RRNzvh_pOqT4DD6SDKJLoYkGI-OaJ65OfW6yWA&s",
+      "name": "Kazakhstan",
+      "nonCaptain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmwZsUvhO1y189puehJnd6RRNzvh_pOqT4DD6SDKJLoYkGI-OaJ65OfW6yWA&s",
+        "name": "Connor Li",
+        "searchableName": "connor_li"
+      },
+      "primaryColor": null,
+      "searchableName": "kazakhstan",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=team_weezer",
+        "name": "Zaiah Deards",
+        "searchableName": "zaiah_deards"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr5l1DhCA1N8aTUhxSqaLsKsgRKtz1R4-gSjSHhakHPYHMs5byD1jMv4L8jw&s",
+      "name": "The Cats",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ikea_workers",
+        "name": "William Prozerska",
+        "searchableName": "william_prozerska"
+      },
+      "primaryColor": null,
+      "searchableName": "cats",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=whipped",
+        "name": "Michael Russ",
+        "searchableName": "michael_russ"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ569r4nrh3vLAqWd7-qmH3Gv50vHFj_OipKKfCZC4fzG6DEe4sEm2y9Wii7SI&s",
+      "name": "(Solo) Michael Russ",
+      "nonCaptain": null,
+      "primaryColor": null,
+      "searchableName": "solo_michael_russ",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=officials",
+        "name": "Alex Soudure",
+        "searchableName": "alex_soudure"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyLFKGxP3rX5nCxBUhvNc_7z9P8Vx3LMUX6540vCnM0bEmwDa8G3fds3Mw2w&s",
+      "name": "DJ Kuhlman",
+      "nonCaptain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=enjoyers_of_male_genitalia",
+        "name": "Digby Ross",
+        "searchableName": "digby_ross"
+      },
+      "primaryColor": null,
+      "searchableName": "dj_kuhlman",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=ikea_workers",
+        "name": "William Prozerska",
+        "searchableName": "william_prozerska"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0QVYzVl6gb9kRxZunEwcyhOS7Mf2sgbxLVE13ygmEiDHy32-5bfVeGdpyhbE&s",
+      "name": "(Solo) William Prozerska",
+      "nonCaptain": null,
+      "primaryColor": null,
+      "searchableName": "solo_william_prozerska",
+      "secondaryColor": null,
+      "substitute": null
+    },
+    {
+      "captain": {
+        "imageUrl": "https://squarers.org/api/teams/image?name=rip_brodie",
+        "name": "Benjamin Giles",
+        "searchableName": "benjamin_giles"
+      },
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_1uZfRUb-vIAQvDEfUMgH7TuG3iLA_Zvyrw9Ps5gskOMFwlVRHkYheB7l6Zc&s",
+      "name": "New Team",
+      "nonCaptain": {
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdqRG3n-WDu4geqf3B5z2ldjL6jEOypUo8IYbcd9epCJVFZioawEhvBjaKOy8&s",
+        "name": "Aimee Soudure",
+        "searchableName": "aimee_soudure"
+      },
+      "primaryColor": null,
+      "searchableName": "new_team",
+      "secondaryColor": null,
+      "substitute": null
+    }
+  ]
+}

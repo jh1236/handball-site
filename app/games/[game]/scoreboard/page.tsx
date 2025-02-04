@@ -1,13 +1,13 @@
 import React from 'react';
 import { GamePageArgs } from '@/app/types';
-import { GamePage } from '@/components/HandballComponenets/GamePageComponents/GamePage';
+import { Scoreboard } from '@/components/HandballComponenets/GamePageComponents/Scoreboard';
 
 export default async function GamesPage({ params }: GamePageArgs) {
   const { game } = await params;
 
   return (
     <>
-      <GamePage gameID={+game}></GamePage>
+      <Scoreboard gameID={+game}></Scoreboard>
     </>
   );
 }
