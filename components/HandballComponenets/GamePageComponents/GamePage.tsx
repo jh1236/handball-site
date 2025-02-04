@@ -2,7 +2,19 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Box, Divider, Grid, Image, Paper, Select, Table, Tabs, Text, Title } from '@mantine/core';
+import {
+  Box,
+  Divider,
+  Grid,
+  Image,
+  Paper,
+  Select,
+  Table,
+  Tabs,
+  Text,
+  Title,
+  useMantineColorScheme,
+} from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
 import { isAdmin, isOfficial } from '@/components/HandballComponenets/ServerActions';
@@ -21,6 +33,7 @@ export function GamePage({ gameID }: GamePageProps) {
   const [activeTab, setActiveTab] = useState<string | null>('teamStats');
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { colorScheme } = useMantineColorScheme();
   useEffect(() => {
     getGame({
       gameID,
@@ -147,7 +160,7 @@ export function GamePage({ gameID }: GamePageProps) {
       </Table.Tr>
     ));
     return (
-      <Table stripedColor="green" striped="odd" withColumnBorders>
+      <Table striped="odd" withColumnBorders>
         <Table.Thead>
           <Table.Tr>
             <Table.Th w="37.5%" style={{ textAlign: 'center' }}>
@@ -195,6 +208,7 @@ export function GamePage({ gameID }: GamePageProps) {
           >
             <Grid.Col span={5}>
               <Title
+                c={colorScheme === 'dark' ? 'white' : 'black'}
                 order={2}
                 lineClamp={2}
                 component="a"
@@ -209,6 +223,7 @@ export function GamePage({ gameID }: GamePageProps) {
             </Grid.Col>
             <Grid.Col span={5}>
               <Title
+                c={colorScheme === 'dark' ? 'white' : 'black'}
                 component="a"
                 className={classes.secretLink}
                 order={2}
@@ -303,8 +318,8 @@ export function GamePage({ gameID }: GamePageProps) {
         </Box>
         <Divider></Divider>
         <Box pos="relative">
-          <Tabs value={activeTab} onChange={setActiveTab} color="#B2F2BB">
-            <Paper component={Tabs.List} grow bg="#fcfffc" shadow="xs" justify="space-between">
+          <Tabs value={activeTab} onChange={setActiveTab}>
+            <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
               <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
               <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
               {isOfficial() && <Tabs.Tab value="admin"> ADMIN TAB </Tabs.Tab>}
