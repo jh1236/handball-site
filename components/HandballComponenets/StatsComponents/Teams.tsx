@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Container, Grid, Image, Text } from '@mantine/core';
+import { Box, Container, Grid, Image, Text } from '@mantine/core';
 import { getTeams } from '@/ServerActions/TeamActions';
 import { TeamStructure } from '@/ServerActions/types';
 
@@ -13,6 +13,7 @@ function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
     <Container
       bg={team.teamColor ? team.teamColor : 'red.5'}
       w="auto"
+      h={300}
       p={20}
       m={10}
       bd="2 solid black"
@@ -22,9 +23,11 @@ function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
       <Text size="auto" fw={700} ta="center">
         {team.name}
       </Text>
-      <Link href={getLinkForTeam(team, tournament)}>
-        <Image alt={team.name} src={team.imageUrl} h="200" w="auto" m="auto"></Image>
-      </Link>
+      <Box h={200}>
+        <Link href={getLinkForTeam(team, tournament)}>
+          <Image alt={team.name} src={team.imageUrl} fit="contain" w="100%" h="100%"></Image>
+        </Link>
+      </Box>
       <Text fw={700} ta="center">
         {team.captain.name}
       </Text>
