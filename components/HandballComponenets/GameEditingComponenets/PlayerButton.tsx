@@ -105,109 +105,7 @@ function getActions(
   const players = [team.left, team.right, team.sub].filter((a) => typeof a.get !== 'undefined');
   const currentPlayer = players.length > 1 ? players[leftSide ? 0 : 1] : players[0];
 
-  if (!game.started.get) {
-    const otherPlayers = players.filter(
-      (a) => a.get && a.get.searchableName !== currentPlayer.get?.searchableName
-    );
-    return otherPlayers.map((a) => ({
-      Icon: IconArrowsUpDown,
-      value: `Swap with ${a.get?.name}`,
-      color: 'white',
-      content: (
-        <Button
-          size="lg"
-          onClick={() => {
-            const temp = a.get!;
-            a.set(currentPlayer.get!);
-            currentPlayer.set(temp);
-            close();
-          }}
-        >
-          Swap
-        </Button>
-      ),
-    }));
-  }
-  if (game.ended.get) {
-    return [
-      {
-        Icon: IconTrophy,
-        value: 'Set Best Player',
-        color: 'white',
-        content: (
-          <Button
-            color={currentPlayer.get?.isBestPlayer ? 'orange' : 'blue'}
-            size="lg"
-            onClick={() => {
-              allPlayers.forEach((p) => {
-                const t = p.get!;
-                t.isBestPlayer = t.searchableName === currentPlayer?.get?.searchableName;
-                p.set(t);
-              });
-              close();
-            }}
-          >
-            Best
-          </Button>
-        ),
-      },
-    ];
-  }
-  let toggle = true;
   const out = [
-    {
-      Icon: IconBallTennis,
-      value: 'Score',
-      color: 'white',
-      content: (
-        <>
-          {SCORE_METHODS.slice(0, 3).map((method) => {
-            toggle = !toggle;
-            return (
-              <>
-                <Button
-                  style={{ margin: '3px' }}
-                  size="sm"
-                  onClick={() => {
-                    score(game, firstTeam, leftSide, method);
-                    close();
-                  }}
-                >
-                  {method}
-                </Button>
-                <br />
-              </>
-            );
-          })}
-          <Box>
-            <Button style={{ margin: '3px' }} color="gray" onClick={toggleOpenMore}>
-              Show {openMore ? 'Less' : 'More'}
-            </Button>
-
-            <Collapse in={openMore}>
-              {SCORE_METHODS.slice(3).map((method) => {
-                toggle = !toggle;
-                return (
-                  <>
-                    <Button
-                      style={{ margin: '3px' }}
-                      size="sm"
-                      onClick={() => {
-                        score(game, firstTeam, leftSide, method);
-                        close();
-                      }}
-                    >
-                      {method}
-                    </Button>
-                    <br />
-                  </>
-                );
-              })}
-            </Collapse>
-          </Box>
-        </>
-      ),
-    },
     {
       Icon: IconExclamationMark,
       value: 'Warning',
@@ -302,6 +200,106 @@ function getActions(
       )),
     },
   ];
+
+  if (!game.started.get) {
+    const otherPlayers = players.filter(
+      (a) => a.get && a.get.searchableName !== currentPlayer.get?.searchableName
+    );
+    return otherPlayers.map((a) => ({
+      Icon: IconArrowsUpDown,
+      value: `Swap with ${a.get?.name}`,
+      color: 'white',
+      content: (
+        <Button
+          size="lg"
+          onClick={() => {
+            const temp = a.get!;
+            a.set(currentPlayer.get!);
+            currentPlayer.set(temp);
+            close();
+          }}
+        >
+          Swap
+        </Button>
+      ),
+    }));
+  }
+  if (game.ended.get) {
+    out.splice(0, 0, {
+      Icon: IconTrophy,
+      value: 'Set Best Player',
+      color: 'white',
+      content: (
+        <Button
+          color={currentPlayer.get?.isBestPlayer ? 'orange' : 'blue'}
+          size="lg"
+          onClick={() => {
+            allPlayers.forEach((p) => {
+              const t = p.get!;
+              t.isBestPlayer = t.searchableName === currentPlayer?.get?.searchableName;
+              p.set(t);
+            });
+            close();
+          }}
+        >
+          Best
+        </Button>
+      ),
+    });
+    return out;
+  }
+  out.splice(0, 0, {
+    Icon: IconBallTennis,
+    value: 'Score',
+    color: 'white',
+    content: (
+      <>
+        {SCORE_METHODS.slice(0, 3).map((method) => {
+          return (
+            <>
+              <Button
+                style={{ margin: '3px' }}
+                size="sm"
+                onClick={() => {
+                  score(game, firstTeam, leftSide, method);
+
+                  close();
+                }}
+              >
+                {method}
+              </Button>
+              <br />
+            </>
+          );
+        })}
+        <Box>
+          <Button style={{ margin: '3px' }} color="gray" onClick={toggleOpenMore}>
+            Show {openMore ? 'Less' : 'More'}
+          </Button>
+
+          <Collapse in={openMore}>
+            {SCORE_METHODS.slice(3).map((method) => {
+              return (
+                <>
+                  <Button
+                    style={{ margin: '3px' }}
+                    size="sm"
+                    onClick={() => {
+                      score(game, firstTeam, leftSide, method);
+                      close();
+                    }}
+                  >
+                    {method}
+                  </Button>
+                  <br />
+                </>
+              );
+            })}
+          </Collapse>
+        </Box>
+      </>
+    ),
+  });
   if (team.sub.get && game.teamOne.score.get + game.teamTwo.score.get < 9) {
     out.splice(1, 0, {
       Icon: IconArrowsLeftRight,
@@ -371,7 +369,7 @@ export function PlayerButton({
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
   );
-  const [openMore, { toggle: toggleMore }] = useDisclosure(false);
+  const [openMore, { close: closeMore, toggle: toggleMore }] = useDisclosure(false);
   const serving = useMemo(
     () =>
       game.started.get &&
@@ -445,7 +443,9 @@ export function PlayerButton({
     <>
       <Modal opened={opened} centered onClose={close} title="Action">
         <Title> {player?.name ?? 'Placeholder'}</Title>
-        <Accordion defaultValue="Score">{items}</Accordion>
+        <Accordion defaultValue="Score" onChange={closeMore}>
+          {items}
+        </Accordion>
       </Modal>
       <Button
         size="lg"
@@ -466,7 +466,7 @@ export function PlayerButton({
         ) : (
           name
         )}{' '}
-        {(!team.left.get || !team.right.get) && serving && (trueLeftSide ? ' (Left)' : ' (Right)')}
+        {(!team.left.get || !team.right.get) && (game.servedFromLeft ? ' (Left)' : ' (Right)')}
       </Button>
       {player?.cardTimeRemaining !== 0 && player && !game.ended.get && (
         <Progress

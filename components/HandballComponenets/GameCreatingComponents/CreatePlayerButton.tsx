@@ -27,7 +27,7 @@ export function CreatePlayerButton({
           placeholder="John Doe"
           data={players.map((a) => a.name)}
           value={player}
-          onChange={setPlayer}
+          onChange={(v) => setPlayer(v.trim() === '' ? undefined : v)}
         />
       </Modal>
       <Button

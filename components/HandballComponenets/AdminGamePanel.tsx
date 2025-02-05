@@ -28,11 +28,22 @@ import { PiHandshakeFill } from 'react-icons/pi';
 import { Accordion, Button, Center, Divider, Rating, Text, Timeline, Title } from '@mantine/core';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { isAdmin } from '@/components/HandballComponenets/ServerActions';
+import { resolveGame } from '@/ServerActions/GameActions';
 import { GameEventStructure, GameStructure } from '@/ServerActions/types';
 
 interface AdminGamePanelProps {
   game: GameStructure;
 }
+
+const RESOLVED_STATUSES = [
+  'Resolved',
+  'In Progress',
+  'Official',
+  'Ended',
+  'Waiting for Start',
+  'Forfeit',
+  undefined,
+];
 
 const eventIcon = (e: GameEventStructure) => {
   switch (e.eventType) {
@@ -99,6 +110,19 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
       </Accordion.Item>
       {isAdmin() && (
         <>
+          <Accordion.Item value="resolve">
+            <Accordion.Control icon={<IconCheckbox />}>Resolve</Accordion.Control>
+            <Accordion.Panel>
+              <Button
+                disabled={RESOLVED_STATUSES.includes(game.status)}
+                onClick={() => {
+                  resolveGame(game.id).then(() => location.reload());
+                }}
+              >
+                Resolve
+              </Button>
+            </Accordion.Panel>
+          </Accordion.Item>
           <Accordion.Item value="notes">
             <Accordion.Control icon={<IconNote />}>Notes</Accordion.Control>
             <Accordion.Panel>

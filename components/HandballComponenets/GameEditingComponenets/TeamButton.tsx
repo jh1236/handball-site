@@ -37,7 +37,9 @@ interface TeamButtonProps {
 }
 
 export const FEEDBACK_TEXTS = [
-  <Text c="gray"><i>Unset</i></Text>,
+  <Text c="gray">
+    <i>Unset</i>
+  </Text>,
   <Text c="red">Follow up Required</Text>,
   <Text c="orange">Disrespectful Behaviour</Text>,
   <Text>Acceptable Behaviour</Text>,
@@ -181,7 +183,15 @@ function getActions(
       {
         Icon: IconNote,
         value: 'Feedback',
-        color: 'white',
+        title: (team.rating.get && (team.rating.get !== 1 || team.notes.get)) ? (
+          'Feedback'
+        ) : (
+          <>
+            <strong>Feedback</strong>
+            <strong style={{ color: 'red' }}>*</strong>{' '}
+          </>
+        ),
+        color: undefined,
         content: (
           <>
             <Rating value={team.rating.get} size="lg" onChange={team.rating.set}></Rating>
@@ -285,7 +295,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
         (item, i) => (
           <Accordion.Item key={i} value={item.value}>
             <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
-              {item.value}
+              {item.title ?? item.value}
             </Accordion.Control>
             <Accordion.Panel>{item.content}</Accordion.Panel>
           </Accordion.Item>

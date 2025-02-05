@@ -350,7 +350,7 @@ export function EditGame({ game }: { game: number }) {
       />
       <Box style={{ width: '100%', height: '40%' }}>
         {(
-          gameState.teamOneIGA.get ? !teamTwoLeft || !teamTwoRight : !teamOneLeft || !teamOneRight
+          gameState.teamOneIGA.get ? teamOneLeft && teamOneRight : teamTwoLeft && teamTwoRight
           ) ? (
           <>
             <Box style={{ width: '50%', height: '90%', float: 'left' }}>
@@ -435,7 +435,7 @@ export function EditGame({ game }: { game: number }) {
           <TeamButton firstTeam={false} game={gameState}></TeamButton>
         </Box>
         {(
-          gameState.teamOneIGA.get ? !teamOneLeft || !teamOneRight : !teamTwoLeft || !teamTwoRight
+          gameState.teamOneIGA.get ? teamTwoLeft && teamTwoRight : teamOneLeft && teamOneRight
         ) ? (
           <>
             <Box style={{ width: '50%', height: '90%', float: 'left' }}>

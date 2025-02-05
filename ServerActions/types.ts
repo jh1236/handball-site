@@ -129,7 +129,6 @@ export interface GameStructure {
   admin?: {
     notes?: string;
     cards: GameEventStructure[];
-    adminStatus: string;
     noteableStatus: string;
     teamOneRating: number;
     teamTwoRating: number;

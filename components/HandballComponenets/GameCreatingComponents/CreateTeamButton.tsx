@@ -52,8 +52,10 @@ export function CreateTeamButton({
     if (!teamName || teamName === 'New Team') return;
     const t = teams.find((t) => t.name === teamName);
     if (!t) return;
-    const players = getPlayersFromTeam(t);
-    if (players.includes(leftPlayer) && players.includes(rightPlayer)) {
+    if (rightPlayer === t.captain.name) {
+      setRightPlayer(t!.captain.name);
+      setLeftPlayer(t!.nonCaptain?.name);
+    } else {
       setLeftPlayer(t!.captain.name);
       setRightPlayer(t!.nonCaptain?.name);
     }

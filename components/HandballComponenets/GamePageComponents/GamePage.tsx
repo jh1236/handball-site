@@ -44,6 +44,8 @@ export function GamePage({ gameID }: GamePageProps) {
   useEffect(() => {
     if (activeTab !== 'teamStats') {
       router.replace(`${window.location.href.split('?')[0]}?tab=${activeTab}`);
+    } else {
+      router.replace(`${window.location.href.split('?')[0]}`);
     }
   }, [activeTab, router]);
   useEffect(() => {

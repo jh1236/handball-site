@@ -16,7 +16,7 @@ interface TournamentLandingProps {
   tournament: string;
 }
 
-type StatCategory = {
+export type StatCategory = {
   type: 'player' | 'team';
   title: string;
   stat: string;
@@ -88,54 +88,65 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
     const sortMultiplier = STATS[statIndex].order === 'asc' ? 1 : -1;
     if (STATS[statIndex].type === 'team') {
       const team = teams?.reduce((a, b) => {
-        const newStat = sortMultiplier * parseFloat(String(a.stats![STATS[statIndex].stat]));
-        const oldStat = sortMultiplier * parseFloat(String(b.stats![STATS[statIndex].stat]));
-        if (newStat > oldStat) {
+        const diff =
+          sortMultiplier *
+          (parseFloat(String(b.stats![STATS[statIndex].stat])) -
+            parseFloat(String(a.stats![STATS[statIndex].stat])));
+        if (diff > 0) {
           return a;
         }
-        if (newStat === oldStat) {
+        if (diff === 0) {
           return Math.random() > 0.5 ? a : b;
         }
         return b;
       }, teams[0]);
       return (
-        <Link href={`/${tournament}/teams/${team.searchableName}`} className="hideLink">
-          <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
+        <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
+          <Link href={`/${tournament}/players/${team.searchableName}`} className="hideLink">
             <Text size="auto" fw={700} ta="center">
               {team.name}
             </Text>
+          </Link>
+          <Link href={`/${tournament}/players/${team.searchableName}`} className="hideLink">
             <Image alt={team.name} src={team.imageUrl} h="200" w="auto" m="auto"></Image>
+          </Link>
+          <Link href={`/${tournament}/players/${team.searchableName}`} className="hideLink">
             <Text ta="center">
               With {team.stats![STATS[statIndex].stat]} {STATS[statIndex].description}
             </Text>
-          </Container>
-        </Link>
+          </Link>
+        </Container>
       );
     }
     const player = players?.reduce((a, b) => {
-      const newStat = sortMultiplier * parseFloat(String(a.stats![STATS[statIndex].stat]));
-      const oldStat = sortMultiplier * parseFloat(String(b.stats![STATS[statIndex].stat]));
-      if (newStat > oldStat) {
+      const diff =
+        sortMultiplier *
+        (parseFloat(String(b.stats![STATS[statIndex].stat])) -
+          parseFloat(String(a.stats![STATS[statIndex].stat])));
+      if (diff > 0) {
         return a;
       }
-      if (newStat === oldStat) {
+      if (diff === 0) {
         return Math.random() > 0.5 ? a : b;
       }
       return b;
     }, players[0]);
     return (
-      <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
-        <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
+      <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
+        <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
           <Text size="auto" fw={700} ta="center">
             {player.name}
           </Text>
+        </Link>
+        <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
           <Image alt={player.name} src={player.imageUrl} h="200" w="auto" m="auto"></Image>
-
+        </Link>
+        <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
           <Text ta="center">
             With {player.stats![STATS[statIndex].stat]} {STATS[statIndex].description}
           </Text>
-        </Container>
-      </Link>
+        </Link>
+      </Container>
     );
   }
 

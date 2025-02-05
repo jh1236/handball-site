@@ -571,7 +571,7 @@ export function endGame(
     id: gameId,
     bestPlayer,
     teamOneRating,
-    teamTwoRating
+    teamTwoRating,
   };
 
   if (notes) {

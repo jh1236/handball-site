@@ -1,18 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import {
-  IconCheckbox,
-  IconCloudUpload,
-  IconNote,
-  IconStarHalfFilled,
-  IconTrophy,
-} from '@tabler/icons-react';
-import { Accordion, Button, Checkbox, List, Modal, Textarea, Title } from '@mantine/core';
+import { IconCheckbox, IconCloudUpload, IconNote } from '@tabler/icons-react';
+import { Accordion, Button, Checkbox, List, Modal, Rating, Textarea, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   begin,
   end,
   GameState,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface GameScoreArgs {
@@ -26,71 +21,22 @@ function getActions(
   reviewReqd: boolean,
   setReviewReqd: (value: ((prevState: boolean) => boolean) | boolean) => void
 ) {
-  if (!bestPlayer) return [];
   const winningTeam =
     game.teamTwo.score.get > game.teamOne.score.get ? game.teamTwo.name : game.teamOne.name;
   return [
     {
-      Icon: IconTrophy,
-      value: 'Game Statistics',
-      color: 'white',
-      content: (
-        <>
-          <List>
-            <List.Item>
-              <strong>Winning Team: </strong>
-              {winningTeam}
-            </List.Item>
-            <List.Item>
-              <strong>Best Player: </strong>
-              {bestPlayer.name}
-            </List.Item>
-            <List.Item>
-              <strong>Review Required: </strong>
-              {reviewReqd ? 'Yes' : 'No'}
-            </List.Item>
-            <List.Item>
-              <strong>Team One: </strong> {game.teamOne.name}
-              <List>
-                <List.Item>
-                  <strong>Protest Reason: </strong>
-                  {game.teamOne.protest.get ? game.teamOne.protest.get : <i>None</i>}
-                </List.Item>
-                <List.Item>
-                  <strong>Rating: </strong>
-                  {game.teamOne.rating.get} / 5
-                </List.Item>
-                <List.Item>
-                  <strong>Notes: </strong>
-                  {game.teamOne.notes.get ? game.teamOne.notes.get : <i>None</i>}
-                </List.Item>
-              </List>
-            </List.Item>
-            <List.Item>
-              <strong>Team Two: </strong> {game.teamTwo.name}
-              <List>
-                <List.Item>
-                  <strong>Protest Reason: </strong>
-                  {game.teamTwo.protest.get ? game.teamTwo.protest.get : <i>None</i>}
-                </List.Item>
-                <List.Item>
-                  <strong>Rating: </strong>
-                  {game.teamTwo.rating.get} / 5
-                </List.Item>
-                <List.Item>
-                  <strong>Notes: </strong>
-                  {game.teamTwo.notes.get ? game.teamTwo.notes.get : <i>None</i>}
-                </List.Item>
-              </List>
-            </List.Item>
-          </List>
-        </>
-      ),
-    },
-    {
       Icon: IconNote,
       value: 'Notes',
-      color: 'white',
+      title:
+        !reviewReqd || game.notes.get ? (
+          'Notes'
+        ) : (
+          <>
+            <strong>Notes</strong>
+            <strong style={{ color: 'red' }}>*</strong>{' '}
+          </>
+        ),
+      color: undefined,
       content: (
         <Textarea
           value={game.notes.get}
@@ -116,16 +62,96 @@ function getActions(
       value: 'Finalise Game',
       color: 'white',
       content: (
-        <Button
-          size="lg"
-          color="red"
-          onClick={() => {
-            end(game, bestPlayer.searchableName, reviewReqd);
-            close();
-          }}
-        >
-          Submit
-        </Button>
+        <>
+          <List>
+            <List.Item>
+              <strong>Winning Team: </strong>
+              {winningTeam}
+            </List.Item>
+            <List.Item>
+              <strong>Best Player</strong>
+              {!bestPlayer && <strong style={{ color: 'red' }}>*</strong>}
+              <strong>: </strong>
+              {bestPlayer?.name ?? <i>Unset</i>}
+            </List.Item>
+            <List.Item>
+              <strong>Review Required: </strong>
+              {reviewReqd ? 'Yes' : 'No'}
+            </List.Item>
+            <List.Item>
+              <strong>Notes</strong>
+              {reviewReqd && !game.notes.get && <strong style={{ color: 'red' }}>*</strong>}
+              <strong>: </strong>
+              {game.notes.get.trim() === '' ? <i>Unset</i> : game.notes.get}
+            </List.Item>
+            <List.Item>
+              <strong>Team One: </strong> {game.teamOne.name}
+              <List>
+                <List.Item>
+                  <strong>Protest Reason: </strong>
+                  {game.teamOne.protest.get ? game.teamOne.protest.get : <i>Unset</i>}
+                </List.Item>
+                <List.Item>
+                  <strong>Rating</strong>
+                  {!game.teamOne.rating.get && <strong style={{ color: 'red' }}>*</strong>}
+                  <strong>: </strong>
+                  <Rating value={game.teamOne.rating.get} readOnly></Rating>
+                  {FEEDBACK_TEXTS[game.teamOne.rating.get ?? 0]}
+                </List.Item>
+                <List.Item>
+                  <strong>Notes</strong>
+                  {game.teamOne.rating.get === 1 && <strong style={{ color: 'red' }}>*</strong>}
+                  <strong>: </strong>
+                  {game.teamOne.notes.get ? game.teamOne.notes.get : <i>Unset</i>}
+                </List.Item>
+              </List>
+            </List.Item>
+            <List.Item>
+              <strong>Team Two: </strong> {game.teamTwo.name}
+              <List>
+                <List.Item>
+                  <strong>Protest Reason: </strong>
+                  {game.teamTwo.protest.get ? game.teamTwo.protest.get : <i>Unset</i>}
+                </List.Item>
+                <List.Item>
+                  <strong>Rating </strong>
+                  {!game.teamTwo.rating.get && <strong style={{ color: 'red' }}>*</strong>}
+                  <strong>: </strong>
+                  <Rating value={game.teamTwo.rating.get} readOnly></Rating>
+                  {FEEDBACK_TEXTS[game.teamTwo.rating.get ?? 0]}
+                </List.Item>
+                <List.Item>
+                  <strong>Notes </strong>
+                  {game.teamTwo.rating.get === 1 && <strong style={{ color: 'red' }}>*</strong>}
+                  <strong>: </strong>
+                  {game.teamTwo.notes.get ? game.teamTwo.notes.get : <i>Unset</i>}
+                </List.Item>
+              </List>
+            </List.Item>
+          </List>
+          <Button
+            size="lg"
+            color="red"
+            disabled={
+              !bestPlayer ||
+              !(
+                game.teamOne.rating.get &&
+                (game.teamOne.rating.get !== 1 || game.teamOne.notes.get)
+              ) ||
+              !(
+                game.teamTwo.rating.get &&
+                (game.teamTwo.rating.get !== 1 || game.teamTwo.notes.get)
+              ) ||
+              (reviewReqd && !game.notes.get)
+            }
+            onClick={() => {
+              end(game, bestPlayer.searchableName, reviewReqd);
+              close();
+            }}
+          >
+            Submit
+          </Button>
+        </>
       ),
     },
   ];
@@ -147,7 +173,7 @@ export function GameScore({ game }: GameScoreArgs) {
       getActions(game, bestPlayer[0]?.get, close, reviewReqd, setReviewReqd).map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
           <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
-            {item.value}
+            {item.title ?? item.value}
           </Accordion.Control>
           <Accordion.Panel>{item.content}</Accordion.Panel>
         </Accordion.Item>
@@ -167,15 +193,7 @@ export function GameScore({ game }: GameScoreArgs) {
       {game.started.get ? (
         game.ended.get ? (
           <>
-            <Button
-              size="lg"
-              onClick={open}
-              disabled={
-                bestPlayer.length === 0 ||
-                game.teamOne.rating.get === 0 ||
-                game.teamTwo.rating.get === 0
-              }
-            >
+            <Button size="lg" onClick={open}>
               End
             </Button>
           </>
