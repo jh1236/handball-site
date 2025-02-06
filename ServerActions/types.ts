@@ -84,11 +84,20 @@ export interface GameEventStructure {
   [k: string]: any;
 }
 
-export type GameTeamStructure = TeamStructure & {
-  captain: PlayerGameStatsStructure;
-  nonCaptain: PlayerGameStatsStructure | null;
-  substitute: PlayerGameStatsStructure | null;
-};
+export interface GameTeamStructure {
+  name: string;
+  searchableName: string;
+  imageUrl: string;
+  captain: PersonStructure;
+  nonCaptain: PersonStructure | null;
+  substitute: PersonStructure | null;
+  teamColor: string | null;
+  teamColorAsRGBABecauseDigbyIsLazy: number[];
+  servedFromLeft?: boolean;
+  stats?: { [key: string]: any };
+
+  [k: string]: any;
+}
 
 export interface GameStructure {
   id: number;
