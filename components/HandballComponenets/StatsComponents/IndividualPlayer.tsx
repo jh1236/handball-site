@@ -102,7 +102,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
         ></Image>
         <Title ta="center">{chartData?.name}</Title>
       </Container>
-      <Tabs defaultValue="gallery">
+      <Tabs defaultValue="stats">
         <Tabs.List grow>
           <Tabs.Tab value="stats" leftSection={<IconTable size={12} />}>
             Statistics
@@ -123,15 +123,17 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
         <Tabs.Panel value="stats" w="100%">
           {Object.entries(CATEGORIES).map(([title, stats], index) => (
             <Fragment key={index}>
-              <Title>{title}</Title>
+              <Title ta="center">{title}</Title>
               <Table>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th w="20%">Stat</Table.Th>
-                    <Table.Th w="25%" ta="center">
+                    <Table.Th w="33%" ta="center">
+                      Stat
+                    </Table.Th>
+                    <Table.Th w="33%" ta="center">
                       Player Value
                     </Table.Th>
-                    <Table.Th w="25%" ta="center">
+                    <Table.Th w="33%" ta="center">
                       Average Value
                     </Table.Th>
                   </Table.Tr>
@@ -139,13 +141,9 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                 <Table.Tbody>
                   {stats.map((stat, key) => (
                     <Table.Tr key={key}>
-                      <Table.Th w="20%">{stat}</Table.Th>
-                      <Table.Td w="25%" ta="center">
-                        {chartData?.stats[stat]}
-                      </Table.Td>
-                      <Table.Td w="25%" ta="center">
-                        {averageStats?.stats[stat] ?? '-'}
-                      </Table.Td>
+                      <Table.Th ta="center">{stat}</Table.Th>
+                      <Table.Td ta="center">{chartData?.stats[stat]}</Table.Td>
+                      <Table.Td ta="center">{averageStats?.stats[stat] ?? '-'}</Table.Td>
                     </Table.Tr>
                   ))}
                 </Table.Tbody>
