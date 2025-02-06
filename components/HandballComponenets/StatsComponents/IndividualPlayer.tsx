@@ -10,7 +10,7 @@ import {
 } from '@tabler/icons-react';
 import { Container, Image, Table, Tabs, Text, Title } from '@mantine/core';
 import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
-import { getPlayer } from '@/ServerActions/PlayerActions';
+import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
 import { PersonStructure } from '@/ServerActions/types';
 
 interface PlayersProps {
@@ -77,10 +77,18 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   // const [sort, setSort] = React.useState<number>(-1);
 
   const [chartData, setChartData] = React.useState<PersonStructure | undefined>(undefined);
+  const [averageStats, setAverageStats] = React.useState<
+    { stats: { [p: string]: any } } | undefined
+  >(undefined);
   useEffect(() => {
-    getPlayer({ player, tournament, game: undefined, formatData: true }).then((o) =>
-      setChartData(o.player)
-    );
+    getPlayer({ player, tournament, formatData: true, includeStats: true }).then((o) => {
+      console.log(Object.keys(o.player.stats));
+      setChartData(o.player);
+    });
+    getAveragePlayerStats({ tournament, formatData: true }).then((o) => {
+      setAverageStats(o);
+      console.log(Object.keys(o.stats));
+    });
   }, [player, tournament]);
   return (
     <>
@@ -117,6 +125,17 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
             <Fragment key={index}>
               <Title>{title}</Title>
               <Table>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th w="20%">Stat</Table.Th>
+                    <Table.Th w="25%" ta="center">
+                      Player Value
+                    </Table.Th>
+                    <Table.Th w="25%" ta="center">
+                      Average Value
+                    </Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
                 <Table.Tbody>
                   {stats.map((stat, key) => (
                     <Table.Tr key={key}>
@@ -125,7 +144,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                         {chartData?.stats[stat]}
                       </Table.Td>
                       <Table.Td w="25%" ta="center">
-                        {chartData?.stats[stat]}
+                        {averageStats?.stats[stat] ?? '-'}
                       </Table.Td>
                     </Table.Tr>
                   ))}

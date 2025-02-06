@@ -50,6 +50,45 @@ export function getPlayers({
   });
 }
 
+interface GetAveragePlayerStatsArgs {
+  tournament?: SearchableName;
+  game?: number;
+  formatData?: boolean;
+  returnTournament?: boolean;
+}
+
+export function getAveragePlayerStats({
+  tournament,
+  game,
+  formatData,
+  returnTournament = false,
+}: GetAveragePlayerStatsArgs): Promise<{
+  stats: { [key: string]: any };
+  tournament?: TournamentStructure;
+}> {
+  const url = new URL('/players/stats', SERVER_ADDRESS);
+  if (tournament) {
+    url.searchParams.set('tournament', tournament);
+  }
+  if (game) {
+    url.searchParams.set('game', String(game));
+  }
+  if (formatData) {
+    url.searchParams.set('formatData', 'true');
+  }
+  if (returnTournament) {
+    url.searchParams.set('returnTournament', 'true');
+  }
+  return tokenFetch(url, {
+    method: 'GET',
+  }).then((response) => {
+    if (!response.ok) {
+      return Promise.reject(response.text());
+    }
+    return response.json();
+  });
+}
+
 interface GetPlayerArgs {
   player: SearchableName;
   tournament?: SearchableName;
