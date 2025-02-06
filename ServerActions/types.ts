@@ -5,6 +5,7 @@ export interface TeamStructure {
   name: string;
   searchableName: string;
   imageUrl: string;
+  bigImageUrl: string;
   captain: PersonStructure | PlayerGameStatsStructure;
   nonCaptain: PersonStructure | PlayerGameStatsStructure | null;
   substitute: PersonStructure | PlayerGameStatsStructure | null;
