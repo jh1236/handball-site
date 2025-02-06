@@ -6,8 +6,6 @@ export default async function GamesPage({ params }: GamePageArgs) {
   const { game } = await params;
 
   return (
-    <>
       <Scoreboard gameID={+game}></Scoreboard>
-    </>
   );
 }
