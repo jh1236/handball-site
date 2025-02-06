@@ -6,7 +6,7 @@ import {
   IconBallVolleyball,
   IconBounceRightFilled,
   IconCheckbox,
-  IconCircleFilled,
+  IconCircleFilled, IconDeviceTv,
   IconExclamationMark,
   IconFilePencil,
   IconFlagCheck,
@@ -105,6 +105,14 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
         <Accordion.Panel>
           <Link href={`/games/${game.id}/edit`} className="hideLink">
             <Button>Edit Game</Button>
+          </Link>
+        </Accordion.Panel>
+      </Accordion.Item>
+      <Accordion.Item value="display">
+        <Accordion.Control icon={<IconDeviceTv />}>Game Scoreboard</Accordion.Control>
+        <Accordion.Panel>
+          <Link href={`/games/${game.id}/scoreboard`} className="hideLink">
+            <Button>Display Game</Button>
           </Link>
         </Accordion.Panel>
       </Accordion.Item>

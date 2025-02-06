@@ -1,12 +1,27 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { Box, Button, Center, LoadingOverlay, RingProgress, Stack, Text, Title } from '@mantine/core';
+import React, { useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
+import {
+  Box,
+  Center,
+  Grid,
+  Image,
+  LoadingOverlay,
+  Portal,
+  RingProgress,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { endTimeout } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
-import { getChangeCode, getGame } from '@/ServerActions/GameActions';
-import { GameStructure, GameTeamStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
-
+import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
+import {
+  GameStructure,
+  GameTeamStructure,
+  PersonStructure,
+  PlayerGameStatsStructure,
+} from '@/ServerActions/types';
 
 interface ScoreboardProps {
   gameID: number;
@@ -14,19 +29,29 @@ interface ScoreboardProps {
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
   const [game, setGame] = React.useState<GameStructure>();
+  const [prevGame, setPrevGame] = React.useState<GameStructure>();
   const [currentTime, setCurrentTime] = React.useState<number>(0);
   const [lastCheck, setLastCheck] = React.useState<number>(0);
   const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
+  const urlSearchParams = useSearchParams();
+
+  const teamOne = useMemo(() => (game?.firstTeamIga ? game?.teamOne : game?.teamTwo), [game]);
+  const teamTwo = useMemo(() => (game?.firstTeamIga ? game?.teamTwo : game?.teamOne), [game]);
 
   function reloadGame() {
     getGame({
       gameID,
     }).then((g) => {
+      const prev = game;
       setGame(g);
       if (g.timeoutExpirationTime > 0) {
         openTimeout();
       } else {
         closeTimeout();
+      }
+      if (prev && prev.firstTeamIga !== g.firstTeamIga) {
+        //BUG: WHAT THE FUCK IS GOING ON!!!! The bg images REFUSE to co-operate without a forced reload if the side changes 😭😭😭😭
+        location.reload();
       }
     });
   }
@@ -35,6 +60,24 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   useEffect(() => {
     reloadGame();
   }, [gameID]);
+
+  useEffect(() => {
+    const prev = urlSearchParams.get('prev');
+    if (prev) {
+      getGame({
+        gameID: +prev,
+      }).then((g) => {
+        setPrevGame(g);
+      });
+      if (game && game.ended) {
+        getNextGameId(gameID).then((nextGameId) => {
+          if (nextGameId > 0) {
+            location.href = `/games/${nextGameId}/scoreboard?prev=${gameID}`;
+          }
+        });
+      }
+    }
+  }, [urlSearchParams]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -60,12 +103,12 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   }
 
   //TODO: if a player is carded, strikethrough their name and move currently on player to be on service side
-  function generateBackground(): any {
-    const team1Col = game?.teamOne.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
-    const team2Col = game?.teamTwo.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
-    const imgURL1 = game?.teamOne.bigImageUrl ?? game?.teamOne.imageUrl;
-    const imgURL2 = game?.teamTwo.bigImageUrl ?? game?.teamTwo.imageUrl;
-    const style = {
+  function generateBackground(teamOneIn, teamTwoIn): any {
+    const team1Col = teamOneIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
+    const team2Col = teamTwoIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
+    const imgURL1 = teamOneIn?.bigImageUrl ?? teamOneIn?.imageUrl;
+    const imgURL2 = teamTwoIn?.bigImageUrl ?? teamTwoIn?.imageUrl;
+    return {
       background: `
       linear-gradient(90deg, rgba(${team1Col}) 0%, rgba(0,0,0,0) 60%), 
       linear-gradient(90deg, rgba(0,0,0,0) 40%, rgba(${team2Col}) 100%), 
@@ -75,7 +118,6 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       backgroundSize: 'cover, cover, 50vw auto, 50vw auto',
       backgroundRepeat: 'no-repeat',
     };
-    return style;
   }
 
   function getSides(team: GameTeamStructure): {
@@ -91,7 +133,9 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       team.nonCaptain,
       team.substitute,
     ].filter((a) => a !== null);
-    if (players.length === 1) {
+    if (!game?.started) {
+      [left, right, sub] = players;
+    } else if (players.length === 1) {
       if (game?.sideToServe === 'Left') {
         [left] = players;
       } else {
@@ -122,27 +166,95 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     if (!game) {
       return <p>error</p>;
     }
+    const serving = game.firstTeamToServe
+      ? team.name === teamOne?.name && side === game.sideToServe.toLowerCase()
+      : team.name === teamTwo?.name && side === game.sideToServe.toLowerCase();
+
+    let name: React.JSX.Element = <>{p.name}</>;
+
+    if (serving && game.faulted) {
+      name = <i>{name}*</i>;
+    }
+
+    name =
+      team === teamOne ? (
+        <>
+          [{side === 'left' ? 'L' : 'R'}] {name}
+        </>
+      ) : (
+        <>
+          {name} [{side === 'left' ? 'L' : 'R'}]
+        </>
+      );
+
     return (
       <Text
         fz="5vh"
-        fw={
-          game.firstTeamToServe
-            ? team.name === game.teamOne.name && side === game.sideToServe.toLowerCase()
-              ? 'bold'
-              : ''
-            : team.name === game.teamTwo.name && side === game.sideToServe.toLowerCase()
-              ? 'bold'
-              : ''
-        }
+        fw={serving ? 'bold' : ''}
         td={p.cardTimeRemaining === 0 ? '' : 'line-through'}
       >
-        {team === game.teamOne
-          ? `[${side === 'left' ? 'L' : 'R'}] ${p.name}`
-          : `${p.name} [${side === 'left' ? 'L' : 'R'}]`}
+        {name}
       </Text>
     );
   }
 
+  //TODO: Digby make this look nice please :3
+  const startKids = (
+    <>
+      {prevGame && (
+        <Portal>
+          <Center>
+            <Box
+              w="800"
+              pos="absolute"
+              top="0"
+              style={{
+                zIndex: 999,
+                backgroundColor: 'black',
+              }}
+            >
+              <Center>
+                <Title>Previous Game:</Title>
+              </Center>
+              <Grid ta="center" justify="center" columns={16} gutter="sm">
+                <Grid.Col span={7}>
+                  <Title order={2}>{prevGame.teamOne.name}</Title>
+                </Grid.Col>
+                <Grid.Col span={1}>
+                  <Title order={2}>vs</Title>
+                </Grid.Col>
+                <Grid.Col span={7}>
+                  <Title order={2}>{prevGame.teamTwo.name}</Title>
+                </Grid.Col>
+                <Grid.Col span={7}>
+                  <Image src={prevGame.teamOne.imageUrl} w={200} display="inline" />
+                </Grid.Col>
+                <Grid.Col span={1}></Grid.Col>
+                <Grid.Col span={7}>
+                  <Image src={prevGame.teamTwo.imageUrl} w={200} display="inline" />
+                </Grid.Col>
+                <Grid.Col span={7}>
+                  <Title order={2} fz={50}>
+                    {prevGame.teamOneScore}
+                  </Title>
+                </Grid.Col>
+                <Grid.Col span={1}></Grid.Col>
+                <Grid.Col span={7}>
+                  <Title order={2} fz={50}>
+                    {prevGame.teamTwoScore}
+                  </Title>
+                </Grid.Col>
+              </Grid>
+            </Box>
+          </Center>
+        </Portal>
+      )}
+      <Text ta="center" fz="20vh" fw="semi-bold">
+        Waiting for start.{currentTime % 2100 > 700 && '.'}
+        {currentTime % 2100 > 1400 && '.'}
+      </Text>
+    </>
+  );
   const timeoutKids = (
     <Stack>
       <RingProgress
@@ -181,35 +293,39 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   );
 
   return (
-    <Box style={generateBackground()} h="100vh" w="100vw">
+    <Box style={generateBackground(teamOne, teamTwo)} h="100vh" w="100vw">
       <LoadingOverlay
-        visible={isTimeoutOpen}
-        loaderProps={{ children: timeoutKids }}
-        overlayProps={{ radius: 'sm', blur: 10 }}
+        visible={!game.started || isTimeoutOpen}
+        loaderProps={{ children: game.started ? timeoutKids : startKids }}
+        overlayProps={{ radius: 'sm', blur: game.started ? 10 : 1 }}
       />
       <Box w="100vw" pos="absolute" top="25px">
         <Center component={Title} fz={40}>
-          {game.teamOne.name} vs {game.teamTwo.name}
+          {teamOne?.name} vs {teamTwo?.name}
         </Center>
       </Box>
       <Box mt="auto">
-        <Box pos="absolute" left="15%">
-          <Text fz="50vh" fw="semi-bold">
-            {game.teamOneScore}
-          </Text>
-        </Box>
-        <Box pos="absolute" right="15%">
-          <Text fz="50vh" fw="semi-bold">
-            {game.teamTwoScore}
-          </Text>
-        </Box>
+        {game.started && (
+          <>
+            <Box pos="absolute" left="15%">
+              <Text fz="50vh" fw="semi-bold">
+                {game.firstTeamIga ? game.teamOneScore : game.teamTwoScore}
+              </Text>
+            </Box>
+            <Box pos="absolute" right="15%">
+              <Text fz="50vh" fw="semi-bold">
+                {game.firstTeamIga ? game.teamTwoScore : game.teamOneScore}
+              </Text>
+            </Box>
+          </>
+        )}
         <Box pos="absolute" left="10%" bottom="10%">
-          {createNamePlate(game.teamOne, 'right')}
-          {createNamePlate(game.teamOne, 'left')}
+          {createNamePlate(teamOne!, 'right')}
+          {createNamePlate(teamOne!, 'left')}
         </Box>
         <Box pos="absolute" right="10%" bottom="10%" style={{ textAlign: 'right' }}>
-          {createNamePlate(game.teamTwo, 'right')}
-          {createNamePlate(game.teamTwo, 'left')}
+          {createNamePlate(teamTwo!, 'right')}
+          {createNamePlate(teamTwo!, 'left')}
         </Box>
         <Box pos="absolute" bottom={20} w="100%">
           <Text ta="center" fz={20}>
@@ -219,7 +335,8 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
             Official: {game.official.name}
           </Text>
           <Text ta="center" fz={20}>
-            Time Elapsed: bruh
+            Time Elapsed:{' '}
+            {new Date(Math.floor(currentTime - game.startTime * 1000)).toISOString().slice(14, 19)}
           </Text>
         </Box>
       </Box>

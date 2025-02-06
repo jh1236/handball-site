@@ -7,7 +7,18 @@ import {
 } from '@/ServerActions/types';
 
 export function getChangeCode(gameID: number): Promise<number> {
-  return tokenFetch(`/games/change_code?gameID=${gameID}`, {
+  return tokenFetch(`/games/change_code?id=${gameID}`, {
+    method: 'GET',
+  }).then((response) => {
+    if (!response.ok) {
+      return Promise.reject(response.text());
+    }
+    return response.json().then((json: { code: number }) => json.code);
+  });
+}
+
+export function getNextGameId(gameID: number): Promise<number> {
+  return tokenFetch(`/games/next?id=${gameID}`, {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
