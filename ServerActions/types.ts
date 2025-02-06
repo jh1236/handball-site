@@ -134,6 +134,7 @@ export interface GameStructure {
   events?: GameEventStructure[];
   players?: PlayerGameStatsStructure[];
   timeoutExpirationTime: number;
+  changeCode: number;
   cardsTeamOne?: GameEventStructure[];
   cardsTeamTwo?: GameEventStructure[];
   admin?: {

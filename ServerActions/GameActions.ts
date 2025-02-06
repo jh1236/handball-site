@@ -67,6 +67,7 @@ interface GetGamesArgs {
   includeGameEvents?: boolean;
   includePlayerStats?: boolean;
   returnTournament?: boolean;
+  limit?: number;
 }
 
 export function getGames({
@@ -78,6 +79,7 @@ export function getGames({
   includeGameEvents = false,
   includePlayerStats = false,
   returnTournament = false,
+  limit = 20,
 }: GetGamesArgs): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
   const url = new URL('/games', SERVER_ADDRESS);
   if (tournament) {
@@ -103,6 +105,9 @@ export function getGames({
   }
   if (returnTournament) {
     url.searchParams.set('returnTournament', 'true');
+  }
+  if (limit) {
+    url.searchParams.set('limit', `${limit}`);
   }
   return tokenFetch(url, {
     method: 'GET',

@@ -1,16 +1,12 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { linearGradient } from 'polished';
-import { Box, Center, Flex, Grid, Image, Text, Title, useMantineColorScheme } from '@mantine/core';
-import { getGame } from '@/ServerActions/GameActions';
-import {
-  GameStructure,
-  GameTeamStructure,
-  PersonStructure,
-  PlayerGameStatsStructure,
-  TeamStructure,
-} from '@/ServerActions/types';
+import { Box, Button, Center, LoadingOverlay, RingProgress, Stack, Text, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { endTimeout } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { getChangeCode, getGame } from '@/ServerActions/GameActions';
+import { GameStructure, GameTeamStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+
 
 interface ScoreboardProps {
   gameID: number;
@@ -18,22 +14,57 @@ interface ScoreboardProps {
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
   const [game, setGame] = React.useState<GameStructure>();
-  //
-  useEffect(() => {
+  const [currentTime, setCurrentTime] = React.useState<number>(0);
+  const [lastCheck, setLastCheck] = React.useState<number>(0);
+  const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
+
+  function reloadGame() {
     getGame({
       gameID,
-    }).then(setGame);
+    }).then((g) => {
+      setGame(g);
+      if (g.timeoutExpirationTime > 0) {
+        openTimeout();
+      } else {
+        closeTimeout();
+      }
+    });
+  }
+
+  //
+  useEffect(() => {
+    reloadGame();
   }, [gameID]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    //this will run every time currentTime is updated (10 times a second)
+    if (lastCheck + 500 < currentTime) {
+      setLastCheck(currentTime);
+      getChangeCode(gameID).then((code) => {
+        if (game && code !== game.changeCode) {
+          reloadGame();
+        }
+      });
+    }
+  }, [currentTime]);
+
   if (!game) {
     return <>Loading...</>;
   }
 
   //TODO: if a player is carded, strikethrough their name and move currently on player to be on service side
   function generateBackground(): any {
-    const team1Col = game.teamOne.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
-    const team2Col = game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
-    const imgURL1 = game.teamOne.bigImageUrl ?? game.teamOne.imageUrl;
-    const imgURL2 = game.teamTwo.bigImageUrl ?? game.teamTwo.imageUrl;
+    const team1Col = game?.teamOne.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
+    const team2Col = game?.teamTwo.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
+    const imgURL1 = game?.teamOne.bigImageUrl ?? game?.teamOne.imageUrl;
+    const imgURL2 = game?.teamTwo.bigImageUrl ?? game?.teamTwo.imageUrl;
     const style = {
       background: `
       linear-gradient(90deg, rgba(${team1Col}) 0%, rgba(0,0,0,0) 60%), 
@@ -59,7 +90,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       team.captain,
       team.nonCaptain,
       team.substitute,
-    ].filter((a): PlayerGameStatsStructure => a);
+    ].filter((a) => a !== null);
     if (players.length === 1) {
       if (game?.sideToServe === 'Left') {
         [left] = players;
@@ -112,9 +143,50 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     );
   }
 
-  //
+  const timeoutKids = (
+    <Stack>
+      <RingProgress
+        size={1000}
+        thickness={80}
+        rootColor="red"
+        label={
+          <Title
+            ta="center"
+            style={{
+              color:
+                game.timeoutExpirationTime > currentTime || currentTime % 1000 <= 500 ? '' : 'red',
+            }}
+            fz={150}
+            order={1}
+          >
+            {Math.max(Math.floor((game.timeoutExpirationTime - currentTime) / 100) / 10, 0).toFixed(
+              1
+            )}{' '}
+            Seconds
+          </Title>
+        }
+        sections={[
+          {
+            value:
+              game.timeoutExpirationTime > currentTime
+                ? 100 - (game.timeoutExpirationTime - currentTime) / 300
+                : currentTime % 1000 > 500
+                  ? 100
+                  : 0,
+            color: 'gray',
+          },
+        ]}
+      ></RingProgress>
+    </Stack>
+  );
+
   return (
     <Box style={generateBackground()} h="100vh" w="100vw">
+      <LoadingOverlay
+        visible={isTimeoutOpen}
+        loaderProps={{ children: timeoutKids }}
+        overlayProps={{ radius: 'sm', blur: 10 }}
+      />
       <Box w="100vw" pos="absolute" top="25px">
         <Center component={Title} fz={40}>
           {game.teamOne.name} vs {game.teamTwo.name}

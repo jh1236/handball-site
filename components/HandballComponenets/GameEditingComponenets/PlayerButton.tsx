@@ -321,8 +321,7 @@ function getActions(
     color: 'white',
     content: (
       <>
-        {SCORE_METHODS.slice(0, 3).map((method) => {
-          return (
+        {SCORE_METHODS.slice(0, 3).map((method) => (
             <>
               <Button
                 style={{ margin: '3px' }}
@@ -336,8 +335,7 @@ function getActions(
               </Button>
               <br />
             </>
-          );
-        })}
+          ))}
         <Box>
           <Button
             style={{ margin: '3px' }}
@@ -348,8 +346,7 @@ function getActions(
           </Button>
 
           <Collapse in={openModal === 'score'}>
-            {SCORE_METHODS.slice(3).map((method) => {
-              return (
+            {SCORE_METHODS.slice(3).map((method) => (
                 <>
                   <Button
                     style={{ margin: '3px' }}
@@ -363,8 +360,7 @@ function getActions(
                   </Button>
                   <br />
                 </>
-              );
-            })}
+              ))}
           </Collapse>
         </Box>
       </>

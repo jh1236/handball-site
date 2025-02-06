@@ -1,17 +1,17 @@
 'use client';
 
 import React, { Fragment, useEffect } from 'react';
-import {
-  IconAlertTriangle,
-  IconChartScatter,
-  IconClock2,
-  IconSettings,
-  IconTable,
-} from '@tabler/icons-react';
-import { Container, Image, Table, Tabs, Text, Title } from '@mantine/core';
+import { IconAlertTriangle, IconClock2, IconTable } from '@tabler/icons-react';
+import { Card, Container, Grid, Image, List, Table, Tabs, Text, Title } from '@mantine/core';
 import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
+import { getGames } from '@/ServerActions/GameActions';
 import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
-import { PersonStructure } from '@/ServerActions/types';
+import {
+  GameStructure,
+  GameTeamStructure,
+  PersonStructure,
+  PlayerGameStatsStructure,
+} from '@/ServerActions/types';
 
 interface PlayersProps {
   tournament?: string;
@@ -73,34 +73,54 @@ const CATEGORIES = {
   ],
 };
 
+function playersOf(team: GameTeamStructure): string[] {
+  return [team.captain, team.nonCaptain, team.substitute]
+    .filter((a) => a !== null)
+    .map((a) => a?.searchableName);
+}
+
+function findPlayer(game: GameStructure, playerName: string): PlayerGameStatsStructure {
+  return [
+    game.teamOne.captain,
+    game.teamOne.nonCaptain,
+    game.teamOne.substitute,
+    game.teamTwo.captain,
+    game.teamTwo.nonCaptain,
+    game.teamTwo.substitute,
+  ].find((a) => a && a.searchableName === playerName);
+}
+
 export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   // const [sort, setSort] = React.useState<number>(-1);
 
-  const [chartData, setChartData] = React.useState<PersonStructure | undefined>(undefined);
+  const [games, setGames] = React.useState<GameStructure[]>([]);
+  const [playerObj, setPlayerObj] = React.useState<PersonStructure | undefined>(undefined);
   const [averageStats, setAverageStats] = React.useState<
     { stats: { [p: string]: any } } | undefined
   >(undefined);
   useEffect(() => {
-    getPlayer({ player, tournament, formatData: true, includeStats: true }).then((o) => {
-      console.log(Object.keys(o.player.stats));
-      setChartData(o.player);
+    getPlayer({ player, tournament, formatData: true }).then((o) => {
+      setPlayerObj(o.player);
     });
     getAveragePlayerStats({ tournament, formatData: true }).then((o) => {
       setAverageStats(o);
-      console.log(Object.keys(o.stats));
     });
+    getGames({ player: [player], tournament, limit: 20, includePlayerStats: true }).then((g) =>
+      setGames(g.games)
+    );
   }, [player, tournament]);
+
   return (
     <>
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
         <Image
           alt="The SUSS handball Logo"
-          src={chartData?.imageUrl ?? 'https://api.squarers.club/image?name=blank'}
+          src={playerObj?.imageUrl ?? 'https://api.squarers.club/image?name=blank'}
           h="100"
           w="auto"
           m="auto"
         ></Image>
-        <Title ta="center">{chartData?.name}</Title>
+        <Title ta="center">{playerObj?.name}</Title>
       </Container>
       <Tabs defaultValue="stats">
         <Tabs.List grow>
@@ -110,9 +130,9 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
           <Tabs.Tab value="prevGames" leftSection={<IconClock2 size={12} />}>
             Previous Games
           </Tabs.Tab>
-          <Tabs.Tab value="graphs" leftSection={<IconChartScatter size={12} />}>
-            Graphs
-          </Tabs.Tab>
+          {/*<Tabs.Tab value="graphs" leftSection={<IconChartScatter size={12} />}>*/}
+          {/*  Graphs*/}
+          {/*</Tabs.Tab>*/}
           {isUmpireManager() && (
             <Tabs.Tab value="mgmt" leftSection={<IconAlertTriangle size={12} />}>
               Management
@@ -139,22 +159,76 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {stats.map((stat, key) => (
-                    <Table.Tr key={key}>
-                      <Table.Th ta="center">{stat}</Table.Th>
-                      <Table.Td ta="center">{chartData?.stats[stat]}</Table.Td>
-                      <Table.Td ta="center">{averageStats?.stats[stat] ?? '-'}</Table.Td>
-                    </Table.Tr>
-                  ))}
+                  {stats
+                    .filter((a) => Object.keys(playerObj?.stats ?? []).includes(a))
+                    .map((stat, key) => (
+                      <Table.Tr key={key}>
+                        <Table.Th ta="center">{stat}</Table.Th>
+                        <Table.Td ta="center">{playerObj?.stats[stat] ?? '-'}</Table.Td>
+                        <Table.Td ta="center">{averageStats?.stats[stat] ?? '-'}</Table.Td>
+                      </Table.Tr>
+                    ))}
                 </Table.Tbody>
               </Table>
             </Fragment>
           ))}
         </Tabs.Panel>
+        <Tabs.Panel value="prevGames">
+          <Grid>
+            {games.map((game, k) => (
+              <Grid.Col span={{ base: 6, sm: 4, md: 3 }}>
+                <Card
+                  shadow="sm"
+                  padding="xl"
+                  key={k}
+                  component="a"
+                  href={`/games/${game.id}`}
+                  className="hideLink"
+                >
+                  <Card.Section>
+                    <Image
+                      src={
+                        !playersOf(game.teamOne).includes(player)
+                          ? game.teamOne.imageUrl
+                          : game.teamTwo.imageUrl
+                      }
+                      h={160}
+                      alt="logo for the other team"
+                    />
+                  </Card.Section>
 
-        <Tabs.Panel value="prevGames">Messages tab content</Tabs.Panel>
+                  <Text fw={500} size="lg" mt="md">
+                    {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
+                    {game.teamTwoScore})
+                  </Text>
 
-        <Tabs.Panel value="charts">Settings tab content</Tabs.Panel>
+                  <List mt="xs" c="dimmed" size="sm">
+                    <List.Item>
+                      <strong>Points Scored: </strong>{' '}
+                      {findPlayer(game, player).stats['Points Scored']}
+                    </List.Item>
+                    <List.Item>
+                      <strong>Aces Scored: </strong> {findPlayer(game, player).stats['Aces Scored']}
+                    </List.Item>
+                    <List.Item>
+                      <strong>Elo Delta: </strong>
+                      <strong
+                        style={{
+                          color: findPlayer(game, player).stats['Elo Delta'] >= 0 ? 'green' : 'red',
+                        }}
+                      >
+                        {findPlayer(game, player).stats['Elo Delta'] > 0 ? '+' : ''}
+                        {findPlayer(game, player).stats['Elo Delta']}
+                      </strong>
+                    </List.Item>
+                  </List>
+                </Card>
+              </Grid.Col>
+            ))}
+          </Grid>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="charts">How did you even get here?</Tabs.Panel>
 
         <Tabs.Panel value="mgmt">Settings tab content</Tabs.Panel>
       </Tabs>
