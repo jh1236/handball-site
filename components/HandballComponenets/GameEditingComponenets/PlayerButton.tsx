@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   IconArrowsLeftRight,
   IconArrowsUpDown,
@@ -15,9 +15,9 @@ import {
   Box,
   Button,
   Collapse,
-  Group,
   Modal,
   Progress,
+  Select,
   Slider,
   Title,
 } from '@mantine/core';
@@ -90,8 +90,8 @@ function getActions(
   close: () => void,
   cardTime: number,
   setCardTime: (v: number) => void,
-  openMore: boolean,
-  toggleOpenMore: () => void
+  openModal: string,
+  setOpenModal: (string) => void
 ) {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const allPlayers = [
@@ -130,21 +130,45 @@ function getActions(
       Icon: IconTriangleInvertedFilled,
       color: 'green',
       value: 'Green Card',
-      content: CARDS.green.map((reason) => (
+      content: (
         <>
+          {CARDS.green.map((reason) => (
+            <>
+              <Button
+                style={{ margin: '3px' }}
+                size="sm"
+                color="green"
+                onClick={() => {
+                  greenCard(game, firstTeam, leftSide, reason);
+                  close();
+                }}
+              >
+                {reason}
+              </Button>
+              <br />
+            </>
+          ))}
           <Button
+            onClick={() => setOpenModal('green')}
             style={{ margin: '3px' }}
             size="sm"
-            onClick={() => {
-              greenCard(game, firstTeam, leftSide, reason);
-              close();
-            }}
+            color="gray"
           >
-            {reason}
+            Repeat Offence
           </Button>
-          <br />
+          <Modal opened={openModal === 'green'} onClose={() => setOpenModal(undefined)}>
+            <Select
+              label="Select Repeat Reason"
+              allowDeselect={false}
+              data={CARDS.warning}
+              onChange={(reason) => {
+                greenCard(game, firstTeam, leftSide, `Repeat ${reason!}`);
+                close();
+              }}
+            ></Select>
+          </Modal>
         </>
-      )),
+      ),
     },
     {
       Icon: IconSquareFilled,
@@ -157,6 +181,7 @@ function getActions(
               <Button
                 style={{ margin: '3px' }}
                 size="sm"
+                color="orange"
                 onClick={() => {
                   yellowCard(game, firstTeam, leftSide, reason, cardTime);
                   close();
@@ -167,6 +192,25 @@ function getActions(
               <br />
             </>
           ))}
+          <Button
+            onClick={() => setOpenModal('yellow')}
+            style={{ margin: '3px' }}
+            size="sm"
+            color="gray"
+          >
+            Repeat Offence
+          </Button>
+          <Modal opened={openModal === 'yellow'} onClose={() => setOpenModal(undefined)}>
+            <Select
+              label="Select Repeat Reason"
+              allowDeselect={false}
+              data={[...new Set(CARDS.warning.concat(CARDS.green))]}
+              onChange={(reason) => {
+                yellowCard(game, firstTeam, leftSide, `Repeat ${reason!}`);
+                close();
+              }}
+            ></Select>
+          </Modal>
           <Title order={2}>Rounds: </Title>
           <Slider
             defaultValue={6}
@@ -183,24 +227,47 @@ function getActions(
       Icon: IconCircleFilled,
       color: 'red',
       value: 'Red Card',
-      content: CARDS.red.map((reason) => (
+      content: (
         <>
+          {CARDS.red.map((reason) => (
+            <>
+              <Button
+                style={{ margin: '3px' }}
+                size="sm"
+                color="red"
+                onClick={() => {
+                  redCard(game, firstTeam, leftSide, reason);
+                  close();
+                }}
+              >
+                {reason}
+              </Button>
+              <br />
+            </>
+          ))}
           <Button
+            onClick={() => setOpenModal('red')}
             style={{ margin: '3px' }}
             size="sm"
-            onClick={() => {
-              redCard(game, firstTeam, leftSide, reason);
-              close();
-            }}
+            color="gray"
           >
-            {reason}
+            Repeat Offence
           </Button>
-          <br />
+          <Modal opened={openModal === 'red'} onClose={() => setOpenModal(undefined)}>
+            <Select
+              label="Select Repeat Reason"
+              allowDeselect={false}
+              data={[...new Set(CARDS.warning.concat(CARDS.green).concat(CARDS.yellow))]}
+              onChange={(reason) => {
+                redCard(game, firstTeam, leftSide, `Repeat ${reason!}`);
+                close();
+              }}
+            ></Select>
+          </Modal>
         </>
-      )),
+      ),
     },
   ];
-
   if (!game.started.get) {
     const otherPlayers = players.filter(
       (a) => a.get && a.get.searchableName !== currentPlayer.get?.searchableName
@@ -262,7 +329,6 @@ function getActions(
                 size="sm"
                 onClick={() => {
                   score(game, firstTeam, leftSide, method);
-
                   close();
                 }}
               >
@@ -273,11 +339,15 @@ function getActions(
           );
         })}
         <Box>
-          <Button style={{ margin: '3px' }} color="gray" onClick={toggleOpenMore}>
-            Show {openMore ? 'Less' : 'More'}
+          <Button
+            style={{ margin: '3px' }}
+            color="gray"
+            onClick={() => setOpenModal(openModal ? undefined : 'score')}
+          >
+            Show {openModal ? 'Less' : 'More'}
           </Button>
 
-          <Collapse in={openMore}>
+          <Collapse in={openModal === 'score'}>
             {SCORE_METHODS.slice(3).map((method) => {
               return (
                 <>
@@ -369,7 +439,9 @@ export function PlayerButton({
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
   );
-  const [openMore, { close: closeMore, toggle: toggleMore }] = useDisclosure(false);
+  const [openModal, setOpenModal] = useState<undefined | 'green' | 'yellow' | 'red' | 'score'>(
+    undefined
+  );
   const serving = useMemo(
     () =>
       game.started.get &&
@@ -426,8 +498,8 @@ export function PlayerButton({
         close,
         cardTime,
         setCardTime,
-        openMore,
-        toggleMore
+        openModal,
+        setOpenModal
       ).map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
           <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
@@ -443,7 +515,7 @@ export function PlayerButton({
     <>
       <Modal opened={opened} centered onClose={close} title="Action">
         <Title> {player?.name ?? 'Placeholder'}</Title>
-        <Accordion defaultValue="Score" onChange={closeMore}>
+        <Accordion defaultValue="Score" onChange={() => setOpenModal(undefined)}>
           {items}
         </Accordion>
       </Modal>

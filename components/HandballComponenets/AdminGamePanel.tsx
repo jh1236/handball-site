@@ -27,7 +27,7 @@ import { GiTennisCourt } from 'react-icons/gi';
 import { PiHandshakeFill } from 'react-icons/pi';
 import { Accordion, Button, Center, Divider, Rating, Text, Timeline, Title } from '@mantine/core';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
-import { isAdmin } from '@/components/HandballComponenets/ServerActions';
+import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
 import { resolveGame } from '@/ServerActions/GameActions';
 import { GameEventStructure, GameStructure } from '@/ServerActions/types';
 
@@ -108,7 +108,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
           </Link>
         </Accordion.Panel>
       </Accordion.Item>
-      {isAdmin() && (
+      {isUmpireManager() && (
         <>
           <Accordion.Item value="resolve">
             <Accordion.Control icon={<IconCheckbox />}>Resolve</Accordion.Control>

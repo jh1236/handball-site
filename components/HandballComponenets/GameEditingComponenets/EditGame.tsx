@@ -2,12 +2,10 @@
 
 import React, { useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Box, Button, LoadingOverlay, Textarea, Title } from '@mantine/core';
+import { Box, Button, LoadingOverlay, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
-  begin,
   del,
-  end,
   endTimeout,
   GameState,
   sync,
@@ -26,7 +24,7 @@ let setGameFn: (game: GameStructure) => void;
 export let startLoading: () => void;
 
 export function reloadGame(gameID: number) {
-  getGame({ gameID, includeStats: true }).then((gameIn) => {
+  getGame({ gameID }).then((gameIn) => {
     setGameFn(gameIn);
   });
 }
@@ -349,9 +347,7 @@ export function EditGame({ game }: { game: number }) {
         }}
       />
       <Box style={{ width: '100%', height: '40%' }}>
-        {(
-          gameState.teamOneIGA.get ? teamOneLeft && teamOneRight : teamTwoLeft && teamTwoRight
-          ) ? (
+        {(gameState.teamOneIGA.get ? teamOneLeft && teamOneRight : teamTwoLeft && teamTwoRight) ? (
           <>
             <Box style={{ width: '50%', height: '90%', float: 'left' }}>
               <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
@@ -434,9 +430,7 @@ export function EditGame({ game }: { game: number }) {
         <Box style={{ width: '100%', height: '10%', float: 'right' }}>
           <TeamButton firstTeam={false} game={gameState}></TeamButton>
         </Box>
-        {(
-          gameState.teamOneIGA.get ? teamTwoLeft && teamTwoRight : teamOneLeft && teamOneRight
-        ) ? (
+        {(gameState.teamOneIGA.get ? teamTwoLeft && teamTwoRight : teamOneLeft && teamOneRight) ? (
           <>
             <Box style={{ width: '50%', height: '90%', float: 'left' }}>
               <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>

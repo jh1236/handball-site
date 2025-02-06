@@ -3,7 +3,7 @@ import { TournamentPageArgs } from '@/app/types';
 import { AuthenticationTitle } from '@/components/Authentication/AuthenticationTitle';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
-export default async function GamesPage({ params }: TournamentPageArgs) {
+export default async function LoginPage({ params }: TournamentPageArgs) {
   const { tournament } = await params;
   return (
     <>

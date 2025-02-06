@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
-import { isAdmin, isOfficial } from '@/components/HandballComponenets/ServerActions';
+import { isOfficial } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
 import { GameStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
@@ -39,7 +39,10 @@ export function GamePage({ gameID }: GamePageProps) {
       gameID,
       includeStats: true,
       includeGameEvents: true,
-    }).then(setGame);
+    }).then((g) => {
+      setGame(g);
+      setPlayerSelect(g.teamOne.captain.name);
+    });
   }, [gameID]);
   useEffect(() => {
     if (activeTab !== 'teamStats') {
@@ -324,7 +327,7 @@ export function GamePage({ gameID }: GamePageProps) {
             <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
               <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
               <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
-              {isOfficial() && <Tabs.Tab value="admin"> ADMIN TAB </Tabs.Tab>}
+              {isOfficial() && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
             </Paper>
             <Tabs.Panel value="teamStats">{generateTeamStatsTable()}</Tabs.Panel>
             <Tabs.Panel value="playerStats">
@@ -338,6 +341,7 @@ export function GamePage({ gameID }: GamePageProps) {
                   game.teamTwo.nonCaptain?.name,
                 ].filter((a) => typeof a === 'string')}
                 onSearchChange={setPlayerSelect}
+                allowDeselect={false}
                 searchValue={playerSelect}
               ></Select>
               <p>{playerSelect}</p>

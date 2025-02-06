@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import {Title, Center, Box, Flex, Button, Group, useMantineColorScheme} from '@mantine/core';
+import { Title, Center, Box, Flex, Button, Group, useMantineColorScheme } from '@mantine/core';
 import { GameStructure } from '@/ServerActions/types';
 import { getGame } from '@/ServerActions/GameActions';
-import SidebarLayout from "@/components/Sidebar/SidebarLayout";
+import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
 interface ScoreboardProps {
     gameID: number;

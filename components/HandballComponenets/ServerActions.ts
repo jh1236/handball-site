@@ -23,6 +23,10 @@ export function isOfficial() {
   return loggedIn() && +localStorage.getItem('permissionLevel')! >= 2;
 }
 
+export function isUmpireManager() {
+  return isAdmin() || +localStorage.getItem('permissionLevel')! === 4;
+}
+
 export function tokenFetch(url: string | URL, args: any = {}) {
   if (loggedIn()) {
     if (!args.headers) {

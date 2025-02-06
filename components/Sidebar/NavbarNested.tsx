@@ -13,7 +13,7 @@ import {
   IconLayoutSidebarLeftExpand,
   IconLock,
   IconMoon,
-  IconPresentationAnalytics,
+  IconNote,
   IconSun,
   IconUser,
 } from '@tabler/icons-react';
@@ -71,7 +71,7 @@ function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament
         { label: 'Teams', link: '/teams' },
       ],
     },
-    { label: 'Analytics', icon: IconPresentationAnalytics },
+    { label: 'Create Game', icon: IconNote, link: '/games/create' },
     { label: 'Contracts', icon: IconFileAnalytics },
     { label: 'Settings', icon: IconAdjustments },
     {
@@ -167,8 +167,7 @@ export function NavbarNested({
               ) : (
                 <IconLayoutSidebarLeftExpand
                   style={{ width: rem(18), height: rem(18) }}
-                >
-                </IconLayoutSidebarLeftExpand>
+                ></IconLayoutSidebarLeftExpand>
               )}
             </ThemeIcon>
           </Box>

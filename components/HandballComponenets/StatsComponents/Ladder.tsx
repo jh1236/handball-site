@@ -48,7 +48,7 @@ export default function Ladder({
   if (isPooled) {
     return (
       <Box style={{ textAlign: 'center' }}>
-        <Title order={3}>Pool One</Title>
+        <Title order={4}>Pool One</Title>
         <DynamicTable
           columns={columnState}
           setColumns={setColumnState}
@@ -58,7 +58,7 @@ export default function Ladder({
           editable={editable}
           maxRows={Math.floor(maxRows / 2)}
         ></DynamicTable>
-        <Title order={3}>Pool Two</Title>
+        <Title order={4}>Pool Two</Title>
         <DynamicTable
           columns={columnState}
           sortIndexIn={sortIndex}

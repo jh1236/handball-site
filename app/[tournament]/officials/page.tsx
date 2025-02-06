@@ -1,5 +1,7 @@
 import React from 'react';
+import { Title } from '@mantine/core';
 import { OfficialPageArgs } from '@/app/types';
+import Officials from '@/components/HandballComponenets/Officials';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
 export default async function IndividualOfficialPage({ params }: OfficialPageArgs) {
@@ -7,7 +9,8 @@ export default async function IndividualOfficialPage({ params }: OfficialPageArg
   return (
     <>
       <SidebarLayout tournamentName={tournament}>
-        <h1>This page is still a WIP!</h1>
+        <Title>Officials</Title>
+        <Officials tournament={tournament}></Officials>
       </SidebarLayout>
     </>
   );
