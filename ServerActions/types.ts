@@ -88,9 +88,9 @@ export interface GameTeamStructure {
   name: string;
   searchableName: string;
   imageUrl: string;
-  captain: PersonStructure;
-  nonCaptain: PersonStructure | null;
-  substitute: PersonStructure | null;
+  captain: PlayerGameStatsStructure;
+  nonCaptain: PlayerGameStatsStructure | null;
+  substitute: PlayerGameStatsStructure | null;
   teamColor: string | null;
   teamColorAsRGBABecauseDigbyIsLazy: number[];
   servedFromLeft?: boolean;
