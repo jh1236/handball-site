@@ -336,7 +336,13 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
           </Text>
           <Text ta="center" fz={20}>
             Time Elapsed:{' '}
-            {new Date(Math.floor(currentTime - game.startTime * 1000)).toISOString().slice(14, 19)}
+            {game.ended
+              ? new Date(Math.floor(game.length * 1000))
+                  .toISOString()
+                  .slice(14, 19)
+              : new Date(Math.floor(currentTime - game.startTime * 1000))
+                  .toISOString()
+                  .slice(14, 19)}
           </Text>
         </Box>
       </Box>
