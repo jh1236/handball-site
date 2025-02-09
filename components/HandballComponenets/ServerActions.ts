@@ -1,5 +1,5 @@
-// export const SERVER_ADDRESS = 'https://api.squarers.club';
-export const SERVER_ADDRESS = 'http://localhost:5001/api';
+export const SERVER_ADDRESS = 'https://api.squarers.club';
+// export const SERVER_ADDRESS = 'http://localhost:5001/api';
 // export const SERVER_ADDRESS = 'http://49.192.26.182:5001';
 
 export async function tokenFetcher(url: string, args: any = {}) {
@@ -37,7 +37,6 @@ export function tokenFetch(url: string | URL, args: any = {}) {
   if (typeof url === 'string') {
     return fetch(`${SERVER_ADDRESS}${url}`, args);
   }
-  url.pathname = `/api${url.pathname}`;
   return fetch(url, args);
 }
 
