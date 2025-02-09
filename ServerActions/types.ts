@@ -14,6 +14,7 @@ export interface TeamStructure {
   teamColor: string | null;
   teamColorAsRGBABecauseDigbyIsLazy: number[];
   servedFromLeft?: boolean;
+  gameDetails?: { [key: number]: { notes: string; cards: CardStructure[]; rating: number } };
   stats?: { [key: string]: any };
 
   [k: string]: any;
