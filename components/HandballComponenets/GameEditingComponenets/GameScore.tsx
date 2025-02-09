@@ -1,6 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { IconCheckbox, IconCloudUpload, IconNote } from '@tabler/icons-react';
-import { Accordion, Button, Checkbox, List, Modal, Rating, Textarea, Title } from '@mantine/core';
+import {
+  Accordion,
+  Box,
+  Button, Center,
+  Checkbox,
+  List,
+  Modal,
+  Popover,
+  Rating,
+  Text,
+  Textarea,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   begin,
@@ -145,7 +157,7 @@ function getActions(
               (reviewReqd && !game.notes.get)
             }
             onClick={() => {
-              end(game, bestPlayer.searchableName, reviewReqd);
+              end(game, bestPlayer!.searchableName, reviewReqd);
               close();
             }}
           >
@@ -167,45 +179,72 @@ export function GameScore({ game }: GameScoreArgs) {
     game.teamTwo.sub,
   ].filter((a) => a.get && a.get.isBestPlayer);
   const [reviewReqd, setReviewReqd] = useState<boolean>(false);
-  const [opened, { open, close }] = useDisclosure(false);
+  const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
+  const [openMatchPoints, setOpenMatchPoints] = useState(false);
   const items = useMemo(
     () =>
-      getActions(game, bestPlayer[0]?.get, close, reviewReqd, setReviewReqd).map((item, i) => (
-        <Accordion.Item key={i} value={item.value}>
-          <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
-            {item.title ?? item.value}
-          </Accordion.Control>
-          <Accordion.Panel>{item.content}</Accordion.Panel>
-        </Accordion.Item>
-      )),
-    [bestPlayer, close, game]
+      getActions(game, bestPlayer[0]?.get, closeEndGame, reviewReqd, setReviewReqd).map(
+        (item, i) => (
+          <Accordion.Item key={i} value={item.value}>
+            <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
+              {item.title ?? item.value}
+            </Accordion.Control>
+            <Accordion.Panel>{item.content}</Accordion.Panel>
+          </Accordion.Item>
+        )
+      ),
+    [bestPlayer, closeEndGame, game]
   );
   const teamOne = game.teamOneIGA.get ? game.teamOne : game.teamTwo;
   const teamTwo = game.teamOneIGA.get ? game.teamTwo : game.teamOne;
-  const matchPoints =
-    teamOne.score.get >= 10 || teamTwo.score.get >= 10 ? teamOne.score.get - teamTwo.score.get : 0;
+  const matchPoints = useMemo(
+    () =>
+      teamOne.score.get >= 10 || teamTwo.score.get >= 10
+        ? teamOne.score.get - teamTwo.score.get
+        : 0,
+    [teamOne.score.get, teamTwo.score.get]
+  );
   return (
     <>
-      <Modal opened={opened} centered onClose={close} title="Action">
+      <Modal opened={endGameOpen} centered onClose={closeEndGame} title="Action">
         <Title> End Game</Title>
         <Accordion defaultValue="Notes">{items}</Accordion>
       </Modal>
       {game.started.get ? (
         game.ended.get ? (
           <>
-            <Button size="lg" onClick={open}>
+            <Button size="lg" onClick={openEndGame}>
               End
             </Button>
           </>
         ) : (
           <>
-            <Title order={1}>
-              {matchPoints > 0 ? <strong>{teamOne.score.get}*</strong> : teamOne.score.get}
-            </Title>
-            <Title order={1}>-</Title>
-            <Title order={1}>
-              {matchPoints < 0 ? <strong>{teamTwo.score.get}*</strong> : teamTwo.score.get}
-            </Title>
+            <Popover opened={openMatchPoints} onChange={setOpenMatchPoints}>
+              <Popover.Target>
+                <Box onClick={() => setOpenMatchPoints(!openMatchPoints)}>
+                  <Title order={1}>
+                    {matchPoints > 0 ? <strong>{teamOne.score.get}*</strong> : teamOne.score.get}
+                  </Title>
+                  <Title order={1}>-</Title>
+                  <Title order={1}>
+                    {matchPoints < 0 ? <strong>{teamTwo.score.get}*</strong> : teamTwo.score.get}
+                  </Title>
+                </Box>
+              </Popover.Target>
+
+              <Popover.Dropdown>
+                <Center>
+                  <Title>The Zaiah Box</Title>
+                </Center>
+                <Center>
+                  <Text fw={700} fz={20}>
+                    <i>
+                      {-matchPoints} matchpoints to {matchPoints > 0 ? teamOne.name : teamTwo.name}
+                    </i>
+                  </Text>
+                </Center>
+              </Popover.Dropdown>
+            </Popover>
           </>
         )
       ) : (
