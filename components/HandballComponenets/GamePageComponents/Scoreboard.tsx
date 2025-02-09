@@ -166,7 +166,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     if (!game) {
       return <p>error</p>;
     }
-    const serving = game.firstTeamToServe
+    const serving = game.firstTeamToServe === game.firstTeamIga
       ? team.name === teamOne?.name && side === game.sideToServe.toLowerCase()
       : team.name === teamTwo?.name && side === game.sideToServe.toLowerCase();
 
