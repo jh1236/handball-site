@@ -69,13 +69,13 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       }).then((g) => {
         setPrevGame(g);
       });
-      if (game && game.ended) {
-        getNextGameId(gameID).then((nextGameId) => {
-          if (nextGameId > 0) {
-            location.href = `/games/${nextGameId}/scoreboard?prev=${gameID}`;
-          }
-        });
-      }
+    }
+    if (game && game.ended) {
+      getNextGameId(gameID).then((nextGameId) => {
+        if (nextGameId > 0) {
+          location.href = `/games/${nextGameId}/scoreboard?prev=${gameID}`;
+        }
+      });
     }
   }, [urlSearchParams]);
 

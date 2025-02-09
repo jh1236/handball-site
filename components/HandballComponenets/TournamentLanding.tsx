@@ -84,7 +84,17 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
   const [statIndex, setStatIndex] = React.useState<number>(0);
 
   function createRandomStatBubble() {
-    if (!teams || !players) return 'Loading...';
+    if (!teams || !players) {
+      return (
+        <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
+          <Text size="auto" fw={700} ta="center">
+            Loading...
+          </Text>
+          <Image alt="a loading image" src="" h="200" w="auto" m="auto"></Image>
+          <Text ta="center">With Loading...</Text>
+        </Container>
+      );
+    }
     const sortMultiplier = STATS[statIndex].order === 'asc' ? 1 : -1;
     if (STATS[statIndex].type === 'team') {
       const team = teams?.reduce((a, b) => {

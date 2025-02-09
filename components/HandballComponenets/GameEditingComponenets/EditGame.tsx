@@ -116,7 +116,7 @@ export function EditGame({ game }: { game: number }) {
     //Team Specific
     setTeamOneTimeouts(gameObj.teamOneTimeouts);
     setTeamOneScore(gameObj.teamOneScore);
-    setTeamOneServedLeft(gameObj.teamOne.servedFromLeft! !== gameObj.firstTeamToServe);
+    setTeamOneServedLeft(gameObj.teamOne.servedFromLeft!);
     const { teamOne, teamTwo } = gameObj;
     if (gameObj.started) {
       for (const i of [teamOne.captain, teamOne.nonCaptain, teamOne.substitute]) {
@@ -140,7 +140,7 @@ export function EditGame({ game }: { game: number }) {
     setTeamTwoName(gameObj.teamTwo.name);
     setTeamTwoTimeouts(gameObj.teamTwoTimeouts);
     setTeamTwoScore(gameObj.teamTwoScore);
-    setTeamTwoServedLeft(gameObj.teamTwo.servedFromLeft! === gameObj.firstTeamToServe);
+    setTeamTwoServedLeft(gameObj.teamTwo.servedFromLeft!);
     if (gameObj.started) {
       for (const i of [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute]) {
         if (i?.sideOfCourt === 'Left') {

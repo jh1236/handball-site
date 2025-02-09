@@ -1,3 +1,5 @@
+import { GameState } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+
 export type SearchableName = string;
 export type RealName = string;
 
@@ -17,12 +19,21 @@ export interface TeamStructure {
   [k: string]: any;
 }
 
+export interface CardStructure {
+  eventType: string;
+  firstTeam: boolean;
+  player: PersonStructure;
+  details: number;
+  notes: string;
+}
+
 export interface PersonStructure {
   name: string;
   searchableName: string;
   imageUrl: string;
   isAdmin?: boolean;
   team?: TeamStructure;
+  gameDetails?: { [key: number]: { notes: string; cards: CardStructure[]; rating: number } };
   stats?: { [key: string]: number };
 
   [k: string]: any;
@@ -62,6 +73,7 @@ export interface PlayerGameStatsStructure extends PersonStructure {
   cardTimeRemaining: number;
   startSide: 'Left' | 'Right' | 'Substitute';
   sideOfCourt: 'Left' | 'Right' | 'Substitute';
+  rating: number;
   stats: { [key: string]: any };
 
   [k: string]: any;
@@ -135,11 +147,11 @@ export interface GameStructure {
   players?: PlayerGameStatsStructure[];
   timeoutExpirationTime: number;
   changeCode: number;
-  cardsTeamOne?: GameEventStructure[];
-  cardsTeamTwo?: GameEventStructure[];
+  cardsTeamOne?: CardStructure[];
+  cardsTeamTwo?: CardStructure[];
   admin?: {
     notes?: string;
-    cards: GameEventStructure[];
+    cards: CardStructure[];
     noteableStatus: string;
     teamOneRating: number;
     teamTwoRating: number;

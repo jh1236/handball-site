@@ -29,7 +29,7 @@ import { Accordion, Button, Center, Divider, Rating, Text, Timeline, Title } fro
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
 import { resolveGame } from '@/ServerActions/GameActions';
-import { GameEventStructure, GameStructure } from '@/ServerActions/types';
+import {CardStructure, GameEventStructure, GameStructure} from '@/ServerActions/types';
 
 interface AdminGamePanelProps {
   game: GameStructure;
@@ -45,7 +45,7 @@ const RESOLVED_STATUSES = [
   undefined,
 ];
 
-const eventIcon = (e: GameEventStructure) => {
+export const eventIcon = (e: CardStructure) => {
   switch (e.eventType) {
     case 'Ace':
       return <IconBallVolleyball color="white" />;

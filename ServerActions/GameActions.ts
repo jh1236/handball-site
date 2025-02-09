@@ -191,7 +191,7 @@ export function getFixtures({
   if (separateFinals) {
     url.searchParams.set('separateFinals', 'true');
   }
-  return fetch(url, {
+  return tokenFetch(url, {
     method: 'GET',
     headers: {
       'Content-type': 'application/json; charset=UTF-8',

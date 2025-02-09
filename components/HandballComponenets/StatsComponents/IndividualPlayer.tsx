@@ -2,7 +2,23 @@
 
 import React, { Fragment, useEffect } from 'react';
 import { IconAlertTriangle, IconClock2, IconTable } from '@tabler/icons-react';
-import { Card, Container, Grid, Image, List, Table, Tabs, Text, Title } from '@mantine/core';
+import {
+  Accordion, Box,
+  Card, Center,
+  Container,
+  Grid,
+  Image,
+  List,
+  NumberInput,
+  Rating,
+  Table,
+  Tabs,
+  Text,
+  Timeline,
+  Title,
+} from '@mantine/core';
+import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
+import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
 import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
@@ -54,10 +70,10 @@ const CATEGORIES = {
   ],
   'Card and Penalty Metrics': [
     'Cards',
+    'Warnings',
     'Green Cards',
     'Yellow Cards',
     'Red Cards',
-    'Warnings',
     'Rounds Carded',
     'Cards per Game',
     'Penalty Points',
@@ -93,11 +109,13 @@ function findPlayer(game: GameStructure, playerName: string): PlayerGameStatsStr
 export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   // const [sort, setSort] = React.useState<number>(-1);
 
+  const [gamesCount, setGamesCount] = React.useState<number>(20);
   const [games, setGames] = React.useState<GameStructure[]>([]);
   const [playerObj, setPlayerObj] = React.useState<PersonStructure | undefined>(undefined);
   const [averageStats, setAverageStats] = React.useState<
     { stats: { [p: string]: any } } | undefined
   >(undefined);
+
   useEffect(() => {
     getPlayer({ player, tournament, formatData: true }).then((o) => {
       setPlayerObj(o.player);
@@ -105,10 +123,15 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
     getAveragePlayerStats({ tournament, formatData: true }).then((o) => {
       setAverageStats(o);
     });
-    getGames({ player: [player], tournament, limit: 20, includePlayerStats: true }).then((g) =>
-      setGames(g.games)
-    );
   }, [player, tournament]);
+
+  useEffect(() => {
+    setGames([]);
+    getGames({ player: [player], tournament, limit: gamesCount, includePlayerStats: true }).then(
+      (g) => setGames(g.games)
+    );
+  }, [gamesCount, player, tournament]);
+
 
   return (
     <>
@@ -135,7 +158,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
           {/*</Tabs.Tab>*/}
           {isUmpireManager() && (
             <Tabs.Tab value="mgmt" leftSection={<IconAlertTriangle size={12} />}>
-              Management
+              Cards
             </Tabs.Tab>
           )}
         </Tabs.List>
@@ -174,6 +197,12 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
           ))}
         </Tabs.Panel>
         <Tabs.Panel value="prevGames">
+          <NumberInput
+            label="Set Games Count"
+            min={1}
+            value={gamesCount}
+            onChange={(a) => setGamesCount(+a)}
+          />
           <Grid>
             {games.map((game, k) => (
               <Grid.Col span={{ base: 6, sm: 4, md: 3 }}>
@@ -205,22 +234,46 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                   <List mt="xs" c="dimmed" size="sm">
                     <List.Item>
                       <strong>Points Scored: </strong>{' '}
-                      {findPlayer(game, player).stats['Points Scored']}
+                      {findPlayer(game, player)?.stats?.['Points Scored']}
                     </List.Item>
                     <List.Item>
-                      <strong>Aces Scored: </strong> {findPlayer(game, player).stats['Aces Scored']}
+                      <strong>Aces Scored: </strong> {findPlayer(game, player)?.stats?.['Aces Scored']}
                     </List.Item>
                     <List.Item>
                       <strong>Elo Delta: </strong>
                       <strong
                         style={{
-                          color: findPlayer(game, player).stats['Elo Delta'] >= 0 ? 'green' : 'red',
+                          color: findPlayer(game, player).stats?.['Elo Delta'] >= 0 ? 'green' : 'red',
                         }}
                       >
-                        {findPlayer(game, player).stats['Elo Delta'] > 0 ? '+' : ''}
-                        {findPlayer(game, player).stats['Elo Delta']}
+                        {findPlayer(game, player)?.stats?.['Elo Delta'] > 0 ? '+' : ''}
+                        {findPlayer(game, player)?.stats?.['Elo Delta']}
                       </strong>
                     </List.Item>
+                    {isUmpireManager() && (
+                      <>
+                        <List.Item>
+                          <Box display="flex">
+                            <strong>Rating: </strong>{' '}
+                            <Rating
+                              w="auto"
+                              size="sm"
+                              value={findPlayer(game, player)?.rating}
+                              readOnly
+                            />
+                          </Box>
+                          {FEEDBACK_TEXTS[findPlayer(game, player)?.rating]}
+                        </List.Item>
+                        <List.Item>
+                          <strong>Cards: </strong>
+                          {
+                            (game?.admin?.cards ?? []).filter(
+                              (c) => c.player.searchableName === player
+                            ).length
+                          }
+                        </List.Item>
+                      </>
+                    )}
                   </List>
                 </Card>
               </Grid.Col>
@@ -230,7 +283,39 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
 
         <Tabs.Panel value="charts">How did you even get here?</Tabs.Panel>
 
-        <Tabs.Panel value="mgmt">Settings tab content</Tabs.Panel>
+        <Tabs.Panel value="mgmt">
+          <Accordion>
+            {isUmpireManager() && (
+              <>
+                {playerObj &&
+                  Object.entries(playerObj.gameDetails)
+                    .map(([_, i]) => i.cards)
+                    .flat().length === 0 && (
+                    <Text>
+                      <i>No Cards Recorded Yet</i>
+                    </Text>
+                  )}
+                <Timeline bulletSize={24}>
+                  {playerObj &&
+                    Object.entries(playerObj.gameDetails)
+                      .map(([_, i]) => i.cards)
+                      .flat()
+                      .map((card, i) => (
+                        <Timeline.Item
+                          key={i}
+                          title={`${card.eventType} for ${card.player.name}`}
+                          bullet={eventIcon(card)}
+                        >
+                          <Text c="dimmed" size="sm">
+                            <strong>{card.notes}</strong>
+                          </Text>
+                        </Timeline.Item>
+                      ))}
+                </Timeline>
+              </>
+            )}
+          </Accordion>
+        </Tabs.Panel>
       </Tabs>
     </>
   );
