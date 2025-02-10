@@ -1,10 +1,21 @@
 'use client';
 
 import React, { Fragment, useEffect } from 'react';
-import { IconAlertTriangle, IconClock2, IconTable } from '@tabler/icons-react';
+import Link from 'next/link';
 import {
-  Accordion, Box,
-  Card, Center,
+  IconAlertTriangle,
+  IconCheckbox,
+  IconClock2,
+  IconStarHalf,
+  IconTable,
+  IconTriangleInvertedFilled,
+} from '@tabler/icons-react';
+import {
+  Accordion,
+  Box,
+  Button,
+  Card,
+  Center,
   Container,
   Grid,
   Image,
@@ -20,7 +31,7 @@ import {
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
-import { getGames } from '@/ServerActions/GameActions';
+import { getGames, resolveGame } from '@/ServerActions/GameActions';
 import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
 import {
   GameStructure,
@@ -89,7 +100,8 @@ const CATEGORIES = {
   ],
 };
 
-function playersOf(team: GameTeamStructure): string[] {
+function playersOf(team?: GameTeamStructure): string[] {
+  if (!team) return [];
   return [team.captain, team.nonCaptain, team.substitute]
     .filter((a) => a !== null)
     .map((a) => a?.searchableName);
@@ -131,7 +143,6 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
       (g) => setGames(g.games)
     );
   }, [gamesCount, player, tournament]);
-
 
   return (
     <>
@@ -237,13 +248,15 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                       {findPlayer(game, player)?.stats?.['Points Scored']}
                     </List.Item>
                     <List.Item>
-                      <strong>Aces Scored: </strong> {findPlayer(game, player)?.stats?.['Aces Scored']}
+                      <strong>Aces Scored: </strong>{' '}
+                      {findPlayer(game, player)?.stats?.['Aces Scored']}
                     </List.Item>
                     <List.Item>
                       <strong>Elo Delta: </strong>
                       <strong
                         style={{
-                          color: findPlayer(game, player).stats?.['Elo Delta'] >= 0 ? 'green' : 'red',
+                          color:
+                            findPlayer(game, player).stats?.['Elo Delta'] >= 0 ? 'green' : 'red',
                         }}
                       >
                         {findPlayer(game, player)?.stats?.['Elo Delta'] > 0 ? '+' : ''}
@@ -284,37 +297,89 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
         <Tabs.Panel value="charts">How did you even get here?</Tabs.Panel>
 
         <Tabs.Panel value="mgmt">
-          <Accordion>
-            {isUmpireManager() && (
-              <>
-                {playerObj &&
-                  Object.entries(playerObj.gameDetails)
-                    .map(([_, i]) => i.cards)
-                    .flat().length === 0 && (
-                    <Text>
-                      <i>No Cards Recorded Yet</i>
-                    </Text>
-                  )}
-                <Timeline bulletSize={24}>
+          {isUmpireManager() && (
+            <Accordion>
+              <Accordion.Item value="cards">
+                <Accordion.Control icon={<IconTriangleInvertedFilled />}>Cards</Accordion.Control>
+                <Accordion.Panel>
                   {playerObj &&
                     Object.entries(playerObj.gameDetails)
                       .map(([_, i]) => i.cards)
-                      .flat()
-                      .map((card, i) => (
-                        <Timeline.Item
-                          key={i}
-                          title={`${card.eventType} for ${card.player.name}`}
-                          bullet={eventIcon(card)}
-                        >
-                          <Text c="dimmed" size="sm">
-                            <strong>{card.notes}</strong>
-                          </Text>
-                        </Timeline.Item>
-                      ))}
-                </Timeline>
-              </>
-            )}
-          </Accordion>
+                      .flat().length === 0 && (
+                      <Text>
+                        <i>No Cards Recorded Yet</i>
+                      </Text>
+                    )}
+                  <Timeline bulletSize={24}>
+                    {playerObj &&
+                      Object.entries(playerObj.gameDetails)
+                        .map(([_, i]) => i.cards)
+                        .flat()
+                        .map((card, i) => (
+                          <Timeline.Item
+                            key={i}
+                            title={`${card.eventType} for ${card.player.name}`}
+                            bullet={eventIcon(card)}
+                          >
+                            <Text c="dimmed" size="sm">
+                              <strong>{card.notes}</strong>
+                            </Text>
+                          </Timeline.Item>
+                        ))}
+                  </Timeline>
+                </Accordion.Panel>
+              </Accordion.Item>
+              <Accordion.Item value="notes">
+                <Accordion.Control icon={<IconStarHalf />}>Notes & Ratings</Accordion.Control>
+                <Accordion.Panel>
+                  <Table>
+                    <Table.Tr>
+                      <Table.Th>Opponent</Table.Th>
+                      <Table.Th>Rating</Table.Th>
+                      <Table.Th>Cards Received</Table.Th>
+                      <Table.Th>Notes</Table.Th>
+                    </Table.Tr>
+                    {playerObj &&
+                      Object.entries(playerObj.gameDetails).map(
+                        ([id, { notes, game, cards, rating }], i) => (
+                          <Table.Tr key={i}>
+                            <Table.Th>
+                              <Link href={`/games/${id}`} className="hideLink">
+                                {game
+                                  ? !playersOf(game.teamOne).includes(player)
+                                    ? game?.teamOne.name
+                                    : game?.teamTwo.name
+                                  : `Game ${id}`}
+                              </Link>
+                            </Table.Th>
+                            <Table.Td>
+                              <Link href={`/games/${id}`} className="hideLink">
+                                <Rating readOnly value={rating}></Rating>
+                              </Link>
+                            </Table.Td>
+                            <Table.Td>
+                              <Link href={`/games/${id}`} className="hideLink">
+                                {cards.map((card, j) => (
+                                  <Text c="dimmed" size="sm">
+                                    <strong>{card.eventType}:</strong>
+                                    <i>{card.notes}</i>
+                                  </Text>
+                                ))}
+                              </Link>
+                            </Table.Td>
+                            <Table.Td>
+                              <Link href={`/games/${id}`} className="hideLink">
+                                {notes}
+                              </Link>
+                            </Table.Td>
+                          </Table.Tr>
+                        )
+                      )}
+                  </Table>
+                </Accordion.Panel>
+              </Accordion.Item>
+            </Accordion>
+          )}
         </Tabs.Panel>
       </Tabs>
     </>

@@ -14,6 +14,9 @@ export interface TeamStructure {
   teamColor: string | null;
   teamColorAsRGBABecauseDigbyIsLazy: number[];
   servedFromLeft?: boolean;
+  gameDetails?: {
+    [key: number]: { notes: string; cards: CardStructure[]; rating: number; game?: GameStructure };
+  };
   stats?: { [key: string]: any };
 
   [k: string]: any;
@@ -33,7 +36,9 @@ export interface PersonStructure {
   imageUrl: string;
   isAdmin?: boolean;
   team?: TeamStructure;
-  gameDetails?: { [key: number]: { notes: string; cards: CardStructure[]; rating: number } };
+  gameDetails?: {
+    [key: number]: { notes: string; cards: CardStructure[]; rating: number; game?: GameStructure };
+  };
   stats?: { [key: string]: number };
 
   [k: string]: any;
