@@ -4,7 +4,6 @@ import React, { Fragment, useEffect } from 'react';
 import Link from 'next/link';
 import {
   IconAlertTriangle,
-  IconCheckbox,
   IconClock2,
   IconStarHalf,
   IconTable,
@@ -13,9 +12,7 @@ import {
 import {
   Accordion,
   Box,
-  Button,
   Card,
-  Center,
   Container,
   Grid,
   Image,
@@ -31,7 +28,7 @@ import {
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
-import { getGames, resolveGame } from '@/ServerActions/GameActions';
+import { getGames } from '@/ServerActions/GameActions';
 import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
 import {
   GameStructure,

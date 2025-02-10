@@ -3,7 +3,8 @@ import { IconCheckbox, IconCloudUpload, IconNote } from '@tabler/icons-react';
 import {
   Accordion,
   Box,
-  Button, Center,
+  Button,
+  Center,
   Checkbox,
   List,
   Modal,
@@ -21,6 +22,7 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
+import useSound from "use-sound";
 
 interface GameScoreArgs {
   game: GameState;
@@ -195,6 +197,11 @@ export function GameScore({ game }: GameScoreArgs) {
       ),
     [bestPlayer, closeEndGame, game]
   );
+
+  const [playZaiahBox] = useSound('/resources/zaiah', {
+    volume: 0.25,
+  });
+  
   const teamOne = game.teamOneIGA.get ? game.teamOne : game.teamTwo;
   const teamTwo = game.teamOneIGA.get ? game.teamTwo : game.teamOne;
   const matchPoints = useMemo(
@@ -221,7 +228,7 @@ export function GameScore({ game }: GameScoreArgs) {
           <>
             <Popover opened={openMatchPoints} onChange={setOpenMatchPoints}>
               <Popover.Target>
-                <Box onClick={() => setOpenMatchPoints(!openMatchPoints)}>
+                <Box onClick={() => setOpenMatchPoints(matchPoints !== 0 && !openMatchPoints)}>
                   <Title order={1}>
                     {matchPoints > 0 ? <strong>{teamOne.score.get}*</strong> : teamOne.score.get}
                   </Title>
