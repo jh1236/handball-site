@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { IconCheckbox, IconCloudUpload, IconNote } from '@tabler/icons-react';
+import useSound from 'use-sound';
 import {
   Accordion,
   Box,
@@ -22,7 +23,6 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
-import useSound from "use-sound";
 
 interface GameScoreArgs {
   game: GameState;
@@ -183,6 +183,7 @@ export function GameScore({ game }: GameScoreArgs) {
   const [reviewReqd, setReviewReqd] = useState<boolean>(false);
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
   const [openMatchPoints, setOpenMatchPoints] = useState(false);
+  const [openZaiahBox, setOpenZaiahBox] = useState<number>(0);
   const items = useMemo(
     () =>
       getActions(game, bestPlayer[0]?.get, closeEndGame, reviewReqd, setReviewReqd).map(
@@ -198,10 +199,10 @@ export function GameScore({ game }: GameScoreArgs) {
     [bestPlayer, closeEndGame, game]
   );
 
-  const [playZaiahBox] = useSound('/resources/zaiah', {
-    volume: 0.25,
+  const [playZaiahBox] = useSound(`/sounds/zaiah${Math.floor(Math.random() * 6 + 1)}.mp3`, {
+    volume: 1,
   });
-  
+
   const teamOne = game.teamOneIGA.get ? game.teamOne : game.teamTwo;
   const teamTwo = game.teamOneIGA.get ? game.teamTwo : game.teamOne;
   const matchPoints = useMemo(
@@ -217,6 +218,115 @@ export function GameScore({ game }: GameScoreArgs) {
         <Title> End Game</Title>
         <Accordion defaultValue="Notes">{items}</Accordion>
       </Modal>
+      <Modal
+        h={500}
+        zIndex={999}
+        opened={openZaiahBox === 3}
+        centered
+        onClose={() => setOpenZaiahBox(openZaiahBox - 1)}
+        title="Action"
+      >
+        <Title> You have opened The Zaiah box</Title>
+        <Text>
+          This text is here so you cant see the value of the zaiah box whilst this dialogue box is
+          open. This is really important, and im protecting the sanctity of the zaiah box.  Apparrently its not long enough, so now i need to 
+        </Text>
+      </Modal>
+      <Modal
+        h={500}
+        zIndex={999}
+        opened={openZaiahBox === 2}
+        centered
+        onClose={() => setOpenZaiahBox(openZaiahBox - 1)}
+        title="Action"
+      >
+        <Title>
+          {' '}
+          You just closed the dialogue box which tells you about how you opened the zaiah box
+        </Title>
+        <Text>
+          This is the last one I promise. Dont forget: if it's less than 5 rounds, you're supposed
+          to say it out loud, and its kinda important that you get this right.
+        </Text>
+      </Modal>
+      <Modal
+        h={500}
+        zIndex={999}
+        opened={openZaiahBox === 1}
+        centered
+        onClose={() => {
+          setOpenZaiahBox(openZaiahBox - 1)
+          setOpenMatchPoints(true)
+        }}
+        title="Action"
+      >
+        <Title>
+          {' '}
+          You have opened box designed to let you know that the previous box was there so you knew
+          that you closed the box to tell you about the zaiah box.
+        </Title>
+        <Text>
+          (Black screen with text; The sound of buzzing bees can be heard) According to all known
+          laws of aviation, : there is no way a bee should be able to fly. : Its wings are too small
+          to get its fat little body off the ground. : The bee, of course, flies anyway : because
+          bees don't care what humans think is impossible. BARRY BENSON: (Barry is picking out a
+          shirt) Yellow, black. Yellow, black. Yellow, black. Yellow, black. : Ooh, black and
+          yellow! Let's shake it up a little. JANET BENSON: Barry! Breakfast is ready! BARRY:
+          Coming! : Hang on a second. (Barry uses his antenna like a phone) : Hello? ADAM FLAYMAN:
+          (Through phone) - Barry? BARRY: - Adam? ADAM: - Can you believe this is happening? BARRY:
+          - I can't. I'll pick you up. (Barry flies down the stairs) : MARTIN BENSON: Looking sharp.
+          JANET: Use the stairs. Your father paid good money for those. BARRY: Sorry. I'm excited.
+          MARTIN: Here's the graduate. We're very proud of you, son. : A perfect report card, all
+          B's. JANET: Very proud. (Rubs Barry's hair) BARRY= Ma! I got a thing going here. JANET: -
+          You got lint on your fuzz. BARRY: - Ow! That's me! JANET: - Wave to us! We'll be in row
+          118,000. - Bye! (Barry flies out the door) JANET: Barry, I told you, stop flying in the
+          house! (Barry drives through the hive,and is waved at by Adam who is reading a newspaper)
+          BARRY== - Hey, Adam. ADAM: - Hey, Barry. (Adam gets in Barry's car) : - Is that fuzz gel?
+          BARRY: - A little. Special day, graduation. ADAM: Never thought I'd make it. (Barry pulls
+          away from the house and continues driving) BARRY: Three days grade school, three days high
+          school... ADAM: Those were awkward. BARRY: Three days college. I'm glad I took a day and
+          hitchhiked around the hive. ADAM== You did come back different. (Barry and Adam pass by
+          Artie, who is jogging) ARTIE: - Hi, Barry! BARRY: - Artie, growing a mustache? Looks good.
+          ADAM: - Hear about Frankie? BARRY: - Yeah. ADAM== - You going to the funeral? BARRY: - No,
+          I'm not going to his funeral. : Everybody knows, sting someone, you die. : Don't waste it
+          on a squirrel. Such a hothead. ADAM: I guess he could have just gotten out of the way.
+          (The car does a barrel roll on the loop-shaped bridge and lands on the highway) : I love
+          this incorporating an amusement park into our regular day. BARRY: I guess that's why they
+          say we don't need vacations. (Barry parallel parks the car and together they fly over the
+          graduating students) Boy, quite a bit of pomp... under the circumstances. (Barry and Adam
+          sit down and put on their hats) : - Well, Adam, today we are men. ADAM: - We are! BARRY= -
+          Bee-men. =ADAM= - Amen! BARRY AND ADAM: Hallelujah! (Barry and Adam both have a happy
+          spasm) ANNOUNCER: Students, faculty, distinguished bees, : please welcome Dean Buzzwell.
+          DEAN BUZZWELL: Welcome, New Hive Oity graduating class of... : ...9: : That concludes our
+          ceremonies. : And begins your career at Honex Industries! ADAM: Will we pick our job
+          today? (Adam and Barry get into a tour bus) BARRY= I heard it's just orientation. (Tour
+          buses rise out of the ground and the students are automatically loaded into the buses)
+          TOUR GUIDE: Heads up! Here we go. ANNOUNCER: Keep your hands and antennas inside the tram
+          at all times. BARRY: - Wonder what it'll be like? ADAM: - A little scary. TOUR GUIDE==
+          Welcome to Honex, a division of Honesco : and a part of the Hexagon Group. Barry: This is
+          it! BARRY AND ADAM: Wow. BARRY: Wow. (The bus drives down a road an on either side are the
+          Bee's massive complicated Honey-making machines) TOUR GUIDE: We know that you, as a bee,
+          have worked your whole life : to get to the point where you can work for your whole life.
+          : Honey begins when our valiant Pollen Jocks bring the nectar to the hive. : Our
+          top-secret formula : is automatically color-corrected, scent-adjusted and bubble-contoured
+          : into this soothing sweet syrup : with its distinctive golden glow you know as...
+          EVERYONE ON BUS: Honey! (The guide has been collecting honey into a bottle and she throws
+          it into the crowd on the bus and it is caught by a girl in the back) ADAM: - That girl was
+          hot. BARRY: - She's my cousin! ADAM== - She is? BARRY: - Yes, we're all cousins. ADAM: -
+          Right. You're right. TOUR GUIDE: - At Honex, we constantly strive : to improve every
+          aspect of bee existence. : These bees are stress-testing a new helmet technology. (The bus
+          passes by a Bee wearing a helmet who is being smashed into the ground with fly-swatters,
+          newspapers and boots. He lifts a thumbs up but you can hear him groan) : ADAM== - What do
+          you think he makes? BARRY: - Not enough. TOUR GUIDE: Here we have our latest advancement,
+          the Krelman. (They pass by a turning wheel with Bees standing on pegs, who are each
+          wearing a finger-shaped hat) Barry: - Wow, What does that do? TOUR GUIDE: - Catches that
+          little strand of honey : that hangs after you pour it. Saves us millions. ADAM:
+          (Intrigued) Can anyone work on the Krelman? TOUR GUIDE: Of course. Most bee jobs are small
+          ones. But bees know that every small job, if it's done well, means a lot. : But choose
+          carefully : because you'll stay in the job you pick for the rest of your life. (Everyone
+          claps except for Barry) BARRY: The same job the rest of your life? I didn't know that.
+        </Text>
+      </Modal>
       {game.started.get ? (
         game.ended.get ? (
           <>
@@ -228,7 +338,16 @@ export function GameScore({ game }: GameScoreArgs) {
           <>
             <Popover opened={openMatchPoints} onChange={setOpenMatchPoints}>
               <Popover.Target>
-                <Box onClick={() => setOpenMatchPoints(matchPoints !== 0 && !openMatchPoints)}>
+                <Box
+                  onClick={() => {
+                    if (matchPoints !== 0) {
+                      if (!openMatchPoints) {
+                        playZaiahBox();
+                      }
+                      setOpenZaiahBox(3);
+                    }
+                  }}
+                >
                   <Title order={1}>
                     {matchPoints > 0 ? <strong>{teamOne.score.get}*</strong> : teamOne.score.get}
                   </Title>
@@ -246,7 +365,8 @@ export function GameScore({ game }: GameScoreArgs) {
                 <Center>
                   <Text fw={700} fz={20}>
                     <i>
-                      {-matchPoints} matchpoints to {matchPoints > 0 ? teamOne.name : teamTwo.name}
+                      {Math.abs(matchPoints)} matchpoints to{' '}
+                      {matchPoints > 0 ? teamOne.name : teamTwo.name}
                     </i>
                   </Text>
                 </Center>
