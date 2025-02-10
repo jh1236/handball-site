@@ -1,8 +1,26 @@
 'use client';
 
+/*
+He who is skilled in coding hides within the deepest recesses of the code. He who is skilled in gaming shoots forth from the heights of the game
+ */
+
 import React, { Fragment, useEffect } from 'react';
 import { IconAlertTriangle, IconClock2, IconTable } from '@tabler/icons-react';
-import { Accordion, Container, Image, Tabs, Text, Title } from '@mantine/core';
+import {
+  Accordion,
+  Box,
+  Card,
+  Container,
+  Grid,
+  Image,
+  List,
+  NumberInput,
+  Rating,
+  Tabs,
+  Text,
+  Title,
+} from '@mantine/core';
+import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
 import { getTeam } from '@/ServerActions/TeamActions';
@@ -14,17 +32,54 @@ interface TeamsProps {
   team: string;
 }
 
+const stats = [
+  'Games Played',
+  'Games Won',
+  'Games Lost',
+  'Percentage',
+  'Points Scored',
+  'Points Against',
+  'Point Difference',
+  'Faults',
+  'Double Faults',
+  'Warnings',
+  'Penalty Points',
+  'Green Cards',
+  'Yellow Cards',
+  'Red Cards',
+  'Timeouts Called',
+  'Elo',
+];
+1;
+
 export default function IndividualTeam({ tournament, team }: TeamsProps) {
   // const [sort, setSort] = React.useState<number>(-1);
 
+  const [games, setGames] = React.useState<GameStructure[]>([]);
   const [teamObj, setTeamObj] = React.useState<TeamStructure | undefined>(undefined);
+  const [gamesCount, setGamesCount] = React.useState<number>(20);
 
   useEffect(() => {
-    getTeam({ team, tournament, formatData: true }).then((o) => {
+    getTeam({
+      team,
+      tournament,
+      formatData: true,
+    }).then((o) => {
       setTeamObj(o.team);
     });
   }, [team, tournament]);
-
+  useEffect(() => {
+    setGames([]);
+    getGames({
+      team: [team],
+      tournament,
+      limit: gamesCount,
+      includePlayerStats: true,
+    }).then((g) => setGames(g.games));
+  }, [gamesCount, team, tournament]);
+  if (!teamObj) {
+    return <p>loading...</p>;
+  }
   return (
     <>
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
@@ -56,12 +111,21 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
         </Tabs.List>
 
         <Tabs.Panel value="stats" w="100%">
-          <PlayerStatsTable team={teamObj}></PlayerStatsTable>
-          <p>team: {teamObj?.name}</p>
+          <Tabs defaultValue="teamStats" variant="outline">
+            <Tabs.List grow>
+              <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
+              <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value="teamStats">
+              <PlayerStatsTable team={teamObj}></PlayerStatsTable>
+            </Tabs.Panel>
+            <Tabs.Panel value="playerStats">
+              <PlayerStatsTable team={teamObj} teamPlayers={true}></PlayerStatsTable>
+            </Tabs.Panel>
+          </Tabs>
         </Tabs.Panel>
         <Tabs.Panel value="prevGames">
-          <p>put prevgames here</p>
-          {/*<NumberInput
+          <NumberInput
             label="Set Games Count"
             min={1}
             value={gamesCount}
@@ -69,7 +133,13 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
           />
           <Grid>
             {games.map((game, k) => (
-              <Grid.Col span={{ base: 6, sm: 4, md: 3 }}>
+              <Grid.Col
+                span={{
+                  base: 6,
+                  sm: 4,
+                  md: 3,
+                }}
+              >
                 <Card
                   shadow="sm"
                   padding="xl"
@@ -81,7 +151,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                   <Card.Section>
                     <Image
                       src={
-                        !teamsOf(game.teamOne).includes(team)
+                        game.teamOne.searchableName !== team
                           ? game.teamOne.imageUrl
                           : game.teamTwo.imageUrl
                       }
@@ -95,49 +165,34 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                     {game.teamTwoScore})
                   </Text>
 
-                  <List mt="xs" c="dimmed" size="sm">
-                    <List.Item>
-                      <strong>Points Scored: </strong>{' '}
-                      {findteam(game, team)?.stats?.['Points Scored']}
-                    </List.Item>
-                    <List.Item>
-                      <strong>Aces Scored: </strong> {findteam(game, team)?.stats?.['Aces Scored']}
-                    </List.Item>
-                    <List.Item>
-                      <strong>Elo Delta: </strong>
-                      <strong
-                        style={{
-                          color: findteam(game, team).stats?.['Elo Delta'] >= 0 ? 'green' : 'red',
-                        }}
-                      >
-                        {findteam(game, team)?.stats?.['Elo Delta'] > 0 ? '+' : ''}
-                        {findteam(game, team)?.stats?.['Elo Delta']}
-                      </strong>
-                    </List.Item>
-                    {isUmpireManager() && (
-                      <>
-                        <List.Item>
-                          <Box display="flex">
-                            <strong>Rating: </strong>{' '}
-                            <Rating
-                              w="auto"
-                              size="sm"
-                              value={findteam(game, team)?.rating}
-                              readOnly
-                            />
-                          </Box>
-                          {FEEDBACK_TEXTS[findteam(game, team)?.rating]}
-                        </List.Item>
-                        <List.Item>
-                          <p>fix later</p>
-                        </List.Item>
-                      </>
-                    )}
-                  </List>
+                  {isUmpireManager() && (
+                    <List>
+                      <List.Item>
+                        <Box display="flex">
+                          <strong>Rating: </strong>{' '}
+                          <Rating
+                            w="auto"
+                            size="sm"
+                            value={
+                              (team === game.teamOne.searchableName ? game.teamOne : game.teamTwo)
+                                .rating
+                            }
+                            readOnly
+                          />
+                        </Box>
+                        {
+                          FEEDBACK_TEXTS[
+                            (team === game.teamOne.searchableName ? game.teamOne : game.teamTwo)
+                              .rating
+                          ]
+                        }
+                      </List.Item>
+                    </List>
+                  )}
                 </Card>
               </Grid.Col>
             ))}
-          </Grid>*/}
+          </Grid>
         </Tabs.Panel>
 
         <Tabs.Panel value="charts">How did you even get here?</Tabs.Panel>

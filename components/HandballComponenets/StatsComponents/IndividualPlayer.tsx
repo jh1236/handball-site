@@ -97,14 +97,14 @@ const CATEGORIES = {
   ],
 };
 
-function playersOf(team?: GameTeamStructure): string[] {
+export function playersOf(team?: GameTeamStructure): string[] {
   if (!team) return [];
   return [team.captain, team.nonCaptain, team.substitute]
     .filter((a) => a !== null)
     .map((a) => a?.searchableName);
 }
 
-function findPlayer(game: GameStructure, playerName: string): PlayerGameStatsStructure {
+export function findPlayer(game: GameStructure, playerName: string): PlayerGameStatsStructure {
   return [
     game.teamOne.captain,
     game.teamOne.nonCaptain,
