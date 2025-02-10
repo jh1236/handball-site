@@ -34,7 +34,7 @@ export function tokenFetch(url: string | URL, args: any = {}) {
     }
     args.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
   }
-  if (typeof url === 'string') {
+  if (typeof url === 'string' && !url.startsWith(SERVER_ADDRESS)) {
     return fetch(`${SERVER_ADDRESS}${url}`, args);
   }
   return fetch(url, args);
