@@ -19,6 +19,7 @@ import {
   Progress,
   Select,
   Slider,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -87,11 +88,13 @@ function getActions(
   firstTeam: boolean,
   leftSide: boolean,
   serving: boolean,
-  close: () => void,
+  closeIn: () => void,
   cardTime: number,
   setCardTime: (v: number) => void,
   openModal: string,
-  setOpenModal: (string) => void
+  setOpenModal: (string) => void,
+  otherReason: string,
+  setOtherReason: (string) => void
 ) {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const allPlayers = [
@@ -104,7 +107,12 @@ function getActions(
   ].filter((a) => typeof a.get !== 'undefined');
   const players = [team.left, team.right, team.sub].filter((a) => typeof a.get !== 'undefined');
   const currentPlayer = players.length > 1 ? players[leftSide ? 0 : 1] : players[0];
-
+  const close = () => {
+    closeIn();
+    setCardTime(6);
+    setOpenModal(undefined);
+    setOtherReason('');
+  };
   const out = [
     {
       Icon: IconExclamationMark,
@@ -154,18 +162,49 @@ function getActions(
             size="sm"
             color="gray"
           >
-            Repeat Offence
+            More
           </Button>
-          <Modal opened={openModal === 'green'} onClose={() => setOpenModal(undefined)}>
+
+          <Modal
+            opened={openModal === 'green'}
+            onClose={() => {
+              setOpenModal(undefined);
+              setOtherReason('');
+            }}
+          >
             <Select
               label="Select Repeat Reason"
               allowDeselect={false}
-              data={CARDS.warning}
-              onChange={(reason) => {
-                greenCard(game, firstTeam, leftSide, `Repeat ${reason!}`);
+              defaultValue={'Other'}
+              data={CARDS.warning.concat('Other')}
+              onChange={(reason) =>
+                setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
+              }
+            ></Select>
+            <TextInput
+              value={
+                otherReason.startsWith('Repeated ')
+                  ? '-'
+                  : otherReason === 'Other'
+                    ? ''
+                    : otherReason
+              }
+              disabled={otherReason.startsWith('Repeated ')}
+              onChange={(event) => setOtherReason(event.currentTarget.value)}
+              label="Select Other Reason"
+            ></TextInput>
+            <Button
+              onClick={() => {
+                greenCard(game, firstTeam, leftSide, otherReason);
                 close();
               }}
-            ></Select>
+              style={{ margin: '3px' }}
+              size="sm"
+              disabled={!otherReason}
+              color="green"
+            >
+              Submit
+            </Button>
           </Modal>
         </>
       ),
@@ -198,18 +237,48 @@ function getActions(
             size="sm"
             color="gray"
           >
-            Repeat Offence
+            More
           </Button>
-          <Modal opened={openModal === 'yellow'} onClose={() => setOpenModal(undefined)}>
+          <Modal
+            opened={openModal === 'yellow'}
+            onClose={() => {
+              setOpenModal(undefined);
+              setOtherReason('');
+            }}
+          >
             <Select
               label="Select Repeat Reason"
               allowDeselect={false}
-              data={[...new Set(CARDS.warning.concat(CARDS.green))]}
-              onChange={(reason) => {
-                yellowCard(game, firstTeam, leftSide, `Repeat ${reason!}`);
+              defaultValue="Other"
+              data={[...new Set(CARDS.warning.concat(CARDS.green))].concat('Other')}
+              onChange={(reason) =>
+                setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
+              }
+            ></Select>
+            <TextInput
+              value={
+                otherReason.startsWith('Repeated ')
+                  ? '-'
+                  : otherReason === 'Other'
+                    ? ''
+                    : otherReason
+              }
+              disabled={otherReason.startsWith('Repeated ')}
+              onChange={(event) => setOtherReason(event.currentTarget.value)}
+              label="Select Other Reason"
+            ></TextInput>
+            <Button
+              onClick={() => {
+                yellowCard(game, firstTeam, leftSide, otherReason);
                 close();
               }}
-            ></Select>
+              style={{ margin: '3px' }}
+              size="sm"
+              disabled={!otherReason}
+              color="orange"
+            >
+              Submit
+            </Button>
           </Modal>
           <Title order={2}>Rounds: </Title>
           <Slider
@@ -253,16 +322,48 @@ function getActions(
           >
             Repeat Offence
           </Button>
-          <Modal opened={openModal === 'red'} onClose={() => setOpenModal(undefined)}>
+          <Modal
+            opened={openModal === 'red'}
+            onClose={() => {
+              setOpenModal(undefined);
+              setOtherReason('');
+            }}
+          >
             <Select
               label="Select Repeat Reason"
               allowDeselect={false}
-              data={[...new Set(CARDS.warning.concat(CARDS.green).concat(CARDS.yellow))]}
-              onChange={(reason) => {
-                redCard(game, firstTeam, leftSide, `Repeat ${reason!}`);
+              defaultValue="Other"
+              data={[...new Set(CARDS.warning.concat(CARDS.green).concat(CARDS.yellow))].concat(
+                'Other'
+              )}
+              onChange={(reason) =>
+                setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
+              }
+            ></Select>
+            <TextInput
+              value={
+                otherReason.startsWith('Repeated ')
+                  ? '-'
+                  : otherReason === 'Other'
+                    ? ''
+                    : otherReason
+              }
+              disabled={otherReason.startsWith('Repeated ')}
+              onChange={(event) => setOtherReason(event.currentTarget.value)}
+              label="Select Other Reason"
+            ></TextInput>
+            <Button
+              onClick={() => {
+                redCard(game, firstTeam, leftSide, otherReason);
                 close();
               }}
-            ></Select>
+              style={{ margin: '3px' }}
+              size="sm"
+              disabled={!otherReason}
+              color="red"
+            >
+              Submit
+            </Button>
           </Modal>
         </>
       ),
@@ -322,20 +423,20 @@ function getActions(
     content: (
       <>
         {SCORE_METHODS.slice(0, 3).map((method) => (
-            <>
-              <Button
-                style={{ margin: '3px' }}
-                size="sm"
-                onClick={() => {
-                  score(game, firstTeam, leftSide, method);
-                  close();
-                }}
-              >
-                {method}
-              </Button>
-              <br />
-            </>
-          ))}
+          <>
+            <Button
+              style={{ margin: '3px' }}
+              size="sm"
+              onClick={() => {
+                score(game, firstTeam, leftSide, method);
+                close();
+              }}
+            >
+              {method}
+            </Button>
+            <br />
+          </>
+        ))}
         <Box>
           <Button
             style={{ margin: '3px' }}
@@ -347,20 +448,20 @@ function getActions(
 
           <Collapse in={openModal === 'score'}>
             {SCORE_METHODS.slice(3).map((method) => (
-                <>
-                  <Button
-                    style={{ margin: '3px' }}
-                    size="sm"
-                    onClick={() => {
-                      score(game, firstTeam, leftSide, method);
-                      close();
-                    }}
-                  >
-                    {method}
-                  </Button>
-                  <br />
-                </>
-              ))}
+              <>
+                <Button
+                  style={{ margin: '3px' }}
+                  size="sm"
+                  onClick={() => {
+                    score(game, firstTeam, leftSide, method);
+                    close();
+                  }}
+                >
+                  {method}
+                </Button>
+                <br />
+              </>
+            ))}
           </Collapse>
         </Box>
       </>
@@ -431,6 +532,7 @@ export function PlayerButton({
     [game.teamOneIGA.get, trueFirstTeam]
   );
   const [cardTime, setCardTime] = React.useState<number>(6);
+  const [otherReason, setOtherReason] = React.useState<string>('');
   const team = useMemo(
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
@@ -495,7 +597,9 @@ export function PlayerButton({
         cardTime,
         setCardTime,
         openModal,
-        setOpenModal
+        setOpenModal,
+        otherReason,
+        setOtherReason
       ).map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
           <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>

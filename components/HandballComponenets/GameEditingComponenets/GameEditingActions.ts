@@ -202,8 +202,9 @@ export function timeout(game: GameState, firstTeam: boolean): void {
 }
 
 export function forfeit(game: GameState, firstTeam: boolean) {
+  const myTeam = firstTeam ? game.teamOne : game.teamTwo;
   const otherTeam = firstTeam ? game.teamTwo : game.teamOne;
-  otherTeam.score.set(Math.max(11, otherTeam.score.get + 2));
+  otherTeam.score.set(Math.max(11, myTeam.score.get + 2));
 
   forfeitGame(game.id, firstTeam).catch(() => sync(game));
 }

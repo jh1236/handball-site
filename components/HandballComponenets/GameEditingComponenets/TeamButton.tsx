@@ -29,6 +29,7 @@ import {
   GameState,
   timeout,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { ZAIAH_BOX_FUCKERY } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface TeamButtonProps {
@@ -183,14 +184,15 @@ function getActions(
       {
         Icon: IconNote,
         value: 'Feedback',
-        title: (team.rating.get && (team.rating.get !== 1 || team.notes.get)) ? (
-          'Feedback'
-        ) : (
-          <>
-            <strong>Feedback</strong>
-            <strong style={{ color: 'red' }}>*</strong>{' '}
-          </>
-        ),
+        title:
+          team.rating.get && (team.rating.get !== 1 || team.notes.get) ? (
+            'Feedback'
+          ) : (
+            <>
+              <strong>Feedback</strong>
+              <strong style={{ color: 'red' }}>*</strong>{' '}
+            </>
+          ),
         color: undefined,
         content: (
           <>
@@ -240,31 +242,43 @@ function getActions(
           </Popover.Target>
           <Popover.Dropdown>
             <Text>Are you sure you want to forfeit?</Text>
-            <Popover width={200} position="top" withArrow shadow="md">
-              <Popover.Target>
-                <Button color="red">Confirm</Button>
-              </Popover.Target>
-              <Popover.Dropdown w={350}>
-                <ReCAPTCHA
-                  theme="dark"
-                  sitekey="6Lcbu8oqAAAAAOo9sSSEPuCY5chDdm-27OcF7zjp"
-                  onChange={() => setCaptchaPassed(true)}
-                />
-                <br />
-                <Group justify="center">
-                  <Button
-                    color="red"
-                    disabled={!captchaPassed}
-                    onClick={() => {
-                      forfeit(game, firstTeam);
-                      close();
-                    }}
-                  >
-                    YES!
-                  </Button>
-                </Group>
-              </Popover.Dropdown>
-            </Popover>
+            {ZAIAH_BOX_FUCKERY ? (
+              <Popover width={200} position="top" withArrow shadow="md">
+                <Popover.Target>
+                  <Button color="red">Confirm</Button>
+                </Popover.Target>
+                <Popover.Dropdown w={350}>
+                  <ReCAPTCHA
+                    theme="dark"
+                    sitekey="6Lcbu8oqAAAAAOo9sSSEPuCY5chDdm-27OcF7zjp"
+                    onChange={() => setCaptchaPassed(true)}
+                  />
+                  <br />
+                  <Group justify="center">
+                    <Button
+                      color="red"
+                      disabled={!captchaPassed}
+                      onClick={() => {
+                        forfeit(game, firstTeam);
+                        close();
+                      }}
+                    >
+                      YES!
+                    </Button>
+                  </Group>
+                </Popover.Dropdown>
+              </Popover>
+            ) : (
+              <Button
+                color="red"
+                onClick={() => {
+                  forfeit(game, firstTeam);
+                  close();
+                }}
+              >
+                Confirm
+              </Button>
+            )}
           </Popover.Dropdown>
         </Popover>
       ),
