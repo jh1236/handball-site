@@ -142,24 +142,24 @@ export default function FixturesInternal({
                 {value.games.map((game, index2) => (
                   <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
                     <Table.Td>
-                      <Link className="hideLink" href={`/games/${game.id}`}>
+                      <Link className="hideLink" href={!game.isBye ? `/games/${game.id}` : '#'}>
                         <Text size="sm">{game.teamOne.name}</Text>
                         <Text hiddenFrom="md"> vs {game.teamTwo.name}</Text>
                       </Link>
                     </Table.Td>
                     <Table.Td visibleFrom="md">
-                      <Link className="hideLink" href={`/games/${game.id}`}>
+                      <Link className="hideLink" href={!game.isBye ? `/games/${game.id}` : '#'}>
                         <Text size="sm">VS</Text>
                       </Link>
                     </Table.Td>
                     <Table.Td visibleFrom="md">
-                      <Link className="hideLink" href={`/games/${game.id}`}>
+                      <Link className="hideLink" href={!game.isBye ? `/games/${game.id}` : '#'}>
                         <Text size="sm">{game.teamTwo.name}</Text>
                       </Link>
                     </Table.Td>
 
                     <Table.Td>
-                      <Link className="hideLink" href={`/games/${game.id}`}>
+                      <Link className="hideLink" href={!game.isBye ? `/games/${game.id}` : '#'}>
                         <Text size="sm">
                           {game.started ? `${game.teamOneScore} - ${game.teamTwoScore}` : '-'}
                         </Text>
@@ -169,20 +169,20 @@ export default function FixturesInternal({
                     {expanded && (
                       <>
                         <Table.Td>
-                          <Link className="hideLink" href={`/games/${game.id}`}>
+                          <Link className="hideLink" href={!game.isBye ? `/games/${game.id}` : '#'}>
                             <Text size="sm">{game.official?.name ?? '-'}</Text>
                           </Link>
                         </Table.Td>
                         {(tournamentState?.hasScorer ?? false) && (
                           <Table.Td>
-                            <Link className="hideLink" href={`/games/${game.id}`}>
+                            <Link className="hideLink" href={!game.isBye ? `/games/${game.id}` : '#'}>
                               <Text size="sm">{game.scorer?.name ?? '-'}</Text>
                             </Link>
                           </Table.Td>
                         )}
                         {(tournamentState?.twoCourts ?? false) && (
                           <Table.Td>
-                            <Link className="hideLink" href={`/games/${game.id}`}>
+                            <Link className="hideLink" href={game.isBye ? `/games/${game.id}` : '#'}>
                               <Text size="sm">{game.court + 1 > 0 ? game.court + 1 : '-'}</Text>
                             </Link>
                           </Table.Td>
