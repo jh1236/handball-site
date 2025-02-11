@@ -132,7 +132,7 @@ export default function PlayerStatsTable({
           </Table.Th>
         </Table.Tr>
         {stats
-          .filter((stat) => Object.keys(players[0].stats).includes(stat))
+          .filter((stat) => Object.keys(players[0]?.stats ?? {}).includes(stat))
           .map((stat) => (
             <Table.Tr key={stat}>
               <Table.Td ta={TA}>{stat}</Table.Td>

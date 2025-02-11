@@ -31,7 +31,7 @@ interface GameScoreArgs {
 
 const CAN_HAVE_ZAIAH_BOX = ['Zaiah Deards', 'Jared Healy'];
 
-export const ZAIAH_BOX_FUCKERY = false;
+export const ZAIAH_BOX_FUCKERY = true;
 
 function getActions(
   game: GameState,
