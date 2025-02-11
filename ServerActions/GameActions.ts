@@ -143,6 +143,7 @@ interface GetFixturesArgs {
   includePlayerStats?: boolean;
   returnTournament?: boolean;
   separateFinals?: boolean;
+  maxRounds?: number;
 }
 
 export function getFixtures({
@@ -155,12 +156,16 @@ export function getFixtures({
   includePlayerStats = false,
   returnTournament = false,
   separateFinals = false,
+  maxRounds,
 }: GetFixturesArgs): Promise<{
   fixtures: { games: GameStructure[]; final: boolean }[];
   finals?: { games: GameStructure[]; final: true }[];
   tournament?: TournamentStructure;
 }> {
   const url = new URL('/games/fixtures', SERVER_ADDRESS);
+  if (maxRounds) {
+    url.searchParams.set('maxRounds', `${maxRounds}`);
+  }
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }

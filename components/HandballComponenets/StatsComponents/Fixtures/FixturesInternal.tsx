@@ -25,12 +25,13 @@ export default function FixturesInternal({
   // const [sort, setSort] = React.useState<number>(-1);
   const [finals, setFinals] = React.useState<{ games: GameStructure[]; final: boolean }[]>([]);
   const [fixtures, setFixtures] = React.useState<{ games: GameStructure[]; final: boolean }[]>([]);
-  const [tournamentState, setTournamentState] = React.useState<TournamentStructure>(undefined);
+  const [tournamentState, setTournamentState] = React.useState<TournamentStructure>();
   useEffect(() => {
     getFixtures({
       tournament,
       returnTournament: true,
       separateFinals: true,
+      maxRounds: maxRounds > 0 ? maxRounds : undefined,
     }).then((data) => {
       if (maxRounds > 0) {
         if ((data?.finals?.length ?? 0) > maxRounds) {
