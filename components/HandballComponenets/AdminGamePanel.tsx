@@ -1,3 +1,4 @@
+import React from 'react';
 import Link from 'next/link';
 import {
   IconAlertTriangle,
@@ -6,7 +7,8 @@ import {
   IconBallVolleyball,
   IconBounceRightFilled,
   IconCheckbox,
-  IconCircleFilled, IconDeviceTv,
+  IconCircleFilled,
+  IconDeviceTv,
   IconExclamationMark,
   IconFilePencil,
   IconFlagCheck,
@@ -25,11 +27,23 @@ import {
 } from '@tabler/icons-react';
 import { GiTennisCourt } from 'react-icons/gi';
 import { PiHandshakeFill } from 'react-icons/pi';
-import { Accordion, Button, Center, Divider, Rating, Text, Timeline, Title } from '@mantine/core';
+import {
+  Accordion,
+  Button,
+  Center,
+  Divider,
+  Group,
+  Popover,
+  Rating,
+  Text,
+  Timeline,
+  Title,
+} from '@mantine/core';
+import { forfeit } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
-import { resolveGame } from '@/ServerActions/GameActions';
-import {CardStructure, GameEventStructure, GameStructure} from '@/ServerActions/types';
+import { deleteGame, resolveGame } from '@/ServerActions/GameActions';
+import { CardStructure, GameEventStructure, GameStructure } from '@/ServerActions/types';
 
 interface AdminGamePanelProps {
   game: GameStructure;
@@ -118,18 +132,41 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
       </Accordion.Item>
       {isUmpireManager() && (
         <>
-          <Accordion.Item value="resolve">
-            <Accordion.Control icon={<IconCheckbox />}>Resolve</Accordion.Control>
-            <Accordion.Panel>
-              <Button
-                disabled={RESOLVED_STATUSES.includes(game.status)}
-                onClick={() => {
-                  resolveGame(game.id).then(() => location.reload());
-                }}
-              >
-                Resolve
-              </Button>
-            </Accordion.Panel>
+          <Accordion.Item value="actions">
+            <Accordion.Control icon={<IconCheckbox />}>Actions</Accordion.Control>
+            {game.tournament.editable && (
+              <Accordion.Panel>
+                <Button
+                  disabled={RESOLVED_STATUSES.includes(game.status)}
+                  onClick={() => {
+                    resolveGame(game.id).then(() => location.reload());
+                  }}
+                >
+                  Resolve
+                </Button>
+                <br />
+                <br />
+                <Popover width={200} position="top" withArrow shadow="md">
+                  <Popover.Target>
+                    <Button color="red">Delete</Button>
+                  </Popover.Target>
+                  <Popover.Dropdown w={350}>
+                    <Group justify="center">
+                      <Button
+                        onClick={() => {
+                          deleteGame(game.id).then(
+                            () => (location.href = `/${game.tournament.searchableName}`)
+                          );
+                        }}
+                        color="red"
+                      >
+                        Confirm
+                      </Button>
+                    </Group>
+                  </Popover.Dropdown>
+                </Popover>
+              </Accordion.Panel>
+            )}
           </Accordion.Item>
           <Accordion.Item value="notes">
             <Accordion.Control icon={<IconNote />}>Notes</Accordion.Control>
