@@ -79,6 +79,7 @@ interface GetGamesArgs {
   includePlayerStats?: boolean;
   returnTournament?: boolean;
   limit?: number;
+  includeByes?: boolean;
 }
 
 export function getGames({
@@ -90,6 +91,7 @@ export function getGames({
   includeGameEvents = false,
   includePlayerStats = false,
   returnTournament = false,
+  includeByes = false,
   limit = 20,
 }: GetGamesArgs): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
   const url = new URL('/games', SERVER_ADDRESS);
@@ -119,6 +121,9 @@ export function getGames({
   }
   if (limit) {
     url.searchParams.set('limit', `${limit}`);
+  }
+  if (includeByes) {
+    url.searchParams.set('includeByes', 'true');
   }
   return tokenFetch(url, {
     method: 'GET',
