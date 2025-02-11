@@ -73,6 +73,7 @@ const CARDS = {
     'Misconduct Whilst Carded',
     'Displays of Aggression',
     'Trying to circumvent swearing rules',
+    'Egregiously Inappropriate Uniform',
   ],
   red: [
     'Violence',

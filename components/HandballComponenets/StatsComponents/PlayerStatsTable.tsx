@@ -10,6 +10,61 @@ import {
   TournamentStructure,
 } from '@/ServerActions/types';
 
+const CATEGORIES = {
+  'Ace and Serve Metrics': [
+    'Aces Scored',
+    'Serve Ace Rate',
+    'Aces per Game',
+    'Average Ace Streak',
+    'Max Ace Streak',
+    'Serves per Ace',
+    'Serves per Fault',
+    'Serves per Game',
+    'Serves Received',
+    'Serves Returned',
+    'Serve Return Rate',
+    'Max Serve Streak',
+    'Average Serve Streak',
+  ],
+  'Fault and Error Metrics': ['Faults', 'Double Faults', 'Faults per Game', 'Serve Fault Rate'],
+  'Points and Scoring Metrics': [
+    'Points Scored',
+    'Points Served',
+    'Percentage of Points Scored',
+    'Percentage of Points Scored For Team',
+    'Percentage of Points Served Won',
+    'Points per Game',
+    'Points per Loss',
+  ],
+  'Game and Match Metrics': [
+    'Games Played',
+    'Rounds on Court',
+    'Percentage of Games Starting Left',
+    'Games Won',
+    'Games Lost',
+    'Percentage',
+  ],
+  'Card and Penalty Metrics': [
+    'Cards',
+    'Warnings',
+    'Green Cards',
+    'Yellow Cards',
+    'Red Cards',
+    'Rounds Carded',
+    'Cards per Game',
+    'Penalty Points',
+    'Points per Card',
+  ],
+  'Rating and Voting Metrics': [
+    'Elo',
+    'Net Elo Delta',
+    'Average Elo Delta',
+    'Average Rating',
+    'B&F Votes',
+    'Votes per 100 Games',
+  ],
+};
+
 export default function PlayerStatsTable({
   team,
   teamPlayers,
@@ -43,60 +98,7 @@ export default function PlayerStatsTable({
   let players: (PersonStructure | PlayerGameStatsStructure)[] = [];
   const TA: string = 'Center';
   const statsTable = [];
-  const CATEGORIES = {
-    'Ace and Serve Metrics': [
-      'Aces Scored',
-      'Serve Ace Rate',
-      'Aces per Game',
-      'Average Ace Streak',
-      'Max Ace Streak',
-      'Serves per Ace',
-      'Serves per Fault',
-      'Serves per Game',
-      'Serves Received',
-      'Serves Returned',
-      'Serve Return Rate',
-      'Max Serve Streak',
-      'Average Serve Streak',
-    ],
-    'Fault and Error Metrics': ['Faults', 'Double Faults', 'Faults per Game', 'Serve Fault Rate'],
-    'Points and Scoring Metrics': [
-      'Points Scored',
-      'Points Served',
-      'Percentage of Points Scored',
-      'Percentage of Points Scored For Team',
-      'Percentage of Points Served Won',
-      'Points per Game',
-      'Points per Loss',
-    ],
-    'Game and Match Metrics': [
-      'Games Played',
-      'Rounds on Court',
-      'Percentage of Games Starting Left',
-      'Games Won',
-      'Games Lost',
-      'Percentage',
-    ],
-    'Card and Penalty Metrics': [
-      'Cards',
-      'Warnings',
-      'Green Cards',
-      'Yellow Cards',
-      'Red Cards',
-      'Rounds Carded',
-      'Cards per Game',
-      'Penalty Points',
-      'Points per Card',
-    ],
-    'Rating and Voting Metrics': [
-      'Elo',
-      'Net Elo Delta',
-      'Average Elo Delta',
-      'Average Rating',
-      'B&F Votes',
-      'Votes per 100 Games',
-    ],
-  };
+
   if (team && !teamPlayers) {
     for (const k of Object.keys(team.stats)) {
       statsTable.push({
@@ -125,9 +127,13 @@ export default function PlayerStatsTable({
     rows = Object.entries(CATEGORIES).map(([title, stats]) => (
       <Fragment key={title}>
         <Table.Tr ta={TA}>
-          <Table.Th ta={TA} colSpan={4}>{title}</Table.Th>
+          <Table.Th ta={TA} colSpan={4}>
+            {title}
+          </Table.Th>
         </Table.Tr>
-          {stats.map((stat) => (
+        {stats
+          .filter((stat) => Object.keys(players[0].stats).includes(stat))
+          .map((stat) => (
             <Table.Tr key={stat}>
               <Table.Td ta={TA}>{stat}</Table.Td>
               {players.map((p) => (
