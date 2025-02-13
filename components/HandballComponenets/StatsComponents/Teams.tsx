@@ -2,7 +2,17 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Box, Container, Grid, Image, luminance, Text } from '@mantine/core';
+import {
+  Box,
+  Center,
+  Container,
+  Grid,
+  Image,
+  luminance,
+  Skeleton,
+  Space,
+  Text,
+} from '@mantine/core';
 import { getTeams } from '@/ServerActions/TeamActions';
 import { TeamStructure } from '@/ServerActions/types';
 
@@ -11,7 +21,7 @@ import { TeamStructure } from '@/ServerActions/types';
 function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
   return (
     <Container
-      bg={team.teamColor ? team.teamColor : 'red.5'}
+      bg={team.teamColor ? team.teamColor : 'blue.7'}
       w="auto"
       h={300}
       p={20}
@@ -47,6 +57,36 @@ function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
   );
 }
 
+const loadingBubble = (
+  <Container
+    bg="blue.7"
+    w="auto"
+    h={300}
+    p={20}
+    m={10}
+    bd="2 solid black"
+    pos="relative"
+    style={{ overflow: 'hidden' }}
+  >
+    <Center>
+      <Skeleton h={16} mt={6} radius="xl" w="20%"></Skeleton>
+    </Center>
+    <Space h="md"></Space>
+    <Center>
+      <Skeleton circle height={200}></Skeleton>
+    </Center>
+    <Center>
+      <Skeleton h={8} mt={6} radius="xl" w="60%"></Skeleton>
+    </Center>
+    <Center>
+      <Skeleton h={8} mt={6} radius="xl" w="60%"></Skeleton>
+    </Center>
+    <Center>
+      <Skeleton h={8} mt={6} radius="xl" w="70%"></Skeleton>
+    </Center>
+  </Container>
+);
+
 function getLinkForTeam(team: TeamStructure, tournament?: string) {
   if (tournament) {
     return `/${tournament}/teams/${team.searchableName}`;
@@ -59,15 +99,27 @@ interface TeamsProps {
 }
 
 export default function Teams({ tournament }: TeamsProps) {
-  const [chartData, setchartData] = React.useState<TeamStructure[]>([]);
+  const [chartData, setchartData] = React.useState<TeamStructure[]>();
   useEffect(() => {
     getTeams({ tournament }).then((o) => setchartData(o.teams));
   }, [tournament]);
 
-  if (chartData.length === 0) {
+  if (!chartData) {
     return (
       <div>
-        <Text>loading...</Text>
+        <Grid w="98.5%">
+          {Array.from({ length: 10 }).map((_) => (
+            <Grid.Col
+              span={{
+                base: 6,
+                md: 4,
+                lg: 3,
+              }}
+            >
+              {loadingBubble}
+            </Grid.Col>
+          ))}
+        </Grid>
       </div>
     );
   }

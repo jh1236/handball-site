@@ -3,9 +3,22 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconInfoCircle, IconRefresh } from '@tabler/icons-react';
-import { Blockquote, Box, Center, Container, Grid, Image, Stack, Text, Title } from '@mantine/core';
+import {
+  Blockquote,
+  Box,
+  Center,
+  Container,
+  Grid,
+  Image,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
+import { StatBubble } from '@/components/HandballComponenets/StatBubble';
 import Ladder from '@/components/HandballComponenets/StatsComponents/Ladder';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
+import { SUSSLogo } from '@/components/HandballComponenets/SUSSLogo';
 import { StatCategory } from '@/components/HandballComponenets/TournamentLanding';
 import { TournamentList } from '@/components/HandballComponenets/TournamentList';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
@@ -164,13 +177,7 @@ export default function HomePage() {
       <SidebarLayout>
         <>
           <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
-            <Image
-              alt="The SUSS handball Logo"
-              src="https://api.squarers.club/image?name=SUSS"
-              h="100"
-              w="auto"
-              m="auto"
-            ></Image>
+            <SUSSLogo alt="The SUSS handball Logo" h="100" w="auto" m="auto"></SUSSLogo>
             <Title ta="center">Welcome to S.U.S.S. Handball.</Title>
           </Container>
           <Grid w="98.5%">
@@ -197,18 +204,34 @@ export default function HomePage() {
                   {STATS[statIndex]?.title ?? 'Loading...'}{' '}
                   <IconRefresh onClick={() => setStatIndex((statIndex! + 1) % STATS.length)} />
                 </Title>
-                {createRandomStatBubble()}
+                <StatBubble players={players} teams={teams} stat={STATS[statIndex]} />
               </Box>
               <Box style={{ textAlign: 'center' }}>
                 <Title order={2}>Quote of the day</Title>
                 <Blockquote
                   color="blue"
                   iconSize={46}
-                  cite={`– ${qotd?.author ?? 'Loading...'}`}
+                  cite={
+                    qotd?.author ? (
+                      `– ${qotd?.author}`
+                    ) : (
+                      <Center>
+                        <Skeleton h={8} mt={6} w="15%" />
+                      </Center>
+                    )
+                  }
                   icon={<IconInfoCircle />}
                   mt="xl"
                 >
-                  {qotd?.quote ?? 'Loading...'}
+                  {qotd?.quote ?? (
+                    <>
+                      <Skeleton h={8} mt={6} />
+                      <Skeleton h={8} mt={6} />
+                      <Skeleton h={8} mt={6} />
+                      <Skeleton h={8} mt={6} />
+                      <Skeleton h={8} mt={6} w="70%" />
+                    </>
+                  )}
                 </Blockquote>
               </Box>
               <Box style={{ textAlign: 'center' }}>

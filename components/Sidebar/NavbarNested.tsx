@@ -27,7 +27,7 @@ import {
   Title,
   useMantineColorScheme,
 } from '@mantine/core';
-import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { isUmpireManager, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
 import { getTournaments } from '@/ServerActions/TournamentActions';
@@ -59,6 +59,9 @@ function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament
         { label: 'Teams', link: `/${currentTournament}/teams` },
       ],
     });
+    if (isUmpireManager()) {
+      out[out.length - 1].links.push({ label: 'Manage', link: `/${currentTournament}/manage` });
+    }
   }
   out.push(
     {
@@ -72,7 +75,7 @@ function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament
       ],
     },
     { label: 'Create Game', icon: IconNote, link: '/games/create' },
-    { label: 'Contracts', icon: IconFileAnalytics },
+    { label: 'Documents', icon: IconFileAnalytics, link: '/documents' },
     { label: 'Settings', icon: IconAdjustments },
     {
       label: 'Security',
@@ -179,7 +182,10 @@ export function NavbarNested({
                 width={40}
                 height={40}
                 style={{ width: '40px', margin: 0 }}
-                src={myTournament?.imageUrl || `${SERVER_ADDRESS}/image?name=SUSS`}
+                src={
+                  myTournament?.imageUrl ||
+                  `${SERVER_ADDRESS}/image?name=SUSS${colorScheme === 'dark' ? '' : '_light'}`
+                }
               />
               <Box style={{ overflowWrap: 'break-word', width: '70%', margin: 0 }}>
                 <Title order={4}>

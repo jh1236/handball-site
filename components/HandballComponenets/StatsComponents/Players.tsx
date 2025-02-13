@@ -4,8 +4,8 @@ import React, { useEffect } from 'react';
 import useSWR from 'swr';
 import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
 import { DynamicTable } from '@/components/HandballComponenets/StatsComponents/DynamicTable';
-import { PersonStructure } from '@/ServerActions/types';
 import { getPlayer, getPlayers } from '@/ServerActions/PlayerActions';
+import { PersonStructure } from '@/ServerActions/types';
 
 interface LadderProps {
   maxRows?: number;
@@ -13,6 +13,7 @@ interface LadderProps {
   columns?: string[];
   editable?: boolean;
   sortIndex?: number;
+  playersIn?: PersonStructure[] | null;
 }
 
 function linkTo(player: PersonStructure, tournament?: string): string {
@@ -27,23 +28,32 @@ export default function Players({
   tournament,
   columns = ['B&F Votes', 'Elo'],
   sortIndex,
+  playersIn,
   editable = true,
 }: LadderProps) {
   // const [sort, setSort] = React.useState<number>(-1);
   const [players, setPlayers] = React.useState<PersonStructure[]>();
 
   useEffect(() => {
-    getPlayers({ tournament, team: undefined, includeStats: true, formatData: true }).then((o) => setPlayers(o.players));
-  }, [tournament]);
+    if (playersIn !== undefined) {
+      setPlayers(playersIn || undefined);
+    } else {
+      getPlayers({
+        tournament,
+        team: undefined,
+        includeStats: true,
+        formatData: true,
+      }).then((o) => setPlayers(o.players));
+    }
+  }, [playersIn, tournament]);
   return (
     <DynamicTable
       columns={columns}
       objToLink={(o) => linkTo(o, tournament)}
       sortIndexIn={sortIndex}
-      data={players ?? []}
+      data={players}
       editable={editable}
       maxRows={maxRows}
-    >
-    </DynamicTable>
+    ></DynamicTable>
   );
 }

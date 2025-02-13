@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconRefresh } from '@tabler/icons-react';
 import { Box, Container, Grid, Image, Text, Title } from '@mantine/core';
+import { StatBubble } from '@/components/HandballComponenets/StatBubble';
 import Fixtures from '@/components/HandballComponenets/StatsComponents/Fixtures/Fixtures';
 import Ladder from '@/components/HandballComponenets/StatsComponents/Ladder';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
@@ -83,83 +84,6 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
   const [tournamentObj, setTournamentObj] = React.useState<TournamentStructure>();
   const [statIndex, setStatIndex] = React.useState<number>(0);
 
-  function createRandomStatBubble() {
-    if (!teams || !players) {
-      return (
-        <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
-          <Text size="auto" fw={700} ta="center">
-            Loading...
-          </Text>
-          <Image alt="a loading image" src="" h="200" w="auto" m="auto"></Image>
-          <Text ta="center">With Loading...</Text>
-        </Container>
-      );
-    }
-    const sortMultiplier = STATS[statIndex].order === 'asc' ? 1 : -1;
-    if (STATS[statIndex].type === 'team') {
-      const team = teams?.reduce((a, b) => {
-        const diff =
-          sortMultiplier *
-          (parseFloat(String(b.stats![STATS[statIndex].stat])) -
-            parseFloat(String(a.stats![STATS[statIndex].stat])));
-        if (diff > 0) {
-          return a;
-        }
-        if (diff === 0) {
-          return Math.random() > 0.5 ? a : b;
-        }
-        return b;
-      }, teams[0]);
-      return (
-        <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
-          <Link href={`/${tournament}/players/${team.searchableName}`} className="hideLink">
-            <Text size="auto" fw={700} ta="center">
-              {team.name}
-            </Text>
-          </Link>
-          <Link href={`/${tournament}/players/${team.searchableName}`} className="hideLink">
-            <Image alt={team.name} src={team.imageUrl} h="200" w="auto" m="auto"></Image>
-          </Link>
-          <Link href={`/${tournament}/players/${team.searchableName}`} className="hideLink">
-            <Text ta="center">
-              With {team.stats![STATS[statIndex].stat]} {STATS[statIndex].description}
-            </Text>
-          </Link>
-        </Container>
-      );
-    }
-    const player = players?.reduce((a, b) => {
-      const diff =
-        sortMultiplier *
-        (parseFloat(String(b.stats![STATS[statIndex].stat])) -
-          parseFloat(String(a.stats![STATS[statIndex].stat])));
-      if (diff > 0) {
-        return a;
-      }
-      if (diff === 0) {
-        return Math.random() > 0.5 ? a : b;
-      }
-      return b;
-    }, players[0]);
-    return (
-      <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
-        <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
-          <Text size="auto" fw={700} ta="center">
-            {player.name}
-          </Text>
-        </Link>
-        <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
-          <Image alt={player.name} src={player.imageUrl} h="200" w="auto" m="auto"></Image>
-        </Link>
-        <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
-          <Text ta="center">
-            With {player.stats![STATS[statIndex].stat]} {STATS[statIndex].description}
-          </Text>
-        </Link>
-      </Container>
-    );
-  }
-
   useEffect(() => {
     getTournament(tournament!).then((t) => {
       setTournamentObj(t);
@@ -205,7 +129,12 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
               {STATS[statIndex]?.title ?? 'Loading...'}{' '}
               <IconRefresh onClick={() => setStatIndex((statIndex! + 1) % STATS.length)} />
             </Title>
-            {createRandomStatBubble()}
+            <StatBubble
+              players={players}
+              teams={teams}
+              tournament={tournament}
+              stat={STATS[statIndex]}
+            ></StatBubble>
           </Box>
           <Box style={{ textAlign: 'center' }}>
             <Link className="hideLink" href={`/${tournament}/players`}>

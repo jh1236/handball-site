@@ -138,6 +138,55 @@ export function getGames({
   });
 }
 
+interface GetNoteableGamesArgs {
+  tournament?: SearchableName;
+  team?: SearchableName[];
+  player?: SearchableName[];
+  official?: SearchableName[];
+  court?: number;
+  includeGameEvents?: boolean;
+  includePlayerStats?: boolean;
+  returnTournament?: boolean;
+  limit?: number;
+  includeByes?: boolean;
+}
+
+export function getNoteableGames({
+  tournament,
+  includeGameEvents = false,
+  includePlayerStats = false,
+  returnTournament = false,
+  limit = 20,
+}: GetNoteableGamesArgs): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
+  const url = new URL('/games/noteable', SERVER_ADDRESS);
+  if (tournament) {
+    url.searchParams.set('tournament', tournament);
+  }
+  if (includeGameEvents) {
+    url.searchParams.set('includeGameEvents', 'true');
+  }
+  if (includePlayerStats) {
+    url.searchParams.set('includePlayerStats', 'true');
+  }
+  if (returnTournament) {
+    url.searchParams.set('returnTournament', 'true');
+  }
+  if (limit) {
+    url.searchParams.set('limit', `${limit}`);
+  }
+  return tokenFetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      return Promise.reject(response.text());
+    }
+    return response.json();
+  });
+}
+
 interface GetFixturesArgs {
   tournament?: SearchableName;
   team?: SearchableName;
@@ -689,7 +738,6 @@ export function createGameWithPlayers(
   if (teamTwoName) {
     body.teamTwo = teamTwoName;
   }
-  console.log(JSON.stringify(body));
   return tokenFetch('/games/update/create', {
     method: 'POST',
     body: JSON.stringify(body),

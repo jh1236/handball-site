@@ -54,7 +54,7 @@ export default function Ladder({
           setColumns={setColumnState}
           sortIndexIn={sortIndex}
           objToLink={(o) => linkTo(o, tournament)}
-          data={ladder ?? []}
+          data={ladder}
           editable={editable}
           maxRows={Math.floor(maxRows / 2)}
         ></DynamicTable>
@@ -63,7 +63,7 @@ export default function Ladder({
           columns={columnState}
           sortIndexIn={sortIndex}
           objToLink={(o) => linkTo(o, tournament)}
-          data={poolTwo ?? []}
+          data={poolTwo}
           editable={false}
           maxRows={Math.floor(maxRows / 2)}
         ></DynamicTable>
@@ -75,7 +75,7 @@ export default function Ladder({
       columns={columns}
       sortIndexIn={sortIndex}
       objToLink={(o) => linkTo(o, tournament)}
-      data={ladder ?? []}
+      data={ladder}
       editable={editable}
       maxRows={maxRows}
     ></DynamicTable>

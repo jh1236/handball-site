@@ -2,11 +2,38 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Box, Container, Grid, Image, Text } from '@mantine/core';
+import { Box, Center, Container, Grid, Image, Skeleton, Space, Text } from '@mantine/core';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { OfficialStructure } from '@/ServerActions/types';
 
 //TODO: - Uniform Box Size
+
+const loadingBubble = (
+  <Container
+    bg="blue.7"
+    w="auto"
+    h={300}
+    p={20}
+    m={10}
+    bd="2 solid black"
+    pos="relative"
+    style={{ overflow: 'hidden' }}
+  >
+    <Center>
+      <Skeleton h={16} mt={6} radius="xl" w="20%"></Skeleton>
+    </Center>
+    <Space h="md"></Space>
+    <Center>
+      <Skeleton circle height={200}></Skeleton>
+    </Center>
+    <Center>
+      <Skeleton h={8} mt={6} radius="xl" w="60%"></Skeleton>
+    </Center>
+    <Center>
+      <Skeleton h={8} mt={6} radius="xl" w="60%"></Skeleton>
+    </Center>
+  </Container>
+);
 
 function GenerateOfficialBubble(official: OfficialStructure, tournament?: string) {
   return (
@@ -45,20 +72,32 @@ function getLinkForOfficial(team: OfficialStructure, tournament?: string) {
   return `/officials/${team.searchableName}`;
 }
 
-interface TeamsProps {
+interface OfficialsProps {
   tournament?: string;
 }
 
-export default function Officials({ tournament }: TeamsProps) {
-  const [chartData, setchartData] = React.useState<OfficialStructure[]>([]);
+export default function Officials({ tournament }: OfficialsProps) {
+  const [chartData, setchartData] = React.useState<OfficialStructure[]>();
   useEffect(() => {
     getOfficials({ tournament }).then((o) => setchartData(o.officials));
   }, [tournament]);
 
-  if (chartData.length === 0) {
+  if (!chartData) {
     return (
       <div>
-        <Text>loading...</Text>
+        <Grid w="98.5%">
+          {Array.from({ length: 10 }).map((_) => (
+            <Grid.Col
+              span={{
+                base: 6,
+                md: 4,
+                lg: 3,
+              }}
+            >
+              {loadingBubble}
+            </Grid.Col>
+          ))}
+        </Grid>
       </div>
     );
   }

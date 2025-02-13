@@ -20,7 +20,6 @@ export default function SidebarLayout({
   tournamentName?: string;
 }) {
   const [sidebarVisible, setSidebarVisible] = React.useState<boolean>(true);
-  const { colorScheme } = useMantineColorScheme();
   return (
     <div>
       <Box hiddenFrom="md">

@@ -131,8 +131,6 @@ export interface GameStructure {
   started: boolean;
   someoneHasWon: boolean;
   ended: boolean;
-  protested: boolean;
-  resolved: boolean;
   ranked: boolean;
   bestPlayer: PersonStructure;
   official: OfficialStructure;
@@ -157,6 +155,8 @@ export interface GameStructure {
   admin?: {
     notes?: string;
     cards: CardStructure[];
+    markedForReview: boolean;
+    requiresAction: boolean;
     noteableStatus: string;
     teamOneRating: number;
     teamTwoRating: number;
@@ -164,6 +164,7 @@ export interface GameStructure {
     teamTwoNotes: string | null;
     teamOneProtest: string | null;
     teamTwoProtest: string | null;
+    resolved: boolean;
   };
 
   [k: string]: any;
