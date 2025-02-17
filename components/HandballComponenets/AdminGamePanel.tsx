@@ -50,7 +50,7 @@ interface AdminGamePanelProps {
   game: GameStructure;
 }
 
-const markIfReqd = (b: boolean, s: string) =>
+export const markIfReqd = (b: boolean, s: string) =>
   b ? (
     <strong>
       {s}
@@ -229,7 +229,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
             <Accordion.Panel>
               <Title order={3}>{markIfReqd(game.admin?.teamOneRating === 1, 'Rating')}</Title>
               <Center>
-                <Rating value={game.admin?.teamOneRating} readOnly size="lg"></Rating>
+                <Rating count={4} value={game.admin?.teamOneRating} readOnly size="lg"></Rating>
               </Center>
               {FEEDBACK_TEXTS[game.admin?.teamOneRating ?? 0]}
               <Divider></Divider>
@@ -290,7 +290,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
             <Accordion.Panel>
               <Title order={3}>{markIfReqd(game.admin?.teamTwoRating === 1, 'Rating')}</Title>
               <Center>
-                <Rating value={game.admin?.teamTwoRating} readOnly size="lg"></Rating>
+                <Rating count={4} value={game.admin?.teamTwoRating} readOnly size="lg"></Rating>
               </Center>
               {FEEDBACK_TEXTS[game.admin?.teamTwoRating ?? 0]}
               <Divider></Divider>

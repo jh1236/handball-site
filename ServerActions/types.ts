@@ -85,6 +85,7 @@ export interface PlayerGameStatsStructure extends PersonStructure {
 }
 
 export interface GameEventStructure {
+  id: number;
   eventType: string;
   firstTeam: boolean;
   player: PersonStructure;

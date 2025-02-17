@@ -397,7 +397,7 @@ function getActions(
     out.splice(0, 0, {
       Icon: IconTrophy,
       value: 'Set Best Player',
-      color: 'white',
+      color: undefined,
       content: (
         <Button
           color={currentPlayer.get?.isBestPlayer ? 'orange' : 'blue'}
@@ -420,7 +420,7 @@ function getActions(
   out.splice(0, 0, {
     Icon: IconBallTennis,
     value: 'Score',
-    color: 'white',
+    color: undefined,
     content: (
       <>
         {SCORE_METHODS.slice(0, 3).map((method) => (
@@ -472,7 +472,7 @@ function getActions(
     out.splice(1, 0, {
       Icon: IconArrowsLeftRight,
       value: `Substitute (${9 - (game.teamOne.score.get + game.teamTwo.score.get)} points remaining)`,
-      color: 'white',
+      color: undefined,
       content: (
         <Button
           size="sm"
@@ -491,7 +491,7 @@ function getActions(
     out.splice(1, 0, {
       Icon: IconPlayHandball,
       value: 'Serving Actions',
-      color: 'white',
+      color: undefined,
       content: (
         <>
           <Button
@@ -545,7 +545,7 @@ export function PlayerButton({
     () =>
       game.started.get &&
       !game.ended.get &&
-      (game.servedFromLeft === trueLeftSide || !team.left.get || !team.right.get) &&
+      (game.servedFromLeft !== trueLeftSide || !team.left.get || !team.right.get) &&
       game.firstTeamServes.get === firstTeam,
     [
       firstTeam,

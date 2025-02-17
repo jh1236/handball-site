@@ -44,6 +44,10 @@ type Team = {
     get: boolean;
     set: (v: boolean) => void;
   };
+  signed: {
+    get: string;
+    set: (v: string) => void;
+  };
   left: {
     get?: PlayerGameStatsStructure;
     set: (v?: PlayerGameStatsStructure) => void;
@@ -175,10 +179,11 @@ export function score(
     | 'Illegal Body Part'
     | 'Obstruction'
 ): void {
+  const servingTeam = game.firstTeamServes.get ? game.teamOne : game.teamTwo;
+  servingTeam.servedFromLeft.set(!servingTeam.servedFromLeft.get);
   const team = firstTeam ? game.teamOne : game.teamTwo;
   team.score.set(team.score.get + 1);
   const needsSwap = firstTeam === game.firstTeamServes.get;
-  team.servedFromLeft.set(!team.servedFromLeft.get);
   game.firstTeamServes.set(firstTeam);
   nextPoint(game, needsSwap ? firstTeam : undefined);
   scoreForGame(game.id, firstTeam, leftPlayer, method).catch(() => sync(game));
