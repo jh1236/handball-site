@@ -10,7 +10,7 @@ interface FixturesProps {
   expandable?: boolean;
 }
 
-export default function Fixtures({ maxRounds = -1, tournament, expandable = true }: FixturesProps) {
+export default function   Fixtures({ maxRounds = -1, tournament, expandable = true }: FixturesProps) {
   // const [sort, setSort] = React.useState<number>(-1);
   const [expanded, setExpanded] = React.useState<boolean>(false);
 

@@ -1,0 +1,9 @@
+.sonicAce {
+    animation: test 4s ease infinite
+}
+
+@keyframes test {
+    0% { transform: rotate(-30deg) }
+    50% { transform: rotate(30deg) }
+    100% { transform: rotate(-30deg) }
+}

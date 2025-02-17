@@ -17,11 +17,15 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
 import {
+  GameEventStructure,
   GameStructure,
   GameTeamStructure,
   PersonStructure,
   PlayerGameStatsStructure,
 } from '@/ServerActions/types';
+import {
+  customTournamentScoreboardEffects
+} from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
 
 interface ScoreboardProps {
   gameID: number;
@@ -38,9 +42,12 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   const teamOne = useMemo(() => (game?.firstTeamIga ? game?.teamOne : game?.teamTwo), [game]);
   const teamTwo = useMemo(() => (game?.firstTeamIga ? game?.teamTwo : game?.teamOne), [game]);
 
+  const knownGameEvents: GameEventStructure[] = game?.events ? game.events : [];
+
   function reloadGame() {
     getGame({
       gameID,
+      includeGameEvents: true,
     }).then((g) => {
       const prev = game;
       setGame(g);
@@ -102,7 +109,6 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     return <>Loading...</>;
   }
 
-  //TODO: if a player is carded, strikethrough their name and move currently on player to be on service side
   function generateBackground(teamOneIn, teamTwoIn): any {
     const team1Col = teamOneIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
     const team2Col = teamTwoIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
@@ -155,7 +161,11 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       }
     }
 
-    return { left, right, sub };
+    return {
+      left,
+      right,
+      sub,
+    };
   }
 
   function createNamePlate(team: GameTeamStructure, side: 'left' | 'right' | 'sub') {
@@ -166,9 +176,10 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     if (!game) {
       return <p>error</p>;
     }
-    const serving = game.firstTeamToServe === game.firstTeamIga
-      ? team.name === teamOne?.name && side === game.sideToServe.toLowerCase()
-      : team.name === teamTwo?.name && side === game.sideToServe.toLowerCase();
+    const serving =
+      game.firstTeamToServe === game.firstTeamIga
+        ? team.name === teamOne?.name && side === game.sideToServe.toLowerCase()
+        : team.name === teamTwo?.name && side === game.sideToServe.toLowerCase();
 
     let name: React.JSX.Element = <>{p.name}</>;
 
@@ -297,7 +308,10 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       <LoadingOverlay
         visible={!game.started || isTimeoutOpen}
         loaderProps={{ children: game.started ? timeoutKids : startKids }}
-        overlayProps={{ radius: 'sm', blur: game.started ? 10 : 1 }}
+        overlayProps={{
+          radius: 'sm',
+          blur: game.started ? 10 : 1,
+        }}
       />
       <Box w="100vw" pos="absolute" top="25px">
         <Center component={Title} fz={40}>
@@ -337,15 +351,14 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
           <Text ta="center" fz={20}>
             Time Elapsed:{' '}
             {game.ended
-              ? new Date(Math.floor(game.length * 1000))
-                  .toISOString()
-                  .slice(14, 19)
+              ? new Date(Math.floor(game.length * 1000)).toISOString().slice(14, 19)
               : new Date(Math.floor(currentTime - game.startTime * 1000))
                   .toISOString()
                   .slice(14, 19)}
           </Text>
         </Box>
       </Box>
+      {customTournamentScoreboardEffects(game)}
     </Box>
   );
 }
