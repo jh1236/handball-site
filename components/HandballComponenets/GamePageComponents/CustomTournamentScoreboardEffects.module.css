@@ -1,9 +1,24 @@
 .sonicAce {
-    animation: test 4s ease infinite
+    animation:  test 4s infinite ease, boomer 4s ease normal;
+}
+
+.ring {
+    animation: ringAnimation 3s linear;
+    opacity: 0
+}
+
+@keyframes ringAnimation {
+    0% { opacity: 1; }
+    100% { transform: translate(0px, -250px); opacity: 0; }
 }
 
 @keyframes test {
     0% { transform: rotate(-30deg) }
     50% { transform: rotate(30deg) }
     100% { transform: rotate(-30deg) }
+}
+
+@keyframes boomer {
+    0% { transform: rotate(0deg); width: 1000% }
+    100% { transform: rotate(-750deg); width: 500px }
 }

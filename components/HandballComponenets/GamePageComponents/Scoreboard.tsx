@@ -38,12 +38,10 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   const [lastCheck, setLastCheck] = React.useState<number>(0);
   const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
   const urlSearchParams = useSearchParams();
+  let coolEffect: React.JSX.Element | null = null;
 
   const teamOne = useMemo(() => (game?.firstTeamIga ? game?.teamOne : game?.teamTwo), [game]);
   const teamTwo = useMemo(() => (game?.firstTeamIga ? game?.teamTwo : game?.teamOne), [game]);
-
-  const knownGameEvents: GameEventStructure[] = game?.events ? game.events : [];
-
   function reloadGame() {
     getGame({
       gameID,
@@ -61,6 +59,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
         location.reload();
       }
     });
+    coolEffect = customTournamentScoreboardEffects(game);
   }
 
   //
@@ -305,6 +304,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
 
   return (
     <Box style={generateBackground(teamOne, teamTwo)} h="100vh" w="100vw">
+      <p>{game.events.map(e => e.notes)}</p>
       <LoadingOverlay
         visible={!game.started || isTimeoutOpen}
         loaderProps={{ children: game.started ? timeoutKids : startKids }}
