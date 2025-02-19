@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import {
   IconAlertTriangle,
   IconArrowsUpDown,
@@ -6,13 +6,16 @@ import {
   IconClock,
   IconFlagFilled,
   IconNote,
+  IconSignature,
   IconTrophy,
   IconUser,
   IconUsersGroup,
 } from '@tabler/icons-react';
 import ReCAPTCHA from 'react-google-recaptcha';
+import SignatureCanvas from 'react-signature-canvas';
 import {
   Accordion,
+  Box,
   Button,
   Group,
   List,
@@ -22,8 +25,10 @@ import {
   Text,
   Textarea,
   Title,
+  useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { markIfReqd } from '@/components/HandballComponenets/AdminGamePanel';
 import {
   forfeit,
   GameState,
@@ -44,7 +49,6 @@ export const FEEDBACK_TEXTS = [
   <Text c="red">Follow up Required</Text>,
   <Text c="orange">Disrespectful Behaviour</Text>,
   <Text>Acceptable Behaviour</Text>,
-  <Text>Polite Behaviour</Text>,
   <Text c="green">Above and Beyond</Text>,
 ];
 
@@ -54,7 +58,9 @@ function getActions(
   serving: boolean,
   close: () => void,
   captchaPassed: boolean,
-  setCaptchaPassed: (b: boolean) => void
+  setCaptchaPassed: (b: boolean) => void,
+  colorScheme: string,
+  canvasRef: Ref
 ) {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const players = [team.left.get, team.right.get, team.sub.get].filter(
@@ -74,7 +80,6 @@ function getActions(
         {
           Icon: IconUsersGroup,
           value: 'Team Lineup',
-          color: 'white',
           content: (
             <>
               <Text>The team line up is:</Text>
@@ -103,7 +108,6 @@ function getActions(
       {
         Icon: IconArrowsUpDown,
         value: 'Swap Sides',
-        color: 'white',
         content: (
           <Button
             size="lg"
@@ -119,7 +123,6 @@ function getActions(
       {
         Icon: IconBallTennis,
         value: serving ? 'Set Not Serving' : 'Set Serving',
-        color: 'white',
         content: (
           <Button
             size="lg"
@@ -148,7 +151,6 @@ function getActions(
       out.splice(1, 0, {
         Icon: IconTrophy,
         value: `Set ${team.sub.get.name} as Best Player`,
-        color: 'white',
         content: (
           <Button
             color={team.sub.get?.isBestPlayer ? 'orange' : 'blue'}
@@ -184,24 +186,45 @@ function getActions(
       {
         Icon: IconNote,
         value: 'Feedback',
-        title:
-          team.rating.get && (team.rating.get !== 1 || team.notes.get) ? (
-            'Feedback'
-          ) : (
-            <>
-              <strong>Feedback</strong>
-              <strong style={{ color: 'red' }}>*</strong>{' '}
-            </>
-          ),
+        title: markIfReqd(team.rating.get === 1 || !team.rating.get, 'Feedback'),
         color: undefined,
         content: (
           <>
-            <Rating value={team.rating.get} size="lg" onChange={team.rating.set}></Rating>
+            <Rating value={team.rating.get} count={4} size="lg" onChange={team.rating.set}></Rating>
             {FEEDBACK_TEXTS[team.rating.get]}
             <Textarea
               value={team.notes.get}
               onChange={(v) => team.notes.set(v.currentTarget.value)}
             ></Textarea>
+          </>
+        ),
+      },
+      {
+        Icon: IconSignature,
+        value: 'Signature',
+        title: markIfReqd(!team.signed.get, 'Signature'),
+        content: (
+          <>
+            <Box style={{ border: '1px solid' }} mb={5}>
+              <SignatureCanvas
+                ref={canvasRef}
+                onEnd={() => team.signed.set(canvasRef.current.toDataURL())}
+                penColor={colorScheme === 'dark' ? 'white' : 'black'}
+                canvasProps={{
+                  width: 'auto',
+                  height: 100,
+                  className: 'sigCanvas',
+                }}
+              ></SignatureCanvas>
+            </Box>
+            <Button
+              onClick={() => {
+                team.signed.set('');
+                canvasRef.current.clear();
+              }}
+            >
+              Reset
+            </Button>
           </>
         ),
       }
@@ -215,7 +238,7 @@ function getActions(
     {
       Icon: IconClock,
       value: `Timeout (${timeoutsRemaining} remaining)`,
-      color: timeoutsRemaining > 0 ? 'white' : 'grey',
+      color: timeoutsRemaining > 0 ? undefined : 'grey',
       content: (
         <Button
           size="lg"
@@ -290,6 +313,7 @@ function getActions(
 export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) {
   const firstTeam = trueFirstTeam === game.teamOneIGA.get;
   const [captchaPassed, setCaptchaPassed] = React.useState<boolean>(false);
+  const canvas = useRef();
   const team = useMemo(
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
@@ -303,18 +327,31 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
     [firstTeam, game.ended.get, game.firstTeamServes.get]
   );
   const [opened, { open, close }] = useDisclosure(false);
+  const { colorScheme } = useMantineColorScheme();
+  useEffect(() => {
+    if (opened) {
+      canvas.current?.fromDataURL(team.signed.get);
+    }
+  }, [opened]);
   const items = useMemo(
     () =>
-      getActions(game, firstTeam, serving, close, captchaPassed, setCaptchaPassed).map(
-        (item, i) => (
-          <Accordion.Item key={i} value={item.value}>
-            <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
-              {item.title ?? item.value}
-            </Accordion.Control>
-            <Accordion.Panel>{item.content}</Accordion.Panel>
-          </Accordion.Item>
-        )
-      ),
+      getActions(
+        game,
+        firstTeam,
+        serving,
+        close,
+        captchaPassed,
+        setCaptchaPassed,
+        colorScheme,
+        canvas
+      ).map((item, i) => (
+        <Accordion.Item key={i} value={item.value}>
+          <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
+            {item.title ?? item.value}
+          </Accordion.Control>
+          <Accordion.Panel>{item.content}</Accordion.Panel>
+        </Accordion.Item>
+      )),
     [game, firstTeam, serving, close]
   );
   const name = team ? team.name : 'Loading...';

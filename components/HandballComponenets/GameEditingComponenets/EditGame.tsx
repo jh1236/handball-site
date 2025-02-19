@@ -49,6 +49,7 @@ export function EditGame({ game }: { game: number }) {
   const [teamOneTimeouts, setTeamOneTimeouts] = React.useState<number>(0);
   const [teamOneNotes, setTeamOneNotes] = React.useState<string>('');
   const [teamOneProtest, setTeamOneProtest] = React.useState<string>('');
+  const [teamOneSigned, setTeamOneSigned] = React.useState<string>('');
   const [teamOneServedLeft, setTeamOneServedLeft] = React.useState<boolean>(true);
   const [teamOneName, setTeamOneName] = React.useState<string>('Loading...');
   const [teamOneScore, setTeamOneScore] = React.useState<number>(0);
@@ -65,8 +66,9 @@ export function EditGame({ game }: { game: number }) {
   //team two state
   const [teamTwoTimeouts, setTeamTwoTimeouts] = React.useState<number>(0);
   const [teamTwoNotes, setTeamTwoNotes] = React.useState<string>('');
-
   const [teamTwoProtest, setTeamTwoProtest] = React.useState<string>('');
+
+  const [teamTwoSigned, setTeamTwoSigned] = React.useState<string>('');
   const [teamTwoServedLeft, setTeamTwoServedLeft] = React.useState<boolean>(true);
   const [teamTwoName, setTeamTwoName] = React.useState<string>('Loading...');
   const [teamTwoScore, setTeamTwoScore] = React.useState<number>(0);
@@ -117,6 +119,7 @@ export function EditGame({ game }: { game: number }) {
     setTeamOneTimeouts(gameObj.teamOneTimeouts);
     setTeamOneScore(gameObj.teamOneScore);
     setTeamOneServedLeft(gameObj.teamOne.servedFromLeft!);
+    console.log(`${gameObj.teamOne.name} Left Serve is ${gameObj.teamOne.servedFromLeft}`);
     const { teamOne, teamTwo } = gameObj;
     if (gameObj.started) {
       for (const i of [teamOne.captain, teamOne.nonCaptain, teamOne.substitute]) {
@@ -141,6 +144,7 @@ export function EditGame({ game }: { game: number }) {
     setTeamTwoTimeouts(gameObj.teamTwoTimeouts);
     setTeamTwoScore(gameObj.teamTwoScore);
     setTeamTwoServedLeft(gameObj.teamTwo.servedFromLeft!);
+    console.log(`${gameObj.teamTwo.name} Left Serve is ${gameObj.teamTwo.servedFromLeft}`);
     if (gameObj.started) {
       for (const i of [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute]) {
         if (i?.sideOfCourt === 'Left') {
@@ -203,6 +207,10 @@ export function EditGame({ game }: { game: number }) {
     },
     teamOne: {
       name: teamOneName,
+      signed: {
+        get: teamOneSigned,
+        set: setTeamOneSigned,
+      },
       score: {
         get: teamOneScore,
         set: setTeamOneScore,
@@ -242,6 +250,10 @@ export function EditGame({ game }: { game: number }) {
     },
     teamTwo: {
       name: teamTwoName,
+      signed: {
+        get: teamTwoSigned,
+        set: setTeamTwoSigned,
+      },
       score: {
         get: teamTwoScore,
         set: setTeamTwoScore,

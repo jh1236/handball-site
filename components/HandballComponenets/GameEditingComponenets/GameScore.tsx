@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { IconCheckbox, IconCloudUpload, IconNote } from '@tabler/icons-react';
+import { IconCheckbox, IconCloudUpload, IconNote, IconSquare } from '@tabler/icons-react';
 import useSound from 'use-sound';
 import {
   Accordion,
@@ -17,6 +17,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { markIfReqd } from '@/components/HandballComponenets/AdminGamePanel';
 import {
   begin,
   end,
@@ -32,6 +33,14 @@ interface GameScoreArgs {
 const CAN_HAVE_ZAIAH_BOX = ['Zaiah Deards', 'Jared Healy'];
 
 export const ZAIAH_BOX_FUCKERY = true;
+
+export function FakeCheckbox({ checked }: { checked: boolean }) {
+  return checked ? (
+    <IconCheckbox size="1.25em"></IconCheckbox>
+  ) : (
+    <IconSquare size="1.25em"></IconSquare>
+  );
+}
 
 function getActions(
   game: GameState,
@@ -79,7 +88,6 @@ function getActions(
     {
       Icon: IconCloudUpload,
       value: 'Finalise Game',
-      color: 'white',
       content: (
         <>
           <List>
@@ -111,17 +119,20 @@ function getActions(
                   {game.teamOne.protest.get ? game.teamOne.protest.get : <i>Unset</i>}
                 </List.Item>
                 <List.Item>
-                  <strong>Rating</strong>
-                  {!game.teamOne.rating.get && <strong style={{ color: 'red' }}>*</strong>}
+                  <strong>{markIfReqd(!game.teamOne.rating.get, 'Rating')} </strong>
                   <strong>: </strong>
-                  <Rating value={game.teamOne.rating.get} readOnly></Rating>
+                  <Rating count={4} value={game.teamOne.rating.get} readOnly></Rating>
                   {FEEDBACK_TEXTS[game.teamOne.rating.get ?? 0]}
                 </List.Item>
                 <List.Item>
-                  <strong>Notes</strong>
-                  {game.teamOne.rating.get === 1 && <strong style={{ color: 'red' }}>*</strong>}
+                  <strong>{markIfReqd(game.teamOne.rating.get === 1, 'Notes')} </strong>
                   <strong>: </strong>
                   {game.teamOne.notes.get ? game.teamOne.notes.get : <i>Unset</i>}
+                </List.Item>
+                <List.Item>
+                  <strong>{markIfReqd(!game.teamOne.signed.get, 'Signature')} </strong>
+                  <strong>: </strong>
+                  <FakeCheckbox checked={game.teamOne.signed.get}></FakeCheckbox>
                 </List.Item>
               </List>
             </List.Item>
@@ -133,17 +144,20 @@ function getActions(
                   {game.teamTwo.protest.get ? game.teamTwo.protest.get : <i>Unset</i>}
                 </List.Item>
                 <List.Item>
-                  <strong>Rating </strong>
-                  {!game.teamTwo.rating.get && <strong style={{ color: 'red' }}>*</strong>}
+                  <strong>{markIfReqd(!game.teamTwo.rating.get, 'Rating')} </strong>
                   <strong>: </strong>
-                  <Rating value={game.teamTwo.rating.get} readOnly></Rating>
+                  <Rating count={4} value={game.teamTwo.rating.get} readOnly></Rating>
                   {FEEDBACK_TEXTS[game.teamTwo.rating.get ?? 0]}
                 </List.Item>
                 <List.Item>
-                  <strong>Notes </strong>
-                  {game.teamTwo.rating.get === 1 && <strong style={{ color: 'red' }}>*</strong>}
+                  <strong>{markIfReqd(game.teamTwo.rating.get === 1, 'Notes')} </strong>
                   <strong>: </strong>
                   {game.teamTwo.notes.get ? game.teamTwo.notes.get : <i>Unset</i>}
+                </List.Item>
+                <List.Item>
+                  <strong>{markIfReqd(!game.teamTwo.signed.get, 'Signature')} </strong>
+                  <strong>: </strong>
+                  <FakeCheckbox checked={game.teamTwo.signed.get}></FakeCheckbox>
                 </List.Item>
               </List>
             </List.Item>
@@ -161,7 +175,9 @@ function getActions(
                 game.teamTwo.rating.get &&
                 (game.teamTwo.rating.get !== 1 || game.teamTwo.notes.get)
               ) ||
-              (reviewReqd && !game.notes.get)
+              (reviewReqd && !game.notes.get) ||
+              !game.teamOne.signed.get ||
+              !game.teamTwo.signed.get
             }
             onClick={() => {
               end(game, bestPlayer!.searchableName, reviewReqd);

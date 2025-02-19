@@ -98,100 +98,101 @@ export default function FixturesInternal({
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {Array.from({ length: 6 }).map((_, index) => (
-              <>
-                {maxRounds !== 1 && (
-                  <Table.Tr key={100 * index - 1}>
-                    <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
-                      <Text size="sm">
-                        <b>Round {index + 1}</b>
-                      </Text>
-                    </Table.Th>
-                    <Table.Th visibleFrom="md" style={{ textAlign: 'center' }} rowSpan={5}>
-                      <Text size="sm">
-                        <b>Round {index + 1}</b>
-                      </Text>
-                    </Table.Th>
-                  </Table.Tr>
-                )}
-                {Array.from({ length: 4 }).map((_, index2) => (
-                  <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
-                    <Table.Td>
-                      <Skeleton h={8} mt={6}></Skeleton>
-                    </Table.Td>
-                    <Table.Td visibleFrom="md">
-                      <Text size="sm">VS</Text>
-                    </Table.Td>
-                    <Table.Td visibleFrom="md">
-                      <Skeleton h={8} mt={6}></Skeleton>
-                    </Table.Td>
-                    <Table.Td>
-                      <Skeleton h={8} mt={6}></Skeleton>
-                    </Table.Td>
-                    {expandable && (
-                      <Table.Td
-                        visibleFrom="md"
-                        style={{ maxWidth: '15px', width: '15px' }}
-                      ></Table.Td>
-                    )}
-                  </Table.Tr>
-                ))}
-              </>
-            ))}
-            <>
-              <Table.Tr>
-                <Table.Th colSpan={99999} style={{ textAlign: 'center' }}>
-                  <Title>Finals</Title>
-                </Table.Th>
-              </Table.Tr>
-              {Array.from({ length: 2 }).map((_, index) => {
-                if (index > maxRounds && maxRounds > 0) return null;
-                return (
-                  <>
-                    {maxRounds !== 1 && (
-                      <Table.Tr key={100 * index - 1}>
-                        <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
-                          <Text size="sm">
-                            <b>Round {index + 1}</b>
-                          </Text>
-                        </Table.Th>
-                        <Table.Th
+            {Array.from({ length: maxRounds < 0 ? 6 : Math.max(maxRounds - 2, 0) }).map(
+              (_, index) => (
+                <>
+                  {maxRounds !== 1 && (
+                    <Table.Tr key={100 * index - 1}>
+                      <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
+                        <Text size="sm">
+                          <b>Round {index + 1}</b>
+                        </Text>
+                      </Table.Th>
+                      <Table.Th visibleFrom="md" style={{ textAlign: 'center' }} rowSpan={5}>
+                        <Text size="sm">
+                          <b>Round {index + 1}</b>
+                        </Text>
+                      </Table.Th>
+                    </Table.Tr>
+                  )}
+                  {Array.from({ length: 4 }).map((_, index2) => (
+                    <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
+                      <Table.Td>
+                        <Skeleton h={8} mt={6}></Skeleton>
+                      </Table.Td>
+                      <Table.Td visibleFrom="md">
+                        <Text size="sm">VS</Text>
+                      </Table.Td>
+                      <Table.Td visibleFrom="md">
+                        <Skeleton h={8} mt={6}></Skeleton>
+                      </Table.Td>
+                      <Table.Td>
+                        <Skeleton h={8} mt={6}></Skeleton>
+                      </Table.Td>
+                      {expandable && (
+                        <Table.Td
                           visibleFrom="md"
-                          style={{ textAlign: 'center' }}
-                          rowSpan={4 / (index + 1) + 1}
-                        >
-                          <Text size="sm">
-                            <b>Round {index + 1}</b>
-                          </Text>
-                        </Table.Th>
-                      </Table.Tr>
-                    )}
-                    {Array.from({ length: 4 / (index + 1) }).map((_, index2) => (
-                      <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
-                        <Table.Td>
-                          <Skeleton h={8} mt={6}></Skeleton>
-                        </Table.Td>
-                        <Table.Td visibleFrom="md">
-                          <Text size="sm">VS</Text>
-                        </Table.Td>
-                        <Table.Td visibleFrom="md">
-                          <Skeleton h={8} mt={6}></Skeleton>
-                        </Table.Td>
-                        <Table.Td>
-                          <Skeleton h={8} mt={6}></Skeleton>
-                        </Table.Td>
-                        {expandable && (
-                          <Table.Td
-                            visibleFrom="md"
-                            style={{ maxWidth: '15px', width: '15px' }}
-                          ></Table.Td>
-                        )}
-                      </Table.Tr>
-                    ))}
-                  </>
-                );
-              })}
-            </>
+                          style={{ maxWidth: '15px', width: '15px' }}
+                        ></Table.Td>
+                      )}
+                    </Table.Tr>
+                  ))}
+                </>
+              )
+            )}
+
+            <Table.Tr>
+              <Table.Th colSpan={99999} style={{ textAlign: 'center' }}>
+                <Title>Finals</Title>
+              </Table.Th>
+            </Table.Tr>
+            {Array.from({ length: maxRounds < 0 ? 2 : Math.min(maxRounds, 2) }).map((_, index) => {
+              if (index > maxRounds && maxRounds > 0) return null;
+              return (
+                <>
+                  {maxRounds !== 1 && (
+                    <Table.Tr key={100 * index - 1}>
+                      <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
+                        <Text size="sm">
+                          <b>Round {index + 1}</b>
+                        </Text>
+                      </Table.Th>
+                      <Table.Th
+                        visibleFrom="md"
+                        style={{ textAlign: 'center' }}
+                        rowSpan={4 / (index + 1) + 1}
+                      >
+                        <Text size="sm">
+                          <b>Round {index + 1}</b>
+                        </Text>
+                      </Table.Th>
+                    </Table.Tr>
+                  )}
+                  {Array.from({ length: 4 / (index + 1) }).map((_, index2) => (
+                    <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
+                      <Table.Td>
+                        <Skeleton h={8} mt={6}></Skeleton>
+                      </Table.Td>
+                      <Table.Td visibleFrom="md">
+                        <Text size="sm">VS</Text>
+                      </Table.Td>
+                      <Table.Td visibleFrom="md">
+                        <Skeleton h={8} mt={6}></Skeleton>
+                      </Table.Td>
+                      <Table.Td>
+                        <Skeleton h={8} mt={6}></Skeleton>
+                      </Table.Td>
+                      {expandable && (
+                        <Table.Td
+                          visibleFrom="md"
+                          style={{ maxWidth: '15px', width: '15px' }}
+                        ></Table.Td>
+                      )}
+                    </Table.Tr>
+                  ))}
+                </>
+              );
+            })}
           </Table.Tbody>
         </Table>
       </div>

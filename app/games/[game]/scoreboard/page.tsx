@@ -1,11 +1,8 @@
 import React from 'react';
 import { GamePageArgs } from '@/app/types';
-import { Scoreboard } from '@/components/HandballComponenets/GamePageComponents/Scoreboard';
+import { TournamentScoreboard } from '@/components/HandballComponenets/GamePageComponents/TournamentScoreboard';
 
 export default async function GamesPage({ params }: GamePageArgs) {
   const { game } = await params;
-
-  return (
-      <Scoreboard gameID={+game}></Scoreboard>
-  );
+  return <TournamentScoreboard gameID={+game} />;
 }

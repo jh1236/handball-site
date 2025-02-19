@@ -16,6 +16,7 @@ import {
   Title,
 } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
+import { FakeCheckbox } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
 import { getNoteableGames } from '@/ServerActions/GameActions';
@@ -70,21 +71,13 @@ function gameToPaper(game: GameStructure) {
             </Text>
             <Text>
               <strong>Marked For Review: </strong>
-              {game.admin!.markedForReview ? (
-                <IconCheckbox size="1.25em"></IconCheckbox>
-              ) : (
-                <IconSquare size="1.25em"></IconSquare>
-              )}
+              <FakeCheckbox checked={game.admin?.markedForReview}> </FakeCheckbox>
             </Text>
             <HoverCard width={280} shadow="md" disabled={game.admin!.notes === null}>
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  {game.admin!.notes ? (
-                    <IconCheckbox size="1.25em"></IconCheckbox>
-                  ) : (
-                    <IconSquare size="1.25em"></IconSquare>
-                  )}
+                  <FakeCheckbox checked={game.admin?.notes}> </FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>{game.admin?.notes ?? <i>No Notes Left</i>}</HoverCard.Dropdown>
@@ -135,11 +128,7 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  {game.admin!.teamOneNotes ? (
-                    <IconCheckbox size="1.25em"></IconCheckbox>
-                  ) : (
-                    <IconSquare size="1.25em"></IconSquare>
-                  )}
+                  <FakeCheckbox checked={game.admin!.teamOneNotes}></FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -150,11 +139,7 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Protested: </strong>
-                  {game.admin!.teamOneProtest ? (
-                    <IconCheckbox size="1.25em"></IconCheckbox>
-                  ) : (
-                    <IconSquare size="1.25em"></IconSquare>
-                  )}
+                  <FakeCheckbox checked={game.admin!.teamOneProtest}></FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -167,7 +152,13 @@ function gameToPaper(game: GameStructure) {
               <HoverCard width={280} shadow="md">
                 <HoverCard.Target>
                   <Text>
-                    <Rating readOnly size="sm" w="auto" value={game.admin?.teamOneRating}></Rating>
+                    <Rating
+                      count={4}
+                      readOnly
+                      size="sm"
+                      w="auto"
+                      value={game.admin?.teamOneRating}
+                    ></Rating>
                   </Text>
                 </HoverCard.Target>
                 <HoverCard.Dropdown>
@@ -182,11 +173,7 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  {game.admin!.teamTwoNotes ? (
-                    <IconCheckbox size="1.25em"></IconCheckbox>
-                  ) : (
-                    <IconSquare size="1.25em"></IconSquare>
-                  )}
+                  <FakeCheckbox checked={game.admin!.teamTwoNotes}></FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -197,11 +184,7 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Protested: </strong>
-                  {game.admin!.teamTwoProtest ? (
-                    <IconCheckbox size="1.25em"></IconCheckbox>
-                  ) : (
-                    <IconSquare size="1.25em"></IconSquare>
-                  )}
+                  <FakeCheckbox checked={game.admin!.teamTwoProtest}></FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -214,7 +197,13 @@ function gameToPaper(game: GameStructure) {
               <HoverCard width={280} shadow="md">
                 <HoverCard.Target>
                   <Text>
-                    <Rating readOnly w="auto" size="sm" value={game.admin?.teamTwoRating}></Rating>
+                    <Rating
+                      count={4}
+                      readOnly
+                      w="auto"
+                      size="sm"
+                      value={game.admin?.teamTwoRating}
+                    ></Rating>
                   </Text>
                 </HoverCard.Target>
                 <HoverCard.Dropdown>
@@ -230,7 +219,12 @@ function gameToPaper(game: GameStructure) {
   );
 }
 
-export function Management({ tournament }: ManagementArgs) {
+export function Management({
+                             tournament;
+}:
+ManagementArgs;
+)
+{
   const [actionableGames, setActionableGames] = useState<GameStructure[]>([]);
   const [players, setPlayers] = useState<PersonStructure[] | null>(null);
   const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);

@@ -266,6 +266,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                           <Box display="flex">
                             <strong>Rating: </strong>{' '}
                             <Rating
+                              count={4}
                               w="auto"
                               size="sm"
                               value={findPlayer(game, player)?.rating}
