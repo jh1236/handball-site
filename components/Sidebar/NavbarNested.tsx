@@ -5,10 +5,12 @@ import Link from 'next/link';
 import {
   IconAddressBook,
   IconAdjustments,
+  IconBrandTeams,
   IconChartPie,
   IconFileAnalytics,
   IconGraph,
   IconHome,
+  IconLadder,
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
   IconLock,
@@ -16,7 +18,9 @@ import {
   IconNote,
   IconSun,
   IconUser,
+  IconUsersGroup,
 } from '@tabler/icons-react';
+import { GiWhistle } from 'react-icons/gi';
 import {
   Box,
   Group,
@@ -27,7 +31,11 @@ import {
   Title,
   useMantineColorScheme,
 } from '@mantine/core';
-import { isUmpireManager, SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import {
+  isOfficial,
+  isUmpireManager,
+  SERVER_ADDRESS,
+} from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
 import { getTournaments } from '@/ServerActions/TournamentActions';
@@ -36,7 +44,7 @@ import { TournamentStructure } from '@/ServerActions/types';
 function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament?: string) {
   const out: {
     label: string;
-    icon: React.ForwardRefExoticComponent<any>;
+    icon: React.ElementType;
     links?: { label: string; link: string }[];
     link?: string;
   }[] = [
@@ -64,28 +72,17 @@ function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament
     }
   }
   out.push(
-    {
-      label: 'Lifetime Statistics',
-      icon: IconGraph,
-      links: [
-        { label: 'Ladder', link: '/ladder' },
-        { label: 'Players', link: '/players' },
-        { label: 'Officials', link: '/officials' },
-        { label: 'Teams', link: '/teams' },
-      ],
-    },
-    { label: 'Create Game', icon: IconNote, link: '/games/create' },
+    { label: 'Lifetime Ladder', icon: IconLadder, link: '/ladder' },
+    { label: 'Lifetime Players', icon: IconUser, link: '/players' },
+    { label: 'Lifetime Officials', icon: GiWhistle, link: '/officials' },
+    { label: 'Lifetime Teams', icon: IconUsersGroup, link: '/teams' }
+  );
+  if (isOfficial()) {
+    out.push({ label: 'Create Game', icon: IconNote, link: '/games/create' });
+  }
+  out.push(
     { label: 'Documents', icon: IconFileAnalytics, link: '/documents' },
-    { label: 'Settings', icon: IconAdjustments },
-    {
-      label: 'Security',
-      icon: IconLock,
-      links: [
-        { label: 'Enable 2FA', link: '/' },
-        { label: 'Change password', link: '/' },
-        { label: 'Recovery codes', link: '/' },
-      ],
-    }
+    { label: 'Settings', icon: IconAdjustments, link: '/settings' }
   );
   return out;
 }

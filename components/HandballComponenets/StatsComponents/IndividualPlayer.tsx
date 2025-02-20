@@ -352,7 +352,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                             </Table.Th>
                             <Table.Td>
                               <Link href={`/games/${id}`} className="hideLink">
-                                <Rating readOnly value={rating}></Rating>
+                                <Rating readOnly value={rating} count={4}></Rating>
                               </Link>
                             </Table.Td>
                             <Table.Td>

@@ -2,7 +2,19 @@
 
 import React, { Fragment, useEffect } from 'react';
 import { IconClock2, IconTable } from '@tabler/icons-react';
-import { Card, Container, Grid, Image, NumberInput, Table, Tabs, Text, Title } from '@mantine/core';
+import {
+  Card,
+  Container,
+  Grid,
+  Group,
+  Image,
+  NumberInput,
+  Stack,
+  Table,
+  Tabs,
+  Text,
+  Title,
+} from '@mantine/core';
 import { getGames } from '@/ServerActions/GameActions';
 import { getOfficial } from '@/ServerActions/OfficialActions';
 import { GameStructure, OfficialStructure } from '@/ServerActions/types';
@@ -100,8 +112,20 @@ export default function IndividualOfficial({ tournament, official }: OfficialPro
                   className="hideLink"
                 >
                   <Card.Section>
-                    <Image src={game.teamOne.imageUrl} h={80} alt="logo for the other team" />
-                    <Image src={game.teamTwo.imageUrl} h={80} alt="logo for the other team" />
+                    <Image
+                      src={game.teamOne.imageUrl}
+                      h={160}
+                      w="50%"
+                      alt="logo for the other team"
+                      display="inline"
+                    />
+                    <Image
+                      src={game.teamTwo.imageUrl}
+                      h={160}
+                      w="50%"
+                      alt="logo for the other team"
+                      display="inline"
+                    />
                   </Card.Section>
 
                   <Text fw={500} size="lg" mt="md">
