@@ -23,7 +23,7 @@ function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
     <Container
       bg={team.teamColor ? team.teamColor : 'blue.7'}
       w="auto"
-      h={300}
+      h={350}
       p={20}
       m={10}
       bd="2 solid black"
@@ -35,6 +35,7 @@ function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
         fw={700}
         ta="center"
         c={team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black'}
+        lineClamp={2}
       >
         {team.name}
       </Text>
