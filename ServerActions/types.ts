@@ -25,7 +25,7 @@ export interface TeamStructure {
 export interface CardStructure {
   eventType: string;
   firstTeam: boolean;
-  player: PersonStructure;
+  player?: PersonStructure;
   details: number;
   notes: string;
 }
@@ -36,6 +36,7 @@ export interface PersonStructure {
   imageUrl: string;
   isAdmin?: boolean;
   team?: TeamStructure;
+  prevCards?: CardStructure[];
   gameDetails?: {
     [key: number]: { notes: string; cards: CardStructure[]; rating: number; game?: GameStructure };
   };
@@ -79,6 +80,7 @@ export interface PlayerGameStatsStructure extends PersonStructure {
   startSide: 'Left' | 'Right' | 'Substitute';
   sideOfCourt: 'Left' | 'Right' | 'Substitute';
   rating: number;
+  prevCards?: CardStructure[];
   stats: { [key: string]: any };
 
   [k: string]: any;
@@ -151,8 +153,6 @@ export interface GameStructure {
   players?: PlayerGameStatsStructure[];
   timeoutExpirationTime: number;
   changeCode: number;
-  cardsTeamOne?: CardStructure[];
-  cardsTeamTwo?: CardStructure[];
   admin?: {
     notes?: string;
     cards: CardStructure[];

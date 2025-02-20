@@ -292,7 +292,9 @@ export function card(
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const otherTeam = firstTeam ? game.teamTwo : game.teamOne;
   const player = leftPlayer ? team.left : team.right;
+  const outPlayer = player.get!;
   const otherPlayer = leftPlayer ? team.right : team.left;
+  const outOtherPlayer = otherPlayer.get!;
   const otherTeamWins = Math.max(11, team.score.get + 2);
   if (!player.get || !otherPlayer.get) {
     if (duration === -1) {
@@ -319,18 +321,18 @@ export function card(
       player.get.cardTimeRemaining += duration;
       player.get.cardTime = player.get.cardTimeRemaining;
       const stillCardedPlayer =
-        otherPlayer.get.cardTimeRemaining > player.get.cardTimeRemaining ? otherPlayer : player;
+        otherPlayer.get.cardTimeRemaining > player.get.cardTimeRemaining
+          ? outOtherPlayer
+          : outPlayer;
       const notCardedPlayer =
-        otherPlayer.get.cardTimeRemaining <= player.get.cardTimeRemaining ? otherPlayer : player;
-      let temp = stillCardedPlayer.get!;
+        otherPlayer.get.cardTimeRemaining <= player.get.cardTimeRemaining
+          ? outOtherPlayer
+          : outPlayer;
       otherTeam.score.set(
-        Math.min(otherTeamWins, otherTeam.score.get + notCardedPlayer.get!.cardTimeRemaining)
+        Math.min(otherTeamWins, otherTeam.score.get + notCardedPlayer.cardTimeRemaining)
       );
-      temp.cardTimeRemaining -= notCardedPlayer.get!.cardTimeRemaining;
-      stillCardedPlayer.set(temp);
-      temp = notCardedPlayer.get!;
-      temp.cardTimeRemaining = 0;
-      notCardedPlayer.set(temp);
+      stillCardedPlayer.cardTimeRemaining -= notCardedPlayer.cardTimeRemaining;
+      notCardedPlayer.cardTimeRemaining = 0;
     }
     if (game.firstTeamServes.get === firstTeam) {
       const temp = otherTeam.left?.get;
@@ -338,13 +340,19 @@ export function card(
       otherTeam.right?.set(temp);
       game.firstTeamServes.set(!firstTeam);
     }
-  } else {
-    const temp = player.get!;
-    if (temp.cardTimeRemaining !== -1) {
-      temp.cardTime += duration;
-      temp.cardTimeRemaining = temp.cardTime;
-    }
-    player.set(temp);
+  } else if (outPlayer.cardTimeRemaining !== -1) {
+    outPlayer.cardTime += duration;
+    outPlayer.cardTimeRemaining = outPlayer.cardTime;
+  }
+  outPlayer.prevCards?.push({
+    details: duration,
+    eventType: `${color}${color !== 'Warning' ? ' Card' : ''}`,
+    firstTeam,
+    notes: reason,
+  });
+  player.set(outPlayer);
+  if (outOtherPlayer !== otherPlayer.get!) {
+    otherPlayer.set(outOtherPlayer);
   }
   cardForGame(game.id, firstTeam, leftPlayer, color, duration, reason).catch(() => sync(game));
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { Ref, useEffect, useMemo, useRef } from 'react';
 import {
   IconAlertTriangle,
   IconArrowsUpDown,

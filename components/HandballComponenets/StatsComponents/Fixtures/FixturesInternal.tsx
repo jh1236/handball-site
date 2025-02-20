@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { Skeleton, Table, Text, Title } from '@mantine/core';
+import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
 import { getFixtures } from '@/ServerActions/GameActions';
 import { GameStructure, TournamentStructure } from '@/ServerActions/types';
 
@@ -246,6 +247,11 @@ export default function FixturesInternal({
                     <Text size="sm">Court</Text>
                   </Table.Th>
                 )}
+                {isUmpireManager() && (
+                  <Table.Th style={{ width: '20px', textAlign: 'center' }}>
+                    <Text size="sm">Status</Text>
+                  </Table.Th>
+                )}
                 {expandable && (
                   <Table.Th
                     style={{ maxWidth: '2px', width: '2px', textAlign: 'center' }}
@@ -322,10 +328,17 @@ export default function FixturesInternal({
                       )}
                       {(tournamentState?.twoCourts ?? false) && (
                         <Table.Td>
-                          <Link className="hideLink" href={game.isBye ? `/games/${game.id}` : '#'}>
+                          <Link className="hideLink" href={!game.isBye ? `/games/${game.id}` : '#'}>
                             <Text size="sm">{game.court + 1 > 0 ? game.court + 1 : '-'}</Text>
                           </Link>
                         </Table.Td>
+                      )}
+                      {isUmpireManager() && (
+                        <Table.Th style={{ width: '20px', textAlign: 'center' }}>
+                          <Link className="hideLink" href={!game.isBye ? `/games/${game.id}?tab=admin` : '#'}>
+                            <Text size="sm">{game.status}</Text>
+                          </Link>
+                        </Table.Th>
                       )}
                     </>
                   )}

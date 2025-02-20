@@ -43,7 +43,13 @@ import {
 } from '@mantine/core';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
-import { deleteGame, resolveGame } from '@/ServerActions/GameActions';
+import {
+  deleteGame,
+  endGame,
+  forfeitGame,
+  resolveGame,
+  startGame,
+} from '@/ServerActions/GameActions';
 import { CardStructure, GameEventStructure, GameStructure } from '@/ServerActions/types';
 
 interface AdminGamePanelProps {
@@ -72,8 +78,6 @@ const RESOLVED_STATUSES = [
 
 export const eventIcon = (e: CardStructure) => {
   switch (e.eventType) {
-    case 'Ace':
-      return <IconBallVolleyball />;
     case 'Timeout':
       return <IconStopwatch />;
     case 'Resolve':
@@ -90,6 +94,8 @@ export const eventIcon = (e: CardStructure) => {
       return <IconFlagCheck />;
     case 'Score':
       switch (e.notes) {
+        case 'Ace':
+          return <IconBallVolleyball />;
         case 'Double Bounce':
           return <IconBounceRightFilled />;
         case 'Straight':
@@ -161,6 +167,106 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
               >
                 Resolve
               </Button>
+              {!game.ended && (
+                <>
+                  <br />
+                  <br />
+                  <Popover width={200} position="top" withArrow shadow="md">
+                    <Popover.Target>
+                      <Button color="red">Forfeit</Button>
+                    </Popover.Target>
+                    <Popover.Dropdown w={350}>
+                      <Group justify="center">
+                        <Button
+                          onClick={() => {
+                            if (!game.started) {
+                              startGame(game.id, false, false)
+                                .then(() => forfeitGame(game.id, true))
+                                .then(() =>
+                                  endGame(
+                                    game.id,
+                                    game.teamTwo.captain.searchableName,
+                                    3,
+                                    3,
+                                    `Pregame Forfeit by ${game.teamOne.name}`
+                                  ).then(() => location.reload())
+                                );
+                            }
+                            if (!game.someoneHasWon) {
+                              forfeitGame(game.id, true)
+                                .then(() => location.reload())
+                                .then(() =>
+                                  endGame(
+                                    game.id,
+                                    game.teamTwo.captain.searchableName,
+                                    3,
+                                    3,
+                                    `Pregame Forfeit by ${game.teamOne.name}`
+                                  )
+                                )
+                                .then(() => location.reload());
+                            } else {
+                              endGame(
+                                game.id,
+                                game.teamTwo.captain.searchableName,
+                                3,
+                                3,
+                                `Pregame Forfeit by ${game.teamOne.name}`
+                              ).then(() => location.reload());
+                            }
+                          }}
+                          color="red"
+                        >
+                          Forfeit for {game.teamOne.name}
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            if (!game.started) {
+                              startGame(game.id, false, false)
+                                .then(() => forfeitGame(game.id, false))
+                                .then(() =>
+                                  endGame(
+                                    game.id,
+                                    game.teamOne.captain.searchableName,
+                                    3,
+                                    3,
+                                    `Pregame Forfeit by ${game.teamTwo.name}`
+                                  ).then(() => location.reload())
+                                );
+                            }
+                            if (!game.someoneHasWon) {
+                              forfeitGame(game.id, false)
+                                .then(() => location.reload())
+                                .then(() =>
+                                  endGame(
+                                    game.id,
+                                    game.teamOne.captain.searchableName,
+                                    3,
+                                    3,
+                                    `Pregame Forfeit by ${game.teamTwo.name}`
+                                  )
+                                )
+                                .then(() => location.reload());
+                            } else {
+                              endGame(
+                                game.id,
+                                game.teamTwo.captain.searchableName,
+                                3,
+                                3,
+                                `Pregame Forfeit by ${game.teamOne.name}`
+                              ).then(() => location.reload());
+                            }
+                          }}
+                          color="red"
+                        >
+                          Forfeit for {game.teamTwo.name}
+                        </Button>
+                      </Group>
+                    </Popover.Dropdown>
+                  </Popover>
+                </>
+              )}
+
               {game.tournament.editable && (
                 <>
                   <br />

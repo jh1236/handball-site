@@ -65,7 +65,10 @@ export function getGame({
     if (!response.ok) {
       return Promise.reject(response.text());
     }
-    return response.json().then((json: { game: GameStructure }) => json.game);
+    return response.json().then((json: { game: GameStructure }) => {
+      console.log(json.game);
+      return json.game;
+    });
   });
 }
 
@@ -157,7 +160,10 @@ export function getNoteableGames({
   includePlayerStats = false,
   returnTournament = false,
   limit = 20,
-}: GetNoteableGamesArgs): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
+}: GetNoteableGamesArgs): Promise<{
+  games: GameStructure[];
+  tournaments?: TournamentStructure;
+}> {
   const url = new URL('/games/noteable', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
@@ -267,8 +273,8 @@ export function startGame(
   gameId: number,
   swapService: boolean,
   teamOneIGA: boolean,
-  teamOne: SearchableName[],
-  teamTwo: SearchableName[],
+  teamOne?: SearchableName[],
+  teamTwo?: SearchableName[],
   official?: SearchableName,
   scorer?: SearchableName
 ): Promise<void> {
@@ -276,9 +282,13 @@ export function startGame(
     id: gameId,
     swapService,
     teamOneIGA,
-    teamOne,
-    teamTwo,
   };
+  if (teamOne) {
+    body.teamOne = teamOne;
+  }
+  if (teamTwo) {
+    body.teamTwo = teamTwo;
+  }
   if (official) {
     body.official = official;
   }

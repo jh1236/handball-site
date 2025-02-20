@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { IconCheckbox, IconSquare } from '@tabler/icons-react';
 import {
   Box,
   Divider,
@@ -219,12 +218,7 @@ function gameToPaper(game: GameStructure) {
   );
 }
 
-export function Management({
-                             tournament;
-}:
-ManagementArgs;
-)
-{
+export function Management({ tournament }: ManagementArgs) {
   const [actionableGames, setActionableGames] = useState<GameStructure[]>([]);
   const [players, setPlayers] = useState<PersonStructure[] | null>(null);
   const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);

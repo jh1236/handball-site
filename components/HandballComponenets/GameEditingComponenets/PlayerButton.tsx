@@ -34,6 +34,7 @@ import {
   warning,
   yellowCard,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface PlayerButtonProps {
   game: GameState;
@@ -84,6 +85,13 @@ const CARDS = {
   ],
 };
 
+function buttonEnabledFor(player: PlayerGameStatsStructure, reason: string, type: string): boolean {
+  if (!player) return true;
+  const cards = player.prevCards!;
+  const prevCard = cards.find((i) => i.eventType === type && i.notes === reason);
+  return prevCard === undefined;
+}
+
 function getActions(
   game: GameState,
   firstTeam: boolean,
@@ -114,26 +122,66 @@ function getActions(
     setOpenModal(undefined);
     setOtherReason('');
   };
+  if (!currentPlayer?.get) return [];
   const out = [
     {
       Icon: IconExclamationMark,
       value: 'Warning',
       color: 'grey',
-      content: CARDS.warning.map((reason) => (
+      content: (
         <>
+          {CARDS.warning.map((reason) => (
+            <>
+              <Button
+                style={{ margin: '3px' }}
+                size="sm"
+                disabled={!buttonEnabledFor(currentPlayer.get!, reason, 'Warning')}
+                onClick={() => {
+                  warning(game, firstTeam, leftSide, reason);
+                  close();
+                }}
+              >
+                {reason}
+              </Button>
+              <br />
+            </>
+          ))}
           <Button
+            onClick={() => setOpenModal('warning')}
             style={{ margin: '3px' }}
             size="sm"
-            onClick={() => {
-              warning(game, firstTeam, leftSide, reason);
-              close();
+            color="gray"
+          >
+            More
+          </Button>
+
+          <Modal
+            opened={openModal === 'warning'}
+            onClose={() => {
+              setOpenModal(undefined);
+              setOtherReason('');
             }}
           >
-            {reason}
-          </Button>
-          <br />
+            <TextInput
+              value={otherReason}
+              onChange={(event) => setOtherReason(event.currentTarget.value)}
+              label="Select Other Reason"
+            ></TextInput>
+            <Button
+              onClick={() => {
+                warning(game, firstTeam, leftSide, otherReason);
+                close();
+              }}
+              style={{ margin: '3px' }}
+              size="sm"
+              disabled={!otherReason}
+              color="blue"
+            >
+              Submit
+            </Button>
+          </Modal>
         </>
-      )),
+      ),
     },
     {
       Icon: IconTriangleInvertedFilled,
@@ -146,6 +194,7 @@ function getActions(
               <Button
                 style={{ margin: '3px' }}
                 size="sm"
+                disabled={!buttonEnabledFor(currentPlayer.get!, reason, 'Green Card')}
                 color="green"
                 onClick={() => {
                   greenCard(game, firstTeam, leftSide, reason);
@@ -176,8 +225,12 @@ function getActions(
             <Select
               label="Select Repeat Reason"
               allowDeselect={false}
-              defaultValue={'Other'}
-              data={CARDS.warning.concat('Other')}
+              defaultValue="Other"
+              data={CARDS.warning.concat('Other').map((a) => ({
+                value: a,
+                label: a,
+                disabled: !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Green Card'),
+              }))}
               onChange={(reason) =>
                 setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
               }
@@ -221,6 +274,7 @@ function getActions(
               <Button
                 style={{ margin: '3px' }}
                 size="sm"
+                disabled={!buttonEnabledFor(currentPlayer.get!, reason, 'Yellow Card')}
                 color="orange"
                 onClick={() => {
                   yellowCard(game, firstTeam, leftSide, reason, cardTime);
@@ -251,7 +305,11 @@ function getActions(
               label="Select Repeat Reason"
               allowDeselect={false}
               defaultValue="Other"
-              data={[...new Set(CARDS.warning.concat(CARDS.green))].concat('Other')}
+              data={[...new Set(CARDS.warning.concat(CARDS.green))].concat('Other').map((a) => ({
+                value: a,
+                label: a,
+                disabled: !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Yellow Card'),
+              }))}
               onChange={(reason) =>
                 setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
               }
@@ -641,6 +699,7 @@ export function PlayerButton({
         )}{' '}
         {(!team.left.get || !team.right.get) && (game.servedFromLeft ? ' (Left)' : ' (Right)')}
       </Button>
+      <br />
       {player?.cardTimeRemaining !== 0 && player && !game.ended.get && (
         <Progress
           radius={0}

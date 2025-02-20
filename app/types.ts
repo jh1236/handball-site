@@ -17,7 +17,7 @@ export interface PlayerPageArgs extends TournamentPageArgs {
 }
 
 export interface OfficialPageArgs extends TournamentPageArgs {
-  params: Promise<{ tournament?: string; player: string }>;
+  params: Promise<{ tournament?: string; official: string }>;
 }
 
 export interface GamePageArgs {
