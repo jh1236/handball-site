@@ -35,6 +35,7 @@ interface GameScoreArgs {
 const CAN_HAVE_ZAIAH_BOX = ['Zaiah Deards', 'Jared Healy'];
 
 export const ZAIAH_BOX_FUCKERY = true;
+export const QUICK_GAME_END = true;
 
 export function FakeCheckbox({ checked }: { checked: boolean }) {
   return checked ? (
@@ -170,20 +171,23 @@ function getActions(
             color="red"
             disabled={
               !bestPlayer ||
-              !(
-                game.teamOne.rating.get &&
-                (game.teamOne.rating.get !== 1 || game.teamOne.notes.get)
-              ) ||
-              !(
-                game.teamTwo.rating.get &&
-                (game.teamTwo.rating.get !== 1 || game.teamTwo.notes.get)
-              ) ||
-              (reviewReqd && !game.notes.get) ||
-              !game.teamOne.signed.get ||
-              !game.teamTwo.signed.get
+              (!QUICK_GAME_END &&
+                (!(
+                  game.teamOne.rating.get &&
+                  (game.teamOne.rating.get !== 1 || game.teamOne.notes.get)
+                ) ||
+                  !(
+                    game.teamTwo.rating.get &&
+                    (game.teamTwo.rating.get !== 1 || game.teamTwo.notes.get)
+                  ) ||
+                  (reviewReqd && !game.notes.get) ||
+                  !game.teamOne.signed.get ||
+                  !game.teamTwo.signed.get))
             }
             onClick={() => {
-              end(game, bestPlayer!.searchableName, reviewReqd).then(() => router.refresh());
+              end(game, bestPlayer!.searchableName, reviewReqd).then(() =>
+                router.push('/games/create')
+              );
               close();
             }}
           >

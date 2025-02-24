@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconRefresh } from '@tabler/icons-react';
-import { Box, Grid, Title } from '@mantine/core';
+import { Box, Container, Grid, Image, Title } from '@mantine/core';
 import { StatBubble } from '@/components/HandballComponenets/StatBubble';
 import Fixtures from '@/components/HandballComponenets/StatsComponents/Fixtures/Fixtures';
 import Ladder from '@/components/HandballComponenets/StatsComponents/Ladder';
@@ -101,7 +101,16 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
 
   return (
     <>
-      <Title order={1}>{tournamentObj?.name}</Title>
+      <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
+        <Image
+          src={tournamentObj?.imageUrl ?? 'https://api.squarers.club/image?name=SUSS'}
+          alt="The SUSS handball Logo"
+          h="100"
+          w="auto"
+          m="auto"
+        ></Image>
+        <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
+      </Container>
       <Grid w="98.5%">
         <Grid.Col span={{ base: 12, lg: 6 }}>
           <Box style={{ textAlign: 'center' }}>

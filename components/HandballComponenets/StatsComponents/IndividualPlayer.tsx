@@ -270,11 +270,11 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                               count={4}
                               w="auto"
                               size="sm"
-                              value={findPlayer(game, player)?.rating}
+                              value={playerObj?.gameDetails?.[game.id]?.rating ?? 3}
                               readOnly
                             />
                           </Box>
-                          {FEEDBACK_TEXTS[findPlayer(game, player)?.rating]}
+                          {FEEDBACK_TEXTS[playerObj?.gameDetails?.[game.id]?.rating ?? 3]}
                         </List.Item>
                         <List.Item>
                           <strong>Cards: </strong>
@@ -332,48 +332,52 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                 <Accordion.Control icon={<IconStarHalf />}>Notes & Ratings</Accordion.Control>
                 <Accordion.Panel>
                   <Table>
-                    <Table.Tr>
-                      <Table.Th>Opponent</Table.Th>
-                      <Table.Th>Rating</Table.Th>
-                      <Table.Th>Cards Received</Table.Th>
-                      <Table.Th>Notes</Table.Th>
-                    </Table.Tr>
-                    {playerObj &&
-                      Object.entries(playerObj.gameDetails ?? {}).map(
-                        ([id, { notes, game, cards, rating }], i) => (
-                          <Table.Tr key={i}>
-                            <Table.Th>
-                              <Link href={`/games/${id}`} className="hideLink">
-                                {game
-                                  ? !playersOf(game.teamOne).includes(player)
-                                    ? game?.teamOne.name
-                                    : game?.teamTwo.name
-                                  : `Game ${id}`}
-                              </Link>
-                            </Table.Th>
-                            <Table.Td>
-                              <Link href={`/games/${id}`} className="hideLink">
-                                <Rating readOnly value={rating} count={4}></Rating>
-                              </Link>
-                            </Table.Td>
-                            <Table.Td>
-                              <Link href={`/games/${id}`} className="hideLink">
-                                {cards.map((card, j) => (
-                                  <Text c="dimmed" size="sm" key={j}>
-                                    <strong>{card.eventType}:</strong>
-                                    <i>{card.notes}</i>
-                                  </Text>
-                                ))}
-                              </Link>
-                            </Table.Td>
-                            <Table.Td>
-                              <Link href={`/games/${id}`} className="hideLink">
-                                {notes}
-                              </Link>
-                            </Table.Td>
-                          </Table.Tr>
-                        )
-                      )}
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>Opponent</Table.Th>
+                        <Table.Th>Rating</Table.Th>
+                        <Table.Th>Cards Received</Table.Th>
+                        <Table.Th>Notes</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {playerObj &&
+                        Object.entries(playerObj.gameDetails ?? {}).map(
+                          ([id, { notes, game, cards, rating }], i) => (
+                            <Table.Tr key={i}>
+                              <Table.Th>
+                                <Link href={`/games/${id}`} className="hideLink">
+                                  {game
+                                    ? !playersOf(game.teamOne).includes(player)
+                                      ? game?.teamOne.name
+                                      : game?.teamTwo.name
+                                    : `Game ${id}`}
+                                </Link>
+                              </Table.Th>
+                              <Table.Td>
+                                <Link href={`/games/${id}`} className="hideLink">
+                                  <Rating readOnly value={rating} count={4}></Rating>
+                                </Link>
+                              </Table.Td>
+                              <Table.Td>
+                                <Link href={`/games/${id}`} className="hideLink">
+                                  {cards.map((card, j) => (
+                                    <Text c="dimmed" size="sm" key={j}>
+                                      <strong>{card.eventType}:</strong>
+                                      <i>{card.notes}</i>
+                                    </Text>
+                                  ))}
+                                </Link>
+                              </Table.Td>
+                              <Table.Td>
+                                <Link href={`/games/${id}`} className="hideLink">
+                                  {notes}
+                                </Link>
+                              </Table.Td>
+                            </Table.Tr>
+                          )
+                        )}
+                    </Table.Tbody>
                   </Table>
                 </Accordion.Panel>
               </Accordion.Item>

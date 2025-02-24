@@ -2,6 +2,7 @@ import {
   reloadGame,
   startLoading,
 } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
+import { QUICK_GAME_END } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import {
   aceForGame,
   cardForGame,
@@ -40,7 +41,7 @@ type Team = {
     get: number;
     set: (v: number) => void;
   };
-  servedFromLeft: {
+  servingFromLeft: {
     get: boolean;
     set: (v: boolean) => void;
   };
@@ -64,6 +65,7 @@ type Team = {
 };
 
 export interface GameState {
+  badminton: boolean;
   timeoutExpirationTime: {
     get: number;
     set: (v: number) => void;
@@ -95,7 +97,7 @@ export interface GameState {
     get: boolean;
     set: (v: boolean) => void;
   };
-  servedFromLeft: boolean;
+  servingFromLeft: boolean;
 }
 
 function nextPoint(game: GameState, swap?: boolean) {
@@ -114,7 +116,7 @@ function nextPoint(game: GameState, swap?: boolean) {
       i.set(temp);
     }
   }
-  if (swap !== undefined) {
+  if (swap !== undefined && game.badminton) {
     const team = swap ? game.teamOne : game.teamTwo;
     if (team.right.get && team.left.get) {
       const temp = team.left?.get;
@@ -148,8 +150,8 @@ export function end(game: GameState, bestPlayer: SearchableName, reviewRequired:
   return endGame(
     game.id,
     bestPlayer,
-    game.teamOne.rating.get,
-    game.teamTwo.rating.get,
+    game.teamOne.rating.get === 0 && QUICK_GAME_END ? 3 : game.teamOne.rating.get,
+    game.teamTwo.rating.get === 0 && QUICK_GAME_END ? 3 : game.teamTwo.rating.get,
     game.notes.get,
     game.teamOne.protest.get,
     game.teamTwo.protest.get,
@@ -172,8 +174,10 @@ export function score(
   leftPlayer: boolean,
   method?: string
 ): void {
-  const servingTeam = game.firstTeamServes.get ? game.teamOne : game.teamTwo;
-  servingTeam.servedFromLeft.set(!servingTeam.servedFromLeft.get);
+  const servingTeam = firstTeam ? game.teamOne : game.teamTwo;
+  if (game.badminton || game.firstTeamServes.get !== firstTeam) {
+    servingTeam.servingFromLeft.set(!servingTeam.servingFromLeft.get);
+  }
   const team = firstTeam ? game.teamOne : game.teamTwo;
   team.score.set(team.score.get + 1);
   const needsSwap = firstTeam === game.firstTeamServes.get;
@@ -186,7 +190,9 @@ export function ace(game: GameState): void {
   const team = game.firstTeamServes.get ? game.teamOne : game.teamTwo;
   team.score.set(team.score.get + 1);
   nextPoint(game, game.firstTeamServes.get);
-  team.servedFromLeft.set(!team.servedFromLeft.get);
+  if (game.badminton) {
+    team.servingFromLeft.set(!team.servingFromLeft.get);
+  }
   aceForGame(game.id).catch(() => sync(game));
 }
 
@@ -218,7 +224,7 @@ export function fault(game: GameState): void {
   const team = !game.firstTeamServes.get ? game.teamOne : game.teamTwo;
   if (game.faulted.get) {
     team.score.set(team.score.get + 1);
-    team.servedFromLeft.set(!team.servedFromLeft.get);
+    team.servingFromLeft.set(!team.servingFromLeft.get);
     game.firstTeamServes.set(!game.firstTeamServes.get);
     nextPoint(game); //faulted is unset here
   } else {
@@ -290,6 +296,7 @@ export function card(
   const outOtherPlayer = otherPlayer.get!;
   const otherTeamWins = Math.max(11, team.score.get + 2);
   if (!player.get || !otherPlayer.get) {
+    // Single Player Case
     if (duration === -1) {
       otherTeam.score.set(otherTeamWins);
     } else {
@@ -297,13 +304,18 @@ export function card(
     }
     game.firstTeamServes.set(!firstTeam);
   } else if (player.get && otherPlayer.get?.cardTimeRemaining) {
+    // both players are carded
     if (otherPlayer.get.cardTimeRemaining === -1) {
+      // team mate has a red card
       if (duration === -1) {
+        // both players are red carded; the game is over
         otherTeam.score.set(otherTeamWins);
       } else {
+        // instead of being sent off, the other team needs the score to be set
         otherTeam.score.set(Math.min(otherTeamWins, otherTeam.score.get + duration));
       }
     } else if (duration === -1) {
+      //only i have a red card
       otherTeam.score.set(
         Math.min(otherTeamWins, otherTeam.score.get + otherPlayer.get.cardTimeRemaining)
       );
@@ -311,6 +323,7 @@ export function card(
       temp.cardTimeRemaining = 0;
       otherPlayer.set(temp);
     } else {
+      // no one has a red card
       player.get.cardTimeRemaining += duration;
       player.get.cardTime = player.get.cardTimeRemaining;
       const stillCardedPlayer =
@@ -327,13 +340,15 @@ export function card(
       stillCardedPlayer.cardTimeRemaining -= notCardedPlayer.cardTimeRemaining;
       notCardedPlayer.cardTimeRemaining = 0;
     }
+    // set the other team to serve
+    game.firstTeamServes.set(!firstTeam);
     if (game.firstTeamServes.get === firstTeam) {
       const temp = otherTeam.left?.get;
       otherTeam.left?.set(otherTeam.right?.get);
       otherTeam.right?.set(temp);
-      game.firstTeamServes.set(!firstTeam);
     }
   } else if (outPlayer.cardTimeRemaining !== -1) {
+    //I dont already have a red card
     outPlayer.cardTime += duration;
     outPlayer.cardTimeRemaining = outPlayer.cardTime;
   }

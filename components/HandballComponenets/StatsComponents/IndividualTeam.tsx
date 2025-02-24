@@ -4,7 +4,14 @@
 He who is skilled in coding hides within the deepest recesses of the code. He who is skilled in gaming shoots forth from the heights of the game
  */
 import React, { Fragment, useEffect } from 'react';
-import { IconAlertTriangle, IconClock2, IconTable } from '@tabler/icons-react';
+import Link from 'next/link';
+import {
+  IconAlertTriangle,
+  IconClock2,
+  IconStarHalf,
+  IconTable,
+  IconTriangleInvertedFilled,
+} from '@tabler/icons-react';
 import {
   Accordion,
   Box,
@@ -15,10 +22,13 @@ import {
   List,
   NumberInput,
   Rating,
+  Table,
   Tabs,
   Text,
+  Timeline,
   Title,
 } from '@mantine/core';
+import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
@@ -170,20 +180,13 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                           <strong>Rating: </strong>{' '}
                           <Rating
                             w="auto"
+                            count={4}
                             size="sm"
-                            value={
-                              (team === game.teamOne.searchableName ? game.teamOne : game.teamTwo)
-                                .rating
-                            }
+                            value={teamObj?.gameDetails?.[game.id]?.rating ?? 3}
                             readOnly
                           />
                         </Box>
-                        {
-                          FEEDBACK_TEXTS[
-                            (team === game.teamOne.searchableName ? game.teamOne : game.teamTwo)
-                              .rating
-                          ]
-                        }
+                        {FEEDBACK_TEXTS[teamObj?.gameDetails?.[game.id]?.rating ?? 3]}
                       </List.Item>
                     </List>
                   )}
@@ -198,17 +201,87 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
         <Tabs.Panel value="mgmt">
           <Accordion>
             {isUmpireManager && (
-              <>
-                {teamObj &&
-                  Object.entries(teamObj.gameDetails ?? {})
-                    .map(([, i]) => i.cards)
-                    .flat().length === 0 && (
-                    <Text>
-                      <i>No Cards Recorded Yet</i>
-                    </Text>
-                  )}
-                <p>there was a timeline here</p>
-              </>
+              <Accordion>
+                <Accordion.Item value="cards">
+                  <Accordion.Control icon={<IconTriangleInvertedFilled />}>Cards</Accordion.Control>
+                  <Accordion.Panel>
+                    {teamObj &&
+                      Object.entries(teamObj.gameDetails ?? {})
+                        .map(([, i]) => i.cards)
+                        .flat().length === 0 && (
+                        <Text>
+                          <i>No Cards Recorded Yet</i>
+                        </Text>
+                      )}
+                    <Timeline bulletSize={24}>
+                      {teamObj &&
+                        Object.entries(teamObj.gameDetails ?? {})
+                          .map(([, i]) => i.cards)
+                          .flat()
+                          .map((card, i) => (
+                            <Timeline.Item
+                              key={i}
+                              title={`${card.eventType} for ${card.player?.name}`}
+                              bullet={eventIcon(card)}
+                            >
+                              <Text c="dimmed" size="sm">
+                                <strong>{card.notes}</strong>
+                              </Text>
+                            </Timeline.Item>
+                          ))}
+                    </Timeline>
+                  </Accordion.Panel>
+                </Accordion.Item>
+                <Accordion.Item value="notes">
+                  <Accordion.Control icon={<IconStarHalf />}>Notes & Ratings</Accordion.Control>
+                  <Accordion.Panel>
+                    <Table>
+                      <Table.Tr>
+                        <Table.Th>Opponent</Table.Th>
+                        <Table.Th>Rating</Table.Th>
+                        <Table.Th>Cards Received</Table.Th>
+                        <Table.Th>Notes</Table.Th>
+                      </Table.Tr>
+                      {teamObj &&
+                        Object.entries(teamObj.gameDetails ?? {}).map(
+                          ([id, { notes, game, cards, rating }], i) => (
+                            <Table.Tr key={i}>
+                              <Table.Th>
+                                <Link href={`/games/${id}`} className="hideLink">
+                                  {game
+                                    ? game.teamOne.searchableName !== team
+                                      ? game?.teamOne.name
+                                      : game?.teamTwo.name
+                                    : `Game ${id}`}
+                                </Link>
+                              </Table.Th>
+                              <Table.Td>
+                                <Link href={`/games/${id}`} className="hideLink">
+                                  <Rating readOnly value={rating} count={4}></Rating>
+                                </Link>
+                              </Table.Td>
+                              <Table.Td>
+                                <Link href={`/games/${id}`} className="hideLink">
+                                  {cards.map((card, j) => (
+                                    <Text c="dimmed" size="sm" key={j}>
+                                      <strong>{card.eventType}:</strong>
+                                      <i>{card.notes}</i>
+                                    </Text>
+                                  ))}
+                                </Link>
+                              </Table.Td>
+                              <Table.Td>
+                                <Link href={`/games/${id}`} className="hideLink">
+                                  {notes}
+                                </Link>
+                              </Table.Td>
+                            </Table.Tr>
+                          )
+                        )}
+                    </Table>
+                  </Accordion.Panel>
+                </Accordion.Item>
+              </Accordion>
             )}
           </Accordion>
         </Tabs.Panel>

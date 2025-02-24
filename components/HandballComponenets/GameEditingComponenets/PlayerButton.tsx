@@ -614,13 +614,13 @@ export function PlayerButton({
     () =>
       game.started.get &&
       !game.ended.get &&
-      (game.servedFromLeft !== trueLeftSide || !team.left.get || !team.right.get) &&
+      (game.servingFromLeft === trueLeftSide || !team.left.get || !team.right.get) &&
       game.firstTeamServes.get === firstTeam,
     [
       firstTeam,
       game.ended.get,
       game.firstTeamServes.get,
-      game.servedFromLeft,
+      game.servingFromLeft,
       game.started.get,
       team.left.get,
       team.right.get,
@@ -643,14 +643,21 @@ export function PlayerButton({
     const uncardedTeammates = [team.left.get, team.right.get].filter(
       (a) => a?.cardTimeRemaining === 0
     );
-    if (cardedTeammates.length) {
-      if (game.servedFromLeft === trueLeftSide) {
+    if (cardedTeammates.length !== 0) {
+      if (game.servingFromLeft === trueLeftSide) {
         return uncardedTeammates[0];
       }
       return cardedTeammates[0];
     }
     return trueLeftSide ? team.left.get : team.right.get;
-  }, [firstTeam, game.teamOne, game.teamTwo, game.ended.get, game.servedFromLeft, trueLeftSide]);
+  }, [
+    team.right.get,
+    team.left.get,
+    game.ended.get,
+    game.teamOne.servingFromLeft,
+    game.teamTwo.servingFromLeft,
+    trueLeftSide,
+  ]);
   const leftSide = useMemo(
     () => (game.ended.get ? trueLeftSide : player?.sideOfCourt === 'Left'),
     [game.ended.get, player?.sideOfCourt, trueLeftSide]
@@ -708,7 +715,7 @@ export function PlayerButton({
         ) : (
           name
         )}{' '}
-        {(!team.left.get || !team.right.get) && (game.servedFromLeft ? ' (Left)' : ' (Right)')}
+        {(!team.left.get || !team.right.get) && (game.servingFromLeft ? ' (Left)' : ' (Right)')}
       </Button>
       <br />
       {player?.cardTimeRemaining !== 0 && player && !game.ended.get && (

@@ -35,8 +35,8 @@ import {
   timeout,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { ZAIAH_BOX_FUCKERY } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
-import { PlayerGameStatsStructure } from '@/ServerActions/types';
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
+import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface TeamButtonProps {
   game: GameState;
@@ -61,11 +61,11 @@ function getActions(
   captchaPassed: boolean,
   setCaptchaPassed: (b: boolean) => void,
   colorScheme: string,
-  canvasRef: React.MutableRefObject<SignatureCanvas | undefined>,
+  canvasRef: React.MutableRefObject<SignatureCanvas | undefined>
 ): AccordionSettings[] {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const players = [team.left.get, team.right.get, team.sub.get].filter(
-    (a) => typeof a !== 'undefined',
+    (a) => typeof a !== 'undefined'
   );
   const captain = players.filter((a) => a?.isCaptain)[0];
 
@@ -78,29 +78,29 @@ function getActions(
 
   const out: AccordionSettings[] = captain
     ? [
-      {
-        Icon: IconUsersGroup,
-        color: undefined,
-        value: 'Team Lineup',
-        content: (
-          <>
-            <Text>The team line up is:</Text>
-            <List icon={<IconUser></IconUser>}>
-              <List.Item>
-                <strong>Captain: </strong> {captain?.name} <i>(Started {getSide(captain)})</i>
-              </List.Item>
-              {players
-                .filter((a) => !a.isCaptain)
-                .map((a, i) => (
-                  <List.Item key={i}>
-                    <strong>Team Mate: </strong> {a.name} <i>(Started {getSide(a)})</i>
-                  </List.Item>
-                ))}
-            </List>
-          </>
-        ),
-      },
-    ]
+        {
+          Icon: IconUsersGroup,
+          color: undefined,
+          value: 'Team Lineup',
+          content: (
+            <>
+              <Text>The team line up is:</Text>
+              <List icon={<IconUser></IconUser>}>
+                <List.Item>
+                  <strong>Captain: </strong> {captain?.name} <i>(Started {getSide(captain)})</i>
+                </List.Item>
+                {players
+                  .filter((a) => !a.isCaptain)
+                  .map((a, i) => (
+                    <List.Item key={i}>
+                      <strong>Team Mate: </strong> {a.name} <i>(Started {getSide(a)})</i>
+                    </List.Item>
+                  ))}
+              </List>
+            </>
+          ),
+        },
+      ]
     : [];
 
   if (!game.started.get) {
@@ -138,7 +138,7 @@ function getActions(
             Swap Service
           </Button>
         ),
-      },
+      }
     );
     return out;
   }
@@ -234,7 +234,7 @@ function getActions(
             </Button>
           </>
         ),
-      },
+      }
     );
     return out;
   }
@@ -312,7 +312,7 @@ function getActions(
           </Popover.Dropdown>
         </Popover>
       ),
-    },
+    }
   );
   return out;
 }
@@ -323,15 +323,15 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
   const canvas = useRef<SignatureCanvas | undefined>();
   const team = useMemo(
     () => (firstTeam ? game.teamOne : game.teamTwo),
-    [firstTeam, game.teamOne, game.teamTwo],
+    [firstTeam, game.teamOne, game.teamTwo]
   );
   const otherTeam = useMemo(
     () => (firstTeam ? game.teamTwo : game.teamOne),
-    [firstTeam, game.teamOne, game.teamTwo],
+    [firstTeam, game.teamOne, game.teamTwo]
   );
   const serving = useMemo(
     () => !game.ended.get && game.firstTeamServes.get === firstTeam,
-    [firstTeam, game.ended.get, game.firstTeamServes.get],
+    [firstTeam, game.ended.get, game.firstTeamServes.get]
   );
   const [opened, { open, close }] = useDisclosure(false);
   const { colorScheme } = useMantineColorScheme();
@@ -350,7 +350,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
         captchaPassed,
         setCaptchaPassed,
         colorScheme,
-        canvas,
+        canvas
       ).map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
           <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
@@ -359,7 +359,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
           <Accordion.Panel>{item.content}</Accordion.Panel>
         </Accordion.Item>
       )),
-    [game, firstTeam, serving, close],
+    [game, firstTeam, serving, close]
   );
   const name = team ? team.name : 'Loading...';
   return (

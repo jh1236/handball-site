@@ -52,7 +52,7 @@ export function EditGame({ game }: { game: number }) {
   const [teamOneNotes, setTeamOneNotes] = React.useState<string>('');
   const [teamOneProtest, setTeamOneProtest] = React.useState<string>('');
   const [teamOneSigned, setTeamOneSigned] = React.useState<string>('');
-  const [teamOneServedLeft, setTeamOneServedLeft] = React.useState<boolean>(true);
+  const [teamOneServingLeft, setTeamOneServingLeft] = React.useState<boolean>(true);
   const [teamOneName, setTeamOneName] = React.useState<string>('Loading...');
   const [teamOneScore, setTeamOneScore] = React.useState<number>(0);
   const [teamOneRating, setTeamOneRating] = React.useState<number>(0);
@@ -71,7 +71,7 @@ export function EditGame({ game }: { game: number }) {
   const [teamTwoProtest, setTeamTwoProtest] = React.useState<string>('');
 
   const [teamTwoSigned, setTeamTwoSigned] = React.useState<string>('');
-  const [teamTwoServedLeft, setTeamTwoServedLeft] = React.useState<boolean>(true);
+  const [teamTwoServingLeft, setTeamTwoServingLeft] = React.useState<boolean>(true);
   const [teamTwoName, setTeamTwoName] = React.useState<string>('Loading...');
   const [teamTwoScore, setTeamTwoScore] = React.useState<number>(0);
   const [teamTwoRating, setTeamTwoRating] = React.useState<number>(0);
@@ -84,9 +84,9 @@ export function EditGame({ game }: { game: number }) {
   const [teamTwoSub, setTeamTwoSub] = React.useState<PlayerGameStatsStructure | undefined>(
     undefined
   );
-  const servedFromLeft = useMemo(
-    () => (firstTeamServes ? teamOneServedLeft : teamTwoServedLeft),
-    [firstTeamServes, teamOneServedLeft, teamTwoServedLeft]
+  const servingFromLeft = useMemo(
+    () => (firstTeamServes ? teamOneServingLeft : teamTwoServingLeft),
+    [firstTeamServes, teamOneServingLeft, teamTwoServingLeft]
   );
   useEffect(() => {
     const interval = setInterval(() => {
@@ -120,8 +120,8 @@ export function EditGame({ game }: { game: number }) {
     //Team Specific
     setTeamOneTimeouts(gameObj.teamOneTimeouts);
     setTeamOneScore(gameObj.teamOneScore);
-    setTeamOneServedLeft(gameObj.teamOne.servedFromLeft!);
-    console.log(`${gameObj.teamOne.name} Left Serve is ${gameObj.teamOne.servedFromLeft}`);
+    setTeamOneServingLeft(gameObj.teamOne.servingFromLeft!);
+    console.log(`${gameObj.teamOne.name} Left Serve is ${gameObj.teamOne.servingFromLeft}`);
     const { teamOne, teamTwo } = gameObj;
     if (gameObj.started) {
       for (const i of [teamOne.captain, teamOne.nonCaptain, teamOne.substitute]) {
@@ -145,8 +145,8 @@ export function EditGame({ game }: { game: number }) {
     setTeamTwoName(gameObj.teamTwo.name);
     setTeamTwoTimeouts(gameObj.teamTwoTimeouts);
     setTeamTwoScore(gameObj.teamTwoScore);
-    setTeamTwoServedLeft(gameObj.teamTwo.servedFromLeft!);
-    console.log(`${gameObj.teamTwo.name} Left Serve is ${gameObj.teamTwo.servedFromLeft}`);
+    setTeamTwoServingLeft(gameObj.teamTwo.servingFromLeft!);
+    console.log(`${gameObj.teamTwo.name} Left Serve is ${gameObj.teamTwo.servingFromLeft}`);
     if (gameObj.started) {
       for (const i of [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute]) {
         if (i?.sideOfCourt === 'Left') {
@@ -177,6 +177,7 @@ export function EditGame({ game }: { game: number }) {
   }, [closeTimeout, openTimeout, timeoutExpirationTime]);
 
   const gameState: GameState = {
+    badminton: gameObj?.tournament.usingBadmintonServes ?? false,
     timeoutExpirationTime: {
       get: timeoutExpirationTime,
       set: setTimeoutExpirationTime,
@@ -202,7 +203,7 @@ export function EditGame({ game }: { game: number }) {
       set: setFaulted,
     },
     id: gameObj?.id ?? -1,
-    servedFromLeft,
+    servingFromLeft,
     notes: {
       get: notes,
       set: setNotes,
@@ -233,9 +234,9 @@ export function EditGame({ game }: { game: number }) {
         get: teamOneTimeouts,
         set: setTeamOneTimeouts,
       },
-      servedFromLeft: {
-        get: teamOneServedLeft,
-        set: setTeamOneServedLeft,
+      servingFromLeft: {
+        get: teamOneServingLeft,
+        set: setTeamOneServingLeft,
       },
       left: {
         get: teamOneLeft,
@@ -276,9 +277,9 @@ export function EditGame({ game }: { game: number }) {
         get: teamTwoTimeouts,
         set: setTeamTwoTimeouts,
       },
-      servedFromLeft: {
-        get: teamTwoServedLeft,
-        set: setTeamTwoServedLeft,
+      servingFromLeft: {
+        get: teamTwoServingLeft,
+        set: setTeamTwoServingLeft,
       },
       left: {
         get: teamTwoLeft,

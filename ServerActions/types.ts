@@ -112,7 +112,7 @@ export interface GameTeamStructure {
   substitute: PlayerGameStatsStructure | null;
   teamColor: string | null;
   teamColorAsRGBABecauseDigbyIsLazy: number[];
-  servedFromLeft?: boolean;
+  servingFromLeft?: boolean;
   stats?: { [key: string]: any };
 
   [k: string]: any;

@@ -74,7 +74,11 @@ export function CreateTeamButton({
         <Autocomplete
           label="Team Name"
           placeholder="New Team"
-          data={makeUnique(teams.map((a) => a.name))}
+          data={makeUnique(
+            teams
+              .toSorted((a, b) => a.searchableName.localeCompare(b.searchableName))
+              .map((a) => a.name)
+          )}
           value={teamName}
           onChange={setTeamName}
         />

@@ -36,6 +36,7 @@ import {
   Group,
   Popover,
   Rating,
+  Table,
   Text,
   Timeline,
   Title,

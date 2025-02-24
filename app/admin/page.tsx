@@ -7,13 +7,13 @@ import { tokenFetch, useUserData } from '@/components/HandballComponenets/Server
 
 export default function FuckedUpEvilPage() {
   const router = useRouter();
-  const { isAdmin } = useUserData();
+  const { isAdmin, loading } = useUserData();
   useEffect(() => {
     if (!isAdmin) {
       router.push('/login');
     }
   }, [isAdmin, router]);
-  if (!isAdmin) return 'Loading...';
+  if (loading) return 'Loading...';
   return (
     <Stack style={{ textAlign: 'center' }}>
       <Button size="xl" onClick={() => tokenFetch('https://api.squarers.club/stop?exit_code=2')}>

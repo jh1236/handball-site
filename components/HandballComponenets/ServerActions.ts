@@ -11,24 +11,21 @@ export async function tokenFetcher(url: string, args: any = {}) {
   return res.json();
 }
 
-export function getUsername(): string | null {
-  return loggedIn() ? localStorage.getItem('username') : null;
-}
-
 export function useUserData() {
-  const [permissionLevel, setPermissionLevel] = React.useState<number>(0);
+  const [permissionLevel, setPermissionLevel] = React.useState<number | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
   useEffect(() => {
+    setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
     if (loggedIn()) {
       setUsername(localStorage.getItem('username'));
-      setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
     }
   }, []);
   return {
-    isAdmin: permissionLevel === 5,
-    isOfficial: permissionLevel >= 2,
-    isUmpireManager: permissionLevel >= 4,
-    isLoggedIn: permissionLevel !== 0,
+    loading: permissionLevel === null,
+    isAdmin: (permissionLevel ?? 5) === 5,
+    isOfficial: (permissionLevel ?? 5) >= 2,
+    isUmpireManager: (permissionLevel ?? 5) >= 4,
+    isLoggedIn: (permissionLevel ?? 5) !== 0,
     permissionLevel,
     username,
   };
