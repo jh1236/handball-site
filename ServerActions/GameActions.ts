@@ -314,14 +314,7 @@ export function scoreForGame(
   gameId: number,
   firstTeam: boolean,
   leftPlayer: boolean,
-  method?:
-    | 'Double Bounce'
-    | 'Straight'
-    | 'Out of Court'
-    | 'Double Touch'
-    | 'Grabs'
-    | 'Illegal Body Part'
-    | 'Obstruction'
+  method?: string
 ): Promise<void> {
   const body: any = {
     id: gameId,
@@ -727,18 +720,20 @@ export function createGameWithPlayers(
   tournament: SearchableName,
   playersOne: RealName[],
   playersTwo: RealName[],
-  official: SearchableName,
+  official?: SearchableName,
   scorer?: SearchableName,
   teamOneName?: string,
   teamTwoName?: string
 ): Promise<{ id: number }> {
   const body: any = {
     tournament,
-    official,
     playersOne,
     playersTwo,
   };
 
+  if (official) {
+    body.official = official;
+  }
   if (scorer) {
     body.scorer = scorer;
   }

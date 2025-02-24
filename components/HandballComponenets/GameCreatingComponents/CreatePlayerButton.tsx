@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Autocomplete, Button, Modal, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { PersonStructure } from '@/ServerActions/types';
@@ -6,7 +6,7 @@ import { PersonStructure } from '@/ServerActions/types';
 interface CreatePlayerButtonProps {
   players: PersonStructure[];
   player?: string;
-  setPlayer: (v: string) => void;
+  setPlayer: (v: string | undefined) => void;
   leftSide: boolean;
 }
 

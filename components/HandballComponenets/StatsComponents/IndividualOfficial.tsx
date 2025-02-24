@@ -2,19 +2,7 @@
 
 import React, { Fragment, useEffect } from 'react';
 import { IconClock2, IconTable } from '@tabler/icons-react';
-import {
-  Card,
-  Container,
-  Grid,
-  Group,
-  Image,
-  NumberInput,
-  Stack,
-  Table,
-  Tabs,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Card, Container, Grid, Image, NumberInput, Table, Tabs, Text, Title } from '@mantine/core';
 import { getGames } from '@/ServerActions/GameActions';
 import { getOfficial } from '@/ServerActions/OfficialActions';
 import { GameStructure, OfficialStructure } from '@/ServerActions/types';

@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconRefresh } from '@tabler/icons-react';
-import { Box, Container, Grid, Image, Text, Title } from '@mantine/core';
+import { Box, Grid, Title } from '@mantine/core';
 import { StatBubble } from '@/components/HandballComponenets/StatBubble';
 import Fixtures from '@/components/HandballComponenets/StatsComponents/Fixtures/Fixtures';
 import Ladder from '@/components/HandballComponenets/StatsComponents/Ladder';

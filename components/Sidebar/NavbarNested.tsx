@@ -2,18 +2,16 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   IconAddressBook,
   IconAdjustments,
-  IconBrandTeams,
   IconChartPie,
   IconFileAnalytics,
-  IconGraph,
   IconHome,
   IconLadder,
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
-  IconLock,
   IconMoon,
   IconNote,
   IconSun,
@@ -23,69 +21,24 @@ import {
 import { GiWhistle } from 'react-icons/gi';
 import {
   Box,
+  Button,
   Group,
   Image,
+  Popover,
   rem,
   ScrollArea,
   ThemeIcon,
   Title,
+  UnstyledButton,
   useMantineColorScheme,
 } from '@mantine/core';
-import {
-  isOfficial,
-  isUmpireManager,
-  SERVER_ADDRESS,
-} from '@/components/HandballComponenets/ServerActions';
+import { SERVER_ADDRESS, useUserData } from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
+import buttonClasses from '@/components/Sidebar/NavbarLinksGroup.module.css';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
+import { logoutAction } from '@/ServerActions/LoginActions';
 import { getTournaments } from '@/ServerActions/TournamentActions';
 import { TournamentStructure } from '@/ServerActions/types';
-
-function makeSidebarLayout(tournaments: TournamentStructure[], currentTournament?: string) {
-  const out: {
-    label: string;
-    icon: React.ElementType;
-    links?: { label: string; link: string }[];
-    link?: string;
-  }[] = [
-    { label: 'Home', icon: IconHome, link: '/' },
-    {
-      label: 'Tournaments',
-      icon: IconAddressBook,
-      links: tournaments.map((t) => ({ link: `/${t.searchableName}`, label: t.name })),
-    },
-  ];
-  if (currentTournament) {
-    out.push({
-      label: 'Current Tournament',
-      icon: IconChartPie,
-      links: [
-        { label: 'Fixtures', link: `/${currentTournament}/fixtures` },
-        { label: 'Ladder', link: `/${currentTournament}/ladder` },
-        { label: 'Players', link: `/${currentTournament}/players` },
-        { label: 'Officials', link: `/${currentTournament}/officials` },
-        { label: 'Teams', link: `/${currentTournament}/teams` },
-      ],
-    });
-    if (isUmpireManager()) {
-      out[out.length - 1].links.push({ label: 'Manage', link: `/${currentTournament}/manage` });
-    }
-  }
-  out.push(
-    { label: 'Lifetime Ladder', icon: IconLadder, link: '/ladder' },
-    { label: 'Lifetime Players', icon: IconUser, link: '/players' },
-    { label: 'Lifetime Officials', icon: GiWhistle, link: '/officials' },
-    { label: 'Lifetime Teams', icon: IconUsersGroup, link: '/teams' }
-  );
-  if (isOfficial()) {
-    out.push({ label: 'Create Game', icon: IconNote, link: '/games/create' });
-  }
-  out.push(
-    { label: 'Documents', icon: IconFileAnalytics, link: '/documents' },
-    { label: 'Settings', icon: IconAdjustments, link: '/settings' }
-  );
-  return out;
-}
 
 interface NavbarNestedProps {
   sidebarVisible?: boolean;
@@ -100,13 +53,60 @@ export function NavbarNested({
   setSidebarVisible,
   mobile = false,
 }: NavbarNestedProps) {
+  const [openUserActions, setOpenUserActions] = React.useState<boolean>(false);
   const [myTournament, setMyTournament] = React.useState<TournamentStructure | undefined>(
     undefined
   );
+  const { isOfficial, isAdmin, username, isUmpireManager } = useUserData();
   const [tournaments, setTournaments] = React.useState<TournamentStructure[]>([]);
-  const links = makeSidebarLayout(tournaments, tournamentName).map((item) => (
-    <LinksGroup {...item} key={item.label} />
-  ));
+
+  function makeSidebarLayout() {
+    const out: {
+      label: string;
+      icon: React.ElementType;
+      links?: { label: string; link: string }[];
+      link?: string;
+    }[] = [
+      { label: 'Home', icon: IconHome, link: '/' },
+      {
+        label: 'Tournaments',
+        icon: IconAddressBook,
+        links: tournaments.map((t) => ({ link: `/${t.searchableName}`, label: t.name })),
+      },
+    ];
+    if (tournamentName) {
+      out.push({
+        label: 'Current Tournament',
+        icon: IconChartPie,
+        links: [
+          { label: 'Fixtures', link: `/${tournamentName}/fixtures` },
+          { label: 'Ladder', link: `/${tournamentName}/ladder` },
+          { label: 'Players', link: `/${tournamentName}/players` },
+          { label: 'Officials', link: `/${tournamentName}/officials` },
+          { label: 'Teams', link: `/${tournamentName}/teams` },
+        ],
+      });
+      if (isUmpireManager) {
+        out[out.length - 1].links!.push({ label: 'Manage', link: `/${tournamentName}/manage` });
+      }
+    }
+    out.push(
+      { label: 'Lifetime Ladder', icon: IconLadder, link: '/ladder' },
+      { label: 'Lifetime Players', icon: IconUser, link: '/players' },
+      { label: 'Lifetime Officials', icon: GiWhistle, link: '/officials' },
+      { label: 'Lifetime Teams', icon: IconUsersGroup, link: '/teams' }
+    );
+    if (isOfficial) {
+      out.push({ label: 'Create Game', icon: IconNote, link: '/games/create' });
+    }
+    out.push(
+      { label: 'Documents', icon: IconFileAnalytics, link: '/documents' },
+      { label: 'Settings', icon: IconAdjustments, link: '/settings' }
+    );
+    return out;
+  }
+
+  const links = makeSidebarLayout().map((item) => <LinksGroup {...item} key={item.label} />);
   useEffect(() => {
     getTournaments().then(setTournaments);
   }, []);
@@ -135,7 +135,7 @@ export function NavbarNested({
     IconColorScheme = colorScheme === 'light' ? IconMoon : IconSun;
   }, [colorScheme]);
 
-  const userName = localStorage.getItem('username') ?? 'Login';
+  const router = useRouter();
 
   const w = mobile ? '100vw' : '300px';
 
@@ -201,7 +201,60 @@ export function NavbarNested({
 
         <div className={classes.footer}>
           <div style={{ width: '60%', float: 'left' }}>
-            <LinksGroup label={userName} icon={IconUser} key="User" link="/login" />
+            <Popover opened={openUserActions} onClose={() => setOpenUserActions(false)}>
+              <Popover.Target>
+                <UnstyledButton
+                  className={buttonClasses.control}
+                  onClick={
+                    username === null
+                      ? () => {
+                          router.push('/login');
+                        }
+                      : () => setOpenUserActions(true)
+                  }
+                >
+                  <Group justify="space-between" gap={0}>
+                    <Box
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <ThemeIcon
+                        color="green"
+                        variant={colorScheme ? 'light' : undefined}
+                        size={30}
+                      >
+                        <IconUser
+                          style={{
+                            width: rem(18),
+                            height: rem(18),
+                          }}
+                        />
+                      </ThemeIcon>
+                      <Box ml="md">{username ?? 'Login'}</Box>
+                    </Box>
+                  </Group>
+                </UnstyledButton>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Button onClick={() => logoutAction().then(() => router.refresh())}>Logout</Button>
+                {isAdmin && (
+                  <>
+                    <br />
+                    <br />
+                    <Button onClick={() => localStorage.setItem('permissionLevel', '4')}>
+                      Set Umpire Manager
+                    </Button>
+                    <br />
+                    <br />
+                    <Button onClick={() => localStorage.setItem('permissionLevel', '2')}>
+                      Set Official
+                    </Button>
+                  </>
+                )}
+              </Popover.Dropdown>
+            </Popover>
           </div>
           <div style={{ width: '40%', float: 'right' }}>
             <LinksGroup label="Theme" icon={IconColorScheme} key="Theme" action={flipColorScheme} />

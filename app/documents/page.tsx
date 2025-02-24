@@ -23,7 +23,7 @@ function GenerateDocumentBubble(document: documentInfo) {
       target={document.link !== '#' ? '_blank' : undefined}
     >
       <Card.Section>
-        <Image src={document.imageUrl} height={160} alt="Norway" />
+        <Image src={document.imageUrl} height="100%" alt={document.title} />
       </Card.Section>
 
       <Group justify="space-between" mt="md" mb="xs">
@@ -59,7 +59,7 @@ const currentDocuments: documentInfo[] = [
   {
     title: 'Tournament Regulations',
     description: 'The Code of Conduct that binds all S.U.S.S. players, officials and spectators',
-    link: '#', //https://api.squarers.club/documents/regulations
+    link: 'https://api.squarers.club/documents/tournament_regulations',
     imageUrl: 'https://api.squarers.club/image?name=SUSS_dark',
   },
   {
@@ -125,8 +125,9 @@ export default function DocumentPage() {
           <Grid.Col
             span={{
               base: 6,
-              md: 4,
-              lg: 3,
+              sm: 4,
+              md: 3,
+              lg: 2,
             }}
           >
             {GenerateDocumentBubble(t)}
@@ -139,8 +140,9 @@ export default function DocumentPage() {
           <Grid.Col
             span={{
               base: 6,
-              md: 4,
-              lg: 3,
+              sm: 4,
+              md: 3,
+              lg: 2,
             }}
           >
             {GenerateDocumentBubble(t)}

@@ -1,13 +1,19 @@
 'use client';
 
-import { Button, Center, Stack } from '@mantine/core';
-import { isAdmin, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button, Stack } from '@mantine/core';
+import { tokenFetch, useUserData } from '@/components/HandballComponenets/ServerActions';
 
 export default function FuckedUpEvilPage() {
-  if (!isAdmin()) {
-    location.href = '/login';
-    return 'bai';
-  }
+  const router = useRouter();
+  const { isAdmin } = useUserData();
+  useEffect(() => {
+    if (!isAdmin) {
+      router.push('/login');
+    }
+  }, [isAdmin, router]);
+  if (!isAdmin) return 'Loading...';
   return (
     <Stack style={{ textAlign: 'center' }}>
       <Button size="xl" onClick={() => tokenFetch('https://api.squarers.club/stop?exit_code=2')}>

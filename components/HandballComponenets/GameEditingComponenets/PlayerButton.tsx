@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { ForwardRefExoticComponent, useMemo, useState } from 'react';
 import {
   IconArrowsLeftRight,
   IconArrowsUpDown,
@@ -23,6 +23,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { makeUnique } from '@/components/HandballComponenets/GameCreatingComponents/CreateTeamButton';
 import {
   ace,
   fault,
@@ -92,6 +93,14 @@ function buttonEnabledFor(player: PlayerGameStatsStructure, reason: string, type
   return prevCard === undefined;
 }
 
+export type AccordionSettings = {
+  Icon: ForwardRefExoticComponent<any>;
+  value: string;
+  title?: string | React.JSX.Element;
+  color: string | undefined;
+  content: React.JSX.Element;
+};
+
 function getActions(
   game: GameState,
   firstTeam: boolean,
@@ -100,11 +109,11 @@ function getActions(
   closeIn: () => void,
   cardTime: number,
   setCardTime: (v: number) => void,
-  openModal: string,
-  setOpenModal: (string) => void,
+  openModal: string | undefined,
+  setOpenModal: (v: undefined | 'green' | 'yellow' | 'red' | 'score' | 'warning') => void,
   otherReason: string,
-  setOtherReason: (string) => void
-) {
+  setOtherReason: (v: string) => void
+): AccordionSettings[] {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const allPlayers = [
     game.teamOne.left,
@@ -123,7 +132,7 @@ function getActions(
     setOtherReason('');
   };
   if (!currentPlayer?.get) return [];
-  const out = [
+  const out: AccordionSettings[] = [
     {
       Icon: IconExclamationMark,
       value: 'Warning',
@@ -305,11 +314,13 @@ function getActions(
               label="Select Repeat Reason"
               allowDeselect={false}
               defaultValue="Other"
-              data={[...new Set(CARDS.warning.concat(CARDS.green))].concat('Other').map((a) => ({
-                value: a,
-                label: a,
-                disabled: !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Yellow Card'),
-              }))}
+              data={makeUnique(CARDS.warning.concat(CARDS.green))
+                .concat('Other')
+                .map((a) => ({
+                  value: a,
+                  label: a,
+                  disabled: !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Yellow Card'),
+                }))}
               onChange={(reason) =>
                 setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
               }
@@ -392,7 +403,7 @@ function getActions(
               label="Select Repeat Reason"
               allowDeselect={false}
               defaultValue="Other"
-              data={[...new Set(CARDS.warning.concat(CARDS.green).concat(CARDS.yellow))].concat(
+              data={makeUnique(CARDS.warning.concat(CARDS.green).concat(CARDS.yellow)).concat(
                 'Other'
               )}
               onChange={(reason) =>
@@ -596,9 +607,9 @@ export function PlayerButton({
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
   );
-  const [openModal, setOpenModal] = useState<undefined | 'green' | 'yellow' | 'red' | 'score'>(
-    undefined
-  );
+  const [openModal, setOpenModal] = useState<
+    undefined | 'green' | 'yellow' | 'red' | 'score' | 'warning'
+  >(undefined);
   const serving = useMemo(
     () =>
       game.started.get &&

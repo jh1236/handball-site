@@ -70,13 +70,13 @@ function gameToPaper(game: GameStructure) {
             </Text>
             <Text>
               <strong>Marked For Review: </strong>
-              <FakeCheckbox checked={game.admin?.markedForReview}> </FakeCheckbox>
+              <FakeCheckbox checked={Boolean(game.admin?.markedForReview)}></FakeCheckbox>
             </Text>
             <HoverCard width={280} shadow="md" disabled={game.admin!.notes === null}>
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  <FakeCheckbox checked={game.admin?.notes}> </FakeCheckbox>
+                  <FakeCheckbox checked={Boolean(game.admin?.notes)}></FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>{game.admin?.notes ?? <i>No Notes Left</i>}</HoverCard.Dropdown>
@@ -99,7 +99,7 @@ function gameToPaper(game: GameStructure) {
                   <HoverCard.Target>{eventIcon(card)}</HoverCard.Target>
                   <HoverCard.Dropdown>
                     <Text>
-                      <strong>{card.player.name}</strong> received a{' '}
+                      <strong>{card.player?.name}</strong> received a{' '}
                       <strong>{card.eventType}</strong> for <i>{card.notes}</i>
                     </Text>
                   </HoverCard.Dropdown>
@@ -115,7 +115,7 @@ function gameToPaper(game: GameStructure) {
                   <HoverCard.Target>{eventIcon(card)}</HoverCard.Target>
                   <HoverCard.Dropdown>
                     <Text>
-                      <strong>{card.player.name}</strong> received a{' '}
+                      <strong>{card.player?.name}</strong> received a{' '}
                       <strong>{card.eventType}</strong> for <i>{card.notes}</i>
                     </Text>
                   </HoverCard.Dropdown>
@@ -127,7 +127,7 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  <FakeCheckbox checked={game.admin!.teamOneNotes}></FakeCheckbox>
+                  <FakeCheckbox checked={Boolean(game.admin!.teamOneNotes)}></FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -138,7 +138,7 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Protested: </strong>
-                  <FakeCheckbox checked={game.admin!.teamOneProtest}></FakeCheckbox>
+                  <FakeCheckbox checked={Boolean(game.admin!.teamOneProtest)}></FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -172,7 +172,7 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  <FakeCheckbox checked={game.admin!.teamTwoNotes}></FakeCheckbox>
+                  <FakeCheckbox checked={Boolean(game.admin!.teamTwoNotes)}></FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -183,7 +183,7 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Protested: </strong>
-                  <FakeCheckbox checked={game.admin!.teamTwoProtest}></FakeCheckbox>
+                  <FakeCheckbox checked={Boolean(game.admin!.teamTwoProtest)}></FakeCheckbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>

@@ -145,7 +145,7 @@ export function begin(game: GameState) {
 }
 
 export function end(game: GameState, bestPlayer: SearchableName, reviewRequired: boolean) {
-  endGame(
+  return endGame(
     game.id,
     bestPlayer,
     game.teamOne.rating.get,
@@ -156,7 +156,7 @@ export function end(game: GameState, bestPlayer: SearchableName, reviewRequired:
     game.teamOne.notes.get,
     game.teamTwo.notes.get,
     reviewRequired
-  ).then(() => (location.href = `/games/${game.id}`));
+  );
 }
 
 export function del(game: GameState) {
@@ -170,14 +170,7 @@ export function score(
   game: GameState,
   firstTeam: boolean,
   leftPlayer: boolean,
-  method?:
-    | 'Double Bounce'
-    | 'Straight'
-    | 'Out of Court'
-    | 'Double Touch'
-    | 'Grabs'
-    | 'Illegal Body Part'
-    | 'Obstruction'
+  method?: string
 ): void {
   const servingTeam = game.firstTeamServes.get ? game.teamOne : game.teamTwo;
   servingTeam.servedFromLeft.set(!servingTeam.servedFromLeft.get);

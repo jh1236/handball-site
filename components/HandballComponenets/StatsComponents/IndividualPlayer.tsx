@@ -27,7 +27,7 @@ import {
 } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
-import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
 import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
 import {
@@ -112,7 +112,7 @@ export function findPlayer(game: GameStructure, playerName: string): PlayerGameS
     game.teamTwo.captain,
     game.teamTwo.nonCaptain,
     game.teamTwo.substitute,
-  ].find((a) => a && a.searchableName === playerName);
+  ].find((a) => a && a.searchableName === playerName)!;
 }
 
 export default function IndividualPlayer({ tournament, player }: PlayersProps) {
@@ -121,6 +121,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   const [gamesCount, setGamesCount] = React.useState<number>(20);
   const [games, setGames] = React.useState<GameStructure[]>([]);
   const [playerObj, setPlayerObj] = React.useState<PersonStructure | undefined>(undefined);
+  const { isUmpireManager } = useUserData();
   const [averageStats, setAverageStats] = React.useState<
     { stats: { [p: string]: any } } | undefined
   >(undefined);
@@ -164,7 +165,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
           {/*<Tabs.Tab value="graphs" leftSection={<IconChartScatter size={12} />}>*/}
           {/*  Graphs*/}
           {/*</Tabs.Tab>*/}
-          {isUmpireManager() && (
+          {isUmpireManager && (
             <Tabs.Tab value="mgmt" leftSection={<IconAlertTriangle size={12} />}>
               Cards
             </Tabs.Tab>
@@ -195,7 +196,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                     .map((stat, key) => (
                       <Table.Tr key={key}>
                         <Table.Th ta="center">{stat}</Table.Th>
-                        <Table.Td ta="center">{playerObj?.stats[stat] ?? '-'}</Table.Td>
+                        <Table.Td ta="center">{playerObj?.stats?.[stat] ?? '-'}</Table.Td>
                         <Table.Td ta="center">{averageStats?.stats[stat] ?? '-'}</Table.Td>
                       </Table.Tr>
                     ))}
@@ -260,7 +261,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                         {findPlayer(game, player)?.stats?.['Elo Delta']}
                       </strong>
                     </List.Item>
-                    {isUmpireManager() && (
+                    {isUmpireManager && (
                       <>
                         <List.Item>
                           <Box display="flex">
@@ -279,7 +280,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                           <strong>Cards: </strong>
                           {
                             (game?.admin?.cards ?? []).filter(
-                              (c) => c.player.searchableName === player
+                              (c) => c.player?.searchableName === player
                             ).length
                           }
                         </List.Item>
@@ -295,14 +296,14 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
         <Tabs.Panel value="charts">How did you even get here?</Tabs.Panel>
 
         <Tabs.Panel value="mgmt">
-          {isUmpireManager() && (
+          {isUmpireManager && (
             <Accordion>
               <Accordion.Item value="cards">
                 <Accordion.Control icon={<IconTriangleInvertedFilled />}>Cards</Accordion.Control>
                 <Accordion.Panel>
                   {playerObj &&
-                    Object.entries(playerObj.gameDetails)
-                      .map(([_, i]) => i.cards)
+                    Object.entries(playerObj.gameDetails ?? {})
+                      .map(([, i]) => i.cards)
                       .flat().length === 0 && (
                       <Text>
                         <i>No Cards Recorded Yet</i>
@@ -310,13 +311,13 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                     )}
                   <Timeline bulletSize={24}>
                     {playerObj &&
-                      Object.entries(playerObj.gameDetails)
-                        .map(([_, i]) => i.cards)
+                      Object.entries(playerObj.gameDetails ?? {})
+                        .map(([, i]) => i.cards)
                         .flat()
                         .map((card, i) => (
                           <Timeline.Item
                             key={i}
-                            title={`${card.eventType} for ${card.player.name}`}
+                            title={`${card.eventType} for ${card.player?.name}`}
                             bullet={eventIcon(card)}
                           >
                             <Text c="dimmed" size="sm">
@@ -338,7 +339,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                       <Table.Th>Notes</Table.Th>
                     </Table.Tr>
                     {playerObj &&
-                      Object.entries(playerObj.gameDetails).map(
+                      Object.entries(playerObj.gameDetails ?? {}).map(
                         ([id, { notes, game, cards, rating }], i) => (
                           <Table.Tr key={i}>
                             <Table.Th>
@@ -358,7 +359,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                             <Table.Td>
                               <Link href={`/games/${id}`} className="hideLink">
                                 {cards.map((card, j) => (
-                                  <Text c="dimmed" size="sm">
+                                  <Text c="dimmed" size="sm" key={j}>
                                     <strong>{card.eventType}:</strong>
                                     <i>{card.notes}</i>
                                   </Text>

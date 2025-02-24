@@ -3,12 +3,7 @@
 import React, { Fragment, useEffect } from 'react';
 import { Table } from '@mantine/core';
 import { getAveragePlayerStats } from '@/ServerActions/PlayerActions';
-import {
-  PersonStructure,
-  PlayerGameStatsStructure,
-  TeamStructure,
-  TournamentStructure,
-} from '@/ServerActions/types';
+import { PersonStructure, PlayerGameStatsStructure, TeamStructure } from '@/ServerActions/types';
 
 const CATEGORIES = {
   'Ace and Serve Metrics': [
@@ -96,14 +91,14 @@ export default function PlayerStatsTable({
   let rows: any[] = [];
   let headers: any[] = [];
   let players: (PersonStructure | PlayerGameStatsStructure)[] = [];
-  const TA: string = 'Center';
+  const TA = 'center';
   const statsTable = [];
 
   if (team && !teamPlayers) {
-    for (const k of Object.keys(team.stats)) {
+    for (const k of Object.keys(team.stats ?? {})) {
       statsTable.push({
         stat: k,
-        teamStat: team.stats[k],
+        teamStat: team.stats?.[k],
       });
     }
     rows = statsTable.map((s) => (
@@ -137,7 +132,7 @@ export default function PlayerStatsTable({
             <Table.Tr key={stat}>
               <Table.Td ta={TA}>{stat}</Table.Td>
               {players.map((p) => (
-                <Table.Td ta={TA}>{p.stats[stat]}</Table.Td>
+                <Table.Td ta={TA}>{p.stats?.[stat]}</Table.Td>
               ))}
               <Table.Td ta={TA}>{averageStats?.stats[stat]}</Table.Td>
             </Table.Tr>

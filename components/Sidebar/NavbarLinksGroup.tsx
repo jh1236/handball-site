@@ -16,7 +16,7 @@ import {
 import classes from '@/components/Sidebar/NavbarLinksGroup.module.css';
 
 interface LinksGroupProps {
-  icon: React.FC<any>;
+  icon: React.JSX.ElementType;
   label: string;
   initiallyOpened?: boolean;
   links?: { label: string; link: string }[];
@@ -39,14 +39,12 @@ export function LinksGroup({
       {l.label}
     </Text>
   ));
-  if (action) {
-    useEffect(() => {
-      if (opened) {
-        action();
-        setOpened(false);
-      }
-    }, [opened]);
-  }
+  useEffect(() => {
+    if (opened && action) {
+      action();
+      setOpened(false);
+    }
+  }, [opened]);
   const { colorScheme } = useMantineColorScheme();
   const out = (
     <>

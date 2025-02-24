@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Autocomplete, Button, Modal, Select, Title } from '@mantine/core';
+import { Autocomplete, Button, Modal, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { TeamStructure } from '@/ServerActions/types';
 
@@ -7,10 +7,14 @@ interface CreateTeamButtonProps {
   teams: TeamStructure[];
   leftPlayer?: string;
   rightPlayer?: string;
-  setLeftPlayer: (v: string) => void;
-  setRightPlayer: (v: string) => void;
+  setLeftPlayer: (v: string | undefined) => void;
+  setRightPlayer: (v: string | undefined) => void;
   teamName: string | undefined;
   setTeamName: (v: string) => void;
+}
+
+export function makeUnique<T>(list: T[]) {
+  return list.filter((value: T, index: number, array: T[]) => array.indexOf(value) === index);
 }
 
 function getPlayersFromTeam(team: TeamStructure) {
@@ -27,6 +31,7 @@ export function CreateTeamButton({
   setTeamName,
 }: CreateTeamButtonProps) {
   const [team, setTeam] = React.useState<TeamStructure | undefined>(undefined);
+  const [opened, { open, close }] = useDisclosure(false);
 
   useEffect(() => {
     for (const t of teams) {
@@ -46,11 +51,11 @@ export function CreateTeamButton({
       setTeamName('');
     }
     setTeam(undefined);
-  }, [leftPlayer, rightPlayer, teams]);
+  }, [leftPlayer, rightPlayer, setTeamName, team, teams]);
 
   useEffect(() => {
     if (!teamName || teamName === 'New Team') return;
-    const t = teams.find((t) => t.name === teamName);
+    const t = teams.find((t2) => t2.name === teamName);
     if (!t) return;
     if (rightPlayer === t.captain.name) {
       setRightPlayer(t!.captain.name);
@@ -60,9 +65,8 @@ export function CreateTeamButton({
       setRightPlayer(t!.nonCaptain?.name);
     }
     close();
-  }, [teamName]);
+  }, [close, rightPlayer, setLeftPlayer, setRightPlayer, teamName, teams]);
 
-  const [opened, { open, close }] = useDisclosure(false);
   return (
     <>
       <Modal opened={opened} centered onClose={close} title="Action">
@@ -70,7 +74,7 @@ export function CreateTeamButton({
         <Autocomplete
           label="Team Name"
           placeholder="New Team"
-          data={[...new Set(teams.map((a) => a.name))]}
+          data={makeUnique(teams.map((a) => a.name))}
           value={teamName}
           onChange={setTeamName}
         />

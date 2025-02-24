@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Anchor,
@@ -19,28 +18,26 @@ import { searchableOf } from '@/components/HandballComponenets/ServerActions';
 import { loginAction } from '@/ServerActions/LoginActions';
 import classes from './AuthenticationTitle.module.css';
 
-function authenticate(id: string, pwd: string, router: AppRouterInstance): Promise<void> {
-  return loginAction(id, pwd)
-    .then((data) => {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('username', data.username);
-      localStorage.setItem('permissionLevel', `${data.permissionLevel}`);
-      router.push(`/players/${searchableOf(localStorage.getItem('username'))}`);
-    })
-    .catch((error) => {
-      alert('wrong details!');
-    });
-}
-
 export function AuthenticationTitle() {
-  const id = React.useRef<HTMLInputElement>(null);
-  const pwd = React.useRef<HTMLInputElement>(null);
+  const [userId, setUserId] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [rememberMe, setRememberMe] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const router = useRouter();
-  const username = localStorage.getItem('username');
+  useEffect(() => {
+    if (localStorage.getItem('username')) {
+      router.push(`/players/${searchableOf(localStorage.getItem('username')!)}`);
+    }
+  }, [router]);
 
-  if (username) {
-    location.href = `/players/${searchableOf(username)}`;
-    return <></>;
+  function authenticate(id: string, pwd: string, remember: boolean): Promise<void> {
+    return loginAction(id, pwd, remember)
+      .then(() => {
+        router.push(`/players/${searchableOf(localStorage.getItem('username')!)}`);
+      })
+      .catch((passwordError: string) => {
+        setError(passwordError);
+      });
   }
 
   return (
@@ -56,19 +53,33 @@ export function AuthenticationTitle() {
       </Text>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-        <TextInput ref={id} label="Id" placeholder="0" required />
-        <PasswordInput ref={pwd} label="Password" placeholder="Your password" required mt="md" />
+        <TextInput
+          value={userId}
+          onChange={(v) => setUserId(v.target.value)}
+          label="Id"
+          placeholder="0"
+          required
+        />
+        <PasswordInput
+          error={error || undefined}
+          value={password}
+          onChange={(v) => setPassword(v.target.value)}
+          label="Password"
+          placeholder="Your password"
+          required
+          mt="md"
+        />
         <Group justify="space-between" mt="lg">
-          <Checkbox label="Remember me" />
+          <Checkbox
+            label="Remember me"
+            defaultChecked={rememberMe}
+            onChange={(v) => setRememberMe(v.target.checked)}
+          />
           <Anchor component="button" size="sm">
             Forgot password?
           </Anchor>
         </Group>
-        <Button
-          fullWidth
-          mt="xl"
-          onClick={() => authenticate(id.current!.value, pwd.current!.value, router)}
-        >
+        <Button fullWidth mt="xl" onClick={() => authenticate(userId, password, rememberMe)}>
           Sign in
         </Button>
       </Paper>

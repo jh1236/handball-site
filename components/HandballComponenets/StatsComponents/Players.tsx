@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import useSWR from 'swr';
-import { tokenFetcher } from '@/components/HandballComponenets/ServerActions';
 import { DynamicTable } from '@/components/HandballComponenets/StatsComponents/DynamicTable';
-import { getPlayer, getPlayers } from '@/ServerActions/PlayerActions';
+import { getPlayers } from '@/ServerActions/PlayerActions';
 import { PersonStructure } from '@/ServerActions/types';
 
 interface LadderProps {

@@ -1,5 +1,3 @@
-import { GameState } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
-
 export type SearchableName = string;
 export type RealName = string;
 
