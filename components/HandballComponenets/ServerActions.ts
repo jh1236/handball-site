@@ -1,3 +1,7 @@
+'use client';
+
+import React, { useEffect } from 'react';
+
 export const SERVER_ADDRESS = 'https://api.squarers.club';
 // export const SERVER_ADDRESS = 'http://localhost:5001/api';
 // export const SERVER_ADDRESS = 'http://49.192.26.182:5001';
@@ -11,20 +15,27 @@ export function getUsername(): string | null {
   return loggedIn() ? localStorage.getItem('username') : null;
 }
 
-export function loggedIn() {
+export function useUserData() {
+  const [permissionLevel, setPermissionLevel] = React.useState<number>(0);
+  const [username, setUsername] = React.useState<string | null>(null);
+  useEffect(() => {
+    if (loggedIn()) {
+      setUsername(localStorage.getItem('username'));
+      setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
+    }
+  }, []);
+  return {
+    isAdmin: permissionLevel === 5,
+    isOfficial: permissionLevel >= 2,
+    isUmpireManager: permissionLevel >= 4,
+    isLoggedIn: permissionLevel !== 0,
+    permissionLevel,
+    username,
+  };
+}
+
+function loggedIn() {
   return localStorage.getItem('token') !== null;
-}
-
-export function isAdmin() {
-  return loggedIn() && +localStorage.getItem('permissionLevel')! === 5;
-}
-
-export function isOfficial() {
-  return loggedIn() && +localStorage.getItem('permissionLevel')! >= 2;
-}
-
-export function isUmpireManager() {
-  return isAdmin() || +localStorage.getItem('permissionLevel')! === 4;
 }
 
 export function tokenFetch(url: string | URL, args: any = {}) {

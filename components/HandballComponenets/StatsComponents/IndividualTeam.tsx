@@ -3,7 +3,6 @@
 /*
 He who is skilled in coding hides within the deepest recesses of the code. He who is skilled in gaming shoots forth from the heights of the game
  */
-
 import React, { Fragment, useEffect } from 'react';
 import { IconAlertTriangle, IconClock2, IconTable } from '@tabler/icons-react';
 import {
@@ -21,7 +20,7 @@ import {
   Title,
 } from '@mantine/core';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
-import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
 import { getTeam } from '@/ServerActions/TeamActions';
 import { GameStructure, TeamStructure } from '@/ServerActions/types';
@@ -32,25 +31,24 @@ interface TeamsProps {
   team: string;
 }
 
-const stats = [
-  'Games Played',
-  'Games Won',
-  'Games Lost',
-  'Percentage',
-  'Points Scored',
-  'Points Against',
-  'Point Difference',
-  'Faults',
-  'Double Faults',
-  'Warnings',
-  'Penalty Points',
-  'Green Cards',
-  'Yellow Cards',
-  'Red Cards',
-  'Timeouts Called',
-  'Elo',
-];
-1;
+// const stats = [
+//   'Games Played',
+//   'Games Won',
+//   'Games Lost',
+//   'Percentage',
+//   'Points Scored',
+//   'Points Against',
+//   'Point Difference',
+//   'Faults',
+//   'Double Faults',
+//   'Warnings',
+//   'Penalty Points',
+//   'Green Cards',
+//   'Yellow Cards',
+//   'Red Cards',
+//   'Timeouts Called',
+//   'Elo',
+// ];
 
 export default function IndividualTeam({ tournament, team }: TeamsProps) {
   // const [sort, setSort] = React.useState<number>(-1);
@@ -58,7 +56,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
   const [games, setGames] = React.useState<GameStructure[]>([]);
   const [teamObj, setTeamObj] = React.useState<TeamStructure | undefined>(undefined);
   const [gamesCount, setGamesCount] = React.useState<number>(20);
-
+  const { isUmpireManager } = useUserData();
   useEffect(() => {
     getTeam({
       team,
@@ -103,7 +101,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
           {/*<Tabs.Tab value="graphs" leftSection={<IconChartScatter size={12} />}>*/}
           {/*  Graphs*/}
           {/*</Tabs.Tab>*/}
-          {isUmpireManager() && (
+          {isUmpireManager && (
             <Tabs.Tab value="mgmt" leftSection={<IconAlertTriangle size={12} />}>
               Cards
             </Tabs.Tab>
@@ -165,7 +163,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                     {game.teamTwoScore})
                   </Text>
 
-                  {isUmpireManager() && (
+                  {isUmpireManager && (
                     <List>
                       <List.Item>
                         <Box display="flex">
@@ -199,11 +197,11 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
 
         <Tabs.Panel value="mgmt">
           <Accordion>
-            {isUmpireManager() && (
+            {isUmpireManager && (
               <>
                 {teamObj &&
-                  Object.entries(teamObj.gameDetails)
-                    .map(([_, i]) => i.cards)
+                  Object.entries(teamObj.gameDetails ?? {})
+                    .map(([, i]) => i.cards)
                     .flat().length === 0 && (
                     <Text>
                       <i>No Cards Recorded Yet</i>

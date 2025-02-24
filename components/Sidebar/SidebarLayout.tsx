@@ -4,7 +4,7 @@ import '@mantine/core/styles.css';
 
 import React from 'react';
 import { IconLayoutSidebarLeftCollapse, IconLayoutSidebarLeftExpand } from '@tabler/icons-react';
-import { Box, rem, ThemeIcon, useMantineColorScheme } from '@mantine/core';
+import { Box, rem, ThemeIcon } from '@mantine/core';
 import { NavbarNested } from '@/components/Sidebar/NavbarNested';
 
 export const metadata = {

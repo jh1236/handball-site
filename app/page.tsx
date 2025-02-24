@@ -3,18 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconInfoCircle, IconRefresh } from '@tabler/icons-react';
-import {
-  Blockquote,
-  Box,
-  Center,
-  Container,
-  Grid,
-  Image,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Blockquote, Box, Center, Container, Grid, Skeleton, Title } from '@mantine/core';
 import { StatBubble } from '@/components/HandballComponenets/StatBubble';
 import Ladder from '@/components/HandballComponenets/StatsComponents/Ladder';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
@@ -104,73 +93,6 @@ export default function HomePage() {
     getPlayers({ includeStats: true, formatData: true }).then((t) => setPlayers(t.players));
     setStatIndex(Math.floor(Math.random() * STATS.length));
   }, []);
-
-  function createRandomStatBubble() {
-    if (!teams || !players) return 'Loading...';
-    const sortMultiplier = STATS[statIndex].order === 'asc' ? 1 : -1;
-    if (STATS[statIndex].type === 'team') {
-      const team = teams?.reduce((a, b) => {
-        const diff =
-          sortMultiplier *
-          (parseFloat(String(b.stats![STATS[statIndex].stat])) -
-            parseFloat(String(a.stats![STATS[statIndex].stat])));
-        if (diff > 0) {
-          return a;
-        }
-        if (diff === 0) {
-          return Math.random() > 0.5 ? a : b;
-        }
-        return b;
-      }, teams[0]);
-      return (
-        <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
-          <Link href={`/players/${team.searchableName}`} className="hideLink">
-            <Text size="auto" fw={700} ta="center">
-              {team.name}
-            </Text>
-          </Link>
-          <Link href={`/players/${team.searchableName}`} className="hideLink">
-            <Image alt={team.name} src={team.imageUrl} h="200" w="auto" m="auto"></Image>
-          </Link>
-          <Link href={`/players/${team.searchableName}`} className="hideLink">
-            <Text ta="center">
-              With {team.stats![STATS[statIndex].stat]} {STATS[statIndex].description}
-            </Text>
-          </Link>
-        </Container>
-      );
-    }
-    const player = players?.reduce((a, b) => {
-      const diff =
-        sortMultiplier *
-        (parseFloat(String(b.stats![STATS[statIndex].stat])) -
-          parseFloat(String(a.stats![STATS[statIndex].stat])));
-      if (diff > 0) {
-        return a;
-      }
-      if (diff === 0) {
-        return Math.random() > 0.5 ? a : b;
-      }
-      return b;
-    }, players[0]);
-    return (
-      <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
-        <Link href={`/players/${player.searchableName}`} className="hideLink">
-          <Text size="auto" fw={700} ta="center">
-            {player.name}
-          </Text>
-        </Link>
-        <Link href={`/players/${player.searchableName}`} className="hideLink">
-          <Image alt={player.name} src={player.imageUrl} h="200" w="auto" m="auto"></Image>
-        </Link>
-        <Link href={`/players/${player.searchableName}`} className="hideLink">
-          <Text ta="center">
-            With {player.stats![STATS[statIndex].stat]} {STATS[statIndex].description}
-          </Text>
-        </Link>
-      </Container>
-    );
-  }
 
   return (
     <>

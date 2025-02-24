@@ -1,10 +1,10 @@
 import React from 'react';
 import { Title } from '@mantine/core';
-import { OfficialPageArgs } from '@/app/types';
+import { TournamentPageArgs } from '@/app/types';
 import Officials from '@/components/HandballComponenets/Officials';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
-export default async function OfficialsPage({ params }: OfficialPageArgs) {
+export default async function OfficialsPage({ params }: TournamentPageArgs) {
   const { tournament } = await params;
   return (
     <>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Box,
@@ -17,7 +18,7 @@ import {
 } from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
-import { isOfficial } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
 import { GameStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
@@ -29,11 +30,11 @@ interface GamePageProps {
 export function GamePage({ gameID }: GamePageProps) {
   const [game, setGame] = React.useState<GameStructure>();
   const [playerSelect, setPlayerSelect] = React.useState('');
-  localStorage.getItem('permissions');
   const [activeTab, setActiveTab] = useState<string | null>('teamStats');
   const router = useRouter();
   const searchParams = useSearchParams();
   const { colorScheme } = useMantineColorScheme();
+  const { isOfficial } = useUserData();
   useEffect(() => {
     getGame({
       gameID,
@@ -212,31 +213,31 @@ export function GamePage({ gameID }: GamePageProps) {
             }}
           >
             <Grid.Col span={5}>
-              <Title
-                c={colorScheme === 'dark' ? 'white' : 'black'}
-                order={2}
-                lineClamp={2}
-                component="a"
-                className={classes.secretLink}
-                href={`../teams/${game.teamOne.searchableName}`}
-              >
-                {game.teamOne.name}
-              </Title>
+              <Link href={`../teams/${game.teamOne.searchableName}`}>
+                <Title
+                  c={colorScheme === 'dark' ? 'white' : 'black'}
+                  order={2}
+                  lineClamp={2}
+                  className={classes.secretLink}
+                >
+                  {game.teamOne.name}
+                </Title>
+              </Link>
             </Grid.Col>
             <Grid.Col span={2} style={{ fontSize: 30 }}>
               vs
             </Grid.Col>
             <Grid.Col span={5}>
-              <Title
-                c={colorScheme === 'dark' ? 'white' : 'black'}
-                component="a"
-                className={classes.secretLink}
-                order={2}
-                lineClamp={2}
-                href={`../teams/${game.teamTwo.searchableName}`}
-              >
-                {game.teamTwo.name}
-              </Title>
+              <Link href={`../teams/${game.teamTwo.searchableName}`}>
+                <Title
+                  c={colorScheme === 'dark' ? 'white' : 'black'}
+                  className={classes.secretLink}
+                  order={2}
+                  lineClamp={2}
+                >
+                  {game.teamTwo.name}
+                </Title>
+              </Link>
             </Grid.Col>
           </Grid>
           <Grid columns={5} pos="relative" top={-25}>
@@ -327,7 +328,7 @@ export function GamePage({ gameID }: GamePageProps) {
             <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
               <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
               <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
-              {isOfficial() && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
+              {isOfficial && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
             </Paper>
             <Tabs.Panel value="teamStats">{generateTeamStatsTable()}</Tabs.Panel>
             <Tabs.Panel value="playerStats">
@@ -347,7 +348,7 @@ export function GamePage({ gameID }: GamePageProps) {
               <p>{playerSelect}</p>
               <div>{generatePlayerStats(playerSelect)}</div>
             </Tabs.Panel>
-            {isOfficial() && (
+            {isOfficial && (
               <Tabs.Panel value="admin">
                 <AdminGamePanel game={game}></AdminGamePanel>
               </Tabs.Panel>

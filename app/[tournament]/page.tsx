@@ -9,7 +9,7 @@ export default async function TournamentPage({ params }: TournamentPageArgs) {
   return (
     <>
       <SidebarLayout tournamentName={tournament}>
-        <TournamentLanding tournament={tournament}></TournamentLanding>
+        <TournamentLanding tournament={tournament!}></TournamentLanding>
       </SidebarLayout>
     </>
   );

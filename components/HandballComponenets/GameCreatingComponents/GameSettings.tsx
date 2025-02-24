@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Box, Button, Popover, Select } from '@mantine/core';
-import {
-  begin,
-  del,
-  sync,
-  undo,
-} from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
-import { GameScore } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { createGameWithPlayers } from '@/ServerActions/GameActions';
 import { OfficialStructure, TournamentStructure } from '@/ServerActions/types';
 
 interface GameSettingsArgs {
   officials: OfficialStructure[];
-  official: OfficialStructure;
+  official: OfficialStructure | undefined;
   setOfficial: (v: OfficialStructure) => void;
   tournament?: TournamentStructure;
   setTournament: (v: TournamentStructure) => void;
@@ -37,6 +31,7 @@ export function GameSettings({
 }: GameSettingsArgs) {
   const [openedTournaments, setOpenedTournaments] = useState(false);
   const [openedOfficials, setOpenedOfficials] = useState(false);
+  const router = useRouter();
   return (
     <Box
       style={{
@@ -104,13 +99,15 @@ export function GameSettings({
               tournament?.searchableName ?? 'suss_practice',
               playersOne,
               playersTwo,
-              official.searchableName,
+              official?.searchableName,
               undefined,
               teamNameOne,
               teamNameTwo
-            ).then(({ id }) => {
-              location.href = `/games/${id}/edit`;
-            }).catch(() => alert('Learn to use a basic ui!'));
+            )
+              .then(({ id }) => {
+                router.push(`/games/${id}/edit`);
+              })
+              .catch(() => alert('Learn to use a basic ui!'));
           }}
         >
           Create

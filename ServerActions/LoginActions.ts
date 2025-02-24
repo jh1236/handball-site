@@ -1,13 +1,13 @@
 import { tokenFetch } from '@/components/HandballComponenets/ServerActions';
 
-export function loginAction(
-  userId: string,
-  password: string
-): Promise<{ token: string; username: string; permissionLevel: number }> {
+export function loginAction(userId: string, password: string, remember: boolean): Promise<void> {
   const body: any = {
     userId,
     password,
   };
+  if (remember) {
+    body.longSession = remember;
+  }
 
   return tokenFetch('/login/', {
     method: 'POST',
@@ -19,7 +19,25 @@ export function loginAction(
     if (!response.ok) {
       return Promise.reject(response.text());
     }
-    return response.json();
+    return response.json().then((data) => {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('permissionLevel', `${data.permissionLevel}`);
+    });
+  });
+}
+
+export function logoutAction(): Promise<void> {
+  return tokenFetch('/logout/', {
+    method: 'GET',
+  }).then((response) => {
+    if (!response.ok) {
+      return Promise.reject(response.text());
+    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('permissionLevel');
+    return Promise.resolve();
   });
 }
 

@@ -6,7 +6,7 @@ import { Box, Button, LoadingOverlay } from '@mantine/core';
 import { CreatePlayerButton } from '@/components/HandballComponenets/GameCreatingComponents/CreatePlayerButton';
 import { CreateTeamButton } from '@/components/HandballComponenets/GameCreatingComponents/CreateTeamButton';
 import { GameSettings } from '@/components/HandballComponenets/GameCreatingComponents/GameSettings';
-import { getUsername, isOfficial } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { getTeams } from '@/ServerActions/TeamActions';
@@ -31,7 +31,7 @@ export default function CreateGamePage() {
   const [teamTwoLeft, setTeamTwoLeft] = useState<string | undefined>(undefined);
   const [teamTwoName, setTeamTwoName] = useState<string | undefined>('');
   const [selectedTournament, setSelectedTournament] = useState<TournamentStructure>();
-
+  const { username, isOfficial } = useUserData();
   useEffect(() => {
     getTournaments().then((t) => setTournaments(t.filter((a) => a.editable)));
     getPlayers({}).then((t) => setPlayers(t.players));
@@ -46,8 +46,8 @@ export default function CreateGamePage() {
   }, [tournaments]);
 
   useEffect(() => {
-    setOfficial(officials.find((a) => a.name === getUsername()));
-  }, [officials]);
+    setOfficial(officials.find((a) => a.name === username));
+  }, [officials, username]);
 
   const loginProps = (
     <>
@@ -67,7 +67,7 @@ export default function CreateGamePage() {
           color: '#222',
           blur: 15,
         }}
-        visible={!isOfficial()}
+        visible={!isOfficial}
         loaderProps={{ children: loginProps }}
       />
       <Box style={{ width: '100%', height: '40%' }}>

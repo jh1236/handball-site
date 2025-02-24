@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Box,
   Center,
@@ -15,17 +15,14 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { customTournamentScoreboardEffects } from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
 import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
 import {
-  GameEventStructure,
   GameStructure,
   GameTeamStructure,
   PersonStructure,
   PlayerGameStatsStructure,
 } from '@/ServerActions/types';
-import {
-  customTournamentScoreboardEffects
-} from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
 
 interface ScoreboardProps {
   gameID: number;
@@ -38,10 +35,10 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   const [lastCheck, setLastCheck] = React.useState<number>(0);
   const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
   const urlSearchParams = useSearchParams();
-  let coolEffect: React.JSX.Element | null = null;
-
+  const router = useRouter();
   const teamOne = useMemo(() => (game?.firstTeamIga ? game?.teamOne : game?.teamTwo), [game]);
   const teamTwo = useMemo(() => (game?.firstTeamIga ? game?.teamTwo : game?.teamOne), [game]);
+
   function reloadGame() {
     getGame({
       gameID,
@@ -56,10 +53,9 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       }
       if (prev && prev.firstTeamIga !== g.firstTeamIga) {
         //BUG: WHAT THE FUCK IS GOING ON!!!! The bg images REFUSE to co-operate without a forced reload if the side changes 😭😭😭😭
-        location.reload();
+        router.refresh();
       }
     });
-    coolEffect = customTournamentScoreboardEffects(game);
   }
 
   //
@@ -79,7 +75,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     if (game && game.ended) {
       getNextGameId(gameID).then((nextGameId) => {
         if (nextGameId > 0) {
-          location.href = `/games/${nextGameId}/scoreboard?prev=${gameID}`;
+          router.push(`/games/${nextGameId}/scoreboard?prev=${gameID}`);
         }
       });
     }
@@ -102,13 +98,16 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
         }
       });
     }
-  }, [currentTime]);
+  }, [currentTime, game, gameID, lastCheck]);
 
   if (!game) {
     return <>Loading...</>;
   }
 
-  function generateBackground(teamOneIn, teamTwoIn): any {
+  function generateBackground(
+    teamOneIn: GameTeamStructure | undefined,
+    teamTwoIn: GameTeamStructure | undefined
+  ): any {
     const team1Col = teamOneIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
     const team2Col = teamTwoIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
     const imgURL1 = teamOneIn?.bigImageUrl ?? teamOneIn?.imageUrl;
@@ -304,7 +303,6 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
 
   return (
     <Box style={generateBackground(teamOne, teamTwo)} h="100vh" w="100vw">
-      <p>{game.events.map(e => e.notes)}</p>
       <LoadingOverlay
         visible={!game.started || isTimeoutOpen}
         loaderProps={{ children: game.started ? timeoutKids : startKids }}

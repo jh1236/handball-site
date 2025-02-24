@@ -49,7 +49,7 @@ export default function Ladder({
     return (
       <Box style={{ textAlign: 'center' }}>
         <Title order={4}>Pool One</Title>
-        <DynamicTable
+        <DynamicTable<TeamStructure>
           columns={columnState}
           setColumns={setColumnState}
           sortIndexIn={sortIndex}

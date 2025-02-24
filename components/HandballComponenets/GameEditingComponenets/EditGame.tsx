@@ -14,7 +14,7 @@ import {
 import { GameScore } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
-import { isAdmin, isOfficial, loggedIn } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGame } from '@/ServerActions/GameActions';
 import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
@@ -30,6 +30,8 @@ export function reloadGame(gameID: number) {
 }
 
 export function EditGame({ game }: { game: number }) {
+  const { isUmpireManager, isOfficial, isLoggedIn } = useUserData();
+
   const [gameObj, setGameObj] = React.useState<GameStructure | null>(null);
   setGameFn = setGameObj;
   const [visibleLoading, { open: openLoading, close: closeLoading }] = useDisclosure(false);
@@ -338,7 +340,7 @@ export function EditGame({ game }: { game: number }) {
   return (
     <Box style={{ width: '100%', height: '100vh' }}>
       <LoadingOverlay
-        visible={visibleLoading && loggedIn()}
+        visible={visibleLoading && isLoggedIn}
         overlayProps={{ radius: 'sm', blur: 2 }}
         loaderProps={{ color: 'pink', type: 'bars' }}
       />
@@ -348,11 +350,11 @@ export function EditGame({ game }: { game: number }) {
           color: '#222',
           blur: 15,
         }}
-        visible={!isOfficial() || (gameObj?.status === 'Official' && editOfficialGame)}
+        visible={!isOfficial || (gameObj?.status === 'Official' && editOfficialGame)}
         loaderProps={{
           children:
             gameObj?.status === 'Official'
-              ? isAdmin()
+              ? isUmpireManager
                 ? warnAdminAboutEditing
                 : OfficialCantEdit
               : loginProps,

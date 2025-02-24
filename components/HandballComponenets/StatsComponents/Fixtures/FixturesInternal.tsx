@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { Skeleton, Table, Text, Title } from '@mantine/core';
-import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getFixtures } from '@/ServerActions/GameActions';
 import { GameStructure, TournamentStructure } from '@/ServerActions/types';
 
@@ -27,6 +27,7 @@ export default function FixturesInternal({
   const [finals, setFinals] = React.useState<{ games: GameStructure[]; final: boolean }[]>();
   const [fixtures, setFixtures] = React.useState<{ games: GameStructure[]; final: boolean }[]>();
   const [tournamentState, setTournamentState] = React.useState<TournamentStructure>();
+  const { isUmpireManager } = useUserData();
   useEffect(() => {
     getFixtures({
       tournament,
@@ -116,7 +117,7 @@ export default function FixturesInternal({
                       </Table.Th>
                     </Table.Tr>
                   )}
-                  {Array.from({ length: 4 }).map((_, index2) => (
+                  {Array.from({ length: 4 }).map((__, index2) => (
                     <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
                       <Table.Td>
                         <Skeleton h={8} mt={6}></Skeleton>
@@ -169,7 +170,7 @@ export default function FixturesInternal({
                       </Table.Th>
                     </Table.Tr>
                   )}
-                  {Array.from({ length: 4 / (index + 1) }).map((_, index2) => (
+                  {Array.from({ length: 4 / (index + 1) }).map((__, index2) => (
                     <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
                       <Table.Td>
                         <Skeleton h={8} mt={6}></Skeleton>
@@ -247,7 +248,7 @@ export default function FixturesInternal({
                     <Text size="sm">Court</Text>
                   </Table.Th>
                 )}
-                {isUmpireManager() && (
+                {isUmpireManager && (
                   <Table.Th style={{ width: '20px', textAlign: 'center' }}>
                     <Text size="sm">Status</Text>
                   </Table.Th>
@@ -333,9 +334,12 @@ export default function FixturesInternal({
                           </Link>
                         </Table.Td>
                       )}
-                      {isUmpireManager() && (
+                      {isUmpireManager && (
                         <Table.Th style={{ width: '20px', textAlign: 'center' }}>
-                          <Link className="hideLink" href={!game.isBye ? `/games/${game.id}?tab=admin` : '#'}>
+                          <Link
+                            className="hideLink"
+                            href={!game.isBye ? `/games/${game.id}?tab=admin` : '#'}
+                          >
                             <Text size="sm">{game.status}</Text>
                           </Link>
                         </Table.Th>

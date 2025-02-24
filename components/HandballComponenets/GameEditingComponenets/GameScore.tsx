@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from 'react';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { useRouter } from 'next/navigation';
 import { IconCheckbox, IconCloudUpload, IconNote, IconSquare } from '@tabler/icons-react';
 import useSound from 'use-sound';
 import {
@@ -47,7 +49,8 @@ function getActions(
   bestPlayer: PlayerGameStatsStructure | undefined,
   close: () => void,
   reviewReqd: boolean,
-  setReviewReqd: (value: ((prevState: boolean) => boolean) | boolean) => void
+  setReviewReqd: (value: ((prevState: boolean) => boolean) | boolean) => void,
+  router: AppRouterInstance
 ) {
   const winningTeam =
     game.teamTwo.score.get > game.teamOne.score.get ? game.teamTwo.name : game.teamOne.name;
@@ -78,7 +81,7 @@ function getActions(
       color: 'orange',
       content: (
         <Checkbox
-          value={reviewReqd}
+          defaultChecked={reviewReqd}
           onChange={(e) => setReviewReqd(e.currentTarget.checked)}
           label="Mark this game as requiring action"
           description="This will notify the Umpire Manager"
@@ -132,7 +135,7 @@ function getActions(
                 <List.Item>
                   <strong>{markIfReqd(!game.teamOne.signed.get, 'Signature')} </strong>
                   <strong>: </strong>
-                  <FakeCheckbox checked={game.teamOne.signed.get}></FakeCheckbox>
+                  <FakeCheckbox checked={Boolean(game.teamOne.signed.get)}></FakeCheckbox>
                 </List.Item>
               </List>
             </List.Item>
@@ -157,7 +160,7 @@ function getActions(
                 <List.Item>
                   <strong>{markIfReqd(!game.teamTwo.signed.get, 'Signature')} </strong>
                   <strong>: </strong>
-                  <FakeCheckbox checked={game.teamTwo.signed.get}></FakeCheckbox>
+                  <FakeCheckbox checked={Boolean(game.teamTwo.signed.get)}></FakeCheckbox>
                 </List.Item>
               </List>
             </List.Item>
@@ -180,7 +183,7 @@ function getActions(
               !game.teamTwo.signed.get
             }
             onClick={() => {
-              end(game, bestPlayer!.searchableName, reviewReqd);
+              end(game, bestPlayer!.searchableName, reviewReqd).then(() => router.refresh());
               close();
             }}
           >
@@ -201,13 +204,14 @@ export function GameScore({ game }: GameScoreArgs) {
     game.teamTwo.right,
     game.teamTwo.sub,
   ].filter((a) => a.get && a.get.isBestPlayer);
+  const router = useRouter();
   const [reviewReqd, setReviewReqd] = useState<boolean>(false);
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
   const [openMatchPoints, setOpenMatchPoints] = useState(false);
   const [openZaiahBox, setOpenZaiahBox] = useState<number>(0);
   const items = useMemo(
     () =>
-      getActions(game, bestPlayer[0]?.get, closeEndGame, reviewReqd, setReviewReqd).map(
+      getActions(game, bestPlayer[0]?.get, closeEndGame, reviewReqd, setReviewReqd, router).map(
         (item, i) => (
           <Accordion.Item key={i} value={item.value}>
             <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
@@ -281,8 +285,8 @@ export function GameScore({ game }: GameScoreArgs) {
           You just closed the dialogue box which tells you about how you opened the zaiah box
         </Title>
         <Text>
-          This is the last one I promise. Dont forget: if it's less than 5 rounds, you're supposed
-          to say it out loud, and its kinda important that you get this right.
+          This is the last one I promise. Dont forget: if it&apos;s less than 5 rounds, you&apos;re
+          supposed to say it out loud, and its kinda important that you get this right.
         </Text>
       </Modal>
       <Modal
@@ -380,7 +384,7 @@ export function GameScore({ game }: GameScoreArgs) {
                     if (matchPoints !== 0) {
                       if (
                         !openMatchPoints &&
-                        CAN_HAVE_ZAIAH_BOX.includes(localStorage.getItem('username'))
+                        CAN_HAVE_ZAIAH_BOX.includes(localStorage.getItem('username')!)
                       ) {
                         if (ZAIAH_BOX_FUCKERY) {
                           playZaiahBox();

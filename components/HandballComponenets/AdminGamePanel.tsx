@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   IconAlertTriangle,
   IconArrowsLeftRight,
@@ -15,9 +16,7 @@ import {
   IconFlagFilled,
   IconHandGrab,
   IconNote,
-  IconPlayerStop,
   IconPlayHandball,
-  IconShieldCheckered,
   IconShoe,
   IconSquare,
   IconSquare1,
@@ -42,7 +41,7 @@ import {
   Title,
 } from '@mantine/core';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
-import { isUmpireManager } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import {
   deleteGame,
   endGame,
@@ -134,6 +133,8 @@ const cardColor = (e: GameEventStructure | CardStructure) =>
 export function AdminGamePanel({ game }: AdminGamePanelProps) {
   const teamTwoCards = game.admin!.cards!.filter((a) => !a.firstTeam);
   const teamOneCards = game.admin!.cards!.filter((a) => a.firstTeam);
+  const router = useRouter();
+  const { isUmpireManager } = useUserData();
   return (
     <Accordion>
       <Accordion.Item value="edit">
@@ -152,7 +153,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
           </Link>
         </Accordion.Panel>
       </Accordion.Item>
-      {isUmpireManager() && (
+      {isUmpireManager && (
         <>
           <Accordion.Item value="actions">
             <Accordion.Control icon={<IconCheckbox />}>
@@ -162,7 +163,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
               <Button
                 disabled={RESOLVED_STATUSES.includes(game.status)}
                 onClick={() => {
-                  resolveGame(game.id).then(() => location.reload());
+                  resolveGame(game.id).then(() => router.refresh());
                 }}
               >
                 Resolve
@@ -189,12 +190,12 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                     3,
                                     3,
                                     `Pregame Forfeit by ${game.teamOne.name}`
-                                  ).then(() => location.reload())
+                                  ).then(() => router.refresh())
                                 );
                             }
                             if (!game.someoneHasWon) {
                               forfeitGame(game.id, true)
-                                .then(() => location.reload())
+                                .then(() => router.refresh())
                                 .then(() =>
                                   endGame(
                                     game.id,
@@ -204,7 +205,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                     `Pregame Forfeit by ${game.teamOne.name}`
                                   )
                                 )
-                                .then(() => location.reload());
+                                .then(() => router.refresh());
                             } else {
                               endGame(
                                 game.id,
@@ -212,7 +213,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                 3,
                                 3,
                                 `Pregame Forfeit by ${game.teamOne.name}`
-                              ).then(() => location.reload());
+                              ).then(() => router.refresh());
                             }
                           }}
                           color="red"
@@ -231,12 +232,12 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                     3,
                                     3,
                                     `Pregame Forfeit by ${game.teamTwo.name}`
-                                  ).then(() => location.reload())
+                                  ).then(() => router.refresh())
                                 );
                             }
                             if (!game.someoneHasWon) {
                               forfeitGame(game.id, false)
-                                .then(() => location.reload())
+                                .then(() => router.refresh())
                                 .then(() =>
                                   endGame(
                                     game.id,
@@ -246,7 +247,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                     `Pregame Forfeit by ${game.teamTwo.name}`
                                   )
                                 )
-                                .then(() => location.reload());
+                                .then(() => router.refresh());
                             } else {
                               endGame(
                                 game.id,
@@ -254,7 +255,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                 3,
                                 3,
                                 `Pregame Forfeit by ${game.teamOne.name}`
-                              ).then(() => location.reload());
+                              ).then(() => router.refresh());
                             }
                           }}
                           color="red"
@@ -279,9 +280,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                       <Group justify="center">
                         <Button
                           onClick={() => {
-                            deleteGame(game.id).then(
-                              () => (location.href = `/${game.tournament.searchableName}`)
-                            );
+                            deleteGame(game.id).then(() => {
+                              router.push(`/${game.tournament.searchableName}`);
+                            });
                           }}
                           color="red"
                         >
@@ -296,7 +297,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
           </Accordion.Item>
           <Accordion.Item value="notes">
             <Accordion.Control icon={<IconNote />}>
-              {markIfReqd(game.admin?.markedForReview, 'Notes')}
+              {markIfReqd(game.admin?.markedForReview ?? false, 'Notes')}
             </Accordion.Control>
             <Accordion.Panel>
               <strong>Marked For Review: </strong>
@@ -353,7 +354,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
               {teamOneCards?.map((card, i) => (
                 <Text size="sm" key={i}>
                   <strong style={{ color: cardColor(card) }}>{card.eventType}</strong> to{' '}
-                  <strong>{card.player.name}</strong> for <i>{card.notes}</i>
+                  <strong>{card.player!.name}</strong> for <i>{card.notes}</i>
                 </Text>
               ))}
               <Divider></Divider>
@@ -414,7 +415,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
               {teamTwoCards.map((card, i) => (
                 <Text size="sm" key={i}>
                   <strong style={{ color: cardColor(card) }}>{card.eventType}</strong> to{' '}
-                  <strong>{card.player.name}</strong> for <i>{card.notes}</i>
+                  <strong>{card.player!.name}</strong> for <i>{card.notes}</i>
                 </Text>
               ))}
               <Divider></Divider>
@@ -448,7 +449,8 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
           <Accordion.Item value="cards">
             <Accordion.Control icon={<IconTriangleInvertedFilled />}>
               {markIfReqd(
-                game.admin?.cards.some((a) => ['Red Card', 'Yellow Card'].includes(a.eventType)),
+                game.admin?.cards.some((a) => ['Red Card', 'Yellow Card'].includes(a.eventType)) ??
+                  false,
                 'Cards'
               )}
             </Accordion.Control>
@@ -462,7 +464,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                 {game.admin?.cards?.map((card, i) => (
                   <Timeline.Item
                     key={i}
-                    title={`${card.eventType} for ${card.player.name}`}
+                    title={`${card.eventType} for ${card.player!.name}`}
                     bullet={eventIcon(card)}
                   >
                     <Text c="dimmed" size="sm">

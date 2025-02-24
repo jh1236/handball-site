@@ -86,7 +86,7 @@ export default function Officials({ tournament }: OfficialsProps) {
     return (
       <div>
         <Grid w="98.5%">
-          {Array.from({ length: 10 }).map((_) => (
+          {Array.from({ length: 10 }).map(() => (
             <Grid.Col
               span={{
                 base: 6,
