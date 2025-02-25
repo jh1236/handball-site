@@ -93,7 +93,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
         <Image
           alt="The SUSS handball Logo"
-          src={teamObj?.imageUrl ?? 'https://api.squarers.club/image?name=blank'}
+          src={teamObj?.imageUrl ?? 'https://api.squarers.club/api/image?name=blank'}
           h="100"
           w="auto"
           m="auto"

@@ -103,7 +103,7 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
     <>
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
         <Image
-          src={tournamentObj?.imageUrl ?? 'https://api.squarers.club/image?name=SUSS'}
+          src={tournamentObj?.imageUrl ?? 'https://api.squarers.club/api/image?name=SUSS'}
           alt="The SUSS handball Logo"
           h="100"
           w="auto"
