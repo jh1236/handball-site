@@ -9,7 +9,7 @@ export function loginAction(userId: string, password: string, remember: boolean)
     body.longSession = remember;
   }
 
-  return tokenFetch('/login/', {
+  return tokenFetch('/api/login/', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -28,7 +28,7 @@ export function loginAction(userId: string, password: string, remember: boolean)
 }
 
 export function logoutAction(): Promise<void> {
-  return tokenFetch('/logout/', {
+  return tokenFetch('/api/logout/', {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
@@ -46,7 +46,7 @@ export function setUserImage(imageLocation: string): Promise<void> {
     imageLocation,
   };
 
-  return tokenFetch('/image', {
+  return tokenFetch('/api/image', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {

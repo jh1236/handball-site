@@ -19,7 +19,7 @@ export function getTeams({
   teams: TeamStructure[];
   tournament?: TournamentStructure;
 }> {
-  const url = new URL('/teams', SERVER_ADDRESS);
+  const url = new URL('/api/teams', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
@@ -61,7 +61,7 @@ export function getTeam({
   team: TeamStructure;
   tournament?: TournamentStructure;
 }> {
-  const url = new URL(`/teams/${team}`, SERVER_ADDRESS);
+  const url = new URL(`/api/teams/${team}`, SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
@@ -100,7 +100,7 @@ export function getLadder({
   poolTwo?: TeamStructure[];
   tournament?: TournamentStructure;
 }> {
-  const url = new URL('/teams/ladder/', SERVER_ADDRESS);
+  const url = new URL('/api/teams/ladder/', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }

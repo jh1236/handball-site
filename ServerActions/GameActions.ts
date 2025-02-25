@@ -7,7 +7,7 @@ import {
 } from '@/ServerActions/types';
 
 export function getChangeCode(gameID: number): Promise<number> {
-  return tokenFetch(`/games/change_code?id=${gameID}`, {
+  return tokenFetch(`/api/games/change_code?id=${gameID}`, {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
@@ -18,7 +18,7 @@ export function getChangeCode(gameID: number): Promise<number> {
 }
 
 export function getNextGameId(gameID: number): Promise<number> {
-  return tokenFetch(`/games/next?id=${gameID}`, {
+  return tokenFetch(`/api/games/next?id=${gameID}`, {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
@@ -43,7 +43,7 @@ export function getGame({
   includePreviousCards = false,
   formatData = true,
 }: GetGameArgs): Promise<GameStructure> {
-  const url = new URL(`/games/${gameID}`, SERVER_ADDRESS);
+  const url = new URL(`/api/games/${gameID}`, SERVER_ADDRESS);
   if (includeGameEvents) {
     url.searchParams.set('includeGameEvents', 'true');
   }
@@ -97,7 +97,7 @@ export function getGames({
   includeByes = false,
   limit = 20,
 }: GetGamesArgs): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
-  const url = new URL('/games', SERVER_ADDRESS);
+  const url = new URL('/api/games', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
@@ -164,7 +164,7 @@ export function getNoteableGames({
   games: GameStructure[];
   tournaments?: TournamentStructure;
 }> {
-  const url = new URL('/games/noteable', SERVER_ADDRESS);
+  const url = new URL('/apigames/noteable', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
@@ -222,7 +222,7 @@ export function getFixtures({
   finals?: { games: GameStructure[]; final: true }[];
   tournament?: TournamentStructure;
 }> {
-  const url = new URL('/games/fixtures', SERVER_ADDRESS);
+  const url = new URL('/api/games/fixtures', SERVER_ADDRESS);
   if (maxRounds) {
     url.searchParams.set('maxRounds', `${maxRounds}`);
   }
@@ -296,7 +296,7 @@ export function startGame(
     body.scorer = scorer;
   }
 
-  return tokenFetch('/games/update/start', {
+  return tokenFetch('/api/games/update/start', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -344,7 +344,7 @@ export function aceForGame(gameId: number): Promise<void> {
     id: gameId,
   };
 
-  return tokenFetch('/games/update/ace', {
+  return tokenFetch('/api/games/update/ace', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -363,7 +363,7 @@ export function faultForGame(gameId: number): Promise<void> {
     id: gameId,
   };
 
-  return tokenFetch('/games/update/fault', {
+  return tokenFetch('/api/games/update/fault', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -383,7 +383,7 @@ export function timeoutForGame(gameId: number, firstTeam: boolean): Promise<void
     firstTeam,
   };
 
-  return tokenFetch('/games/update/timeout', {
+  return tokenFetch('/api/games/update/timeout', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -402,7 +402,7 @@ export function officalTimeoutForGame(gameId: number): Promise<void> {
     id: gameId,
   };
 
-  return tokenFetch('/games/update/officialTimeout', {
+  return tokenFetch('/api/games/update/officialTimeout', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -421,7 +421,7 @@ export function endTimeoutForGame(gameId: number): Promise<void> {
     id: gameId,
   };
 
-  return tokenFetch('/games/update/endTimeout', {
+  return tokenFetch('/api/games/update/endTimeout', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -441,7 +441,7 @@ export function startServeClockForGame(gameId: number): Promise<void> {
     start: true,
   };
 
-  return tokenFetch('/games/update/end/timeout', {
+  return tokenFetch('/api/games/update/end/timeout', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -461,7 +461,7 @@ export function stopServeClockForGame(gameId: number): Promise<void> {
     start: false,
   };
 
-  return tokenFetch('/games/update/end/timeout', {
+  return tokenFetch('/api/games/update/end/timeout', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -480,7 +480,7 @@ export function undoForGame(gameId: number): Promise<void> {
     id: gameId,
   };
 
-  return tokenFetch('/games/update/undo', {
+  return tokenFetch('/api/games/update/undo', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -511,7 +511,7 @@ export function cardForGame(
     reason,
   };
 
-  return tokenFetch('/games/update/card', {
+  return tokenFetch('/api/games/update/card', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -536,7 +536,7 @@ export function substituteForGame(
     leftPlayer,
   };
 
-  return tokenFetch('/games/update/substitute', {
+  return tokenFetch('/api/games/update/substitute', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -561,7 +561,7 @@ export function pardonForGame(
     leftPlayer,
   };
 
-  return tokenFetch('/games/update/pardon', {
+  return tokenFetch('/api/games/update/pardon', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -581,7 +581,7 @@ export function forfeitGame(gameId: number, firstTeam: boolean): Promise<void> {
     firstTeam,
   };
 
-  return tokenFetch('/games/update/forfeit', {
+  return tokenFetch('/api/games/update/forfeit', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -600,7 +600,7 @@ export function resolveGame(gameId: number): Promise<void> {
     id: gameId,
   };
 
-  return tokenFetch('/games/update/resolve', {
+  return tokenFetch('/api/games/update/resolve', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -619,7 +619,7 @@ export function deleteGame(gameId: number): Promise<void> {
     id: gameId,
   };
 
-  return tokenFetch('/games/update/delete', {
+  return tokenFetch('/api/games/update/delete', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -671,7 +671,7 @@ export function endGame(
     body.markedForReview = 'true';
   }
 
-  return tokenFetch('/games/update/end', {
+  return tokenFetch('/api/games/update/end', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -702,7 +702,7 @@ export function createGameWithTeams(
   if (scorer) {
     body.scorer = scorer;
   }
-  return tokenFetch('/games/update/end', {
+  return tokenFetch('/api/games/update/end', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -743,7 +743,7 @@ export function createGameWithPlayers(
   if (teamTwoName) {
     body.teamTwo = teamTwoName;
   }
-  return tokenFetch('/games/update/create', {
+  return tokenFetch('/api/games/update/create', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {

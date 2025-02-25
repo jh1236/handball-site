@@ -13,7 +13,7 @@ export function getOfficials({ tournament, returnTournament = false }: GetOffici
   officials: OfficialStructure[];
   tournament?: TournamentStructure;
 }> {
-  const url = new URL('/officials', SERVER_ADDRESS);
+  const url = new URL('/api/officials', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
@@ -44,7 +44,7 @@ export function getOfficial({
   official: OfficialStructure;
   tournament?: TournamentStructure;
 }> {
-  const url = new URL(`/officials/${official}`, SERVER_ADDRESS);
+  const url = new URL(`/api/officials/${official}`, SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }

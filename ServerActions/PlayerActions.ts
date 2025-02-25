@@ -24,7 +24,7 @@ export function getPlayers({
   players: PersonStructure[];
   tournament?: TournamentStructure;
 }> {
-  const url = new URL('/players', SERVER_ADDRESS);
+  const url = new URL('/api/players', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
@@ -66,7 +66,7 @@ export function getAveragePlayerStats({
   stats: { [key: string]: any };
   tournament?: TournamentStructure;
 }> {
-  const url = new URL('/players/stats', SERVER_ADDRESS);
+  const url = new URL('/api/players/stats', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
@@ -107,7 +107,7 @@ export function getPlayer({
   player: PersonStructure | PlayerGameStatsStructure;
   tournament?: TournamentStructure;
 }> {
-  const url = new URL(`/players/${player}`, SERVER_ADDRESS);
+  const url = new URL(`/api/players/${player}`, SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }

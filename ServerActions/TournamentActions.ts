@@ -2,7 +2,7 @@ import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/Ser
 import { TournamentStructure, SearchableName } from '@/ServerActions/types';
 
 export function getTournaments(): Promise<TournamentStructure[]> {
-  const url = new URL('/tournaments/', SERVER_ADDRESS);
+  const url = new URL('/api/tournaments/', SERVER_ADDRESS);
   return tokenFetch(url, {
     method: 'GET',
   }).then((response) => {
@@ -14,7 +14,7 @@ export function getTournaments(): Promise<TournamentStructure[]> {
 }
 
 export function getTournament(searchableName: SearchableName): Promise<TournamentStructure> {
-  const url = new URL(`/tournaments/${searchableName}`, SERVER_ADDRESS);
+  const url = new URL(`/api/tournaments/${searchableName}`, SERVER_ADDRESS);
   return tokenFetch(url, {
     method: 'GET',
   }).then((response) => {
@@ -31,7 +31,7 @@ export function noteForTournament(tournament: SearchableName, note: string): Pro
     note,
   };
 
-  return tokenFetch('/tournaments/notes', {
+  return tokenFetch('/api/tournaments/notes', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -57,7 +57,7 @@ export function serveStyleForTournament(
     body.badmintonServes = badmintonServes;
   }
 
-  return tokenFetch('/tournaments/serveStyle', {
+  return tokenFetch('/api/tournaments/serveStyle', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {

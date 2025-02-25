@@ -4,7 +4,7 @@ export function getQOTD(): Promise<{
   quote: string;
   author: string;
 }> {
-  const url = new URL('/qotd', SERVER_ADDRESS);
+  const url = new URL('/api/qotd', SERVER_ADDRESS);
   return tokenFetch(url, {
     method: 'GET',
   }).then((response) => {
