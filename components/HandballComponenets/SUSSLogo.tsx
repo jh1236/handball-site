@@ -5,7 +5,7 @@ export function SUSSLogo(props: any) {
   const { colorScheme } = useMantineColorScheme();
   return (
     <Image
-      src={`https://api.squarers.club/image?name=SUSS${colorScheme === 'dark' ? '' : '_light'}`}
+      src={`https://api.squarers.club/api/image?name=SUSS${colorScheme === 'dark' ? '' : '_light'}`}
       {...props}
     ></Image>
   );

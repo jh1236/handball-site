@@ -41,40 +41,40 @@ const currentDocuments: documentInfo[] = [
   {
     title: 'Current Rules',
     description: 'The Rules governing a game of S.U.S.S. Handball',
-    link: 'https://api.squarers.club/documents/rules',
-    imageUrl: 'https://api.squarers.club/image?name=umpire&big=true',
+    link: 'https://api.squarers.club/api/documents/rules',
+    imageUrl: 'https://api.squarers.club/api/image?name=umpire&big=true',
   },
   {
     title: 'Simplified Rules',
     description: 'The most important rules of handball.  Good for new players!',
-    link: 'https://api.squarers.club/documents/simplified_rules',
-    imageUrl: 'https://api.squarers.club/image?name=SUSS_dark',
+    link: 'https://api.squarers.club/api/documents/simplified_rules',
+    imageUrl: 'https://api.squarers.club/api/image?name=SUSS_dark',
   },
   {
     title: 'Code of Conduct',
     description: 'The Code of Conduct that binds all S.U.S.S. players, officials and spectators',
-    link: 'https://api.squarers.club/documents/code_of_conduct',
-    imageUrl: 'https://api.squarers.club/image?name=SUSS_dark',
+    link: 'https://api.squarers.club/api/documents/code_of_conduct',
+    imageUrl: 'https://api.squarers.club/api/image?name=SUSS_dark',
   },
   {
     title: 'Tournament Regulations',
     description: 'The Code of Conduct that binds all S.U.S.S. players, officials and spectators',
-    link: 'https://api.squarers.club/documents/tournament_regulations',
-    imageUrl: 'https://api.squarers.club/image?name=SUSS_dark',
+    link: 'https://api.squarers.club/api/documents/tournament_regulations',
+    imageUrl: 'https://api.squarers.club/api/image?name=SUSS_dark',
   },
   {
     title: 'The Yellow Book',
     description:
       'A catchall of any unusual decisions that have happened on a handball court, for the sake of keeping precedents',
     link: 'https://docs.google.com/spreadsheets/d/1KwNG112JWU1BIHHj3_LEIhRbPKLNAMla5SdO-SOaotE/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/image?name=yellow_book',
+    imageUrl: 'https://api.squarers.club/api/image?name=yellow_book',
   },
   {
     title: 'The Eighth S.U.S.S. Championship UQP',
     description:
       'The Briefing presented by the S.U.S.S. officiating core covering current interpretations of the rules',
     link: 'https://docs.google.com/presentation/d/1tlqWqJ-WxU8Dl97ELQhfw72ztPIUvP6jwIwdfz9UiaA/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/tournaments/image?name=eighth_suss_championship',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=eighth_suss_championship',
   },
 ];
 
@@ -84,35 +84,35 @@ const oldDocuments: documentInfo[] = [
     description:
       'The Briefing presented by the S.U.S.S. officiating core covering the interpretations of the rules for the Third S.U.S.S. Championship',
     link: 'https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/tournaments/image?name=third_suss_championship&big=true',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=third_suss_championship&big=true',
   },
   {
     title: 'The Fourth S.U.S.S. Championship UQP',
     description:
       'The Briefing presented by the S.U.S.S. officiating core covering the interpretations of the rules for the Fourth S.U.S.S. Championship',
     link: 'https://docs.google.com/presentation/d/19f1aP1ucWNLmslApekfMef_Lu1qsh8ckf3zTYA2P-VE/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/tournaments/image?name=fourth_suss_championship&big=true',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=fourth_suss_championship&big=true',
   },
   {
     title: 'The Fifth S.U.S.S. Championship UQP',
     description:
       'The Briefing presented by the S.U.S.S. officiating core covering the interpretations of the rules for the Fifth S.U.S.S. Championship',
     link: 'https://docs.google.com/presentation/d/1VkYuVcabr1jVMfTHc7EyL6Q0DGcPTJmXHYd2NUz3pFA/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/tournaments/image?name=fifth_suss_championship&big=true',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=fifth_suss_championship&big=true',
   },
   {
     title: 'The Sixth S.U.S.S. Championship UQP',
     description:
       'The Briefing presented by the S.U.S.S. officiating core covering the interpretations of the rules for the Sixth S.U.S.S. Championship',
     link: 'https://docs.google.com/presentation/d/11w2Y5xxK0YuzQu2AhZvCv4zwsjtgIibLtGypKbicdnI/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/tournaments/image?name=sixth_suss_championship&big=true',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=sixth_suss_championship&big=true',
   },
   {
     title: 'The Seventh S.U.S.S. Championship UQP',
     description:
       'The Briefing presented by the S.U.S.S. officiating core covering the interpretations of the rules for the Seventh S.U.S.S. Championship',
     link: 'https://docs.google.com/presentation/d/1mxQUzKvw147NF-bWqrQKwa62t20wfL2Ls4f91EYNH1Y/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/tournaments/image?name=seventh_suss_championship&big=true',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=seventh_suss_championship&big=true',
   },
 ];
 
