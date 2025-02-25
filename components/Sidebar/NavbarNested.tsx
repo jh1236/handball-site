@@ -181,7 +181,7 @@ export function NavbarNested({
                 style={{ width: '40px', margin: 0 }}
                 src={
                   myTournament?.imageUrl ||
-                  `${SERVER_ADDRESS}/image?name=SUSS${colorScheme === 'dark' ? '' : '_light'}`
+                  `${SERVER_ADDRESS}/api/image?name=SUSS${colorScheme === 'dark' ? '' : '_light'}`
                 }
               />
               <Box style={{ overflowWrap: 'break-word', width: '70%', margin: 0 }}>
