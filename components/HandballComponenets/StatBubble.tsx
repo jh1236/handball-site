@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Center, Container, Image, Skeleton, Space, Text } from '@mantine/core';
+import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 import { StatCategory } from '@/components/HandballComponenets/TournamentLanding';
 import { PersonStructure, TeamStructure } from '@/ServerActions/types';
 
@@ -33,6 +34,25 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
   }
   const sortMultiplier = stat.order === 'asc' ? 1 : -1;
   if (stat.type === 'team') {
+    if (teams.length === 0 || !teams.some(a => a.stats!['Games Played'] >= 1)) {
+      return (
+        <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
+          <Text size="auto" fw={700} ta="center">
+            <i>N/A</i>
+          </Text>
+          <Image
+            alt="Question mark"
+            src={`${SERVER_ADDRESS}/api/image?name=blank`}
+            h="200"
+            w="auto"
+            m="auto"
+          ></Image>
+          <Text ta="center">
+            <i>No Teams have played in this tournament</i>
+          </Text>
+        </Container>
+      );
+    }
     const team = teams?.reduce((a, b) => {
       const diff =
         sortMultiplier *
@@ -60,6 +80,25 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
             With {team.stats![stat.stat]} {stat.description}
           </Text>
         </Link>
+      </Container>
+    );
+  }
+  if (players.length === 0 || !players.some(a => a.stats!['Games Played'] >= 1)) {
+    return (
+      <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
+        <Text size="auto" fw={700} ta="center">
+          <i>N/A</i>
+        </Text>
+        <Image
+          alt="Question mark"
+          src={`${SERVER_ADDRESS}/api/image?name=blank`}
+          h="200"
+          w="auto"
+          m="auto"
+        ></Image>
+        <Text ta="center">
+          <i>No Players have played in this tournament</i>
+        </Text>
       </Container>
     );
   }

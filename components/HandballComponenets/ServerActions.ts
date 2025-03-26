@@ -15,9 +15,21 @@ export function useUserData() {
   const [permissionLevel, setPermissionLevel] = React.useState<number | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
   useEffect(() => {
-    setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
     if (loggedIn()) {
+      const timeout = localStorage.getItem('timeout');
+      if (timeout) {
+        const ms = Number.parseFloat(timeout) * 1000;
+        if (ms < Date.now()) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('permissionLevel');
+          localStorage.removeItem('username');
+          localStorage.removeItem('timeout');
+        }
+      }
+      setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
       setUsername(localStorage.getItem('username'));
+    } else {
+      setPermissionLevel(0);
     }
   }, []);
   return {
