@@ -16,7 +16,7 @@ export default function SidebarLayout({
   children,
   tournamentName,
 }: {
-  children: any;
+  children?: any;
   tournamentName?: string;
 }) {
   const [sidebarVisible, setSidebarVisible] = React.useState<boolean>(true);

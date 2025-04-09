@@ -132,7 +132,7 @@ export default function PlayerStatsTable({
             <Table.Tr key={stat}>
               <Table.Td ta={TA}>{stat}</Table.Td>
               {players.map((p) => (
-                <Table.Td ta={TA}>{p.stats?.[stat]}</Table.Td>
+                <Table.Td ta={TA}>{p.stats?.[stat] ?? '-'}</Table.Td>
               ))}
               <Table.Td ta={TA}>{averageStats?.stats[stat]}</Table.Td>
             </Table.Tr>

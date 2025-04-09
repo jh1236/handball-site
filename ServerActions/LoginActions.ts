@@ -9,7 +9,7 @@ export function loginAction(userId: string, password: string, remember: boolean)
     body.longSession = remember;
   }
 
-  return tokenFetch('/api/login/', {
+  return tokenFetch('/api/auth/login/', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
