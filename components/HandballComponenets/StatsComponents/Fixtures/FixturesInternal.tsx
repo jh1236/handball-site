@@ -47,8 +47,11 @@ export default function FixturesInternal({
           }
         } else {
           setFinals(data?.finals ?? []);
-          const temp = data.fixtures!.toReversed();
-          temp.length = maxRounds - (data?.finals?.length ?? 0);
+          const temp = (data.fixtures ?? []).toReversed();
+          temp.length = Math.min(
+            maxRounds - (data?.finals?.length ?? 0),
+            data?.finals?.length ?? 0
+          );
           setFixtures(temp.toReversed());
         }
       } else {

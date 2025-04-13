@@ -325,7 +325,7 @@ export function scoreForGame(
     body.method = method;
   }
 
-  return tokenFetch('/games/update/score', {
+  return tokenFetch('/api/games/update/score', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
@@ -435,45 +435,6 @@ export function endTimeoutForGame(gameId: number): Promise<void> {
   });
 }
 
-export function startServeClockForGame(gameId: number): Promise<void> {
-  const body: any = {
-    id: gameId,
-    start: true,
-  };
-
-  return tokenFetch('/api/games/update/end/timeout', {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8',
-    },
-  }).then((response) => {
-    if (!response.ok) {
-      return Promise.reject(response.text());
-    }
-    return Promise.resolve();
-  });
-}
-
-export function stopServeClockForGame(gameId: number): Promise<void> {
-  const body: any = {
-    id: gameId,
-    start: false,
-  };
-
-  return tokenFetch('/api/games/update/end/timeout', {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8',
-    },
-  }).then((response) => {
-    if (!response.ok) {
-      return Promise.reject(response.text());
-    }
-    return Promise.resolve();
-  });
-}
 
 export function undoForGame(gameId: number): Promise<void> {
   const body: any = {

@@ -28,28 +28,10 @@ import {
 } from '@tabler/icons-react';
 import { GiTennisCourt } from 'react-icons/gi';
 import { PiFlagCheckeredFill, PiHandshakeFill } from 'react-icons/pi';
-import {
-  Accordion,
-  Button,
-  Center,
-  Divider,
-  Group,
-  Popover,
-  Rating,
-  Table,
-  Text,
-  Timeline,
-  Title,
-} from '@mantine/core';
+import { Accordion, Button, Center, Divider, Group, Popover, Rating, Text, Timeline, Title } from '@mantine/core';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
-import {
-  deleteGame,
-  endGame,
-  forfeitGame,
-  resolveGame,
-  startGame,
-} from '@/ServerActions/GameActions';
+import { deleteGame, endGame, forfeitGame, resolveGame, startGame } from '@/ServerActions/GameActions';
 import { CardStructure, GameEventStructure, GameStructure } from '@/ServerActions/types';
 
 interface AdminGamePanelProps {
@@ -132,8 +114,8 @@ const cardColor = (e: GameEventStructure | CardStructure) =>
   e.eventType.toLowerCase().replace(' Card', '');
 
 export function AdminGamePanel({ game }: AdminGamePanelProps) {
-  const teamTwoCards = game.admin!.cards!.filter((a) => !a.firstTeam);
-  const teamOneCards = game.admin!.cards!.filter((a) => a.firstTeam);
+  const teamTwoCards = game.admin?.cards!.filter((a) => !a.firstTeam) ?? [];
+  const teamOneCards = game.admin?.cards!.filter((a) => a.firstTeam) ?? [];
   const router = useRouter();
   const { isUmpireManager } = useUserData();
   return (
@@ -302,7 +284,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
             </Accordion.Control>
             <Accordion.Panel>
               <strong>Marked For Review: </strong>
-              {game.admin!.markedForReview ? (
+              {game.admin?.markedForReview ? (
                 <IconCheckbox size="1.25em"></IconCheckbox>
               ) : (
                 <IconSquare size="1.25em"></IconSquare>
@@ -320,7 +302,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                 )
               ) : (
                 <>
-                  <strong>Notes: </strong> {game.admin?.notes}
+                  <strong>Notes: </strong> {game?.admin?.notes}
                 </>
               )}
             </Accordion.Panel>

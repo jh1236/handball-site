@@ -2,27 +2,12 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  Box,
-  Center,
-  Grid,
-  Image,
-  LoadingOverlay,
-  Portal,
-  RingProgress,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Box, Center, Grid, Image, LoadingOverlay, Portal, RingProgress, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { customTournamentScoreboardEffects } from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
 import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
-import {
-  GameStructure,
-  GameTeamStructure,
-  PersonStructure,
-  PlayerGameStatsStructure,
-} from '@/ServerActions/types';
+import { GameStructure, GameTeamStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+
 
 interface ScoreboardProps {
   gameID: number;
@@ -93,7 +78,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     if (lastCheck + 500 < currentTime) {
       setLastCheck(currentTime);
       getChangeCode(gameID).then((code) => {
-        if (game && code !== game.changeCode) {
+        if (game !== undefined && code !== game.changeCode) {
           reloadGame();
         }
       });

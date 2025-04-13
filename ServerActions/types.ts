@@ -148,7 +148,6 @@ export interface GameStructure {
   isBye: boolean;
   status: string;
   events?: GameEventStructure[];
-  players?: PlayerGameStatsStructure[];
   timeoutExpirationTime: number;
   changeCode: number;
   admin?: {
