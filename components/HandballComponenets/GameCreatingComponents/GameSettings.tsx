@@ -104,7 +104,7 @@ export function GameSettings({
               teamNameOne,
               teamNameTwo
             )
-              .then(({ id }) => {
+              .then((id) => {
                 router.push(`/games/${id}/edit`);
               })
               .catch(() => alert('Learn to use a basic ui!'));
