@@ -164,7 +164,7 @@ export function getNoteableGames({
   games: GameStructure[];
   tournaments?: TournamentStructure;
 }> {
-  const url = new URL('/apigames/noteable', SERVER_ADDRESS);
+  const url = new URL('/api/games/noteable', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
   }
@@ -435,7 +435,6 @@ export function endTimeoutForGame(gameId: number): Promise<void> {
   });
 }
 
-
 export function undoForGame(gameId: number): Promise<void> {
   const body: any = {
     id: gameId,
@@ -685,7 +684,7 @@ export function createGameWithPlayers(
   scorer?: SearchableName,
   teamOneName?: string,
   teamTwoName?: string
-): Promise<{ id: number }> {
+): Promise<number> {
   const body: any = {
     tournament,
     playersOne,
@@ -714,6 +713,14 @@ export function createGameWithPlayers(
     if (!response.ok) {
       return Promise.reject(response.text());
     }
-    return response.json();
+    return response.json().then((j) => {
+      if (j.id !== undefined) {
+        return j.id;
+      }
+      if (j.game !== undefined) {
+        return j.game.id;
+      }
+      return Promise.reject(response.text());
+    });
   });
 }
