@@ -178,12 +178,16 @@ export function score(
   if (game.badminton || game.firstTeamServes.get !== firstTeam) {
     servingTeam.servingFromLeft.set(!servingTeam.servingFromLeft.get);
   }
+
   const team = firstTeam ? game.teamOne : game.teamTwo;
+  const player = leftPlayer ? team.left : team.right;
   team.score.set(team.score.get + 1);
   const needsSwap = firstTeam === game.firstTeamServes.get;
   game.firstTeamServes.set(firstTeam);
   nextPoint(game, needsSwap ? firstTeam : undefined);
-  scoreForGame(game.id, firstTeam, leftPlayer, method).catch(() => sync(game));
+  scoreForGame(game.id, firstTeam, player.get?.searchableName!, leftPlayer, method).catch(() =>
+    sync(game)
+  );
 }
 
 export function ace(game: GameState): void {
@@ -240,7 +244,9 @@ export function sub(game: GameState, firstTeam: boolean, leftPlayer: boolean): v
   const temp = player.get;
   player.set(substitute.get);
   substitute.set(temp);
-  substituteForGame(game.id, firstTeam, leftPlayer).catch(() => sync(game));
+  substituteForGame(game.id, firstTeam, player.get?.searchableName!, leftPlayer).catch(() =>
+    sync(game)
+  );
 }
 
 export function warning(
@@ -362,7 +368,15 @@ export function card(
   if (outOtherPlayer !== otherPlayer.get!) {
     otherPlayer.set(outOtherPlayer);
   }
-  cardForGame(game.id, firstTeam, leftPlayer, color, duration, reason).catch(() => sync(game));
+  cardForGame(
+    game.id,
+    firstTeam,
+    player.get?.searchableName!,
+    color,
+    duration,
+    reason,
+    leftPlayer
+  ).catch(() => sync(game));
 }
 
 export function undo(game: GameState): void {
