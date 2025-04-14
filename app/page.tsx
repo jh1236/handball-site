@@ -100,7 +100,7 @@ export default function HomePage() {
         <>
           <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
             <SUSSLogo alt="The SUSS handball Logo" h="100" w="auto" m="auto"></SUSSLogo>
-            <Title ta="center">Welcome to S.U.S.S. Handball.</Title>
+            <Title ta="center">Welcome to SUSS Handball.</Title>
           </Container>
           <Grid w="98.5%">
             <Grid.Col span={{ base: 12, lg: 6 }}>

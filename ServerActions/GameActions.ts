@@ -313,16 +313,20 @@ export function startGame(
 export function scoreForGame(
   gameId: number,
   firstTeam: boolean,
-  leftPlayer: boolean,
+  playerSearchable: SearchableName,
+  leftPlayer?: boolean,
   method?: string
 ): Promise<void> {
   const body: any = {
     id: gameId,
     firstTeam,
-    leftPlayer,
+    playerSearchable,
   };
   if (method) {
     body.method = method;
+  }
+  if (leftPlayer !== undefined) {
+    body.leftPlayer = leftPlayer;
   }
 
   return tokenFetch('/api/games/update/score', {
@@ -457,19 +461,24 @@ export function undoForGame(gameId: number): Promise<void> {
 export function cardForGame(
   gameId: number,
   firstTeam: boolean,
-  leftPlayer: boolean,
+  playerSearchable: SearchableName,
   color: 'Warning' | 'Green' | 'Yellow' | 'Red',
   duration: number,
-  reason: string
+  reason: string,
+  leftPlayer?: boolean
 ): Promise<void> {
   const body: any = {
     id: gameId,
     firstTeam,
-    leftPlayer,
+    playerSearchable,
     color,
     duration,
     reason,
   };
+
+  if (leftPlayer !== undefined) {
+    body.leftPlayer = leftPlayer;
+  }
 
   return tokenFetch('/api/games/update/card', {
     method: 'POST',
@@ -488,13 +497,18 @@ export function cardForGame(
 export function substituteForGame(
   gameId: number,
   firstTeam: boolean,
-  leftPlayer: boolean
+  playerSearchable: string,
+  leftPlayer?: boolean
 ): Promise<void> {
   const body: any = {
     id: gameId,
     firstTeam,
-    leftPlayer,
+    playerSearchable,
   };
+
+  if (leftPlayer !== undefined) {
+    body.leftPlayer = leftPlayer;
+  }
 
   return tokenFetch('/api/games/update/substitute', {
     method: 'POST',

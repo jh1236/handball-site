@@ -124,17 +124,12 @@ export function EditGame({ game }: { game: number }) {
     console.log(`${gameObj.teamOne.name} Left Serve is ${gameObj.teamOne.servingFromLeft}`);
     const { teamOne, teamTwo } = gameObj;
     if (gameObj.started) {
-      for (const i of [teamOne.captain, teamOne.nonCaptain, teamOne.substitute]) {
-        if (!i) {
-          // The code cleaner fuckin hates me and wants no continue here
-        } else if (i.sideOfCourt === 'Left') {
-          setTeamOneLeft(i);
-        } else if (i.sideOfCourt === 'Right') {
-          setTeamOneRight(i);
-        } else if (i.sideOfCourt === 'Substitute') {
-          setTeamOneSub(i);
-        }
-      }
+      const sorted = [teamOne.captain, teamOne.nonCaptain, teamOne.substitute].toSorted((a, b) =>
+        (a?.sideOfCourt ?? 'z').localeCompare((b?.sideOfCourt ?? 'z'))
+      );
+      setTeamOneLeft(sorted[0] || undefined);
+      setTeamOneRight(sorted[1] || undefined);
+      setTeamOneSub(sorted[2] || undefined);
     } else {
       //trick i stole from python, if nonCaptain is null it will be replaced with undefined
       setTeamOneLeft(teamOne.captain);
@@ -146,19 +141,13 @@ export function EditGame({ game }: { game: number }) {
     setTeamTwoTimeouts(gameObj.teamTwoTimeouts);
     setTeamTwoScore(gameObj.teamTwoScore);
     setTeamTwoServingLeft(gameObj.teamTwo.servingFromLeft!);
-    console.log(`${gameObj.teamTwo.name} Left Serve is ${gameObj.teamTwo.servingFromLeft}`);
     if (gameObj.started) {
-      for (const i of [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute]) {
-        if (i?.sideOfCourt === 'Left') {
-          setTeamTwoLeft(i);
-        }
-        if (i?.sideOfCourt === 'Right') {
-          setTeamTwoRight(i);
-        }
-        if (i?.sideOfCourt === 'Substitute') {
-          setTeamTwoSub(i);
-        }
-      }
+      const sorted = [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute].toSorted((a, b) =>
+        (a?.sideOfCourt ?? 'z').localeCompare((b?.sideOfCourt ?? 'z'))
+      );
+      setTeamTwoLeft(sorted[0] || undefined);
+      setTeamTwoRight(sorted[1] || undefined);
+      setTeamTwoSub(sorted[2] || undefined);
     } else {
       setTeamTwoLeft(teamTwo.captain);
       //trick i stole from python, if nonCaptain is null it will be replaced with undefined
