@@ -3,6 +3,7 @@ export type RealName = string;
 
 export interface TeamStructure {
   name: string;
+  extendedName: string;
   searchableName: string;
   imageUrl: string;
   bigImageUrl: string;
@@ -105,6 +106,7 @@ export interface GameEventStructure {
 
 export interface GameTeamStructure {
   name: string;
+  extendedName: string;
   searchableName: string;
   imageUrl: string;
   captain: PlayerGameStatsStructure;
