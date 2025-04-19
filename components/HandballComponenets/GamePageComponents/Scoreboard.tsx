@@ -298,7 +298,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       />
       <Box w="100vw" pos="absolute" top="25px">
         <Center component={Title} fz={40}>
-          {teamOne?.name} vs {teamTwo?.name}
+          {teamOne?.extendedName} vs {teamTwo?.extendedName}
         </Center>
       </Box>
       <Box mt="auto">

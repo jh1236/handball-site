@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Divider,
@@ -17,6 +18,7 @@ import {
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import { FakeCheckbox } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
 import { getNoteableGames } from '@/ServerActions/GameActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
@@ -222,6 +224,14 @@ export function Management({ tournament }: ManagementArgs) {
   const [actionableGames, setActionableGames] = useState<GameStructure[]>([]);
   const [players, setPlayers] = useState<PersonStructure[] | null>(null);
   const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);
+  const { isUmpireManager, loading } = useUserData();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUmpireManager && !loading) {
+      router.push(`/${tournament}`);
+    }
+  }, [isUmpireManager, loading, router]);
   useEffect(() => {
     getNoteableGames({ tournament }).then((g) => {
       setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());

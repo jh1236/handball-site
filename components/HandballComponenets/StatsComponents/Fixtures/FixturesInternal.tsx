@@ -50,7 +50,7 @@ export default function FixturesInternal({
           const temp = (data.fixtures ?? []).toReversed();
           temp.length = Math.min(
             maxRounds - (data?.finals?.length ?? 0),
-            data?.finals?.length ?? 0
+            data?.fixtures?.length ?? 0
           );
           setFixtures(temp.toReversed());
         }

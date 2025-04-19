@@ -98,7 +98,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
           w="auto"
           m="auto"
         ></Image>
-        <Title ta="center">{teamObj?.name}</Title>
+        <Title ta="center">{teamObj?.extendedName}</Title>
       </Container>
       <Tabs defaultValue="stats">
         <Tabs.List grow>
