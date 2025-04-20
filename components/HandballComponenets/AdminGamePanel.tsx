@@ -50,6 +50,7 @@ import {
   startGame,
 } from '@/ServerActions/GameActions';
 import { CardStructure, GameEventStructure, GameStructure } from '@/ServerActions/types';
+import { playersFromGame } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
 
 interface AdminGamePanelProps {
   game: GameStructure;
@@ -186,7 +187,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                 .then(() =>
                                   endGame(
                                     game.id,
-                                    game.teamTwo.captain.searchableName,
+                                    playersFromGame(game).map((pgs) => pgs!.searchableName),
                                     3,
                                     3,
                                     `Pregame Forfeit by ${game.teamOne.name}`
@@ -198,7 +199,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                 .then(() =>
                                   endGame(
                                     game.id,
-                                    game.teamTwo.captain.searchableName,
+                                    playersFromGame(game).map((pgs) => pgs!.searchableName),
                                     3,
                                     3,
                                     `Pregame Forfeit by ${game.teamOne.name}`
@@ -208,7 +209,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                             } else {
                               endGame(
                                 game.id,
-                                game.teamTwo.captain.searchableName,
+                                playersFromGame(game).map((pgs) => pgs!.searchableName),
                                 3,
                                 3,
                                 `Pregame Forfeit by ${game.teamOne.name}`
@@ -227,7 +228,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                 .then(() =>
                                   endGame(
                                     game.id,
-                                    game.teamOne.captain.searchableName,
+                                    playersFromGame(game).map((pgs) => pgs!.searchableName),
                                     3,
                                     3,
                                     `Pregame Forfeit by ${game.teamTwo.name}`
@@ -240,7 +241,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                 .then(() =>
                                   endGame(
                                     game.id,
-                                    game.teamOne.captain.searchableName,
+                                    playersFromGame(game).map((pgs) => pgs!.searchableName),
                                     3,
                                     3,
                                     `Pregame Forfeit by ${game.teamTwo.name}`
@@ -250,7 +251,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                             } else {
                               endGame(
                                 game.id,
-                                game.teamTwo.captain.searchableName,
+                                playersFromGame(game).map((pgs) => pgs!.searchableName),
                                 3,
                                 3,
                                 `Pregame Forfeit by ${game.teamOne.name}`

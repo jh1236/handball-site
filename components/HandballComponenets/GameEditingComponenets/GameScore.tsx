@@ -1,7 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { useRouter } from 'next/navigation';
-import { IconCheckbox, IconCloudUpload, IconNote, IconSquare } from '@tabler/icons-react';
+import {
+  IconCheckbox,
+  IconCloudUpload,
+  IconNote,
+  IconSquare,
+  IconTrophy,
+} from '@tabler/icons-react';
 import useSound from 'use-sound';
 import {
   Accordion,
@@ -25,6 +31,7 @@ import {
   end,
   GameState,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { OrderPlayers } from '@/components/HandballComponenets/GameEditingComponenets/OrderPlayers';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
@@ -90,6 +97,11 @@ function getActions(
       ),
     },
     {
+      Icon: IconTrophy,
+      value: 'Rank Best Players',
+      content: <OrderPlayers game={game}></OrderPlayers>,
+    },
+    {
       Icon: IconCloudUpload,
       value: 'Finalise Game',
       content: (
@@ -133,11 +145,6 @@ function getActions(
                   <strong>: </strong>
                   {game.teamOne.notes.get ? game.teamOne.notes.get : <i>Unset</i>}
                 </List.Item>
-                <List.Item>
-                  <strong>{markIfReqd(!game.teamOne.signed.get, 'Signature')} </strong>
-                  <strong>: </strong>
-                  <FakeCheckbox checked={Boolean(game.teamOne.signed.get)}></FakeCheckbox>
-                </List.Item>
               </List>
             </List.Item>
             <List.Item>
@@ -158,11 +165,6 @@ function getActions(
                   <strong>: </strong>
                   {game.teamTwo.notes.get ? game.teamTwo.notes.get : <i>Unset</i>}
                 </List.Item>
-                <List.Item>
-                  <strong>{markIfReqd(!game.teamTwo.signed.get, 'Signature')} </strong>
-                  <strong>: </strong>
-                  <FakeCheckbox checked={Boolean(game.teamTwo.signed.get)}></FakeCheckbox>
-                </List.Item>
               </List>
             </List.Item>
           </List>
@@ -180,12 +182,10 @@ function getActions(
                     game.teamTwo.rating.get &&
                     (game.teamTwo.rating.get !== 1 || game.teamTwo.notes.get)
                   ) ||
-                  (reviewReqd && !game.notes.get) ||
-                  !game.teamOne.signed.get ||
-                  !game.teamTwo.signed.get))
+                  (reviewReqd && !game.notes.get)))
             }
             onClick={() => {
-              end(game, bestPlayer!.searchableName, reviewReqd).then(() =>
+              end(game, reviewReqd).then(() =>
                 router.push('/games/create')
               );
               close();

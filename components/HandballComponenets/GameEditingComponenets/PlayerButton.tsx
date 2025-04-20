@@ -463,27 +463,6 @@ function getActions(
     }));
   }
   if (game.ended.get) {
-    out.splice(0, 0, {
-      Icon: IconTrophy,
-      value: 'Set Best Player',
-      color: undefined,
-      content: (
-        <Button
-          color={currentPlayer.get?.isBestPlayer ? 'orange' : 'blue'}
-          size="lg"
-          onClick={() => {
-            allPlayers.forEach((p) => {
-              const t = p.get!;
-              t.isBestPlayer = t.searchableName === currentPlayer?.get?.searchableName;
-              p.set(t);
-            });
-            close();
-          }}
-        >
-          Best
-        </Button>
-      ),
-    });
     return out;
   }
   out.splice(0, 0, {
