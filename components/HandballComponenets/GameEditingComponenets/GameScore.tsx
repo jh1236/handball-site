@@ -33,7 +33,6 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { OrderPlayers } from '@/components/HandballComponenets/GameEditingComponenets/OrderPlayers';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
-import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface GameScoreArgs {
   game: GameState;
@@ -42,7 +41,7 @@ interface GameScoreArgs {
 const CAN_HAVE_ZAIAH_BOX = ['Zaiah Deards', 'Jared Healy'];
 
 export const ZAIAH_BOX_FUCKERY = false;
-export const QUICK_GAME_END = true;
+export const QUICK_GAME_END = false;
 
 export function FakeCheckbox({ checked }: { checked: boolean }) {
   return checked ? (
@@ -54,11 +53,11 @@ export function FakeCheckbox({ checked }: { checked: boolean }) {
 
 function getActions(
   game: GameState,
-  bestPlayer: PlayerGameStatsStructure | undefined,
   close: () => void,
   reviewReqd: boolean,
   setReviewReqd: (value: ((prevState: boolean) => boolean) | boolean) => void,
-  router: AppRouterInstance
+  router: AppRouterInstance,
+  bestPlayersOpened: boolean
 ) {
   const winningTeam =
     game.teamTwo.score.get > game.teamOne.score.get ? game.teamTwo.name : game.teamOne.name;
@@ -99,6 +98,8 @@ function getActions(
     {
       Icon: IconTrophy,
       value: 'Rank Best Players',
+      title: markIfReqd(!bestPlayersOpened, 'Rank Best Players'),
+      color: undefined,
       content: <OrderPlayers game={game}></OrderPlayers>,
     },
     {
@@ -112,10 +113,10 @@ function getActions(
               {winningTeam}
             </List.Item>
             <List.Item>
-              <strong>Best Player</strong>
-              {!bestPlayer && <strong style={{ color: 'red' }}>*</strong>}
+              <strong>Best Players</strong>
+              {!bestPlayersOpened && <strong style={{ color: 'red' }}>*</strong>}
               <strong>: </strong>
-              {bestPlayer?.name ?? <i>Unset</i>}
+              {game.votes.get.map((pgs) => pgs.name).join(', ')}
             </List.Item>
             <List.Item>
               <strong>Review Required: </strong>
@@ -172,22 +173,16 @@ function getActions(
             size="lg"
             color="red"
             disabled={
-              !bestPlayer ||
-              (!QUICK_GAME_END &&
-                (!(
-                  game.teamOne.rating.get &&
-                  (game.teamOne.rating.get !== 1 || game.teamOne.notes.get)
-                ) ||
-                  !(
-                    game.teamTwo.rating.get &&
-                    (game.teamTwo.rating.get !== 1 || game.teamTwo.notes.get)
-                  ) ||
-                  (reviewReqd && !game.notes.get)))
+              !QUICK_GAME_END &&
+              (!game.teamOne.rating.get ||
+                !game.teamTwo.rating.get ||
+                (game.teamOne.rating.get === 1 && !game.teamOne.notes.get) ||
+                (game.teamTwo.rating.get === 1 && !game.teamTwo.notes.get) ||
+                (reviewReqd && !game.notes.get) ||
+                !bestPlayersOpened)
             }
             onClick={() => {
-              end(game, reviewReqd).then(() =>
-                router.push('/games/create')
-              );
+              end(game, reviewReqd).then(() => router.push('/games/create'));
               close();
             }}
           >
@@ -200,22 +195,15 @@ function getActions(
 }
 
 export function GameScore({ game }: GameScoreArgs) {
-  const bestPlayer = [
-    game.teamOne.left,
-    game.teamOne.right,
-    game.teamOne.sub,
-    game.teamTwo.left,
-    game.teamTwo.right,
-    game.teamTwo.sub,
-  ].filter((a) => a.get && a.get.isBestPlayer);
   const router = useRouter();
   const [reviewReqd, setReviewReqd] = useState<boolean>(false);
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
   const [openMatchPoints, setOpenMatchPoints] = useState(false);
+  const [bestPlayersOpened, setBestPlayersOpened] = useState(false);
   const [openZaiahBox, setOpenZaiahBox] = useState<number>(0);
   const items = useMemo(
     () =>
-      getActions(game, bestPlayer[0]?.get, closeEndGame, reviewReqd, setReviewReqd, router).map(
+      getActions(game, closeEndGame, reviewReqd, setReviewReqd, router, bestPlayersOpened).map(
         (item, i) => (
           <Accordion.Item key={i} value={item.value}>
             <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
@@ -225,7 +213,7 @@ export function GameScore({ game }: GameScoreArgs) {
           </Accordion.Item>
         )
       ),
-    [bestPlayer, closeEndGame, game]
+    [closeEndGame, game]
   );
 
   const [playZaiahBox] = useSound(`/sounds/zaiah${Math.floor(Math.random() * 6 + 1)}.mp3`, {
@@ -261,7 +249,16 @@ export function GameScore({ game }: GameScoreArgs) {
       ></Image>
       <Modal opened={endGameOpen} centered onClose={closeEndGame} title="Action">
         <Title> End Game</Title>
-        <Accordion defaultValue="Notes">{items}</Accordion>
+        <Accordion
+          defaultValue="Notes"
+          onChange={(v) => {
+            if (v === 'Rank Best Players') {
+              setBestPlayersOpened(true);
+            }
+          }}
+        >
+          {items}
+        </Accordion>
       </Modal>
       <Modal
         zIndex={999}
