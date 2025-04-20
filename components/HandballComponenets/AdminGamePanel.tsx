@@ -15,6 +15,7 @@ import {
   IconFlagCheck,
   IconFlagFilled,
   IconHandGrab,
+  IconListNumbers,
   IconNote,
   IconPlayHandball,
   IconShoe,
@@ -40,6 +41,7 @@ import {
   Timeline,
   Title,
 } from '@mantine/core';
+import { playersFromGame } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import {
@@ -50,7 +52,6 @@ import {
   startGame,
 } from '@/ServerActions/GameActions';
 import { CardStructure, GameEventStructure, GameStructure } from '@/ServerActions/types';
-import { playersFromGame } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
 
 interface AdminGamePanelProps {
   game: GameStructure;
@@ -92,6 +93,8 @@ export const eventIcon = (e: CardStructure) => {
       return <IconAlertTriangle color="yellow" />;
     case 'Start':
       return <IconFlagCheck />;
+    case 'Votes':
+      return <IconListNumbers />;
     case 'Score':
       switch (e.notes) {
         case 'Ace':
@@ -191,7 +194,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                     3,
                                     3,
                                     `Pregame Forfeit by ${game.teamOne.name}`
-                                  ).then(() => router.push(`/${game.tournament.searchableName}/fixtures`))
+                                  ).then(() =>
+                                    router.push(`/${game.tournament.searchableName}/fixtures`)
+                                  )
                                 );
                             }
                             if (!game.someoneHasWon) {
@@ -205,7 +210,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                     `Pregame Forfeit by ${game.teamOne.name}`
                                   )
                                 )
-                                .then(() => router.push(`/${game.tournament.searchableName}/fixtures`));
+                                .then(() =>
+                                  router.push(`/${game.tournament.searchableName}/fixtures`)
+                                );
                             } else {
                               endGame(
                                 game.id,
@@ -213,7 +220,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                 3,
                                 3,
                                 `Pregame Forfeit by ${game.teamOne.name}`
-                              ).then(() => router.push(`/${game.tournament.searchableName}/fixtures`));
+                              ).then(() =>
+                                router.push(`/${game.tournament.searchableName}/fixtures`)
+                              );
                             }
                           }}
                           color="red"
@@ -232,7 +241,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                     3,
                                     3,
                                     `Pregame Forfeit by ${game.teamTwo.name}`
-                                  ).then(() => router.push(`/${game.tournament.searchableName}/fixtures`))
+                                  ).then(() =>
+                                    router.push(`/${game.tournament.searchableName}/fixtures`)
+                                  )
                                 );
                             }
                             if (!game.someoneHasWon) {
@@ -247,7 +258,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                     `Pregame Forfeit by ${game.teamTwo.name}`
                                   )
                                 )
-                                .then(() => router.push(`/${game.tournament.searchableName}/fixtures`));
+                                .then(() =>
+                                  router.push(`/${game.tournament.searchableName}/fixtures`)
+                                );
                             } else {
                               endGame(
                                 game.id,
@@ -255,7 +268,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                                 3,
                                 3,
                                 `Pregame Forfeit by ${game.teamOne.name}`
-                              ).then(() => router.push(`/${game.tournament.searchableName}/fixtures`));
+                              ).then(() =>
+                                router.push(`/${game.tournament.searchableName}/fixtures`)
+                              );
                             }
                           }}
                           color="red"
@@ -498,7 +513,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                       bullet={eventIcon(e)}
                     >
                       <Text c="dimmed" size="sm">
-                        <strong>{e.notes ?? ''}</strong>
+                        <strong>
+                          {e.notes ?? (e.eventType === 'Votes' ? `${e.details} Votes` : '')}
+                        </strong>
                       </Text>
                     </Timeline.Item>
                   ))}
