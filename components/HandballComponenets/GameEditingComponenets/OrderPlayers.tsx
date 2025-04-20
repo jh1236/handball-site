@@ -1,6 +1,7 @@
 import {
   closestCenter,
   DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -14,7 +15,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { IconAward, IconHomeRibbon, IconTrophy } from '@tabler/icons-react';
 import { Center, Paper, Text } from '@mantine/core';
 import { GameState } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
@@ -24,12 +24,12 @@ interface OrderPlayersProps {
 }
 
 export function OrderPlayers({ game }: OrderPlayersProps) {
-  function handleDragEnd(event) {
-    const { active, over } = event;
-
-    if (active.id !== over.id) {
-      const oldIndex = game.votes.get.map((pgs) => pgs.searchableName).indexOf(active.id);
-      const newIndex = game.votes.get.map((pgs) => pgs.searchableName).indexOf(over.id);
+  function handleDragEnd({ active, over }: DragEndEvent) {
+    if (active.id !== over?.id) {
+      const oldIndex = game.votes.get
+        .map((pgs) => pgs.searchableName)
+        .indexOf(active!.id as string);
+      const newIndex = game.votes.get.map((pgs) => pgs.searchableName).indexOf(over!.id as string);
       game.votes.set(arrayMove(game.votes.get, oldIndex, newIndex));
     }
   }
