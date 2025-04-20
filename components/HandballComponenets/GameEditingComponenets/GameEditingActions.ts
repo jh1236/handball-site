@@ -45,10 +45,6 @@ type Team = {
     get: boolean;
     set: (v: boolean) => void;
   };
-  signed: {
-    get: string;
-    set: (v: string) => void;
-  };
   left: {
     get?: PlayerGameStatsStructure;
     set: (v?: PlayerGameStatsStructure) => void;
@@ -69,6 +65,10 @@ export interface GameState {
   timeoutExpirationTime: {
     get: number;
     set: (v: number) => void;
+  };
+  votes: {
+    get: PlayerGameStatsStructure[];
+    set: (v: PlayerGameStatsStructure[]) => void;
   };
   notes: {
     get: string;
@@ -146,10 +146,10 @@ export function begin(game: GameState) {
   ).then(() => sync(game));
 }
 
-export function end(game: GameState, bestPlayer: SearchableName, reviewRequired: boolean) {
+export function end(game: GameState, reviewRequired: boolean) {
   return endGame(
     game.id,
-    bestPlayer,
+    game.votes.get.map((pgs) => pgs!.searchableName),
     game.teamOne.rating.get === 0 && QUICK_GAME_END ? 3 : game.teamOne.rating.get,
     game.teamTwo.rating.get === 0 && QUICK_GAME_END ? 3 : game.teamTwo.rating.get,
     game.notes.get,

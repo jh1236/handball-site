@@ -23,6 +23,17 @@ let setGameFn: (game: GameStructure) => void;
 // eslint-disable-next-line import/no-mutable-exports
 export let startLoading: () => void;
 
+export function playersFromGame(game: GameStructure): PlayerGameStatsStructure[] {
+  return [
+    game.teamOne.captain,
+    game.teamOne.nonCaptain,
+    game.teamOne.substitute,
+    game.teamTwo.captain,
+    game.teamTwo.nonCaptain,
+    game.teamOne.substitute,
+  ].filter((pgs) => pgs !== null && pgs !== undefined);
+}
+
 export function reloadGame(gameID: number) {
   getGame({ gameID }).then((gameIn) => {
     setGameFn(gameIn);
@@ -46,12 +57,12 @@ export function EditGame({ game }: { game: number }) {
   const [currentTime, setCurrentTime] = React.useState<number>(300);
   const [teamOneIGA, setTeamOneIGA] = React.useState<boolean>(true);
   const [notes, setNotes] = React.useState<string>('');
+  const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
 
   //team one state
   const [teamOneTimeouts, setTeamOneTimeouts] = React.useState<number>(0);
   const [teamOneNotes, setTeamOneNotes] = React.useState<string>('');
   const [teamOneProtest, setTeamOneProtest] = React.useState<string>('');
-  const [teamOneSigned, setTeamOneSigned] = React.useState<string>('');
   const [teamOneServingLeft, setTeamOneServingLeft] = React.useState<boolean>(true);
   const [teamOneName, setTeamOneName] = React.useState<string>('Loading...');
   const [teamOneScore, setTeamOneScore] = React.useState<number>(0);
@@ -70,7 +81,6 @@ export function EditGame({ game }: { game: number }) {
   const [teamTwoNotes, setTeamTwoNotes] = React.useState<string>('');
   const [teamTwoProtest, setTeamTwoProtest] = React.useState<string>('');
 
-  const [teamTwoSigned, setTeamTwoSigned] = React.useState<string>('');
   const [teamTwoServingLeft, setTeamTwoServingLeft] = React.useState<boolean>(true);
   const [teamTwoName, setTeamTwoName] = React.useState<string>('Loading...');
   const [teamTwoScore, setTeamTwoScore] = React.useState<number>(0);
@@ -117,6 +127,7 @@ export function EditGame({ game }: { game: number }) {
     setTimeoutExpirationTime(gameObj.timeoutExpirationTime);
     setStarted(gameObj.started);
     setEnded(gameObj.someoneHasWon);
+    setVotes(playersFromGame(gameObj));
     //Team Specific
     setTeamOneTimeouts(gameObj.teamOneTimeouts);
     setTeamOneScore(gameObj.teamOneScore);
@@ -125,7 +136,7 @@ export function EditGame({ game }: { game: number }) {
     const { teamOne, teamTwo } = gameObj;
     if (gameObj.started) {
       const sorted = [teamOne.captain, teamOne.nonCaptain, teamOne.substitute].toSorted((a, b) =>
-        (a?.sideOfCourt ?? 'z').localeCompare((b?.sideOfCourt ?? 'z'))
+        (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
       );
       setTeamOneLeft(sorted[0] || undefined);
       setTeamOneRight(sorted[1] || undefined);
@@ -143,7 +154,7 @@ export function EditGame({ game }: { game: number }) {
     setTeamTwoServingLeft(gameObj.teamTwo.servingFromLeft!);
     if (gameObj.started) {
       const sorted = [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute].toSorted((a, b) =>
-        (a?.sideOfCourt ?? 'z').localeCompare((b?.sideOfCourt ?? 'z'))
+        (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
       );
       setTeamTwoLeft(sorted[0] || undefined);
       setTeamTwoRight(sorted[1] || undefined);
@@ -166,6 +177,10 @@ export function EditGame({ game }: { game: number }) {
   }, [closeTimeout, openTimeout, timeoutExpirationTime]);
 
   const gameState: GameState = {
+    votes: {
+      get: votes,
+      set: setVotes,
+    },
     badminton: gameObj?.tournament.usingBadmintonServes ?? false,
     timeoutExpirationTime: {
       get: timeoutExpirationTime,
@@ -199,10 +214,6 @@ export function EditGame({ game }: { game: number }) {
     },
     teamOne: {
       name: teamOneName,
-      signed: {
-        get: teamOneSigned,
-        set: setTeamOneSigned,
-      },
       score: {
         get: teamOneScore,
         set: setTeamOneScore,
@@ -242,10 +253,6 @@ export function EditGame({ game }: { game: number }) {
     },
     teamTwo: {
       name: teamTwoName,
-      signed: {
-        get: teamTwoSigned,
-        set: setTeamTwoSigned,
-      },
       score: {
         get: teamTwoScore,
         set: setTeamTwoScore,

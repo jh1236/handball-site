@@ -609,7 +609,7 @@ export function deleteGame(gameId: number): Promise<void> {
 
 export function endGame(
   gameId: number,
-  bestPlayer: SearchableName,
+  votes: SearchableName[],
   teamOneRating: number,
   teamTwoRating: number,
   notes?: string,
@@ -621,7 +621,7 @@ export function endGame(
 ): Promise<void> {
   const body: any = {
     id: gameId,
-    bestPlayer,
+    votes,
     teamOneRating,
     teamTwoRating,
   };

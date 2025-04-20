@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import {
   IconAlertTriangle,
   IconArrowsUpDown,
@@ -6,16 +6,13 @@ import {
   IconClock,
   IconFlagFilled,
   IconNote,
-  IconSignature,
   IconTrophy,
   IconUser,
   IconUsersGroup,
 } from '@tabler/icons-react';
 import ReCAPTCHA from 'react-google-recaptcha';
-import SignatureCanvas from 'react-signature-canvas';
 import {
   Accordion,
-  Box,
   Button,
   Group,
   List,
@@ -25,7 +22,6 @@ import {
   Text,
   Textarea,
   Title,
-  useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { markIfReqd } from '@/components/HandballComponenets/AdminGamePanel';
@@ -59,9 +55,7 @@ function getActions(
   serving: boolean,
   close: () => void,
   captchaPassed: boolean,
-  setCaptchaPassed: (b: boolean) => void,
-  colorScheme: string,
-  canvasRef: React.MutableRefObject<SignatureCanvas | undefined>
+  setCaptchaPassed: (b: boolean) => void
 ): AccordionSettings[] {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const players = [team.left.get, team.right.get, team.sub.get].filter(
@@ -143,37 +137,6 @@ function getActions(
     return out;
   }
   if (game.ended.get) {
-    const allPlayers = [
-      game.teamOne.left,
-      game.teamOne.right,
-      game.teamOne.sub,
-      game.teamTwo.left,
-      game.teamTwo.right,
-      game.teamTwo.sub,
-    ].filter((a) => typeof a.get !== 'undefined');
-    if (team.sub.get) {
-      out.splice(1, 0, {
-        Icon: IconTrophy,
-        color: undefined,
-        value: `Set ${team.sub.get.name} as Best Player`,
-        content: (
-          <Button
-            color={team.sub.get?.isBestPlayer ? 'orange' : 'blue'}
-            size="lg"
-            onClick={() => {
-              allPlayers.forEach((p) => {
-                const t = p.get!;
-                t.isBestPlayer = t.searchableName === team.sub?.get?.searchableName;
-                p.set(t);
-              });
-              close();
-            }}
-          >
-            Best
-          </Button>
-        ),
-      });
-    }
     out.splice(
       1,
       0,
@@ -201,37 +164,6 @@ function getActions(
               value={team.notes.get}
               onChange={(v) => team.notes.set(v.currentTarget.value)}
             ></Textarea>
-          </>
-        ),
-      },
-      {
-        color: undefined,
-        Icon: IconSignature,
-        value: 'Signature',
-        title: markIfReqd(!team.signed.get, 'Signature'),
-        content: (
-          <>
-            <Box style={{ border: '1px solid' }} mb={5}>
-              <SignatureCanvas
-                /*@ts-ignore*/
-                ref={canvasRef}
-                onEnd={() => team.signed.set(canvasRef.current!.toDataURL())}
-                penColor={colorScheme === 'dark' ? 'white' : 'black'}
-                canvasProps={{
-                  width: 'auto',
-                  height: 100,
-                  className: 'sigCanvas',
-                }}
-              ></SignatureCanvas>
-            </Box>
-            <Button
-              onClick={() => {
-                team.signed.set('');
-                canvasRef!.current!.clear();
-              }}
-            >
-              Reset
-            </Button>
           </>
         ),
       }
@@ -320,7 +252,6 @@ function getActions(
 export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) {
   const firstTeam = trueFirstTeam === game.teamOneIGA.get;
   const [captchaPassed, setCaptchaPassed] = React.useState<boolean>(false);
-  const canvas = useRef<SignatureCanvas | undefined>();
   const team = useMemo(
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
@@ -334,31 +265,19 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
     [firstTeam, game.ended.get, game.firstTeamServes.get]
   );
   const [opened, { open, close }] = useDisclosure(false);
-  const { colorScheme } = useMantineColorScheme();
-  useEffect(() => {
-    if (opened) {
-      canvas.current?.fromDataURL(team.signed.get);
-    }
-  }, [opened]);
+
   const items = useMemo(
     () =>
-      getActions(
-        game,
-        firstTeam,
-        serving,
-        close,
-        captchaPassed,
-        setCaptchaPassed,
-        colorScheme,
-        canvas
-      ).map((item, i) => (
-        <Accordion.Item key={i} value={item.value}>
-          <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
-            {item.title ?? item.value}
-          </Accordion.Control>
-          <Accordion.Panel>{item.content}</Accordion.Panel>
-        </Accordion.Item>
-      )),
+      getActions(game, firstTeam, serving, close, captchaPassed, setCaptchaPassed).map(
+        (item, i) => (
+          <Accordion.Item key={i} value={item.value}>
+            <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
+              {item.title ?? item.value}
+            </Accordion.Control>
+            <Accordion.Panel>{item.content}</Accordion.Panel>
+          </Accordion.Item>
+        )
+      ),
     [game, firstTeam, serving, close]
   );
   const name = team ? team.name : 'Loading...';
