@@ -70,49 +70,61 @@ const currentDocuments: documentInfo[] = [
     imageUrl: 'https://api.squarers.club/api/image?name=yellow_book',
   },
   {
-    title: 'The Eighth SUSS Championship UQP',
+    title: 'The Ninth SUSS Championship UQP',
     description:
       'The Briefing presented by the SUSS officiating core covering current interpretations of the rules',
-    link: 'https://docs.google.com/presentation/d/1tlqWqJ-WxU8Dl97ELQhfw72ztPIUvP6jwIwdfz9UiaA/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=eighth_suss_championship',
+    link: 'https://docs.google.com/presentation/d/17KdW7FA45ytAue-eKcvOF_azktaFWCBbqt4pRTzk7T8/edit?usp=sharing',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=ninth_suss_championship',
   },
 ];
 
 const oldDocuments: documentInfo[] = [
   {
-    title: 'The Third SUSS Championship UQP',
+    title: 'The Eighth SUSS Championship UQP',
     description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Third SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=third_suss_championship&big=true',
-  },
-  {
-    title: 'The Fourth SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Fourth SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/19f1aP1ucWNLmslApekfMef_Lu1qsh8ckf3zTYA2P-VE/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=fourth_suss_championship&big=true',
-  },
-  {
-    title: 'The Fifth SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Fifth SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/1VkYuVcabr1jVMfTHc7EyL6Q0DGcPTJmXHYd2NUz3pFA/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=fifth_suss_championship&big=true',
-  },
-  {
-    title: 'The Sixth SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Sixth SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/11w2Y5xxK0YuzQu2AhZvCv4zwsjtgIibLtGypKbicdnI/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=sixth_suss_championship&big=true',
+      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Eighth SUSS Championship',
+    link: 'https://docs.google.com/presentation/d/1tlqWqJ-WxU8Dl97ELQhfw72ztPIUvP6jwIwdfz9UiaA/edit?usp=sharing',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=eighth_suss_championship',
   },
   {
     title: 'The Seventh SUSS Championship UQP',
     description:
       'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Seventh SUSS Championship',
     link: 'https://docs.google.com/presentation/d/1mxQUzKvw147NF-bWqrQKwa62t20wfL2Ls4f91EYNH1Y/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=seventh_suss_championship&big=true',
+    imageUrl:
+      'https://api.squarers.club/api/tournaments/image?name=seventh_suss_championship&big=true',
+  },
+  {
+    title: 'The Sixth SUSS Championship UQP',
+    description:
+      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Sixth SUSS Championship',
+    link: 'https://docs.google.com/presentation/d/11w2Y5xxK0YuzQu2AhZvCv4zwsjtgIibLtGypKbicdnI/edit?usp=sharing',
+    imageUrl:
+      'https://api.squarers.club/api/tournaments/image?name=sixth_suss_championship&big=true',
+  },
+  {
+    title: 'The Fifth SUSS Championship UQP',
+    description:
+      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Fifth SUSS Championship',
+    link: 'https://docs.google.com/presentation/d/1VkYuVcabr1jVMfTHc7EyL6Q0DGcPTJmXHYd2NUz3pFA/edit?usp=sharing',
+    imageUrl:
+      'https://api.squarers.club/api/tournaments/image?name=fifth_suss_championship&big=true',
+  },
+  {
+    title: 'The Fourth SUSS Championship UQP',
+    description:
+      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Fourth SUSS Championship',
+    link: 'https://docs.google.com/presentation/d/19f1aP1ucWNLmslApekfMef_Lu1qsh8ckf3zTYA2P-VE/edit?usp=sharing',
+    imageUrl:
+      'https://api.squarers.club/api/tournaments/image?name=fourth_suss_championship&big=true',
+  },
+  {
+    title: 'The Third SUSS Championship UQP',
+    description:
+      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Third SUSS Championship',
+    link: 'https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing',
+    imageUrl:
+      'https://api.squarers.club/api/tournaments/image?name=third_suss_championship&big=true',
   },
 ];
 
