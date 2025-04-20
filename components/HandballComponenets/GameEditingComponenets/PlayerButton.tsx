@@ -8,7 +8,6 @@ import {
   IconPlayHandball,
   IconSquareFilled,
   IconTriangleInvertedFilled,
-  IconTrophy,
 } from '@tabler/icons-react';
 import {
   Accordion,
@@ -52,6 +51,15 @@ const SCORE_METHODS = [
   'Illegal Body Part',
   'Obstruction',
 ];
+
+/*
+    'Delay of Game',
+    'Dangerous Play',
+    'Disrespectful Behaviour',
+    'Disrespectful Language',
+    'Equipment Abuse',
+    'Inappropriate Uniform',
+ */
 
 const CARDS = {
   warning: [
@@ -115,14 +123,6 @@ function getActions(
   setOtherReason: (v: string) => void
 ): AccordionSettings[] {
   const team = firstTeam ? game.teamOne : game.teamTwo;
-  const allPlayers = [
-    game.teamOne.left,
-    game.teamOne.right,
-    game.teamOne.sub,
-    game.teamTwo.left,
-    game.teamTwo.right,
-    game.teamTwo.sub,
-  ].filter((a) => typeof a.get !== 'undefined');
   const players = [team.left, team.right, team.sub].filter((a) => typeof a.get !== 'undefined');
   const currentPlayer = players.length > 1 ? players[leftSide ? 0 : 1] : players[0];
   const close = () => {
