@@ -128,7 +128,11 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
               <PlayerStatsTable team={teamObj} tournament={tournament}></PlayerStatsTable>
             </Tabs.Panel>
             <Tabs.Panel value="playerStats">
-              <PlayerStatsTable team={teamObj} teamPlayers={true}></PlayerStatsTable>
+              <PlayerStatsTable
+                team={teamObj}
+                teamPlayers={true}
+                tournament={tournament}
+              ></PlayerStatsTable>
             </Tabs.Panel>
           </Tabs>
         </Tabs.Panel>
