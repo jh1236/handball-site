@@ -142,7 +142,7 @@ export function InternalDynamicTable<T extends InputType>({
           return factor * ((valueB as number) - valueA);
         case 'string': {
           const percentA = percentStringToNumber(valueA as string);
-          const percentB = percentStringToNumber(valueA as string);
+          const percentB = percentStringToNumber(valueB as string);
           if (percentA !== null && percentB !== null) {
             return factor * (percentA - percentB);
           }
