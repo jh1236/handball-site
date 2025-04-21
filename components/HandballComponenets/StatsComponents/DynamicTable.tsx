@@ -15,7 +15,10 @@ function selectedToNumber(all: string[], selected: string[]): number {
   return out;
 }
 
-function percentStringToNumber(str: string) {
+function stringToNumber(str: string | number) {
+  if (typeof str === 'number') {
+    return str;
+  }
   if (str.endsWith('%')) {
     return Number(str.substring(0, str.length - 2));
   }
@@ -25,7 +28,7 @@ function percentStringToNumber(str: string) {
   if (str === '\u221e') {
     return Infinity;
   }
-  return null;
+  return str;
 }
 
 function numberToSelected(all: string[], selected: number): string[] {
@@ -135,17 +138,12 @@ export function InternalDynamicTable<T extends InputType>({
       factor *= -1;
     }
     const sort = dataIn!.toSorted((a, b) => {
-      const valueA = getHeader(a, ['name'].concat(selectedHeaders)[idx - 1]);
-      const valueB = getHeader(b, ['name'].concat(selectedHeaders)[idx - 1]);
+      const valueA = stringToNumber(getHeader(a, ['name'].concat(selectedHeaders)[idx - 1]));
+      const valueB = stringToNumber(getHeader(b, ['name'].concat(selectedHeaders)[idx - 1]));
       switch (typeof valueA) {
         case 'number':
           return factor * ((valueB as number) - valueA);
         case 'string': {
-          const percentA = percentStringToNumber(valueA as string);
-          const percentB = percentStringToNumber(valueB as string);
-          if (percentA !== null && percentB !== null) {
-            return factor * (percentB - percentA);
-          }
           return factor * (valueB as string).localeCompare(valueA);
         }
         default:
