@@ -30,7 +30,7 @@ export function playersFromGame(game: GameStructure): PlayerGameStatsStructure[]
     game.teamOne.substitute,
     game.teamTwo.captain,
     game.teamTwo.nonCaptain,
-    game.teamOne.substitute,
+    game.teamTwo.substitute,
   ].filter((pgs) => pgs !== null && pgs !== undefined);
 }
 
