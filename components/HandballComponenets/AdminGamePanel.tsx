@@ -41,16 +41,9 @@ import {
   Timeline,
   Title,
 } from '@mantine/core';
-import { playersFromGame } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
-import {
-  deleteGame,
-  endGame,
-  forfeitGame,
-  resolveGame,
-  startGame,
-} from '@/ServerActions/GameActions';
+import { alertGame, deleteGame, resolveGame } from '@/ServerActions/GameActions';
 import { CardStructure, GameEventStructure, GameStructure } from '@/ServerActions/types';
 
 interface AdminGamePanelProps {
@@ -77,56 +70,56 @@ const RESOLVED_STATUSES = [
   undefined,
 ];
 
-export const eventIcon = (e: CardStructure) => {
+export const eventIcon = (e: CardStructure, props = {}) => {
   switch (e.eventType) {
     case 'Timeout':
-      return <IconStopwatch />;
+      return <IconStopwatch {...props} />;
     case 'Resolve':
-      return <IconCheckbox color="green" />;
+      return <IconCheckbox color="green" {...props} />;
     case 'End Game':
-      return <PiFlagCheckeredFill />;
+      return <PiFlagCheckeredFill {...props} />;
     case 'Forfeit':
-      return <IconFlagFilled color="red" />;
+      return <IconFlagFilled color="red" {...props} />;
     case 'Notes':
       return <IconNote />;
     case 'Protest':
-      return <IconAlertTriangle color="yellow" />;
+      return <IconAlertTriangle color="yellow" {...props} />;
     case 'Start':
-      return <IconFlagCheck />;
+      return <IconFlagCheck {...props} />;
     case 'Votes':
-      return <IconListNumbers />;
+      return <IconListNumbers {...props} />;
     case 'Score':
       switch (e.notes) {
         case 'Ace':
-          return <IconBallVolleyball />;
+          return <IconBallVolleyball {...props} />;
         case 'Double Bounce':
-          return <IconBounceRightFilled />;
+          return <IconBounceRightFilled {...props} />;
         case 'Straight':
-          return <IconBallTennis />;
+          return <IconBallTennis {...props} />;
         case 'Out of Court':
-          return <GiTennisCourt />;
+          return <GiTennisCourt {...props} />;
         case 'Double Touch':
-          return <IconHandGrab />;
+          return <IconHandGrab {...props} />;
         case 'Grabs':
-          return <PiHandshakeFill />;
+          return <PiHandshakeFill {...props} />;
         case 'Illegal Body Part':
-          return <IconShoe />;
+          return <IconShoe {...props} />;
         case 'Obstruction':
-          return <IconBallTennis />;
+          return <IconBallTennis {...props} />;
       }
-      return <IconBallTennis />;
+      return <IconBallTennis {...props} />;
     case 'Fault':
-      return <IconPlayHandball />;
+      return <IconPlayHandball {...props} />;
     case 'Substitute':
-      return <IconArrowsLeftRight />;
+      return <IconArrowsLeftRight {...props} />;
     case 'Warning':
-      return <IconExclamationMark color="grey" />;
+      return <IconExclamationMark color="grey" {...props} />;
     case 'Green Card':
-      return <IconTriangleInvertedFilled color="green" />;
+      return <IconTriangleInvertedFilled color="green" {...props} />;
     case 'Yellow Card':
-      return <IconSquareFilled color="yellow" />;
+      return <IconSquareFilled color="yellow" {...props} />;
     case 'Red Card':
-      return <IconCircleFilled color="red" />;
+      return <IconCircleFilled color="red" {...props} />;
   }
   return null;
 };
@@ -172,116 +165,16 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
               >
                 Resolve
               </Button>
-              {!game.ended && (
-                <>
-                  <br />
-                  <br />
-                  <Popover width={200} position="top" withArrow shadow="md">
-                    <Popover.Target>
-                      <Button color="red">Forfeit</Button>
-                    </Popover.Target>
-                    <Popover.Dropdown w={350}>
-                      <Group justify="center">
-                        <Button
-                          onClick={() => {
-                            if (!game.started) {
-                              startGame(game.id, false, false)
-                                .then(() => forfeitGame(game.id, true))
-                                .then(() =>
-                                  endGame(
-                                    game.id,
-                                    playersFromGame(game).map((pgs) => pgs!.searchableName),
-                                    3,
-                                    3,
-                                    `Pregame Forfeit by ${game.teamOne.name}`
-                                  ).then(() =>
-                                    router.push(`/${game.tournament.searchableName}/fixtures`)
-                                  )
-                                );
-                            }
-                            if (!game.someoneHasWon) {
-                              forfeitGame(game.id, true)
-                                .then(() =>
-                                  endGame(
-                                    game.id,
-                                    playersFromGame(game).map((pgs) => pgs!.searchableName),
-                                    3,
-                                    3,
-                                    `Pregame Forfeit by ${game.teamOne.name}`
-                                  )
-                                )
-                                .then(() =>
-                                  router.push(`/${game.tournament.searchableName}/fixtures`)
-                                );
-                            } else {
-                              endGame(
-                                game.id,
-                                playersFromGame(game).map((pgs) => pgs!.searchableName),
-                                3,
-                                3,
-                                `Pregame Forfeit by ${game.teamOne.name}`
-                              ).then(() =>
-                                router.push(`/${game.tournament.searchableName}/fixtures`)
-                              );
-                            }
-                          }}
-                          color="red"
-                        >
-                          Forfeit for {game.teamOne.name}
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            if (!game.started) {
-                              startGame(game.id, false, false)
-                                .then(() => forfeitGame(game.id, false))
-                                .then(() =>
-                                  endGame(
-                                    game.id,
-                                    playersFromGame(game).map((pgs) => pgs!.searchableName),
-                                    3,
-                                    3,
-                                    `Pregame Forfeit by ${game.teamTwo.name}`
-                                  ).then(() =>
-                                    router.push(`/${game.tournament.searchableName}/fixtures`)
-                                  )
-                                );
-                            }
-                            if (!game.someoneHasWon) {
-                              forfeitGame(game.id, false)
-                                .then(() => router.refresh())
-                                .then(() =>
-                                  endGame(
-                                    game.id,
-                                    playersFromGame(game).map((pgs) => pgs!.searchableName),
-                                    3,
-                                    3,
-                                    `Pregame Forfeit by ${game.teamTwo.name}`
-                                  )
-                                )
-                                .then(() =>
-                                  router.push(`/${game.tournament.searchableName}/fixtures`)
-                                );
-                            } else {
-                              endGame(
-                                game.id,
-                                playersFromGame(game).map((pgs) => pgs!.searchableName),
-                                3,
-                                3,
-                                `Pregame Forfeit by ${game.teamOne.name}`
-                              ).then(() =>
-                                router.push(`/${game.tournament.searchableName}/fixtures`)
-                              );
-                            }
-                          }}
-                          color="red"
-                        >
-                          Forfeit for {game.teamTwo.name}
-                        </Button>
-                      </Group>
-                    </Popover.Dropdown>
-                  </Popover>
-                </>
-              )}
+              <br />
+              <br />
+              <Button
+                disabled={game.status !== 'Waiting For Start'}
+                onClick={() => {
+                  alertGame(game.id);
+                }}
+              >
+                Alert
+              </Button>
 
               {game.tournament.editable && (
                 <>
@@ -342,7 +235,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
           <Accordion.Item value="teamOne">
             <Accordion.Control icon={<IconSquare1 />}>
               {markIfReqd(
-                game.admin?.teamOneProtest !== null ||
+                (game.admin?.teamOneProtest ?? '') !== '' ||
                   game.admin?.teamOneRating === 1 ||
                   teamOneCards.some((a) => ['Red Card', 'Yellow Card'].includes(a.eventType)),
                 'Team One'
@@ -386,7 +279,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                 ))}
               <Text>{game.admin?.teamOneNotes}</Text>
               <Divider></Divider>
-              <Title order={3}>{markIfReqd(game.admin?.teamOneProtest !== null, 'Protest')}</Title>
+              <Title order={3}>{markIfReqd((game.admin?.teamOneProtest ?? '') !== '', 'Protest')}</Title>
               {!game.admin?.teamOneProtest &&
                 (!game.ended ? (
                   <Text>
@@ -403,7 +296,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
           <Accordion.Item value="teamTwo">
             <Accordion.Control icon={<IconSquare2 />}>
               {markIfReqd(
-                game.admin?.teamTwoProtest !== null ||
+                (game.admin?.teamTwoProtest ?? '') !== '' ||
                   game.admin?.teamTwoRating === 1 ||
                   teamTwoCards.some((a) => ['Red Card', 'Yellow Card'].includes(a.eventType)),
                 'Team Two'
@@ -447,7 +340,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                 ))}
               <Text>{game.admin?.teamTwoNotes}</Text>
               <Divider></Divider>
-              <Title order={3}>{markIfReqd(game.admin?.teamTwoProtest !== null, 'Protest')}</Title>
+              <Title order={3}>{markIfReqd((game.admin?.teamTwoProtest ?? '') !== '', 'Protest')}</Title>
               {!game.admin?.teamTwoProtest &&
                 (!game.ended ? (
                   <Text>
