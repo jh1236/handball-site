@@ -3,26 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  Box,
-  Divider,
-  Grid,
-  HoverCard,
-  Image,
-  Paper,
-  Rating,
-  Space,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Box, Grid, HoverCard, Image, Paper, Rating, Space, Text } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import { FakeCheckbox } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
-import Players from '@/components/HandballComponenets/StatsComponents/Players';
-import { getNoteableGames } from '@/ServerActions/GameActions';
-import { getPlayers } from '@/ServerActions/PlayerActions';
-import { GameStructure, PersonStructure } from '@/ServerActions/types';
+import { getGames } from '@/ServerActions/GameActions';
+import { GameStructure } from '@/ServerActions/types';
 
 interface ManagementArgs {
   tournament: string;
@@ -74,7 +61,7 @@ function gameToPaper(game: GameStructure) {
               <strong>Marked For Review: </strong>
               <FakeCheckbox checked={Boolean(game.admin?.markedForReview)}></FakeCheckbox>
             </Text>
-            <HoverCard width={280} shadow="md" disabled={(game.admin!.notes ?? '') === ''}>
+            <HoverCard width={280} shadow="md" disabled={game.admin!.notes === null}>
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
@@ -125,7 +112,7 @@ function gameToPaper(game: GameStructure) {
               ))}
           </Grid.Col>
           <Grid.Col span={{ base: 4, md: 5 }}>
-            <HoverCard width={280} shadow="md" disabled={(game.admin?.teamOneNotes ?? '') === ''}>
+            <HoverCard width={280} shadow="md" disabled={game.admin!.teamOneNotes === null}>
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
@@ -170,7 +157,7 @@ function gameToPaper(game: GameStructure) {
           </Grid.Col>
           <Grid.Col span={{ base: 7, md: 5 }}></Grid.Col>
           <Grid.Col span={{ base: 4, md: 5 }}>
-            <HoverCard width={280} shadow="md" disabled={(game.admin?.teamTwoNotes ?? '') === ''}>
+            <HoverCard width={280} shadow="md" disabled={game.admin!.teamTwoNotes === null}>
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
@@ -220,10 +207,8 @@ function gameToPaper(game: GameStructure) {
   );
 }
 
-export function Management({ tournament }: ManagementArgs) {
-  const [actionableGames, setActionableGames] = useState<GameStructure[]>([]);
-  const [players, setPlayers] = useState<PersonStructure[] | null>(null);
-  const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);
+export function Games({ tournament }: ManagementArgs) {
+  const [games, setGames] = useState<GameStructure[]>([]);
   const { isUmpireManager, loading } = useUserData();
   const router = useRouter();
 
@@ -233,61 +218,21 @@ export function Management({ tournament }: ManagementArgs) {
     }
   }, [isUmpireManager, loading, router]);
   useEffect(() => {
-    getNoteableGames({ tournament }).then((g) => {
-      setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());
-      setActionableGames(g.games.filter((v) => v.admin?.requiresAction).toReversed());
-    });
-    getPlayers({
-      tournament,
-      includeStats: true,
-      formatData: true,
-    }).then((g) => setPlayers(g.players.filter((v) => v.stats!['Penalty Points'] >= 12)));
+    getGames({ tournament }).then((g) => setGames(g.games));
   }, [tournament]);
   return (
-    <>
-      <br />
-      <Divider></Divider>
-      <Grid w="97.5%">
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Box>
-            <Title ta="center" order={2}>
-              Games Requiring action
-            </Title>
-            {actionableGames.length === 0 && (
-              <Paper shadow="lg" radius="md" p="xl" ta="center" ml={30} mr={30}>
-                <i>There are no games to show</i>
-              </Paper>
-            )}
-            {actionableGames.map((g) => gameToPaper(g))}
-            <br />
-            <Divider></Divider>
-            <br />
-            <Title ta="center" order={2}>
-              Players Requiring Actioned
-            </Title>
-            <Players
-              editable={false}
-              maxRows={players?.length ?? 5}
-              sortIndex={2}
-              playersIn={players}
-              columns={['Penalty Points', 'Yellow Cards', 'Red Cards']}
-            ></Players>
-          </Box>
+    <Grid>
+      {games.map((g) => (
+        <Grid.Col
+          span={{
+            base: 12,
+            md: 6,
+            lg: 6,
+          }}
+        >
+          {gameToPaper(g)}
         </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Box>
-            <Title ta="center" order={2}>
-              Games Already Actioned
-            </Title>
-            {noteableGames.length === 0 && (
-              <Paper shadow="lg" radius="md" p="xl" ta="center" ml={30} mr={30}>
-                <i>There are no games to show</i>
-              </Paper>
-            )}
-            {noteableGames.map((g) => gameToPaper(g))}
-          </Box>
-        </Grid.Col>
-      </Grid>
-    </>
+      ))}
+    </Grid>
   );
 }

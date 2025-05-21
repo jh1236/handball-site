@@ -12,6 +12,15 @@ export async function tokenFetcher(url: string, args: any = {}) {
 }
 
 export function useUserData() {
+  // return {
+  //   loading: false,
+  //   isAdmin: true,
+  //   isOfficial: true,
+  //   isUmpireManager: true,
+  //   isLoggedIn: true,
+  //   permissionLevel: 5,
+  //   username: 'testing',
+  // };
   const [permissionLevel, setPermissionLevel] = React.useState<number | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
   useEffect(() => {
