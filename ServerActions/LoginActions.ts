@@ -22,7 +22,7 @@ export function loginAction(userId: string, password: string, remember: boolean)
     return response.json().then((data) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
-      localStorage.setItem('timeout', `${data.timeout * 2000}`);
+      localStorage.setItem('timeout', `${data.timeout}`);
       localStorage.setItem('permissionLevel', `${data.permissionLevel}`);
     });
   });
