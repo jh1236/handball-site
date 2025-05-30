@@ -18,7 +18,7 @@ export function useUserData() {
     if (loggedIn()) {
       const timeout = localStorage.getItem('timeout');
       if (timeout) {
-        const ms = Number.parseFloat(timeout) * 1000;
+        const ms = Number.parseFloat(timeout);
         if (ms < Date.now()) {
           localStorage.removeItem('token');
           localStorage.removeItem('permissionLevel');
