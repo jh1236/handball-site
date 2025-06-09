@@ -1,4 +1,8 @@
-import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import {
+  localLogout,
+  SERVER_ADDRESS,
+  tokenFetch,
+} from '@/components/HandballComponenets/ServerActions';
 import {
   GameStructure,
   RealName,
@@ -11,6 +15,9 @@ export function getChangeCode(gameID: number): Promise<number> {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json().then((json: { code: number }) => json.code);
@@ -22,6 +29,9 @@ export function getNextGameId(gameID: number): Promise<number> {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json().then((json: { id: number }) => json.id);
@@ -63,12 +73,12 @@ export function getGame({
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
-    return response.json().then((json: { game: GameStructure }) => {
-      console.log(json.game);
-      return json.game;
-    });
+    return response.json().then((json: { game: GameStructure }) => json.game);
   });
 }
 
@@ -135,6 +145,9 @@ export function getGames({
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json();
@@ -187,6 +200,9 @@ export function getNoteableGames({
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json();
@@ -263,6 +279,9 @@ export function getFixtures({
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json();
@@ -304,6 +323,9 @@ export function startGame(
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -337,6 +359,9 @@ export function scoreForGame(
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -356,6 +381,9 @@ export function aceForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -375,6 +403,9 @@ export function faultForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -395,6 +426,9 @@ export function timeoutForGame(gameId: number, firstTeam: boolean): Promise<void
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -414,6 +448,9 @@ export function officalTimeoutForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -433,6 +470,9 @@ export function endTimeoutForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -452,6 +492,9 @@ export function undoForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -488,6 +531,9 @@ export function cardForGame(
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -518,6 +564,9 @@ export function substituteForGame(
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -543,6 +592,9 @@ export function pardonForGame(
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -563,6 +615,9 @@ export function forfeitGame(gameId: number, firstTeam: boolean): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -582,6 +637,9 @@ export function resolveGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -601,6 +659,9 @@ export function deleteGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -653,6 +714,9 @@ export function endGame(
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -684,6 +748,9 @@ export function createGameWithTeams(
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -725,6 +792,9 @@ export function createGameWithPlayers(
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json().then((j) => {

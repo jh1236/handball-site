@@ -11,6 +11,13 @@ export async function tokenFetcher(url: string, args: any = {}) {
   return res.json();
 }
 
+export function localLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('permissionLevel');
+  localStorage.removeItem('username');
+  localStorage.removeItem('timeout');
+}
+
 export function useUserData() {
   const [permissionLevel, setPermissionLevel] = React.useState<number | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
@@ -20,10 +27,7 @@ export function useUserData() {
       if (timeout) {
         const ms = Number.parseFloat(timeout) * 1000;
         if (ms < Date.now()) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('permissionLevel');
-          localStorage.removeItem('username');
-          localStorage.removeItem('timeout');
+          localLogout();
         }
       }
       setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
@@ -33,6 +37,8 @@ export function useUserData() {
     }
   }, []);
   return {
+    setUsername,
+    setPermissionLevel,
     loading: permissionLevel === null,
     isAdmin: (permissionLevel ?? 5) === 5,
     isOfficial: (permissionLevel ?? 5) >= 2,
