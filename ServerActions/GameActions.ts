@@ -105,7 +105,7 @@ export function getGames({
   includePlayerStats = false,
   returnTournament = false,
   includeByes = false,
-  limit = 20,
+  limit = undefined,
 }: GetGamesArgs): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
   const url = new URL('/api/games', SERVER_ADDRESS);
   if (tournament) {
@@ -640,6 +640,25 @@ export function resolveGame(gameId: number): Promise<void> {
       if (response.status === 401 || response.status === 403) {
         localLogout();
       }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
+export function alertGame(gameId: number): Promise<void> {
+  const body: any = {
+    id: gameId,
+  };
+
+  return tokenFetch('/api/games/update/alert', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
       return Promise.reject(response.text());
     }
     return Promise.resolve();
