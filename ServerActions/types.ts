@@ -30,6 +30,7 @@ export interface PersonStructure {
   name: string;
   searchableName: string;
   imageUrl: string;
+  bigImageUrl: string;
   isAdmin?: boolean;
   team?: TeamStructure;
   prevCards?: CardStructure[];
