@@ -25,7 +25,7 @@ const STATS: StatCategory[] = [
   },
   {
     type: 'player',
-    stat: 'Votes per 100 games',
+    stat: 'Votes per 100 Games',
     title: 'Leading Player',
     description: 'votes for every 100 games played',
   },
