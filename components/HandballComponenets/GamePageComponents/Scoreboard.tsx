@@ -127,9 +127,9 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   }
 
   function getSides(team: GameTeamStructure): {
-    left: PlayerGameStatsStructure | undefined;
-    right: PlayerGameStatsStructure | undefined;
-    sub: PlayerGameStatsStructure | undefined;
+    Left: PlayerGameStatsStructure | undefined;
+    Right: PlayerGameStatsStructure | undefined;
+    Sub: PlayerGameStatsStructure | undefined;
   } {
     let left: PlayerGameStatsStructure | undefined;
     let right: PlayerGameStatsStructure | undefined;
@@ -160,16 +160,23 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
         }
       }
     }
-
+    // I know these violate the naming conventions, but this is how they are received in sideToServe and sideOfCourt from the backend
     return {
-      left,
-      right,
-      sub,
+      Left: left,
+      Right: right,
+      Sub: sub,
     };
   }
 
-  function createNamePlate(team: GameTeamStructure, side: 'left' | 'right' | 'sub') {
-    const p: PlayerGameStatsStructure | undefined = getSides(team)[side];
+  function createNamePlate(team: GameTeamStructure, side: 'Left' | 'Right' | 'Sub') {
+    const sides = getSides(team);
+    const servingSidePlayer = sides[game?.sideToServe ?? 'Left']!;
+    let p: PlayerGameStatsStructure | undefined = sides[side];
+    if (servingSidePlayer.cardTimeRemaining !== 0) {
+      if (side === 'Left') p = sides.Right;
+      else if (side === 'Right') p = sides.Left;
+    }
+
     if (!p) {
       return <p> error: player not found</p>;
     }
@@ -178,8 +185,8 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     }
     const serving =
       game.firstTeamToServe === game.firstTeamIga
-        ? team.name === teamOne?.name && side === game.sideToServe.toLowerCase()
-        : team.name === teamTwo?.name && side === game.sideToServe.toLowerCase();
+        ? team.name === teamOne?.name && side === game.sideToServe
+        : team.name === teamTwo?.name && side === game.sideToServe;
 
     let name: React.JSX.Element = <>{p.name}</>;
 
@@ -242,7 +249,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
               src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
             ></Image>
           )}
-          [{side === 'left' ? 'L' : 'R'}] {name}
+          [{p.cardTimeRemaining ? '-' : side[0]}] {name}
         </div>
       ) : (
         <div
@@ -257,7 +264,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
             color: team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black',
           }}
         >
-          {name} [{side === 'left' ? 'L' : 'R'}]
+          {name} [{p.cardTimeRemaining ? '-' : side[0]}]
           <Image
             src={p.imageUrl}
             style={{
@@ -422,12 +429,12 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
           </>
         )}
         <Box pos="absolute" left="10%" bottom="10%">
-          {createNamePlate(teamOne!, 'right')}
-          {createNamePlate(teamOne!, 'left')}
+          {createNamePlate(teamOne!, 'Right')}
+          {createNamePlate(teamOne!, 'Left')}
         </Box>
         <Box pos="absolute" right="10%" bottom="10%" style={{ textAlign: 'right' }}>
-          {createNamePlate(teamTwo!, 'right')}
-          {createNamePlate(teamTwo!, 'left')}
+          {createNamePlate(teamTwo!, 'Right')}
+          {createNamePlate(teamTwo!, 'Left')}
         </Box>
         <Box pos="absolute" bottom={20} w="100%">
           <Text ta="center" fz={20}>
