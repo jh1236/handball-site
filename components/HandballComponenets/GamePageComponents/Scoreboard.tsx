@@ -2,15 +2,32 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Box, Center, Grid, Image, LoadingOverlay, Portal, RingProgress, Stack, Text, Title } from '@mantine/core';
+import {
+  Box,
+  Center,
+  Grid,
+  Image,
+  LoadingOverlay,
+  luminance,
+  Portal,
+  RingProgress,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { customTournamentScoreboardEffects } from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
 import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
-import { GameStructure, GameTeamStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
-
+import { GameStructure, GameTeamStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface ScoreboardProps {
   gameID: number;
+}
+
+function cardColorFromDuration(duration: number) {
+  if (duration < 0) return 'red';
+  if (duration === 2) return 'green';
+  return 'orange';
 }
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
@@ -152,7 +169,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   }
 
   function createNamePlate(team: GameTeamStructure, side: 'left' | 'right' | 'sub') {
-    const p: PersonStructure | undefined = getSides(team)[side];
+    const p: PlayerGameStatsStructure | undefined = getSides(team)[side];
     if (!p) {
       return <p> error: player not found</p>;
     }
@@ -169,16 +186,104 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     if (serving && game.faulted) {
       name = <i>{name}*</i>;
     }
-
+    const newColor = [...(team.teamColorAsRGBABecauseDigbyIsLazy ?? [0.7, 0.7, 0.7, 1.0])].map(
+      (a) => a * 0.7
+    );
+    newColor[3] = 0.7;
+    const cardPercent = p.cardTimeRemaining / p.cardTime;
+    let background: string;
+    if (p.cardTimeRemaining !== 0) {
+      if (team === teamOne) {
+        background = `linear-gradient(90deg, ${cardColorFromDuration(p.cardTime)} ${75 * cardPercent}%, rgba(0,0,0,0) ${100 * cardPercent}%)`;
+      } else {
+        background = `linear-gradient(90deg, rgba(0,0,0,0) ${100 - 100 * cardPercent}%, ${cardColorFromDuration(p.cardTime)} ${100 - 75 * cardPercent}%)`;
+      }
+    } else if (team === teamOne) {
+      background = `linear-gradient(90deg, rgba(${newColor}) 0%, rgba(0,0,0,0) 100%)`;
+    } else {
+      background = `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(${newColor}) 100%)`;
+    }
     name =
       team === teamOne ? (
-        <>
+        <div
+          style={{
+            textAlign: 'left',
+            display: 'inline-block',
+            width: '100%',
+            margin: 10,
+            position: 'relative',
+            minWidth: 600,
+            background,
+            color: team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black',
+          }}
+        >
+          <Image
+            src={p.imageUrl}
+            style={{
+              width: 120,
+              verticalAlign: 'middle',
+              margin: 10,
+              marginRight: 20,
+            }}
+            display="inline-block"
+          />
+          {p.cardTimeRemaining !== 0 && (
+            <Image
+              pos="absolute"
+              top={0}
+              left={0}
+              style={{
+                width: 120,
+                verticalAlign: 'middle',
+                margin: 10,
+                marginRight: 20,
+                clipPath: `polygon(100% 0%, 100% 100%,${cardPercent} 100%,${cardPercent} 0%`,
+              }}
+              src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
+            ></Image>
+          )}
           [{side === 'left' ? 'L' : 'R'}] {name}
-        </>
+        </div>
       ) : (
-        <>
+        <div
+          style={{
+            textAlign: 'right',
+            display: 'inline-block',
+            minWidth: 600,
+            width: '100%',
+            margin: 10,
+            position: 'relative',
+            background,
+            color: team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black',
+          }}
+        >
           {name} [{side === 'left' ? 'L' : 'R'}]
-        </>
+          <Image
+            src={p.imageUrl}
+            style={{
+              margin: 10,
+              width: 120,
+              marginLeft: 20,
+              clipPath: `polygon(100% 0%, 100% 100%,${cardPercent} 100%,${cardPercent} 0%`,
+              verticalAlign: 'middle',
+            }}
+            display="inline-block"
+          />
+          {p.cardTimeRemaining !== 0 && (
+            <Image
+              pos="absolute"
+              top={0}
+              right={0}
+              style={{
+                width: 120,
+                verticalAlign: 'middle',
+                margin: 10,
+                marginRight: 20,
+              }}
+              src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
+            ></Image>
+          )}
+        </div>
       );
 
     return (
