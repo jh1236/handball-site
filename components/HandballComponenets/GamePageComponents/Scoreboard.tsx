@@ -19,14 +19,15 @@ import { useDisclosure } from '@mantine/hooks';
 import { customTournamentScoreboardEffects } from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
 import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
 import { GameStructure, GameTeamStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import classes from './Scoreboard.module.css';
 
 interface ScoreboardProps {
   gameID: number;
 }
 
-function cardColorFromDuration(duration: number) {
-  if (duration < 0) return 'red';
-  if (duration === 2) return 'green';
+function cardColorFromPlayer(player: PlayerGameStatsStructure) {
+  if (player.cardTime < 0) return 'red';
+  if (player.cardTime === 2) return 'green';
   return 'orange';
 }
 
@@ -197,18 +198,18 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       (a) => a * 0.7
     );
     newColor[3] = 0.7;
-    const cardPercent = p.cardTimeRemaining / p.cardTime;
+    const cardPercent = p.cardTimeRemaining > 0 ? p.cardTimeRemaining / p.cardTime : 1;
     let background: string;
     if (p.cardTimeRemaining !== 0) {
       if (team === teamOne) {
-        background = `linear-gradient(90deg, ${cardColorFromDuration(p.cardTime)} ${75 * cardPercent}%, rgba(0,0,0,0) ${100 * cardPercent}%)`;
+        background = `linear-gradient(90deg, ${cardColorFromPlayer(p)} ${75 * cardPercent}%, rgba(0,0,0,0) ${100 * cardPercent}%)`;
       } else {
-        background = `linear-gradient(90deg, rgba(0,0,0,0) ${100 - 100 * cardPercent}%, ${cardColorFromDuration(p.cardTime)} ${100 - 75 * cardPercent}%)`;
+        background = `linear-gradient(90deg, rgba(0,0,0,0) ${100 - 100 * cardPercent}%, ${cardColorFromPlayer(p)} ${100 - 75 * cardPercent}%)`;
       }
     } else if (team === teamOne) {
-      background = `linear-gradient(90deg, rgba(${newColor}) 0%, rgba(0,0,0,0) 100%)`;
+      background = `linear-gradient(90deg, rgba(${newColor}) 0%, rgba(0,0,0,0) 70%)`;
     } else {
-      background = `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(${newColor}) 100%)`;
+      background = `linear-gradient(90deg, rgba(0,0,0,0) 30%, rgba(${newColor}) 100%)`;
     }
     name =
       team === teamOne ? (
@@ -239,12 +240,12 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
               pos="absolute"
               top={0}
               left={0}
+              className={classes.floating}
               style={{
                 width: 120,
                 verticalAlign: 'middle',
                 margin: 10,
                 marginRight: 20,
-                clipPath: `polygon(100% 0%, 100% 100%,${cardPercent} 100%,${cardPercent} 0%`,
               }}
               src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
             ></Image>
@@ -271,7 +272,6 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
               margin: 10,
               width: 120,
               marginLeft: 20,
-              clipPath: `polygon(100% 0%, 100% 100%,${cardPercent} 100%,${cardPercent} 0%`,
               verticalAlign: 'middle',
             }}
             display="inline-block"
@@ -281,6 +281,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
               pos="absolute"
               top={0}
               right={0}
+              className={classes.floating}
               style={{
                 width: 120,
                 verticalAlign: 'middle',
