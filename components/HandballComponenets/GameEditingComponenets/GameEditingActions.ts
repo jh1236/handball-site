@@ -17,7 +17,7 @@ import {
   timeoutForGame,
   undoForGame,
 } from '@/ServerActions/GameActions';
-import { PlayerGameStatsStructure, SearchableName } from '@/ServerActions/types';
+import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 type Team = {
   name: string;

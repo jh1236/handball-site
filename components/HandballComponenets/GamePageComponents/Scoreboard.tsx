@@ -2,15 +2,33 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Box, Center, Grid, Image, LoadingOverlay, Portal, RingProgress, Stack, Text, Title } from '@mantine/core';
+import {
+  Box,
+  Center,
+  Grid,
+  Image,
+  LoadingOverlay,
+  luminance,
+  Portal,
+  RingProgress,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { customTournamentScoreboardEffects } from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
 import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
-import { GameStructure, GameTeamStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
-
+import { GameStructure, GameTeamStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import classes from './Scoreboard.module.css';
 
 interface ScoreboardProps {
   gameID: number;
+}
+
+function cardColorFromPlayer(player: PlayerGameStatsStructure) {
+  if (player.cardTime < 0) return 'red';
+  if (player.cardTime === 2) return 'green';
+  return 'orange';
 }
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
@@ -110,9 +128,9 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   }
 
   function getSides(team: GameTeamStructure): {
-    left: PlayerGameStatsStructure | undefined;
-    right: PlayerGameStatsStructure | undefined;
-    sub: PlayerGameStatsStructure | undefined;
+    Left: PlayerGameStatsStructure | undefined;
+    Right: PlayerGameStatsStructure | undefined;
+    Sub: PlayerGameStatsStructure | undefined;
   } {
     let left: PlayerGameStatsStructure | undefined;
     let right: PlayerGameStatsStructure | undefined;
@@ -143,16 +161,23 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
         }
       }
     }
-
+    // I know these violate the naming conventions, but this is how they are received in sideToServe and sideOfCourt from the backend
     return {
-      left,
-      right,
-      sub,
+      Left: left,
+      Right: right,
+      Sub: sub,
     };
   }
 
-  function createNamePlate(team: GameTeamStructure, side: 'left' | 'right' | 'sub') {
-    const p: PersonStructure | undefined = getSides(team)[side];
+  function createNamePlate(team: GameTeamStructure, side: 'Left' | 'Right' | 'Sub') {
+    const sides = getSides(team);
+    const servingSidePlayer = sides[game?.sideToServe ?? 'Left']!;
+    let p: PlayerGameStatsStructure | undefined = sides[side];
+    if (servingSidePlayer.cardTimeRemaining !== 0) {
+      if (side === 'Left') p = sides.Right;
+      else if (side === 'Right') p = sides.Left;
+    }
+
     if (!p) {
       return <p> error: player not found</p>;
     }
@@ -161,24 +186,112 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     }
     const serving =
       game.firstTeamToServe === game.firstTeamIga
-        ? team.name === teamOne?.name && side === game.sideToServe.toLowerCase()
-        : team.name === teamTwo?.name && side === game.sideToServe.toLowerCase();
+        ? team.name === teamOne?.name && side === game.sideToServe
+        : team.name === teamTwo?.name && side === game.sideToServe;
 
     let name: React.JSX.Element = <>{p.name}</>;
 
     if (serving && game.faulted) {
       name = <i>{name}*</i>;
     }
-
+    const newColor = [...(team.teamColorAsRGBABecauseDigbyIsLazy ?? [0.7, 0.7, 0.7, 1.0])].map(
+      (a) => a * 0.7
+    );
+    newColor[3] = 0.7;
+    const cardPercent = p.cardTimeRemaining > 0 ? p.cardTimeRemaining / p.cardTime : 1;
+    let background: string;
+    if (p.cardTimeRemaining !== 0) {
+      if (team === teamOne) {
+        background = `linear-gradient(90deg, ${cardColorFromPlayer(p)} ${75 * cardPercent}%, rgba(0,0,0,0) ${100 * cardPercent}%)`;
+      } else {
+        background = `linear-gradient(90deg, rgba(0,0,0,0) ${100 - 100 * cardPercent}%, ${cardColorFromPlayer(p)} ${100 - 75 * cardPercent}%)`;
+      }
+    } else if (team === teamOne) {
+      background = `linear-gradient(90deg, rgba(${newColor}) 0%, rgba(0,0,0,0) 70%)`;
+    } else {
+      background = `linear-gradient(90deg, rgba(0,0,0,0) 30%, rgba(${newColor}) 100%)`;
+    }
     name =
       team === teamOne ? (
-        <>
-          [{side === 'left' ? 'L' : 'R'}] {name}
-        </>
+        <div
+          style={{
+            textAlign: 'left',
+            display: 'inline-block',
+            width: '100%',
+            margin: 10,
+            position: 'relative',
+            minWidth: 600,
+            background,
+            color: team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black',
+          }}
+        >
+          <Image
+            src={p.imageUrl}
+            style={{
+              width: 120,
+              verticalAlign: 'middle',
+              margin: 10,
+              marginRight: 20,
+            }}
+            display="inline-block"
+          />
+          {p.cardTimeRemaining !== 0 && (
+            <Image
+              pos="absolute"
+              top={0}
+              left={0}
+              className={classes.floating}
+              style={{
+                width: 120,
+                verticalAlign: 'middle',
+                margin: 10,
+                marginRight: 20,
+              }}
+              src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
+            ></Image>
+          )}
+          [{p.cardTimeRemaining ? '-' : side[0]}] {name}
+        </div>
       ) : (
-        <>
-          {name} [{side === 'left' ? 'L' : 'R'}]
-        </>
+        <div
+          style={{
+            textAlign: 'right',
+            display: 'inline-block',
+            minWidth: 600,
+            width: '100%',
+            margin: 10,
+            position: 'relative',
+            background,
+            color: team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black',
+          }}
+        >
+          {name} [{p.cardTimeRemaining ? '-' : side[0]}]
+          <Image
+            src={p.imageUrl}
+            style={{
+              margin: 10,
+              width: 120,
+              marginLeft: 20,
+              verticalAlign: 'middle',
+            }}
+            display="inline-block"
+          />
+          {p.cardTimeRemaining !== 0 && (
+            <Image
+              pos="absolute"
+              top={0}
+              right={0}
+              className={classes.floating}
+              style={{
+                width: 120,
+                verticalAlign: 'middle',
+                margin: 10,
+                marginRight: 20,
+              }}
+              src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
+            ></Image>
+          )}
+        </div>
       );
 
     return (
@@ -317,12 +430,12 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
           </>
         )}
         <Box pos="absolute" left="10%" bottom="10%">
-          {createNamePlate(teamOne!, 'right')}
-          {createNamePlate(teamOne!, 'left')}
+          {createNamePlate(teamOne!, 'Right')}
+          {createNamePlate(teamOne!, 'Left')}
         </Box>
         <Box pos="absolute" right="10%" bottom="10%" style={{ textAlign: 'right' }}>
-          {createNamePlate(teamTwo!, 'right')}
-          {createNamePlate(teamTwo!, 'left')}
+          {createNamePlate(teamTwo!, 'Right')}
+          {createNamePlate(teamTwo!, 'Left')}
         </Box>
         <Box pos="absolute" bottom={20} w="100%">
           <Text ta="center" fz={20}>
