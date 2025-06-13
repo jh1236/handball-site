@@ -1,13 +1,17 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Box, Center, Grid, Image, LoadingOverlay, Portal, RingProgress, Stack, Text, Title } from '@mantine/core';
+import React, { useEffect, useMemo, useState } from 'react';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { Box, Center, LoadingOverlay, RingProgress, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { customTournamentScoreboardEffects } from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
-import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
-import { GameStructure, GameTeamStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
-
+import { Message, UpdateMessage } from '@/ServerActions/SocketTypes';
+import {
+  GameStructure,
+  GameTeamStructure,
+  PersonStructure,
+  PlayerGameStatsStructure,
+} from '@/ServerActions/types';
 
 interface ScoreboardProps {
   gameID: number;
@@ -15,75 +19,44 @@ interface ScoreboardProps {
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
   const [game, setGame] = React.useState<GameStructure>();
-  const [prevGame, setPrevGame] = React.useState<GameStructure>();
-  const [currentTime, setCurrentTime] = React.useState<number>(0);
-  const [lastCheck, setLastCheck] = React.useState<number>(0);
-  const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-  const urlSearchParams = useSearchParams();
-  const router = useRouter();
   const teamOne = useMemo(() => (game?.firstTeamIga ? game?.teamOne : game?.teamTwo), [game]);
   const teamTwo = useMemo(() => (game?.firstTeamIga ? game?.teamTwo : game?.teamOne), [game]);
-
-  function reloadGame() {
-    getGame({
-      gameID,
-      includeGameEvents: true,
-    }).then((g) => {
-      const prev = game;
-      setGame(g);
-      if (g.timeoutExpirationTime > 0) {
-        openTimeout();
-      } else {
-        closeTimeout();
-      }
-      if (prev && prev.firstTeamIga !== g.firstTeamIga) {
-        //BUG: WHAT THE FUCK IS GOING ON!!!! The bg images REFUSE to co-operate without a forced reload if the side changes 😭😭😭😭
-        router.refresh();
-      }
-    });
-  }
-
-  //
-  useEffect(() => {
-    reloadGame();
-  }, [gameID]);
-
-  useEffect(() => {
-    const prev = urlSearchParams.get('prev');
-    if (prev) {
-      getGame({
-        gameID: +prev,
-      }).then((g) => {
-        setPrevGame(g);
-      });
-    }
-    if (game && game.ended) {
-      getNextGameId(gameID).then((nextGameId) => {
-        if (nextGameId > 0) {
-          router.push(`/games/${nextGameId}/scoreboard?prev=${gameID}`);
-        }
-      });
-    }
-  }, [urlSearchParams]);
-
+  const [currentTime, setCurrentTime] = useState(0);
+  const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
+  const WS_URL = `wss://api.squarers.club/api/scoreboard?gameId=${gameID}`;
+  const { sendMessage, lastJsonMessage, readyState } = useWebSocket(WS_URL, {
+    share: false,
+    shouldReconnect: () => true,
+    heartbeat: {
+      message: 'ping',
+      returnMessage: 'pong',
+      timeout: 2 * 60 * 1000, //2 minutes
+      interval: 25 * 1000, //25 seconds
+    },
+  });
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
     }, 100);
     return () => clearInterval(interval);
   }, []);
-
   useEffect(() => {
-    //this will run every time currentTime is updated (10 times a second)
-    if (lastCheck + 500 < currentTime) {
-      setLastCheck(currentTime);
-      getChangeCode(gameID).then((code) => {
-        if (game !== undefined && code !== game.changeCode) {
-          reloadGame();
-        }
-      });
+    if (readyState === ReadyState.OPEN) {
+      sendMessage('update');
     }
-  }, [currentTime, game, gameID, lastCheck]);
+  }, [readyState]);
+  useEffect(() => {
+    console.log(lastJsonMessage);
+    if ((lastJsonMessage as Message)?.type === 'update') {
+      const gameUpdate = (lastJsonMessage as UpdateMessage).game;
+      setGame(gameUpdate);
+      if (gameUpdate.timeoutExpirationTime > 0) {
+        openTimeout();
+      } else {
+        closeTimeout();
+      }
+    }
+  }, [closeTimeout, lastJsonMessage, openTimeout]);
 
   if (!game) {
     return <>Loading...</>;
@@ -195,54 +168,6 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   //TODO: Digby make this look nice please :3
   const startKids = (
     <>
-      {prevGame && (
-        <Portal>
-          <Center>
-            <Box
-              w="800"
-              pos="absolute"
-              top="0"
-              style={{
-                zIndex: 999,
-                backgroundColor: 'black',
-              }}
-            >
-              <Center>
-                <Title>Previous Game:</Title>
-              </Center>
-              <Grid ta="center" justify="center" columns={16} gutter="sm">
-                <Grid.Col span={7}>
-                  <Title order={2}>{prevGame.teamOne.name}</Title>
-                </Grid.Col>
-                <Grid.Col span={1}>
-                  <Title order={2}>vs</Title>
-                </Grid.Col>
-                <Grid.Col span={7}>
-                  <Title order={2}>{prevGame.teamTwo.name}</Title>
-                </Grid.Col>
-                <Grid.Col span={7}>
-                  <Image src={prevGame.teamOne.imageUrl} w={200} display="inline" />
-                </Grid.Col>
-                <Grid.Col span={1}></Grid.Col>
-                <Grid.Col span={7}>
-                  <Image src={prevGame.teamTwo.imageUrl} w={200} display="inline" />
-                </Grid.Col>
-                <Grid.Col span={7}>
-                  <Title order={2} fz={50}>
-                    {prevGame.teamOneScore}
-                  </Title>
-                </Grid.Col>
-                <Grid.Col span={1}></Grid.Col>
-                <Grid.Col span={7}>
-                  <Title order={2} fz={50}>
-                    {prevGame.teamTwoScore}
-                  </Title>
-                </Grid.Col>
-              </Grid>
-            </Box>
-          </Center>
-        </Portal>
-      )}
       <Text ta="center" fz="20vh" fw="semi-bold">
         Waiting for start.{currentTime % 2100 > 700 && '.'}
         {currentTime % 2100 > 1400 && '.'}

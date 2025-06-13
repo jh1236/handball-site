@@ -66,7 +66,6 @@ export function getGame({
       return Promise.reject(response.text());
     }
     return response.json().then((json: { game: GameStructure }) => {
-      console.log(json.game);
       return json.game;
     });
   });
