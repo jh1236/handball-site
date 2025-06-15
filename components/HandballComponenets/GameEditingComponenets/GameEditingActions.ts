@@ -3,6 +3,7 @@ import {
   startLoading,
 } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
 import { QUICK_GAME_END } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
+import { GameState } from '@/components/HandballComponenets/GameState';
 import {
   aceForGame,
   cardForGame,
@@ -17,88 +18,6 @@ import {
   timeoutForGame,
   undoForGame,
 } from '@/ServerActions/GameActions';
-import { PlayerGameStatsStructure, SearchableName } from '@/ServerActions/types';
-
-type Team = {
-  name: string;
-  score: {
-    get: number;
-    set: (v: number) => void;
-  };
-  rating: {
-    get: number;
-    set: (v: number) => void;
-  };
-  notes: {
-    get: string;
-    set: (v: string) => void;
-  };
-  protest: {
-    get: string;
-    set: (v: string) => void;
-  };
-  timeouts: {
-    get: number;
-    set: (v: number) => void;
-  };
-  servingFromLeft: {
-    get: boolean;
-    set: (v: boolean) => void;
-  };
-  left: {
-    get?: PlayerGameStatsStructure;
-    set: (v?: PlayerGameStatsStructure) => void;
-  };
-  right: {
-    get?: PlayerGameStatsStructure;
-    set: (v?: PlayerGameStatsStructure) => void;
-  };
-  sub: {
-    get?: PlayerGameStatsStructure;
-    set: (v?: PlayerGameStatsStructure) => void;
-  };
-  [key: string]: any;
-};
-
-export interface GameState {
-  badminton: boolean;
-  timeoutExpirationTime: {
-    get: number;
-    set: (v: number) => void;
-  };
-  votes: {
-    get: PlayerGameStatsStructure[];
-    set: (v: PlayerGameStatsStructure[]) => void;
-  };
-  notes: {
-    get: string;
-    set: (v: string) => void;
-  };
-  id: number;
-  teamOne: Team;
-  teamTwo: Team;
-  firstTeamServes: {
-    get: boolean;
-    set: (v: boolean) => void;
-  };
-  started: {
-    get: boolean;
-    set: (v: boolean) => void;
-  };
-  ended: {
-    get: boolean;
-    set: (v: boolean) => void;
-  };
-  teamOneIGA: {
-    get: boolean;
-    set: (v: boolean) => void;
-  };
-  faulted: {
-    get: boolean;
-    set: (v: boolean) => void;
-  };
-  servingFromLeft: boolean;
-}
 
 function nextPoint(game: GameState, swap?: boolean) {
   for (const i of [
