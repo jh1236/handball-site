@@ -1,4 +1,5 @@
-import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { SERVER_ADDRESS } from '@/app/config';
 
 export function getQOTD(): Promise<{
   quote: string;

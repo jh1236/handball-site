@@ -1,8 +1,9 @@
-import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { tokenFetch } from '@/components/HandballComponenets/ServerActions';
 import {
   OfficialStructure,
   TournamentStructure,
  SearchableName } from '@/ServerActions/types';
+import { SERVER_ADDRESS } from '@/app/config';
 
 interface GetOfficialsArgs {
   tournament?: SearchableName;

@@ -1,9 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { Center, Container, Image, Skeleton, Space, Text } from '@mantine/core';
-import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
 import { StatCategory } from '@/components/HandballComponenets/TournamentLanding';
 import { PersonStructure, TeamStructure } from '@/ServerActions/types';
+import { SERVER_ADDRESS } from '@/app/config';
 
 interface StatBubbleParams {
   players: PersonStructure[] | undefined;

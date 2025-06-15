@@ -32,7 +32,8 @@ import {
   UnstyledButton,
   useMantineColorScheme,
 } from '@mantine/core';
-import { SERVER_ADDRESS, useUserData } from '@/components/HandballComponenets/ServerActions';
+import { SERVER_ADDRESS } from '@/app/config';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import buttonClasses from '@/components/Sidebar/NavbarLinksGroup.module.css';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
