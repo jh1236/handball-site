@@ -73,7 +73,7 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
           </Text>
         </Link>
         <Link href={`/${tournament}/players/${team.searchableName}`} className="hideLink">
-          <Image alt={team.name} src={team.bigImageUrl} h="200" w="auto" m="auto"></Image>
+          <Image alt={team.name} src={team.imageUrl} h="200" w="auto" m="auto"></Image>
         </Link>
         <Link href={`/${tournament}/players/${team.searchableName}`} className="hideLink">
           <Text ta="center">
@@ -122,7 +122,7 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
         </Text>
       </Link>
       <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
-        <Image alt={player.name} src={player.bigImageUrl} h="200" w="auto" m="auto"></Image>
+        <Image alt={player.name} src={player.imageUrl} h="200" w="auto" m="auto"></Image>
       </Link>
       <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
         <Text ta="center">
