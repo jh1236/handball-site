@@ -59,6 +59,7 @@ export function CreateTeamButton({
     setLeftPlayer(namesFromTeam[0]);
     setRightPlayer(namesFromTeam[1]);
     close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [close, setLeftPlayer, setRightPlayer, setTeamName, teamName, teams]);
 
   return (
