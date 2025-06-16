@@ -2,17 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
-import { Box, Center, LoadingOverlay, RingProgress, Stack, Text, Title } from '@mantine/core';
-import React, { useEffect, useMemo } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Box,
   Center,
-  Grid,
   Image,
   LoadingOverlay,
-  luminance,
-  Portal,
   RingProgress,
   Stack,
   Text,
@@ -22,10 +16,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { addGameEventToGame } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { setGameState, TeamState, useGameState } from '@/components/HandballComponenets/GameState';
 import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
-import { PersonStructure } from '@/ServerActions/types';
-import { customTournamentScoreboardEffects } from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
-import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
-import { GameStructure, GameTeamStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import { PlayerGameStatsStructure } from '@/ServerActions/types';
 import classes from './Scoreboard.module.css';
 
 interface ScoreboardProps {
@@ -130,7 +121,13 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   }
 
   function createNamePlate(team: TeamState, side: 'left' | 'right' | 'sub') {
-    const p: PlayerGameStatsStructure | undefined = team[side].get;
+    const servingSidePlayer = gameState.servingFromLeft ? team.left.get : team.right.get;
+    let p: PlayerGameStatsStructure | undefined = team[side].get;
+    if (servingSidePlayer?.cardTimeRemaining !== 0) {
+      if (side === 'left') p = team.right.get;
+      else if (side === 'right') p = team.left.get;
+    }
+
     if (!p) {
       return <p> error: player not found</p>;
     }
@@ -150,9 +147,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       name = <i>{name}*</i>;
     }
     const color = team.name.get === gameState.teamOne.name.get ? teamOneColor : teamTwoColor;
-    const newColor = [...(color ?? [0.7, 0.7, 0.7, 1.0])].map(
-      (a) => a * 0.7
-    );
+    const newColor = [...(color ?? [0.7, 0.7, 0.7, 1.0])].map((a) => a * 0.7);
     newColor[3] = 0.7;
     const cardPercent = p.cardTimeRemaining > 0 ? p.cardTimeRemaining / p.cardTime : 1;
     let background: string;
@@ -205,7 +200,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
               src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
             ></Image>
           )}
-          [{p.cardTimeRemaining ? '-' : side[0]}] {name}
+          [{p.cardTimeRemaining ? '-' : side[0].toUpperCase()}] {name}
         </div>
       ) : (
         <div
@@ -219,7 +214,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
             background,
           }}
         >
-          {name} [{p.cardTimeRemaining ? '-' : side[0]}]
+          {name} [{p.cardTimeRemaining ? '-' : side[0].toUpperCase()}]
           <Image
             src={p.imageUrl}
             style={{
@@ -324,7 +319,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       />
       <Box w="100vw" pos="absolute" top="25px">
         <Center component={Title} fz={40}>
-          {teamOne?.extendedName} vs {teamTwo?.extendedName}
+          {teamOne?.name.get} vs {teamTwo?.name.get}
         </Center>
       </Box>
       <Box mt="auto">
