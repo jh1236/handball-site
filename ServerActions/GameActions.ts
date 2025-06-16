@@ -1,10 +1,11 @@
-import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { tokenFetch } from '@/components/HandballComponenets/ServerActions';
 import {
   GameStructure,
   RealName,
   SearchableName,
   TournamentStructure,
 } from '@/ServerActions/types';
+import { SERVER_ADDRESS } from '@/app/config';
 
 export function getChangeCode(gameID: number): Promise<number> {
   return tokenFetch(`/api/games/change_code?id=${gameID}`, {
@@ -66,7 +67,6 @@ export function getGame({
       return Promise.reject(response.text());
     }
     return response.json().then((json: { game: GameStructure }) => {
-      console.log(json.game);
       return json.game;
     });
   });

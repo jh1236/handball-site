@@ -104,6 +104,7 @@ export interface GameTeamStructure {
   extendedName: string;
   searchableName: string;
   imageUrl: string;
+  bigImageUrl: string;
   captain: PlayerGameStatsStructure;
   nonCaptain: PlayerGameStatsStructure | null;
   substitute: PlayerGameStatsStructure | null;

@@ -1,5 +1,8 @@
 'use client';
 
+import React, { useEffect, useMemo, useState } from 'react';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { Box, Center, LoadingOverlay, RingProgress, Stack, Text, Title } from '@mantine/core';
 import React, { useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -16,6 +19,10 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { addGameEventToGame } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
+import { setGameState, TeamState, useGameState } from '@/components/HandballComponenets/GameState';
+import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
+import { PersonStructure } from '@/ServerActions/types';
 import { customTournamentScoreboardEffects } from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
 import { getChangeCode, getGame, getNextGameId } from '@/ServerActions/GameActions';
 import { GameStructure, GameTeamStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
@@ -32,169 +39,118 @@ function cardColorFromPlayer(player: PlayerGameStatsStructure) {
 }
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
-  const [game, setGame] = React.useState<GameStructure>();
-  const [prevGame, setPrevGame] = React.useState<GameStructure>();
-  const [currentTime, setCurrentTime] = React.useState<number>(0);
-  const [lastCheck, setLastCheck] = React.useState<number>(0);
+  const gameState = useGameState();
+  const [teamOneColor, setTeamOneColor] = useState<number[] | undefined>();
+  const [teamTwoColor, setTeamTwoColor] = useState<number[] | undefined>();
+  const [teamOneImage, setTeamOneImage] = useState<string | undefined>();
+  const [teamTwoImage, setTeamTwoImage] = useState<string | undefined>();
+  const [time, setTime] = useState<number>(0); //holds length if game is finished, or else start time
+  const [court, setCourt] = useState<number>(0);
+  const [official, setOfficial] = useState<string>();
+  const teamOne = useMemo(
+    () => (gameState?.teamOneIGA.get ? gameState?.teamOne : gameState?.teamTwo),
+    [gameState?.teamOne, gameState?.teamOneIGA.get, gameState?.teamTwo]
+  );
+  const teamTwo = useMemo(
+    () => (gameState?.teamOneIGA.get ? gameState?.teamTwo : gameState?.teamOne),
+    [gameState?.teamOne, gameState?.teamOneIGA.get, gameState?.teamTwo]
+  );
+  const [currentTime, setCurrentTime] = useState(0);
   const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-  const urlSearchParams = useSearchParams();
-  const router = useRouter();
-  const teamOne = useMemo(() => (game?.firstTeamIga ? game?.teamOne : game?.teamTwo), [game]);
-  const teamTwo = useMemo(() => (game?.firstTeamIga ? game?.teamTwo : game?.teamOne), [game]);
-
-  function reloadGame() {
-    getGame({
-      gameID,
-      includeGameEvents: true,
-    }).then((g) => {
-      const prev = game;
-      setGame(g);
-      if (g.timeoutExpirationTime > 0) {
-        openTimeout();
-      } else {
-        closeTimeout();
-      }
-      if (prev && prev.firstTeamIga !== g.firstTeamIga) {
-        //BUG: WHAT THE FUCK IS GOING ON!!!! The bg images REFUSE to co-operate without a forced reload if the side changes 😭😭😭😭
-        router.refresh();
-      }
-    });
-  }
-
-  //
-  useEffect(() => {
-    reloadGame();
-  }, [gameID]);
-
-  useEffect(() => {
-    const prev = urlSearchParams.get('prev');
-    if (prev) {
-      getGame({
-        gameID: +prev,
-      }).then((g) => {
-        setPrevGame(g);
-      });
-    }
-    if (game && game.ended) {
-      getNextGameId(gameID).then((nextGameId) => {
-        if (nextGameId > 0) {
-          router.push(`/games/${nextGameId}/scoreboard?prev=${gameID}`);
-        }
-      });
-    }
-  }, [urlSearchParams]);
-
+  const WS_URL = `wss://api.squarers.club/api/scoreboard?gameId=${gameID}`;
+  const { sendMessage, lastJsonMessage, readyState } = useWebSocket(WS_URL, {
+    share: false,
+    shouldReconnect: () => true,
+    heartbeat: {
+      message: 'ping',
+      returnMessage: 'pong',
+      timeout: 2 * 60 * 1000, //2 minutes
+      interval: 25 * 1000, //25 seconds
+    },
+  });
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
     }, 100);
     return () => clearInterval(interval);
   }, []);
-
   useEffect(() => {
-    //this will run every time currentTime is updated (10 times a second)
-    if (lastCheck + 500 < currentTime) {
-      setLastCheck(currentTime);
-      getChangeCode(gameID).then((code) => {
-        if (game !== undefined && code !== game.changeCode) {
-          reloadGame();
-        }
-      });
+    if (readyState === ReadyState.OPEN) {
+      sendMessage('update');
     }
-  }, [currentTime, game, gameID, lastCheck]);
+  }, [readyState, sendMessage]);
+  useEffect(() => {
+    const message = lastJsonMessage as Message;
+    if (message?.type === 'update') {
+      const gameUpdate = (lastJsonMessage as UpdateMessage).game;
+      setGameState(gameUpdate, gameState);
+      setTeamOneColor(gameUpdate.teamOne.teamColorAsRGBABecauseDigbyIsLazy || undefined);
+      setTeamTwoColor(gameUpdate.teamTwo.teamColorAsRGBABecauseDigbyIsLazy || undefined);
+      setTeamOneImage(gameUpdate.teamOne.bigImageUrl ?? gameUpdate.teamOne.imageUrl);
+      setTeamTwoImage(gameUpdate.teamTwo.bigImageUrl ?? gameUpdate.teamTwo.imageUrl);
+      if (gameUpdate.ended) {
+        setTime(gameUpdate.length);
+      } else {
+        setTime(gameUpdate.startTime);
+      }
+      setOfficial(gameUpdate.official.name);
+      setCourt(gameUpdate.court);
+      if (gameUpdate.timeoutExpirationTime > 0) {
+        openTimeout();
+      } else {
+        closeTimeout();
+      }
+    } else if (message?.type === 'event') {
+      const { event } = lastJsonMessage as EventMessage;
+      addGameEventToGame(gameState, event);
+      if (event.eventType === 'End Game') {
+        setTime(currentTime - time);
+      }
+    }
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeTimeout, lastJsonMessage, openTimeout]);
 
-  if (!game) {
+  if (!gameState.id) {
     return <>Loading...</>;
   }
 
-  function generateBackground(
-    teamOneIn: GameTeamStructure | undefined,
-    teamTwoIn: GameTeamStructure | undefined
-  ): any {
-    const team1Col = teamOneIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
-    const team2Col = teamTwoIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
-    const imgURL1 = teamOneIn?.bigImageUrl ?? teamOneIn?.imageUrl;
-    const imgURL2 = teamTwoIn?.bigImageUrl ?? teamTwoIn?.imageUrl;
+  function generateBackground(): any {
+    const team1Col = teamOneColor ?? '50,50,125,255';
+    const team2Col = teamTwoColor ?? '50,50,125,255';
     return {
       background: `
       linear-gradient(90deg, rgba(${team1Col}) 0%, rgba(0,0,0,0) 60%), 
       linear-gradient(90deg, rgba(0,0,0,0) 40%, rgba(${team2Col}) 100%), 
-      url(${imgURL1}), 
-      url(${imgURL2})`,
+      url(${teamOneImage}), 
+      url(${teamTwoImage})`,
       backgroundPosition: '0 0, 0 0, -10vw center, 60vw center',
       backgroundSize: 'cover, cover, 50vw auto, 50vw auto',
       backgroundRepeat: 'no-repeat',
     };
   }
 
-  function getSides(team: GameTeamStructure): {
-    Left: PlayerGameStatsStructure | undefined;
-    Right: PlayerGameStatsStructure | undefined;
-    Sub: PlayerGameStatsStructure | undefined;
-  } {
-    let left: PlayerGameStatsStructure | undefined;
-    let right: PlayerGameStatsStructure | undefined;
-    let sub: PlayerGameStatsStructure | undefined;
-    const players: PlayerGameStatsStructure[] = [
-      team.captain,
-      team.nonCaptain,
-      team.substitute,
-    ].filter((a) => a !== null);
-    if (!game?.started) {
-      [left, right, sub] = players;
-    } else if (players.length === 1) {
-      if (game?.sideToServe === 'Left') {
-        [left] = players;
-      } else {
-        [right] = players;
-      }
-    } else {
-      for (const p of players) {
-        if (!p) {
-          //
-        } else if (p.sideOfCourt === 'Left') {
-          left = p;
-        } else if (p.sideOfCourt === 'Right') {
-          right = p;
-        } else if (p.sideOfCourt === 'Substitute') {
-          sub = p;
-        }
-      }
-    }
-    // I know these violate the naming conventions, but this is how they are received in sideToServe and sideOfCourt from the backend
-    return {
-      Left: left,
-      Right: right,
-      Sub: sub,
-    };
-  }
-
-  function createNamePlate(team: GameTeamStructure, side: 'Left' | 'Right' | 'Sub') {
-    const sides = getSides(team);
-    const servingSidePlayer = sides[game?.sideToServe ?? 'Left']!;
-    let p: PlayerGameStatsStructure | undefined = sides[side];
-    if (servingSidePlayer.cardTimeRemaining !== 0) {
-      if (side === 'Left') p = sides.Right;
-      else if (side === 'Right') p = sides.Left;
-    }
-
+  function createNamePlate(team: TeamState, side: 'left' | 'right' | 'sub') {
+    const p: PlayerGameStatsStructure | undefined = team[side].get;
     if (!p) {
       return <p> error: player not found</p>;
     }
-    if (!game) {
+    if (!gameState) {
       return <p>error</p>;
     }
     const serving =
-      game.firstTeamToServe === game.firstTeamIga
-        ? team.name === teamOne?.name && side === game.sideToServe
-        : team.name === teamTwo?.name && side === game.sideToServe;
+      gameState.firstTeamServes.get === gameState.teamOneIGA.get
+        ? team.name.get === teamOne?.name.get &&
+          side === (gameState.servingFromLeft ? 'left' : 'right')
+        : team.name.get === teamTwo?.name.get &&
+          side === (gameState.servingFromLeft ? 'left' : 'right');
 
     let name: React.JSX.Element = <>{p.name}</>;
 
-    if (serving && game.faulted) {
+    if (serving && gameState.faulted.get) {
       name = <i>{name}*</i>;
     }
-    const newColor = [...(team.teamColorAsRGBABecauseDigbyIsLazy ?? [0.7, 0.7, 0.7, 1.0])].map(
+    const color = team.name.get === gameState.teamOne.name.get ? teamOneColor : teamTwoColor;
+    const newColor = [...(color ?? [0.7, 0.7, 0.7, 1.0])].map(
       (a) => a * 0.7
     );
     newColor[3] = 0.7;
@@ -212,7 +168,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       background = `linear-gradient(90deg, rgba(0,0,0,0) 30%, rgba(${newColor}) 100%)`;
     }
     name =
-      team === teamOne ? (
+      team.name.get === teamOne.name.get ? (
         <div
           style={{
             textAlign: 'left',
@@ -222,7 +178,6 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
             position: 'relative',
             minWidth: 600,
             background,
-            color: team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black',
           }}
         >
           <Image
@@ -262,7 +217,6 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
             margin: 10,
             position: 'relative',
             background,
-            color: team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black',
           }}
         >
           {name} [{p.cardTimeRemaining ? '-' : side[0]}]
@@ -308,54 +262,6 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   //TODO: Digby make this look nice please :3
   const startKids = (
     <>
-      {prevGame && (
-        <Portal>
-          <Center>
-            <Box
-              w="800"
-              pos="absolute"
-              top="0"
-              style={{
-                zIndex: 999,
-                backgroundColor: 'black',
-              }}
-            >
-              <Center>
-                <Title>Previous Game:</Title>
-              </Center>
-              <Grid ta="center" justify="center" columns={16} gutter="sm">
-                <Grid.Col span={7}>
-                  <Title order={2}>{prevGame.teamOne.name}</Title>
-                </Grid.Col>
-                <Grid.Col span={1}>
-                  <Title order={2}>vs</Title>
-                </Grid.Col>
-                <Grid.Col span={7}>
-                  <Title order={2}>{prevGame.teamTwo.name}</Title>
-                </Grid.Col>
-                <Grid.Col span={7}>
-                  <Image src={prevGame.teamOne.imageUrl} w={200} display="inline" />
-                </Grid.Col>
-                <Grid.Col span={1}></Grid.Col>
-                <Grid.Col span={7}>
-                  <Image src={prevGame.teamTwo.imageUrl} w={200} display="inline" />
-                </Grid.Col>
-                <Grid.Col span={7}>
-                  <Title order={2} fz={50}>
-                    {prevGame.teamOneScore}
-                  </Title>
-                </Grid.Col>
-                <Grid.Col span={1}></Grid.Col>
-                <Grid.Col span={7}>
-                  <Title order={2} fz={50}>
-                    {prevGame.teamTwoScore}
-                  </Title>
-                </Grid.Col>
-              </Grid>
-            </Box>
-          </Center>
-        </Portal>
-      )}
       <Text ta="center" fz="20vh" fw="semi-bold">
         Waiting for start.{currentTime % 2100 > 700 && '.'}
         {currentTime % 2100 > 1400 && '.'}
@@ -373,22 +279,25 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
             ta="center"
             style={{
               color:
-                game.timeoutExpirationTime > currentTime || currentTime % 1000 <= 500 ? '' : 'red',
+                gameState.timeoutExpirationTime.get > currentTime || currentTime % 1000 <= 500
+                  ? ''
+                  : 'red',
             }}
             fz={150}
             order={1}
           >
-            {Math.max(Math.floor((game.timeoutExpirationTime - currentTime) / 100) / 10, 0).toFixed(
-              1
-            )}{' '}
+            {Math.max(
+              Math.floor((gameState.timeoutExpirationTime.get - currentTime) / 100) / 10,
+              0
+            ).toFixed(1)}{' '}
             Seconds
           </Title>
         }
         sections={[
           {
             value:
-              game.timeoutExpirationTime > currentTime
-                ? 100 - (game.timeoutExpirationTime - currentTime) / 300
+              gameState.timeoutExpirationTime.get > currentTime
+                ? 100 - (gameState.timeoutExpirationTime.get - currentTime) / 300
                 : currentTime % 1000 > 500
                   ? 100
                   : 0,
@@ -399,14 +308,18 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     </Stack>
   );
 
+  if (!teamOneImage) {
+    return 'Loading...';
+  }
+
   return (
-    <Box style={generateBackground(teamOne, teamTwo)} h="100vh" w="100vw">
+    <Box style={generateBackground()} h="100vh" w="100vw">
       <LoadingOverlay
-        visible={!game.started || isTimeoutOpen}
-        loaderProps={{ children: game.started ? timeoutKids : startKids }}
+        visible={!gameState.started.get || isTimeoutOpen}
+        loaderProps={{ children: gameState.started.get ? timeoutKids : startKids }}
         overlayProps={{
           radius: 'sm',
-          blur: game.started ? 10 : 1,
+          blur: gameState.started.get ? 10 : 1,
         }}
       />
       <Box w="100vw" pos="absolute" top="25px">
@@ -415,46 +328,47 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
         </Center>
       </Box>
       <Box mt="auto">
-        {game.started && (
+        {gameState.started.get && (
           <>
             <Box pos="absolute" left="15%">
               <Text fz="50vh" fw="semi-bold">
-                {game.firstTeamIga ? game.teamOneScore : game.teamTwoScore}
+                {gameState.teamOneIGA.get
+                  ? gameState.teamOne.score.get
+                  : gameState.teamTwo.score.get}
               </Text>
             </Box>
             <Box pos="absolute" right="15%">
               <Text fz="50vh" fw="semi-bold">
-                {game.firstTeamIga ? game.teamTwoScore : game.teamOneScore}
+                {gameState.teamOneIGA.get
+                  ? gameState.teamTwo.score.get
+                  : gameState.teamOne.score.get}
               </Text>
             </Box>
           </>
         )}
         <Box pos="absolute" left="10%" bottom="10%">
-          {createNamePlate(teamOne!, 'Right')}
-          {createNamePlate(teamOne!, 'Left')}
+          {createNamePlate(teamOne!, 'right')}
+          {createNamePlate(teamOne!, 'left')}
         </Box>
         <Box pos="absolute" right="10%" bottom="10%" style={{ textAlign: 'right' }}>
-          {createNamePlate(teamTwo!, 'Right')}
-          {createNamePlate(teamTwo!, 'Left')}
+          {createNamePlate(teamTwo!, 'right')}
+          {createNamePlate(teamTwo!, 'left')}
         </Box>
         <Box pos="absolute" bottom={20} w="100%">
           <Text ta="center" fz={20}>
-            Court : {game.court + 1}
+            Court : {court + 1}
           </Text>
           <Text ta="center" fz={20}>
-            Official: {game.official.name}
+            Official: {official}
           </Text>
           <Text ta="center" fz={20}>
             Time Elapsed:{' '}
-            {game.ended
-              ? new Date(Math.floor(game.length * 1000)).toISOString().slice(14, 19)
-              : new Date(Math.floor(currentTime - game.startTime * 1000))
-                  .toISOString()
-                  .slice(14, 19)}
+            {gameState.ended.get
+              ? new Date(Math.floor(time * 1000)).toISOString().slice(14, 19)
+              : new Date(Math.floor(currentTime - time * 1000)).toISOString().slice(14, 19)}
           </Text>
         </Box>
       </Box>
-      {customTournamentScoreboardEffects(game)}
     </Box>
   );
 }
