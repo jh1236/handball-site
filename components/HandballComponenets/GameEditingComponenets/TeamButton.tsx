@@ -27,12 +27,12 @@ import { useDisclosure } from '@mantine/hooks';
 import { markIfReqd } from '@/components/HandballComponenets/AdminGamePanel';
 import {
   forfeit,
-  GameState,
   timeout,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { ZAIAH_BOX_FUCKERY } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
+import { GameState } from '@/components/HandballComponenets/GameState';
 
 interface TeamButtonProps {
   game: GameState;
@@ -280,7 +280,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
       ),
     [game, firstTeam, serving, close]
   );
-  const name = team ? team.name : 'Loading...';
+  const name = team ? team.name.get : 'Loading...';
   return (
     <>
       <Modal opened={opened} centered onClose={close} title="Action">

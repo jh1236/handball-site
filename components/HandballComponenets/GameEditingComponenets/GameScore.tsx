@@ -29,10 +29,10 @@ import { markIfReqd } from '@/components/HandballComponenets/AdminGamePanel';
 import {
   begin,
   end,
-  GameState,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { OrderPlayers } from '@/components/HandballComponenets/GameEditingComponenets/OrderPlayers';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
+import { GameState } from '@/components/HandballComponenets/GameState';
 
 interface GameScoreArgs {
   game: GameState;
@@ -110,13 +110,13 @@ function getActions(
           <List>
             <List.Item>
               <strong>Winning Team: </strong>
-              {winningTeam}
+              {winningTeam.get}
             </List.Item>
             <List.Item>
               <strong>Best Players</strong>
               {!bestPlayersOpened && <strong style={{ color: 'red' }}>*</strong>}
               <strong>: </strong>
-              {game.votes.get.map((pgs) => pgs.name).join(', ')}
+              {game.votes.get.map((pgs: { name: string; }) => pgs.name).join(', ')}
             </List.Item>
             <List.Item>
               <strong>Review Required: </strong>
@@ -129,7 +129,7 @@ function getActions(
               {game.notes.get.trim() === '' ? <i>Unset</i> : game.notes.get}
             </List.Item>
             <List.Item>
-              <strong>Team One: </strong> {game.teamOne.name}
+              <strong>Team One: </strong> {game.teamOne.name.get}
               <List>
                 <List.Item>
                   <strong>Protest Reason: </strong>
@@ -149,7 +149,7 @@ function getActions(
               </List>
             </List.Item>
             <List.Item>
-              <strong>Team Two: </strong> {game.teamTwo.name}
+              <strong>Team Two: </strong> {game.teamTwo.name.get}
               <List>
                 <List.Item>
                   <strong>Protest Reason: </strong>
@@ -415,7 +415,7 @@ export function GameScore({ game }: GameScoreArgs) {
                   <Text fw={700} fz={20}>
                     <i>
                       {Math.abs(matchPoints)} match points to{' '}
-                      {matchPoints > 0 ? teamOne.name : teamTwo.name}
+                      {matchPoints > 0 ? teamOne.name.get : teamTwo.name.get}
                     </i>
                   </Text>
                 </Center>
