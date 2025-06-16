@@ -1,4 +1,5 @@
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { GameEventStructure } from '@/ServerActions/types';
 
 function nextPoint(game: GameState, swap?: boolean) {
   for (const i of [
@@ -204,5 +205,46 @@ export function cardLocal(
   player.set(outPlayer);
   if (outOtherPlayer !== otherPlayer.get!) {
     otherPlayer.set(outOtherPlayer);
+  }
+}
+
+export function addGameEventToGame(game: GameState, gameEvent: GameEventStructure) {
+  const team = gameEvent.firstTeam ? game.teamOne : game.teamTwo;
+  const leftPlayer = team.left.get?.searchableName === gameEvent.player.searchableName;
+  switch (gameEvent.eventType) {
+    case 'Score':
+      scoreLocal(game, gameEvent.firstTeam);
+      break;
+    case 'Timeout':
+      timeoutLocal(game, gameEvent.firstTeam);
+      break;
+    case 'Forfeit':
+      forfeitLocal(game, gameEvent.firstTeam);
+      break;
+    case 'End Timeout':
+      endTimeoutLocal(game);
+      break;
+    case 'Fault':
+      faultLocal(game);
+      break;
+    case 'Substitute':
+      subLocal(game, gameEvent.firstTeam, leftPlayer);
+      break;
+    case 'End Game':
+      game.ended.set(true);
+      break;
+
+    case 'Warning':
+    case 'Green Card':
+    case 'Yellow Card':
+    case 'Red Card':
+      cardLocal(
+        game,
+        gameEvent.eventType.replaceAll(' Card', '') as 'Green' | 'Yellow' | 'Red' | 'Warning',
+        gameEvent.firstTeam,
+        leftPlayer,
+        gameEvent.notes,
+        gameEvent.details
+      );
   }
 }

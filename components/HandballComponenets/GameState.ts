@@ -17,8 +17,8 @@ export interface GameState {
     set: (v: string) => void;
   };
   id: number;
-  teamOne: Team;
-  teamTwo: Team;
+  teamOne: TeamState;
+  teamTwo: TeamState;
   firstTeamServes: {
     get: boolean;
     set: (v: boolean) => void;
@@ -42,7 +42,7 @@ export interface GameState {
   servingFromLeft: boolean;
 }
 
-type Team = {
+export type TeamState = {
   name: {
     get: string;
     set: (v: string) => void;

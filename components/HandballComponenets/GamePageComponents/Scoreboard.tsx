@@ -4,23 +4,32 @@ import React, { useEffect, useMemo, useState } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { Box, Center, LoadingOverlay, RingProgress, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { customTournamentScoreboardEffects } from '@/components/HandballComponenets/GamePageComponents/CustomTournamentScoreboardEffects';
-import { Message, UpdateMessage } from '@/ServerActions/SocketTypes';
-import {
-  GameStructure,
-  GameTeamStructure,
-  PersonStructure,
-  PlayerGameStatsStructure,
-} from '@/ServerActions/types';
+import { addGameEventToGame } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
+import { setGameState, TeamState, useGameState } from '@/components/HandballComponenets/GameState';
+import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
+import { PersonStructure } from '@/ServerActions/types';
 
 interface ScoreboardProps {
   gameID: number;
 }
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
-  const [game, setGame] = React.useState<GameStructure>();
-  const teamOne = useMemo(() => (game?.firstTeamIga ? game?.teamOne : game?.teamTwo), [game]);
-  const teamTwo = useMemo(() => (game?.firstTeamIga ? game?.teamTwo : game?.teamOne), [game]);
+  const gameState = useGameState();
+  const [teamOneColor, setTeamOneColor] = useState<number[] | undefined>();
+  const [teamTwoColor, setTeamTwoColor] = useState<number[] | undefined>();
+  const [teamOneImage, setTeamOneImage] = useState<string | undefined>();
+  const [teamTwoImage, setTeamTwoImage] = useState<string | undefined>();
+  const [time, setTime] = useState<number>(0); //holds length if game is finished, or else start time
+  const [court, setCourt] = useState<number>(0);
+  const [official, setOfficial] = useState<string>();
+  const teamOne = useMemo(
+    () => (gameState?.teamOneIGA.get ? gameState?.teamOne : gameState?.teamTwo),
+    [gameState?.teamOne, gameState?.teamOneIGA.get, gameState?.teamTwo]
+  );
+  const teamTwo = useMemo(
+    () => (gameState?.teamOneIGA.get ? gameState?.teamTwo : gameState?.teamOne),
+    [gameState?.teamOne, gameState?.teamOneIGA.get, gameState?.teamTwo]
+  );
   const [currentTime, setCurrentTime] = useState(0);
   const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
   const WS_URL = `wss://api.squarers.club/api/scoreboard?gameId=${gameID}`;
@@ -44,107 +53,80 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     if (readyState === ReadyState.OPEN) {
       sendMessage('update');
     }
-  }, [readyState]);
+  }, [readyState, sendMessage]);
   useEffect(() => {
-    console.log(lastJsonMessage);
-    if ((lastJsonMessage as Message)?.type === 'update') {
+    const message = lastJsonMessage as Message;
+    if (message?.type === 'update') {
       const gameUpdate = (lastJsonMessage as UpdateMessage).game;
-      setGame(gameUpdate);
+      setGameState(gameUpdate, gameState);
+      setTeamOneColor(gameUpdate.teamOne.teamColorAsRGBABecauseDigbyIsLazy || undefined);
+      setTeamTwoColor(gameUpdate.teamTwo.teamColorAsRGBABecauseDigbyIsLazy || undefined);
+      setTeamOneImage(gameUpdate.teamOne.bigImageUrl ?? gameUpdate.teamOne.imageUrl);
+      setTeamTwoImage(gameUpdate.teamTwo.bigImageUrl ?? gameUpdate.teamTwo.imageUrl);
+      if (gameUpdate.ended) {
+        setTime(gameUpdate.length);
+      } else {
+        setTime(gameUpdate.startTime);
+      }
+      setOfficial(gameUpdate.official.name);
+      setCourt(gameUpdate.court);
       if (gameUpdate.timeoutExpirationTime > 0) {
         openTimeout();
       } else {
         closeTimeout();
       }
+    } else if (message?.type === 'event') {
+      const { event } = lastJsonMessage as EventMessage;
+      addGameEventToGame(gameState, event);
+      if (event.eventType === 'End Game') {
+        setTime(currentTime - time);
+      }
     }
+    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeTimeout, lastJsonMessage, openTimeout]);
 
-  if (!game) {
+  if (!gameState.id) {
     return <>Loading...</>;
   }
 
-  function generateBackground(
-    teamOneIn: GameTeamStructure | undefined,
-    teamTwoIn: GameTeamStructure | undefined
-  ): any {
-    const team1Col = teamOneIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
-    const team2Col = teamTwoIn?.teamColorAsRGBABecauseDigbyIsLazy?.toString() ?? '50,50,125,255';
-    const imgURL1 = teamOneIn?.bigImageUrl ?? teamOneIn?.imageUrl;
-    const imgURL2 = teamTwoIn?.bigImageUrl ?? teamTwoIn?.imageUrl;
+  function generateBackground(): any {
+    const team1Col = teamOneColor ?? '50,50,125,255';
+    const team2Col = teamTwoColor ?? '50,50,125,255';
     return {
       background: `
       linear-gradient(90deg, rgba(${team1Col}) 0%, rgba(0,0,0,0) 60%), 
       linear-gradient(90deg, rgba(0,0,0,0) 40%, rgba(${team2Col}) 100%), 
-      url(${imgURL1}), 
-      url(${imgURL2})`,
+      url(${teamOneImage}), 
+      url(${teamTwoImage})`,
       backgroundPosition: '0 0, 0 0, -10vw center, 60vw center',
       backgroundSize: 'cover, cover, 50vw auto, 50vw auto',
       backgroundRepeat: 'no-repeat',
     };
   }
 
-  function getSides(team: GameTeamStructure): {
-    left: PlayerGameStatsStructure | undefined;
-    right: PlayerGameStatsStructure | undefined;
-    sub: PlayerGameStatsStructure | undefined;
-  } {
-    let left: PlayerGameStatsStructure | undefined;
-    let right: PlayerGameStatsStructure | undefined;
-    let sub: PlayerGameStatsStructure | undefined;
-    const players: PlayerGameStatsStructure[] = [
-      team.captain,
-      team.nonCaptain,
-      team.substitute,
-    ].filter((a) => a !== null);
-    if (!game?.started) {
-      [left, right, sub] = players;
-    } else if (players.length === 1) {
-      if (game?.sideToServe === 'Left') {
-        [left] = players;
-      } else {
-        [right] = players;
-      }
-    } else {
-      for (const p of players) {
-        if (!p) {
-          //
-        } else if (p.sideOfCourt === 'Left') {
-          left = p;
-        } else if (p.sideOfCourt === 'Right') {
-          right = p;
-        } else if (p.sideOfCourt === 'Substitute') {
-          sub = p;
-        }
-      }
-    }
-
-    return {
-      left,
-      right,
-      sub,
-    };
-  }
-
-  function createNamePlate(team: GameTeamStructure, side: 'left' | 'right' | 'sub') {
-    const p: PersonStructure | undefined = getSides(team)[side];
+  function createNamePlate(team: TeamState, side: 'left' | 'right' | 'sub') {
+    const p: PersonStructure | undefined = team[side].get;
     if (!p) {
       return <p> error: player not found</p>;
     }
-    if (!game) {
+    if (!gameState) {
       return <p>error</p>;
     }
     const serving =
-      game.firstTeamToServe === game.firstTeamIga
-        ? team.name === teamOne?.name && side === game.sideToServe.toLowerCase()
-        : team.name === teamTwo?.name && side === game.sideToServe.toLowerCase();
+      gameState.firstTeamServes.get === gameState.teamOneIGA.get
+        ? team.name.get === teamOne?.name.get &&
+          side === (gameState.servingFromLeft ? 'left' : 'right')
+        : team.name.get === teamTwo?.name.get &&
+          side === (gameState.servingFromLeft ? 'left' : 'right');
 
     let name: React.JSX.Element = <>{p.name}</>;
 
-    if (serving && game.faulted) {
+    if (serving && gameState.faulted.get) {
       name = <i>{name}*</i>;
     }
 
     name =
-      team === teamOne ? (
+      team.name.get === teamOne?.name.get ? (
         <>
           [{side === 'left' ? 'L' : 'R'}] {name}
         </>
@@ -185,22 +167,25 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
             ta="center"
             style={{
               color:
-                game.timeoutExpirationTime > currentTime || currentTime % 1000 <= 500 ? '' : 'red',
+                gameState.timeoutExpirationTime.get > currentTime || currentTime % 1000 <= 500
+                  ? ''
+                  : 'red',
             }}
             fz={150}
             order={1}
           >
-            {Math.max(Math.floor((game.timeoutExpirationTime - currentTime) / 100) / 10, 0).toFixed(
-              1
-            )}{' '}
+            {Math.max(
+              Math.floor((gameState.timeoutExpirationTime.get - currentTime) / 100) / 10,
+              0
+            ).toFixed(1)}{' '}
             Seconds
           </Title>
         }
         sections={[
           {
             value:
-              game.timeoutExpirationTime > currentTime
-                ? 100 - (game.timeoutExpirationTime - currentTime) / 300
+              gameState.timeoutExpirationTime.get > currentTime
+                ? 100 - (gameState.timeoutExpirationTime.get - currentTime) / 300
                 : currentTime % 1000 > 500
                   ? 100
                   : 0,
@@ -211,14 +196,18 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     </Stack>
   );
 
+  if (!teamOneImage) {
+    return 'Loading...';
+  }
+
   return (
-    <Box style={generateBackground(teamOne, teamTwo)} h="100vh" w="100vw">
+    <Box style={generateBackground()} h="100vh" w="100vw">
       <LoadingOverlay
-        visible={!game.started || isTimeoutOpen}
-        loaderProps={{ children: game.started ? timeoutKids : startKids }}
+        visible={!gameState.started.get || isTimeoutOpen}
+        loaderProps={{ children: gameState.started.get ? timeoutKids : startKids }}
         overlayProps={{
           radius: 'sm',
-          blur: game.started ? 10 : 1,
+          blur: gameState.started.get ? 10 : 1,
         }}
       />
       <Box w="100vw" pos="absolute" top="25px">
@@ -227,16 +216,20 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
         </Center>
       </Box>
       <Box mt="auto">
-        {game.started && (
+        {gameState.started.get && (
           <>
             <Box pos="absolute" left="15%">
               <Text fz="50vh" fw="semi-bold">
-                {game.firstTeamIga ? game.teamOneScore : game.teamTwoScore}
+                {gameState.teamOneIGA.get
+                  ? gameState.teamOne.score.get
+                  : gameState.teamTwo.score.get}
               </Text>
             </Box>
             <Box pos="absolute" right="15%">
               <Text fz="50vh" fw="semi-bold">
-                {game.firstTeamIga ? game.teamTwoScore : game.teamOneScore}
+                {gameState.teamOneIGA.get
+                  ? gameState.teamTwo.score.get
+                  : gameState.teamOne.score.get}
               </Text>
             </Box>
           </>
@@ -251,22 +244,19 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
         </Box>
         <Box pos="absolute" bottom={20} w="100%">
           <Text ta="center" fz={20}>
-            Court : {game.court + 1}
+            Court : {court + 1}
           </Text>
           <Text ta="center" fz={20}>
-            Official: {game.official.name}
+            Official: {official}
           </Text>
           <Text ta="center" fz={20}>
             Time Elapsed:{' '}
-            {game.ended
-              ? new Date(Math.floor(game.length * 1000)).toISOString().slice(14, 19)
-              : new Date(Math.floor(currentTime - game.startTime * 1000))
-                  .toISOString()
-                  .slice(14, 19)}
+            {gameState.ended.get
+              ? new Date(Math.floor(time * 1000)).toISOString().slice(14, 19)
+              : new Date(Math.floor(currentTime - time * 1000)).toISOString().slice(14, 19)}
           </Text>
         </Box>
       </Box>
-      {customTournamentScoreboardEffects(game)}
     </Box>
   );
 }

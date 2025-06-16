@@ -71,6 +71,7 @@ export function EditGame({ game }: { game: number }) {
     if (!gameObj) return;
     setGameState(gameObj, gameState);
     closeLoading();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeLoading, gameObj]);
 
   useEffect(() => {
