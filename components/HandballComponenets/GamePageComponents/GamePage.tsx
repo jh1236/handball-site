@@ -1,27 +1,18 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  Box,
-  Divider,
-  Grid,
-  Image,
-  Paper,
-  Select,
-  Table,
-  Tabs,
-  Text,
-  Title,
-  useMantineColorScheme,
-} from '@mantine/core';
+import { Box, Divider, Image, Paper, Select, Table, Tabs, Text } from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
-import { GameStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import {
+  GameStructure,
+  PersonStructure,
+  PlayerGameStatsStructure,
+} from '@/ServerActions/types';
 
 interface GamePageProps {
   gameID: number;
@@ -33,7 +24,6 @@ export function GamePage({ gameID }: GamePageProps) {
   const [activeTab, setActiveTab] = useState<string | null>('teamStats');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { colorScheme } = useMantineColorScheme();
   const { isOfficial } = useUserData();
   useEffect(() => {
     getGame({
@@ -68,7 +58,6 @@ export function GamePage({ gameID }: GamePageProps) {
   const localeDate: string[] = [];
   localeDate.push(date.toLocaleDateString().slice(0, LocaleDateIndex + 1));
   localeDate.push(date.toLocaleTimeString().slice(LocaleDateIndex + 1));
-  const teamGradient = `linear-gradient(to right, rgba(${game.teamOne.teamColorAsRGBABecauseDigbyIsLazy ? game.teamOne.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'}), rgba(0,0,0,0), rgba(${game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy ? game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'})`;
 
   function generatePlayerStats(playerName: string) {
     if (!game) {
@@ -184,144 +173,50 @@ export function GamePage({ gameID }: GamePageProps) {
       </Table>
     );
   }
+  function generateScoreGraphic(): any {
+    if (!game) {
+      return <p> error! </p>;
+    }
+    return (
+      <Box
+        className={classes.teamGradient}
+        style={{
+          '--team-one-col': game.teamOne.teamColor || '#5c9865',
+          '--team-two-col': game.teamTwo.teamColor || '#5c9865',
+          left: 0,
+        }}
+      >
+        <div className={`${classes.teamNames} ${classes.team1Name}`}><p>{game.teamOne.name}</p> </div>
+        <div className={`${classes.dash} ${classes.verse}`}>VS</div>
+        <div className={`${classes.teamNames} ${classes.team2Name}`}>{game.teamTwo.name}</div>
+        <div className={`${classes.teamLogos} ${classes.logo1}`} style={{ justifyItems: 'flex-end' }}>
+          <Image src={game.teamOne.imageUrl} />
+        </div>
+        <p className={`${classes.teamInfo} ${classes.info1}`}>
+          <p> {game.teamOne.captain.name} </p>
+          { game.teamOne.nonCaptain ? <p>{game.teamOne.nonCaptain.name}</p> : ''}
+          { game.teamOne.substitute ? <p>{game.teamOne.substitute.name}</p> : ''}
+        </p>
+        <div className={`${classes.teamScores} ${classes.score1}`}>{game.teamOneScore}</div>
+        <div className={`${classes.dash}`}>-</div>
+        <div className={`${classes.teamScores} ${classes.score2}`}>{game.teamTwoScore}</div>
+        <p className={`${classes.teamInfo} ${classes.info2}`}>
+          <p> {game.teamTwo.captain.name} </p>
+          {game.teamTwo.nonCaptain ? <p>{game.teamTwo.nonCaptain.name}</p> : ''}
+          {game.teamTwo.substitute ? <p>{game.teamTwo.substitute.name}</p> : ''}
+        </p>
+        <div className={`${classes.teamLogos} ${classes.logo2}`}>
+          <Image src={game.teamTwo.imageUrl} />
+        </div>
+        <div className={`${classes.gameOfficial}`}><p>Officiated by {game.official.name}</p></div>
+      </Box>
+    );
+  }
 
   return (
     <SidebarLayout tournamentName={game.tournament.searchableName}>
       <Box ta="center" w="100%">
-        <Box
-          style={{ background: teamGradient }}
-          w="100%"
-          h="300px"
-          pos="relative"
-          left="0"
-          top="100"
-          pt="0"
-        >
-          <Grid
-            top="0"
-            pt="md"
-            justify="center"
-            align="center"
-            mb={20}
-            mah={250}
-            w="100%"
-            style={{
-              verticalAlign: 'middle',
-              fontWeight: 'bold',
-              fontSize: 50,
-              maxHeight: '1',
-            }}
-          >
-            <Grid.Col span={5}>
-              <Link className="hideLink" href={`../teams/${game.teamOne.searchableName}`}>
-                <Title
-                  c={colorScheme === 'dark' ? 'white' : 'black'}
-                  order={2}
-                  lineClamp={2}
-                  className={classes.secretLink}
-                >
-                  {game.teamOne.name}
-                </Title>
-              </Link>
-            </Grid.Col>
-            <Grid.Col span={2} style={{ fontSize: 30 }}>
-              vs
-            </Grid.Col>
-            <Grid.Col span={5}>
-              <Link className="hideLink" href={`../teams/${game.teamTwo.searchableName}`}>
-                <Title
-                  c={colorScheme === 'dark' ? 'white' : 'black'}
-                  className={classes.secretLink}
-                  order={2}
-                  lineClamp={2}
-                >
-                  {game.teamTwo.name}
-                </Title>
-              </Link>
-            </Grid.Col>
-          </Grid>
-          <Grid columns={5} pos="relative" top={-25}>
-            <Grid.Col span={2} style={{ textAlign: 'end' }}>
-              {date.toLocaleDateString(undefined, {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-              })}
-            </Grid.Col>
-            <Grid.Col span={1}>
-              {date.toLocaleTimeString(undefined, {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-              })}
-            </Grid.Col>
-            <Grid.Col span={2} style={{ textAlign: 'left' }}>
-              {(game.length / 60).toFixed(0)} Minutes
-            </Grid.Col>
-          </Grid>
-          <Grid
-            style={{
-              fontSize: '80px',
-              overflow: 'hidden',
-            }}
-            pos="relative"
-            top={-50}
-            columns={13}
-          >
-            <Grid.Col span={3} pos="relative" h={150}>
-              <Box
-                w="150px"
-                h="150px"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-start', // Align to the left
-                  alignItems: 'center',
-                  overflow: 'hidden', // Ensure overflow is hidden
-                  position: 'absolute',
-                  right: 0,
-                  top: 0,
-                }}
-              >
-                <Image
-                  src={game.teamOne.imageUrl}
-                  fit="cover"
-                  style={{
-                    width: '150px',
-                    height: '150px',
-                    objectFit: 'cover', // Ensure the image fills the container
-                    position: 'absolute',
-                  }}
-                />
-              </Box>
-            </Grid.Col>
-            <Grid.Col span={3}>{game.teamOneScore}</Grid.Col>
-            <Grid.Col span={1}>-</Grid.Col>
-            <Grid.Col span={3}>{game.teamTwoScore}</Grid.Col>
-            <Grid.Col span={3}>
-              <Box
-                w="150px"
-                h="150px"
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Image
-                  src={game.teamTwo.imageUrl}
-                  fit="fill"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                ></Image>
-              </Box>
-            </Grid.Col>
-          </Grid>
-          <Text pos="relative" bottom={20} style={{ background: 'rgba(100, 100, 100, 0.1)' }}>
-            {' '}
-            Status: {game.status} | Officiated by {game.official.name}
-          </Text>
-        </Box>
+        {generateScoreGraphic()}
         <Divider></Divider>
         <Box pos="relative">
           <Tabs value={activeTab} onChange={setActiveTab}>
