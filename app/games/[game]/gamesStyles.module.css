@@ -28,7 +28,6 @@
 
 .teamInfo * {
     line-height: 10px;
-    color: red;
 }
 
 .teamInfo *:first-child {
