@@ -104,7 +104,7 @@ export function InternalDynamicTable<T extends InputType>({
   }, [sortIndex, setSortIndexIn]);
 
   useEffect(() => {
-    const count = Number(searchParams.get('cols') ?? -1);
+    const count = Number(searchParams?.get('cols') ?? -1);
     if (
       count > 0 &&
       editable &&
