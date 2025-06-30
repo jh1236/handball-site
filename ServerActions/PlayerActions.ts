@@ -1,4 +1,4 @@
-import { localLogout, SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
 import {
   PersonStructure,
   PlayerGameStatsStructure,
