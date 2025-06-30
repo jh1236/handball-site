@@ -1,10 +1,11 @@
-import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { localLogout, SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
 import {
   PersonStructure,
   PlayerGameStatsStructure,
   SearchableName,
   TournamentStructure,
 } from '@/ServerActions/types';
+import { SERVER_ADDRESS } from '@/app/config';
 
 interface GetPlayersArgs {
   tournament?: SearchableName;
@@ -44,6 +45,9 @@ export function getPlayers({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json();
@@ -83,6 +87,9 @@ export function getAveragePlayerStats({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json();
@@ -124,6 +131,9 @@ export function getPlayer({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json();

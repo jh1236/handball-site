@@ -1,5 +1,6 @@
-import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { localLogout, SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
 import { SearchableName, TeamStructure, TournamentStructure } from '@/ServerActions/types';
+import { SERVER_ADDRESS } from '@/app/config';
 
 interface GetTeamsArgs {
   tournament?: SearchableName;
@@ -39,6 +40,9 @@ export function getTeams({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json();
@@ -75,6 +79,9 @@ export function getTeam({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json();
@@ -117,6 +124,9 @@ export function getLadder({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json();
