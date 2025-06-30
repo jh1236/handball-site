@@ -3,6 +3,7 @@ import {
   OfficialStructure,
   TournamentStructure,
  SearchableName } from '@/ServerActions/types';
+import { SERVER_ADDRESS } from '@/app/config';
 
 interface GetOfficialsArgs {
   tournament?: SearchableName;

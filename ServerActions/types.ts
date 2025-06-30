@@ -30,6 +30,7 @@ export interface PersonStructure {
   name: string;
   searchableName: string;
   imageUrl: string;
+  bigImageUrl: string;
   isAdmin?: boolean;
   team?: TeamStructure;
   prevCards?: CardStructure[];
@@ -103,6 +104,7 @@ export interface GameTeamStructure {
   extendedName: string;
   searchableName: string;
   imageUrl: string;
+  bigImageUrl: string;
   captain: PlayerGameStatsStructure;
   nonCaptain: PlayerGameStatsStructure | null;
   substitute: PlayerGameStatsStructure | null;
@@ -134,7 +136,7 @@ export interface GameStructure {
   scorer: OfficialStructure | null;
   firstTeamIga: boolean;
   firstTeamToServe: boolean;
-  sideToServe: string;
+  sideToServe: 'Left' | 'Right';
   startTime: number;
   serveTimer: number;
   length: number;

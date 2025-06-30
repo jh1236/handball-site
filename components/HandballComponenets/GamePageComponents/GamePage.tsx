@@ -56,7 +56,7 @@ export function GamePage({ gameID }: GamePageProps) {
     }
   }, [activeTab, router]);
   useEffect(() => {
-    const tab = searchParams.get('tab') ?? 'teamStats';
+    const tab = searchParams?.get('tab') ?? 'teamStats';
     setActiveTab(tab);
   }, [searchParams]);
   if (!game) {

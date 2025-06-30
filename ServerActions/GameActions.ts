@@ -9,6 +9,7 @@ import {
   SearchableName,
   TournamentStructure,
 } from '@/ServerActions/types';
+import { SERVER_ADDRESS } from '@/app/config';
 
 export function getChangeCode(gameID: number): Promise<number> {
   return tokenFetch(`/api/games/change_code?id=${gameID}`, {

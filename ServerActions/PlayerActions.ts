@@ -5,6 +5,7 @@ import {
   SearchableName,
   TournamentStructure,
 } from '@/ServerActions/types';
+import { SERVER_ADDRESS } from '@/app/config';
 
 interface GetPlayersArgs {
   tournament?: SearchableName;
