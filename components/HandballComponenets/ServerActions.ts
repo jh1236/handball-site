@@ -50,6 +50,9 @@ export function useUserData() {
 }
 
 function loggedIn() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
   return localStorage.getItem('token') !== null;
 }
 

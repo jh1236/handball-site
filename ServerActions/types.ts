@@ -136,7 +136,7 @@ export interface GameStructure {
   scorer: OfficialStructure | null;
   firstTeamIga: boolean;
   firstTeamToServe: boolean;
-  sideToServe: string;
+  sideToServe: 'Left' | 'Right';
   startTime: number;
   serveTimer: number;
   length: number;
