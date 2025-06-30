@@ -47,6 +47,7 @@ export interface TournamentStructure {
   ranked: boolean;
   twoCourts: boolean;
   hasScorer: boolean;
+  started: boolean;
   finished: boolean;
   inFinals: boolean;
   isPooled: boolean;
