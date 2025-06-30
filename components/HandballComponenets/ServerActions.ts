@@ -8,6 +8,13 @@ export async function tokenFetcher(url: string, args: any = {}) {
   return res.json();
 }
 
+export function localLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('permissionLevel');
+  localStorage.removeItem('username');
+  localStorage.removeItem('timeout');
+}
+
 export function useUserData() {
   // return {
   //   loading: false,
@@ -26,10 +33,7 @@ export function useUserData() {
       if (timeout) {
         const ms = Number.parseFloat(timeout);
         if (ms < Date.now()) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('permissionLevel');
-          localStorage.removeItem('username');
-          localStorage.removeItem('timeout');
+          localLogout();
         }
       }
       setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
@@ -39,6 +43,8 @@ export function useUserData() {
     }
   }, []);
   return {
+    setUsername,
+    setPermissionLevel,
     loading: permissionLevel === null,
     isAdmin: (permissionLevel ?? 5) === 5,
     isOfficial: (permissionLevel ?? 5) >= 2,
