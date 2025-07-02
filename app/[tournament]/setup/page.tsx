@@ -1,12 +1,12 @@
 import { TournamentPageArgs } from '@/app/types';
-import { GetTeamCard } from '@/components/HandballComponenets/GetTeamCard';
+import { TeamCreatorPage } from '@/components/HandballComponenets/TeamCreatorPage';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
 export default async function CreateTeamsPage({ params }: TournamentPageArgs) {
   const { tournament } = await params;
   return (
     <SidebarLayout tournamentName={tournament}>
-      <GetTeamCard tournament={tournament!} />
+      <TeamCreatorPage tournament={tournament!} />
     </SidebarLayout>
   );
 }

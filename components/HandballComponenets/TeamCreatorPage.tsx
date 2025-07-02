@@ -1,11 +1,26 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Autocomplete, Grid, Group, Image, Paper, Stack, Text, Title } from '@mantine/core';
+import { IconMinus, IconPlus } from '@tabler/icons-react';
+import {
+  ActionIcon,
+  Autocomplete,
+  Grid,
+  Group,
+  Image,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { getTeams } from '@/ServerActions/TeamActions';
-import { getTournament } from '@/ServerActions/TournamentActions';
+import {
+  addTeamToTournament,
+  getTournament,
+  removeTeamFromTournament,
+} from '@/ServerActions/TournamentActions';
 import {
   PersonStructure,
   SearchableName,
@@ -82,17 +97,24 @@ function CustomPlayerCard({
 interface CustomTeamCardArgs {
   setPlayers: (arg: (string | undefined)[]) => void;
   players: (string | undefined)[];
-  teams: TeamStructure[];
+  allTeams: TeamStructure[];
+  teamsInTournament: TeamStructure[];
   allPlayers: PersonStructure[];
   newTeamName: string | undefined;
+  setTeamsInTournament: (value: TeamStructure[]) => void;
   setNewTeamName: (value: string | undefined) => void;
+  tournament: string;
 }
 
 function CustomTeamCard({
   setPlayers,
   players,
   allPlayers,
-  teams,
+  allTeams,
+  tournament,
+  setTeamsInTournament,
+  teamsInTournament,
+  newTeamName,
   setNewTeamName,
 }: CustomTeamCardArgs) {
   const [team, setTeam] = useState<TeamStructure | undefined>();
@@ -100,7 +122,7 @@ function CustomTeamCard({
     setPlayers([undefined, undefined, undefined]);
   }, [setPlayers]);
   useEffect(() => {
-    for (const t of teams) {
+    for (const t of allTeams) {
       const possiblePlayers = [t.captain.name, t.nonCaptain?.name, t.substitute?.name];
       if (JSON.stringify(possiblePlayers.toSorted()) !== JSON.stringify(players.toSorted())) {
         continue;
@@ -109,11 +131,37 @@ function CustomTeamCard({
       return;
     }
     setTeam(undefined);
-  }, [players, teams]);
+  }, [players, allTeams]);
   return (
-    <Paper shadow="lg" m={15}>
+    <Paper shadow="lg" m={15} pos="relative">
       <Group>
         <Stack>
+          <ActionIcon
+            variant="subtle"
+            color="green"
+            size="sm"
+            pos="absolute"
+            top={5}
+            right={5}
+            onClick={() => {
+              if (team) {
+                addTeamToTournament({ tournament, teamName: team.name });
+                setTeamsInTournament([...teamsInTournament, team]);
+              } else {
+                const [captainName, nonCaptainName, substituteName] = players;
+                addTeamToTournament({
+                  tournament,
+                  teamName: newTeamName,
+                  captainName: players[0],
+                  ...(captainName && { captainName }),
+                  ...(nonCaptainName && { nonCaptainName }),
+                  ...(substituteName && { substituteName }),
+                });
+              }
+            }}
+          >
+            <IconPlus></IconPlus>
+          </ActionIcon>
           <Image
             src={team?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
             w="100px"
@@ -129,10 +177,10 @@ function CustomTeamCard({
               size="xs"
               w="100px"
               placeholder="John Doe"
-              data={teams.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
+              data={allTeams.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
               onChange={(v) => {
                 setNewTeamName(v);
-                const t = teams.find((t1) => t1.name === v);
+                const t = allTeams.find((t1) => t1.name === v);
                 if (t) {
                   setPlayers([t?.captain.name, t?.nonCaptain?.name, t?.substitute?.name]);
                 }
@@ -165,7 +213,7 @@ function CustomTeamCard({
   );
 }
 
-export function GetTeamCard({ tournament }: TeamCreatorPageArgs) {
+export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [tournamentObj, setTournamentObj] = React.useState<TournamentStructure | undefined>();
   const [players, setPlayers] = React.useState<(string | undefined)[]>([
     undefined,
@@ -191,7 +239,20 @@ export function GetTeamCard({ tournament }: TeamCreatorPageArgs) {
       <Grid w="95%">
         <Grid.Col span={6}>
           {teamsInTournament.map((t, index) => (
-            <Paper key={index} shadow="lg" m={15}>
+            <Paper key={index} shadow="lg" m={15} pos="relative">
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                size="sm"
+                pos="absolute"
+                top={5}
+                right={5}
+                onClick={() => {
+                  removeTeamFromTournament(tournament, t.searchableName);
+                }}
+              >
+                <IconMinus></IconMinus>
+              </ActionIcon>
               <Group>
                 <Image src={t.imageUrl} w="auto" h="100px"></Image>
                 <Stack>
@@ -207,10 +268,13 @@ export function GetTeamCard({ tournament }: TeamCreatorPageArgs) {
           <CustomTeamCard
             setPlayers={setPlayers}
             players={players}
-            teams={allTeams}
+            allTeams={allTeams}
             allPlayers={allPlayers}
             newTeamName={newTeamName}
             setNewTeamName={setNewTeamName}
+            tournament={tournament}
+            setTeamsInTournament={setAllTeams}
+            teamsInTournament={teamsInTournament}
           ></CustomTeamCard>
         </Grid.Col>
       </Grid>
