@@ -132,8 +132,9 @@ function CustomTeamCard({
     }
     setTeam(undefined);
   }, [players, allTeams]);
+  // @ts-ignore
   return (
-    <Paper shadow="lg" m={15} pos="relative">
+    <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
       <Group>
         <Stack>
           <ActionIcon
@@ -145,7 +146,10 @@ function CustomTeamCard({
             right={5}
             onClick={() => {
               if (team) {
-                addTeamToTournament({ tournament, teamName: team.name });
+                addTeamToTournament({
+                  tournament,
+                  teamName: team.name,
+                });
                 setTeamsInTournament([...teamsInTournament, team]);
               } else {
                 const [captainName, nonCaptainName, substituteName] = players;
@@ -167,26 +171,21 @@ function CustomTeamCard({
             w="100px"
             h="100px"
           ></Image>
-          {team ? (
-            <Text>
-              <b>{team.name}</b>
-            </Text>
-          ) : (
-            <Autocomplete
-              display="inline-block"
-              size="xs"
-              w="100px"
-              placeholder="John Doe"
-              data={allTeams.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
-              onChange={(v) => {
-                setNewTeamName(v);
-                const t = allTeams.find((t1) => t1.name === v);
-                if (t) {
-                  setPlayers([t?.captain.name, t?.nonCaptain?.name, t?.substitute?.name]);
-                }
-              }}
-            />
-          )}
+          <Autocomplete
+            display="inline-block"
+            size="xs"
+            w="100px"
+            error={newTeamName || false}
+            placeholder="Team Name"
+            data={allTeams.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
+            onChange={(v) => {
+              setNewTeamName(v);
+              const t = allTeams.find((t1) => t1.name === v);
+              if (t) {
+                setPlayers([t?.captain.name, t?.nonCaptain?.name, t?.substitute?.name]);
+              }
+            }}
+          />
         </Stack>
         <Stack>
           <CustomPlayerCard
@@ -237,7 +236,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
     <div>
       <Title> {tournamentObj?.name ?? 'Loading...'} </Title>
       <Grid w="95%">
-        <Grid.Col span={6}>
+        <Grid.Col span={{ sm: 12, md: 6 }}>
           {teamsInTournament.map((t, index) => (
             <Paper key={index} shadow="lg" m={15} pos="relative">
               <ActionIcon
