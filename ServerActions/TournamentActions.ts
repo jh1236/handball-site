@@ -1,6 +1,6 @@
 import { SERVER_ADDRESS } from '@/app/config';
 import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
-import { SearchableName, TournamentStructure } from '@/ServerActions/types';
+import { SearchableName, TeamStructure, TournamentStructure } from '@/ServerActions/types';
 
 export function getTournaments(): Promise<TournamentStructure[]> {
   const url = new URL('/api/tournaments/', SERVER_ADDRESS);
@@ -87,7 +87,7 @@ export function addTeamToTournament({
   captainName,
   nonCaptainName,
   substituteName,
-}: AddTeamToTournamentArgs): Promise<void> {
+}: AddTeamToTournamentArgs): Promise<TeamStructure> {
   const url = new URL(`/api/tournaments/${tournament}/addTeam`, SERVER_ADDRESS);
   const body: any = {};
   if (teamName) {
@@ -115,7 +115,7 @@ export function addTeamToTournament({
       }
       return Promise.reject(response.text());
     }
-    return Promise.resolve();
+    return response.json().then((j: { team: TeamStructure }) => j.team);
   });
 }
 

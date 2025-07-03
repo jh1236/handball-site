@@ -128,11 +128,11 @@ function CustomTeamCard({
         continue;
       }
       setTeam(t);
+      setNewTeamName(t.name);
       return;
     }
     setTeam(undefined);
-  }, [players, allTeams]);
-  // @ts-ignore
+  }, [players, allTeams, setNewTeamName]);
   return (
     <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
       <Group>
@@ -140,17 +140,18 @@ function CustomTeamCard({
           <ActionIcon
             variant="subtle"
             color="green"
-            size="sm"
+            size="md"
             pos="absolute"
             top={5}
             right={5}
             onClick={() => {
-              if (team) {
+              if (team && team.name === newTeamName) {
                 addTeamToTournament({
                   tournament,
                   teamName: team.name,
+                }).then((t) => {
+                  setTeamsInTournament([...teamsInTournament, t]);
                 });
-                setTeamsInTournament([...teamsInTournament, team]);
               } else {
                 const [captainName, nonCaptainName, substituteName] = players;
                 addTeamToTournament({
@@ -160,8 +161,11 @@ function CustomTeamCard({
                   ...(captainName && { captainName }),
                   ...(nonCaptainName && { nonCaptainName }),
                   ...(substituteName && { substituteName }),
-                });
+                }).then((t) => setTeamsInTournament([...teamsInTournament, t]));
               }
+              setPlayers([undefined, undefined, undefined]);
+              setTeam(undefined);
+              setNewTeamName('');
             }}
           >
             <IconPlus></IconPlus>
@@ -175,8 +179,8 @@ function CustomTeamCard({
             display="inline-block"
             size="xs"
             w="100px"
-            error={newTeamName || false}
             placeholder="Team Name"
+            value={newTeamName}
             data={allTeams.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
             onChange={(v) => {
               setNewTeamName(v);
@@ -242,18 +246,33 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
               <ActionIcon
                 variant="subtle"
                 color="red"
-                size="sm"
+                size="md"
                 pos="absolute"
                 top={5}
                 right={5}
                 onClick={() => {
-                  removeTeamFromTournament(tournament, t.searchableName);
+                  removeTeamFromTournament(tournament, t.searchableName).then(() => {
+                    setTeamsInTournament(
+                      teamsInTournament.filter((t2) => t2.searchableName !== t.searchableName)
+                    );
+                  });
                 }}
               >
                 <IconMinus></IconMinus>
               </ActionIcon>
+
               <Group>
-                <Image src={t.imageUrl} w="auto" h="100px"></Image>
+                <Stack>
+                  <Image
+                    src={t?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+                    w="100px"
+                    h="100px"
+                  ></Image>
+                  <Text>
+                    <b>{t.name}</b>
+                  </Text>
+                </Stack>
+
                 <Stack>
                   {[t.captain, t.nonCaptain, t.substitute]
                     .filter((t1) => t1 !== null)
@@ -272,7 +291,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
             newTeamName={newTeamName}
             setNewTeamName={setNewTeamName}
             tournament={tournament}
-            setTeamsInTournament={setAllTeams}
+            setTeamsInTournament={setTeamsInTournament}
             teamsInTournament={teamsInTournament}
           ></CustomTeamCard>
         </Grid.Col>
