@@ -1,4 +1,6 @@
-import { localLogout, SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { SERVER_ADDRESS } from '@/app/config';
+import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+
 export function getQOTD(): Promise<{
   quote: string;
   author: string;
