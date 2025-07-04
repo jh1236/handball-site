@@ -1,9 +1,6 @@
-import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
-import {
-  OfficialStructure,
-  TournamentStructure,
- SearchableName } from '@/ServerActions/types';
 import { SERVER_ADDRESS } from '@/app/config';
+import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { OfficialStructure, SearchableName, TournamentStructure } from '@/ServerActions/types';
 
 interface GetOfficialsArgs {
   tournament?: SearchableName;

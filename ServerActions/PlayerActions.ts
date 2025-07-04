@@ -1,3 +1,4 @@
+import { SERVER_ADDRESS } from '@/app/config';
 import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
 import {
   PersonStructure,
@@ -5,7 +6,6 @@ import {
   SearchableName,
   TournamentStructure,
 } from '@/ServerActions/types';
-import { SERVER_ADDRESS } from '@/app/config';
 
 interface GetPlayersArgs {
   tournament?: SearchableName;
