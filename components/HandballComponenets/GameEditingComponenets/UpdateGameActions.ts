@@ -17,12 +17,15 @@ function nextPoint(game: GameState, swap?: boolean) {
       i.set(temp);
     }
   }
-  if (swap !== undefined && game.badminton) {
+  if (swap !== undefined && game.badminton.get) {
     const team = swap ? game.teamOne : game.teamTwo;
     if (team.right.get && team.left.get) {
-      const temp = team.left?.get;
-      team.left.set(team.right?.get);
-      team.right.set(temp);
+      const newRight = team.left?.get;
+      newRight.sideOfCourt = 'Right';
+      const newLeft = team.right?.get;
+      newLeft.sideOfCourt = 'Left';
+      team.left.set(newLeft);
+      team.right.set(newRight);
     }
   }
   game.faulted.set(false);
@@ -30,7 +33,7 @@ function nextPoint(game: GameState, swap?: boolean) {
 
 export function scoreLocal(game: GameState, firstTeam: boolean): void {
   const servingTeam = firstTeam ? game.teamOne : game.teamTwo;
-  if (game.badminton || game.firstTeamServes.get !== firstTeam) {
+  if (game.badminton.get || game.firstTeamServes.get !== firstTeam) {
     servingTeam.servingFromLeft.set(!servingTeam.servingFromLeft.get);
   }
 
@@ -45,7 +48,7 @@ export function aceLocal(game: GameState): void {
   const team = game.firstTeamServes.get ? game.teamOne : game.teamTwo;
   team.score.set(team.score.get + 1);
   nextPoint(game, game.firstTeamServes.get);
-  if (game.badminton) {
+  if (game.badminton.get) {
     team.servingFromLeft.set(!team.servingFromLeft.get);
   }
 }
