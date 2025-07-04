@@ -16,7 +16,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { addGameEventToGame } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { setGameState, TeamState, useGameState } from '@/components/HandballComponenets/GameState';
 import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
-import { PlayerGameStatsStructure } from '@/ServerActions/types';
+import { GameEventStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 import classes from './Scoreboard.module.css';
 
 interface ScoreboardProps {
@@ -27,6 +27,16 @@ function cardColorFromPlayer(player: PlayerGameStatsStructure) {
   if (player.cardTime < 0) return 'red';
   if (player.cardTime === 2) return 'green';
   return 'orange';
+}
+
+function eventToClass(event: GameEventStructure) {
+  switch (event.eventType) {
+    case 'Score':
+      if (event.notes === 'Ace') return classes.ace;
+      return classes.score;
+    default:
+      return undefined;
+  }
 }
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
@@ -184,6 +194,11 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
               marginRight: 20,
             }}
             display="inline-block"
+            className={
+              (lastJsonMessage as EventMessage)?.event?.player?.searchableName === p.searchableName
+                ? eventToClass((lastJsonMessage as EventMessage)?.event)
+                : undefined
+            }
           />
           {p.cardTimeRemaining !== 0 && (
             <Image
@@ -214,7 +229,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
             background,
           }}
         >
-          {name} [{p.cardTimeRemaining ? '-' : side[0].toUpperCase()}]
+          {name} [{p.cardTimeRemaining ? '-' : side[0].toUpperCase()}]{' '}
           <Image
             src={p.imageUrl}
             style={{
@@ -223,6 +238,11 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
               marginLeft: 20,
               verticalAlign: 'middle',
             }}
+            className={
+              (lastJsonMessage as EventMessage)?.event?.player?.searchableName === p.searchableName
+                ? eventToClass((lastJsonMessage as EventMessage)?.event)
+                : undefined
+            }
             display="inline-block"
           />
           {p.cardTimeRemaining !== 0 && (
