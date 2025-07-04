@@ -77,7 +77,7 @@ export function renameTeamForTournament(
   searchable: SearchableName,
   teamSearchable: SearchableName,
   newName: string
-): Promise<void> {
+): Promise<TeamStructure> {
   const url = new URL(`/api/tournaments/${searchable}/updateTeam`, SERVER_ADDRESS);
   return tokenFetch(url, {
     method: 'PATCH',
@@ -95,7 +95,7 @@ export function renameTeamForTournament(
       }
       return Promise.reject(response.text());
     }
-    return Promise.resolve();
+    return response.json().then((j: { team: TeamStructure }) => j.team);
   });
 }
 

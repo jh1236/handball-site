@@ -224,6 +224,7 @@ interface TeamCardParams {
     value: ((prevState: TeamStructure[]) => TeamStructure[]) | TeamStructure[]
   ) => void;
   teamsInTournament: TeamStructure[];
+  setAllTeams: (value: ((prevState: TeamStructure[]) => TeamStructure[]) | TeamStructure[]) => void;
 }
 
 function TeamCard({
@@ -231,6 +232,7 @@ function TeamCard({
   team,
   setTeamsInTournament,
   teamsInTournament,
+  setAllTeams,
 }: TeamCardParams) {
   const [newTeamName, setNewTeamName] = useState<string>(team.name);
   return (
@@ -261,17 +263,15 @@ function TeamCard({
             color="blue"
             size="md"
             onClick={() => {
-              renameTeamForTournament(tournament, team.searchableName, newTeamName).then(() =>
-                setTeamsInTournament(
-                  teamsInTournament.map((t) =>
-                    t.searchableName === team.searchableName
-                      ? {
-                          ...t,
-                          name: newTeamName,
-                        }
-                      : t
-                  )
-                )
+              renameTeamForTournament(tournament, team.searchableName, newTeamName).then(
+                (newTeam) => {
+                  setTeamsInTournament(
+                    teamsInTournament.map((t) =>
+                      t.searchableName === team.searchableName ? newTeam : t
+                    )
+                  );
+                  getTeams({}).then((teams) => setAllTeams(teams.teams));
+                }
               );
             }}
           >
@@ -345,6 +345,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
               team={t}
               setTeamsInTournament={setTeamsInTournament}
               teamsInTournament={teamsInTournament}
+              setAllTeams={setAllTeams}
             />
           ))}
           <CustomTeamCard
