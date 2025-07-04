@@ -73,6 +73,32 @@ export function startTournament(searchableName: SearchableName): Promise<void> {
   });
 }
 
+export function renameTeamForTournament(
+  searchable: SearchableName,
+  teamSearchable: SearchableName,
+  newName: string
+): Promise<void> {
+  const url = new URL(`/api/tournaments/${searchable}/updateTeam`, SERVER_ADDRESS);
+  return tokenFetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify({
+      teamSearchableName: teamSearchable,
+      newName,
+    }),
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
 interface AddTeamToTournamentArgs {
   tournament: SearchableName;
   teamName?: string;

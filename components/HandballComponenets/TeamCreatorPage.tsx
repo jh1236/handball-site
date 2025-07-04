@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { IconMinus, IconPlus } from '@tabler/icons-react';
+import { IconMinus, IconPlus, IconUpload } from '@tabler/icons-react';
 import {
   ActionIcon,
   Autocomplete,
+  Box,
   Grid,
   Group,
   Image,
   Paper,
   Stack,
-  Text,
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
@@ -20,6 +20,7 @@ import {
   addTeamToTournament,
   getTournament,
   removeTeamFromTournament,
+  renameTeamForTournament,
 } from '@/ServerActions/TournamentActions';
 import {
   PersonStructure,
@@ -216,6 +217,102 @@ function CustomTeamCard({
   );
 }
 
+interface TeamCardParams {
+  tournament: string;
+  team: TeamStructure;
+  setTeamsInTournament: (
+    value: ((prevState: TeamStructure[]) => TeamStructure[]) | TeamStructure[]
+  ) => void;
+  teamsInTournament: TeamStructure[];
+}
+
+function TeamCard({
+  tournament,
+  team,
+  setTeamsInTournament,
+  teamsInTournament,
+}: TeamCardParams) {
+  const [newTeamName, setNewTeamName] = useState<string>(team.name);
+  return (
+    <Paper shadow="lg" m={15} pos="relative">
+      <Box
+        top={5}
+        right={5}
+        pos="absolute"
+        style={{ display: 'flex', gap: '4px', flexDirection: 'row-reverse' }}
+      >
+        <ActionIcon
+          variant="subtle"
+          color="red"
+          size="md"
+          onClick={() => {
+            removeTeamFromTournament(tournament, team.searchableName).then(() => {
+              setTeamsInTournament(
+                teamsInTournament.filter((t2) => t2.searchableName !== team.searchableName)
+              );
+            });
+          }}
+        >
+          <IconMinus></IconMinus>
+        </ActionIcon>
+        {newTeamName !== team.name && (
+          <ActionIcon
+            variant="subtle"
+            color="blue"
+            size="md"
+            onClick={() => {
+              renameTeamForTournament(tournament, team.searchableName, newTeamName).then(() =>
+                setTeamsInTournament(
+                  teamsInTournament.map((t) =>
+                    t.searchableName === team.searchableName
+                      ? {
+                          ...t,
+                          name: newTeamName,
+                        }
+                      : t
+                  )
+                )
+              );
+            }}
+          >
+            <IconUpload></IconUpload>
+          </ActionIcon>
+        )}
+      </Box>
+
+      <Group m={15}>
+        <Stack>
+          <Image
+            src={team?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+            w="100px"
+            h="100px"
+          ></Image>
+          <Autocomplete
+            display="inline-block"
+            size="xs"
+            w="100px"
+            mb={10}
+            placeholder="Team Name"
+            value={newTeamName}
+            data={[team.name]}
+            onChange={(v) => {
+              setNewTeamName(v);
+            }}
+          />
+        </Stack>
+
+        <Stack>
+          {[team.captain, team.nonCaptain, team.substitute]
+            .filter((t1) => t1 !== null)
+            .map((player, i) => (
+              <PlayerCard key={i} index={i} player={player} />
+            ))}
+        </Stack>
+      </Group>
+    </Paper>
+  );
+}
+
 export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [tournamentObj, setTournamentObj] = React.useState<TournamentStructure | undefined>();
   const [players, setPlayers] = React.useState<(string | undefined)[]>([
@@ -242,46 +339,13 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
       <Grid w="95%">
         <Grid.Col span={{ sm: 12, md: 6 }}>
           {teamsInTournament.map((t, index) => (
-            <Paper key={index} shadow="lg" m={15} pos="relative">
-              <ActionIcon
-                variant="subtle"
-                color="red"
-                size="md"
-                pos="absolute"
-                top={5}
-                right={5}
-                onClick={() => {
-                  removeTeamFromTournament(tournament, t.searchableName).then(() => {
-                    setTeamsInTournament(
-                      teamsInTournament.filter((t2) => t2.searchableName !== t.searchableName)
-                    );
-                  });
-                }}
-              >
-                <IconMinus></IconMinus>
-              </ActionIcon>
-
-              <Group>
-                <Stack>
-                  <Image
-                    src={t?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
-                    w="100px"
-                    h="100px"
-                  ></Image>
-                  <Text>
-                    <b>{t.name}</b>
-                  </Text>
-                </Stack>
-
-                <Stack>
-                  {[t.captain, t.nonCaptain, t.substitute]
-                    .filter((t1) => t1 !== null)
-                    .map((player, i) => (
-                      <PlayerCard key={i} index={i} player={player} />
-                    ))}
-                </Stack>
-              </Group>
-            </Paper>
+            <TeamCard
+              key={index}
+              tournament={tournament}
+              team={t}
+              setTeamsInTournament={setTeamsInTournament}
+              teamsInTournament={teamsInTournament}
+            />
           ))}
           <CustomTeamCard
             setPlayers={setPlayers}
