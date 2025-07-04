@@ -1,15 +1,11 @@
-import {
-  localLogout,
-  SERVER_ADDRESS,
-  tokenFetch,
-} from '@/components/HandballComponenets/ServerActions';
+import { SERVER_ADDRESS } from '@/app/config';
+import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
 import {
   GameStructure,
   RealName,
   SearchableName,
   TournamentStructure,
 } from '@/ServerActions/types';
-import { SERVER_ADDRESS } from '@/app/config';
 
 export function getChangeCode(gameID: number): Promise<number> {
   return tokenFetch(`/api/games/change_code?id=${gameID}`, {
