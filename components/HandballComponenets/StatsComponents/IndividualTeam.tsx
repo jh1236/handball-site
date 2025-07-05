@@ -18,8 +18,8 @@ import {
   Card,
   Container,
   Grid,
+  HoverCard,
   Image,
-  List,
   NumberInput,
   Rating,
   Table,
@@ -33,7 +33,7 @@ import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComp
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
 import { getTeam } from '@/ServerActions/TeamActions';
-import { GameStructure, TeamStructure } from '@/ServerActions/types';
+import { CardStructure, GameStructure, TeamStructure } from '@/ServerActions/types';
 import PlayerStatsTable from './PlayerStatsTable';
 
 interface TeamsProps {
@@ -64,7 +64,8 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
   // const [sort, setSort] = React.useState<number>(-1);
 
   const [games, setGames] = React.useState<GameStructure[]>([]);
-  const [teamObj, setTeamObj] = React.useState<TeamStructure | undefined>(undefined);
+  const [cards, setCards] = React.useState<{ game: GameStructure; card: CardStructure }[]>([]);
+  const [teamObj, setteamObj] = React.useState<TeamStructure | undefined>(undefined);
   const [gamesCount, setGamesCount] = React.useState<number>(20);
   const { isUmpireManager } = useUserData();
   useEffect(() => {
@@ -73,7 +74,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
       tournament,
       formatData: true,
     }).then((o) => {
-      setTeamObj(o.team);
+      setteamObj(o.team);
     });
   }, [team, tournament]);
   useEffect(() => {
@@ -81,9 +82,20 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
     getGames({
       team: [team],
       tournament,
-      limit: gamesCount,
       includePlayerStats: true,
-    }).then((g) => setGames(g.games));
+    }).then((g) => {
+      let output: { game: GameStructure; card: CardStructure }[] = [];
+      for (const game of g.games) {
+        output = output.concat(
+          (game.admin?.cards ?? [])
+            .filter((card) => card.firstTeam === (game.teamOne.searchableName === team))
+            .map((c) => ({ game, card: c }))
+        );
+      }
+      setCards(output);
+      g.games.reverse();
+      setGames(g.games);
+    });
   }, [gamesCount, team, tournament]);
   if (!teamObj) {
     return <p>loading...</p>;
@@ -128,7 +140,11 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
               <PlayerStatsTable team={teamObj} tournament={tournament}></PlayerStatsTable>
             </Tabs.Panel>
             <Tabs.Panel value="playerStats">
-              <PlayerStatsTable team={teamObj} teamPlayers={true}></PlayerStatsTable>
+              <PlayerStatsTable
+                team={teamObj}
+                teamPlayers={true}
+                tournament={tournament}
+              ></PlayerStatsTable>
             </Tabs.Panel>
           </Tabs>
         </Tabs.Panel>
@@ -140,59 +156,84 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
             onChange={(a) => setGamesCount(+a)}
           />
           <Grid>
-            {games.map((game, k) => (
-              <Grid.Col
-                span={{
-                  base: 6,
-                  sm: 4,
-                  md: 3,
-                }}
-              >
-                <Card
-                  shadow="sm"
-                  padding="xl"
-                  key={k}
-                  component="a"
-                  href={`/games/${game.id}`}
-                  className="hideLink"
+            {games
+              .filter((_, i) => i < gamesCount)
+              .map((game, k) => (
+                <Grid.Col
+                  span={{
+                    base: 6,
+                    sm: 4,
+                    md: 3,
+                  }}
                 >
-                  <Card.Section>
-                    <Image
-                      src={
-                        game.teamOne.searchableName !== team
-                          ? game.teamOne.imageUrl
-                          : game.teamTwo.imageUrl
-                      }
-                      h={160}
-                      alt="logo for the other team"
-                    />
-                  </Card.Section>
+                  <Card
+                    shadow="sm"
+                    padding="xl"
+                    key={k}
+                    component="a"
+                    href={`/games/${game.id}`}
+                    className="hideLink"
+                  >
+                    <Card.Section>
+                      <Image
+                        src={
+                          game.teamOne.searchableName !== team
+                            ? game.teamOne.imageUrl
+                            : game.teamTwo.imageUrl
+                        }
+                        h={160}
+                        alt="logo for the other team"
+                      />
+                    </Card.Section>
 
-                  <Text fw={500} size="lg" mt="md">
-                    {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
-                    {game.teamTwoScore})
-                  </Text>
+                    <Text fw={500} size="lg" mt="md">
+                      {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
+                      {game.teamTwoScore})
+                    </Text>
 
-                  {isUmpireManager && (
-                    <List>
-                      <List.Item>
-                        <Box display="flex">
-                          <strong>Rating: </strong>{' '}
-                          <Rating
-                            w="auto"
-                            count={4}
-                            size="sm"
-                            value={teamObj?.gameDetails?.[game.id]?.rating ?? 3}
-                            readOnly
-                          />
-                        </Box>
-                        {FEEDBACK_TEXTS[teamObj?.gameDetails?.[game.id]?.rating ?? 3]}
-                      </List.Item>
-                    </List>
-                  )}
-                </Card>
-              </Grid.Col>
-            ))}
+                    {isUmpireManager && (
+                      <>
+                        <Text>
+                          <Box display="flex">
+                            <strong>Rating: </strong>{' '}
+                            <Rating
+                              count={4}
+                              w="auto"
+                              size="sm"
+                              value={
+                                (game.teamOne.searchableName === team
+                                  ? game?.admin!.teamOneRating
+                                  : game?.admin!.teamTwoRating) ?? 3
+                              }
+                              readOnly
+                            />
+                          </Box>
+                          {
+                            FEEDBACK_TEXTS[
+                              (game.teamOne.searchableName === team
+                                ? game?.admin!.teamOneRating
+                                : game?.admin!.teamTwoRating) ?? 3
+                            ]
+                          }
+                        </Text>
+                        <Text>
+                          <strong>Cards: </strong>
+                          {(game?.admin?.cards ?? [])
+                            .filter((c) => c.firstTeam === (game.teamOne.searchableName === team))
+                            .map((card, j) => (
+                              <HoverCard key={j}>
+                                <HoverCard.Target>{eventIcon(card)}</HoverCard.Target>
+                                <HoverCard.Dropdown>
+                                  <i>{card.notes}</i>
+                                </HoverCard.Dropdown>
+                              </HoverCard>
+                            ))}
+                        </Text>
+                      </>
+                    )}
+                  </Card>
+                </Grid.Col>
+              ))}
           </Grid>
         </Tabs.Panel>
 
@@ -205,30 +246,26 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                 <Accordion.Item value="cards">
                   <Accordion.Control icon={<IconTriangleInvertedFilled />}>Cards</Accordion.Control>
                   <Accordion.Panel>
-                    {teamObj &&
-                      Object.entries(teamObj.gameDetails ?? {})
-                        .map(([, i]) => i.cards)
-                        .flat().length === 0 && (
-                        <Text>
-                          <i>No Cards Recorded Yet</i>
-                        </Text>
-                      )}
+                    {teamObj && cards.length === 0 && (
+                      <Text>
+                        <i>No Cards Recorded Yet</i>
+                      </Text>
+                    )}
                     <Timeline bulletSize={24}>
                       {teamObj &&
-                        Object.entries(teamObj.gameDetails ?? {})
-                          .map(([, i]) => i.cards)
-                          .flat()
-                          .map((card, i) => (
-                            <Timeline.Item
-                              key={i}
-                              title={`${card.eventType} for ${card.player?.name}`}
-                              bullet={eventIcon(card)}
-                            >
+                        cards.map(({ game, card }, i) => (
+                          <Timeline.Item
+                            key={i}
+                            title={`${card.eventType} for ${card.player?.name}`}
+                            bullet={eventIcon(card)}
+                          >
+                            <Link href={`/games/${game.id}`} className="hideLink">
                               <Text c="dimmed" size="sm">
                                 <strong>{card.notes}</strong>
                               </Text>
-                            </Timeline.Item>
-                          ))}
+                            </Link>
+                          </Timeline.Item>
+                        ))}
                     </Timeline>
                   </Accordion.Panel>
                 </Accordion.Item>
@@ -243,41 +280,62 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                         <Table.Th>Notes</Table.Th>
                       </Table.Tr>
                       {teamObj &&
-                        Object.entries(teamObj.gameDetails ?? {}).map(
-                          ([id, { notes, game, cards, rating }], i) => (
+                        games
+                          .filter(
+                            (game) =>
+                              game.admin!.cards.filter(
+                                (card) => card.firstTeam === (game.teamOne.searchableName === team)
+                              ).length > 0 ||
+                              ((game.teamOne.searchableName === team
+                                ? game.admin?.teamOneRating
+                                : game.admin?.teamTwoRating) ?? 3) < 2
+                          )
+                          .map((game, i) => (
                             <Table.Tr key={i}>
                               <Table.Th>
-                                <Link href={`/games/${id}`} className="hideLink">
-                                  {game
-                                    ? game.teamOne.searchableName !== team
-                                      ? game?.teamOne.name
-                                      : game?.teamTwo.name
-                                    : `Game ${id}`}
+                                <Link href={`/games/${game.id}`} className="hideLink">
+                                  {game.teamOne.searchableName !== team
+                                    ? game?.teamOne.name
+                                    : game?.teamTwo.name}
                                 </Link>
                               </Table.Th>
                               <Table.Td>
-                                <Link href={`/games/${id}`} className="hideLink">
-                                  <Rating readOnly value={rating} count={4}></Rating>
+                                <Link href={`/games/${game.id}`} className="hideLink">
+                                  <Rating
+                                    readOnly
+                                    value={
+                                      (game.teamOne.searchableName !== team
+                                        ? game?.admin?.teamOneRating
+                                        : game?.admin?.teamTwoRating) ?? 3
+                                    }
+                                    count={4}
+                                  ></Rating>
                                 </Link>
                               </Table.Td>
                               <Table.Td>
-                                <Link href={`/games/${id}`} className="hideLink">
-                                  {cards.map((card, j) => (
-                                    <Text c="dimmed" size="sm" key={j}>
-                                      <strong>{card.eventType}:</strong>
-                                      <i>{card.notes}</i>
-                                    </Text>
-                                  ))}
+                                <Link href={`/games/${game.id}`} className="hideLink">
+                                  {game
+                                    .admin!.cards.filter(
+                                      (card) =>
+                                        card.firstTeam === (game.teamOne.searchableName === team)
+                                    )
+                                    .map((card, j) => (
+                                      <HoverCard key={j}>
+                                        <HoverCard.Target>{eventIcon(card)}</HoverCard.Target>
+                                        <HoverCard.Dropdown>
+                                          <i>{card.notes}</i>
+                                        </HoverCard.Dropdown>
+                                      </HoverCard>
+                                    ))}
                                 </Link>
                               </Table.Td>
                               <Table.Td>
-                                <Link href={`/games/${id}`} className="hideLink">
-                                  {notes}
+                                <Link href={`/games/${game.id}`} className="hideLink">
+                                  {game.admin!.notes}
                                 </Link>
                               </Table.Td>
                             </Table.Tr>
-                          )
-                        )}
+                          ))}
                     </Table>
                   </Accordion.Panel>
                 </Accordion.Item>

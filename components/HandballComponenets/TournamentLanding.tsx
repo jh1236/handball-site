@@ -31,7 +31,7 @@ const STATS: StatCategory[] = [
     title: 'Most Selfish Player',
     description: 'of points scored for their team',
   },
-  { type: 'player', stat: 'B&F Votes', title: 'Leading Player', description: 'votes for B&F' },
+  { type: 'player', stat: 'B&F Votes', title: 'Leading Player', description: 'best and fairest votes' },
   {
     type: 'player',
     stat: 'Percentage of Points Scored For Team',

@@ -15,6 +15,7 @@ import {
   Card,
   Container,
   Grid,
+  HoverCard,
   Image,
   List,
   NumberInput,
@@ -31,6 +32,7 @@ import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
 import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
 import {
+  CardStructure,
   GameStructure,
   GameTeamStructure,
   PersonStructure,
@@ -117,6 +119,7 @@ export function findPlayer(game: GameStructure, playerName: string): PlayerGameS
 
 export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   // const [sort, setSort] = React.useState<number>(-1);
+  const [cards, setCards] = React.useState<{ game: GameStructure; card: CardStructure }[]>([]);
 
   const [gamesCount, setGamesCount] = React.useState<number>(20);
   const [games, setGames] = React.useState<GameStructure[]>([]);
@@ -136,10 +139,19 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   }, [player, tournament]);
 
   useEffect(() => {
-    setGames([]);
-    getGames({ player: [player], tournament, limit: gamesCount, includePlayerStats: true }).then(
-      (g) => setGames(g.games)
-    );
+    getGames({ player: [player], tournament, includePlayerStats: true }).then((g) => {
+      g.games.reverse();
+      let output: { game: GameStructure; card: CardStructure }[] = [];
+      for (const game of g.games) {
+        output = output.concat(
+          (game.admin?.cards ?? [])
+            .filter((card) => card.player?.searchableName === player)
+            .map((c) => ({ game, card: c }))
+        );
+      }
+      setCards(output);
+      setGames(g.games);
+    });
   }, [gamesCount, player, tournament]);
 
   return (
@@ -147,7 +159,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
         <Image
           alt="The SUSS handball Logo"
-          src={playerObj?.imageUrl ?? 'https://api.squarers.club/api/image?name=blank'}
+          src={playerObj?.bigImageUrl ?? 'https://api.squarers.club/api/image?name=blank'}
           h="100"
           w="auto"
           m="auto"
@@ -213,83 +225,100 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
             onChange={(a) => setGamesCount(+a)}
           />
           <Grid>
-            {games.map((game, k) => (
-              <Grid.Col span={{ base: 6, sm: 4, md: 3 }}>
-                <Card
-                  shadow="sm"
-                  padding="xl"
-                  key={k}
-                  component="a"
-                  href={`/games/${game.id}`}
-                  className="hideLink"
-                >
-                  <Card.Section>
-                    <Image
-                      src={
-                        !playersOf(game.teamOne).includes(player)
-                          ? game.teamOne.imageUrl
-                          : game.teamTwo.imageUrl
-                      }
-                      h={160}
-                      alt="logo for the other team"
-                    />
-                  </Card.Section>
+            {games
+              .filter((_, i) => i < gamesCount)
+              .map((game, k) => (
+                <Grid.Col span={{ base: 6, sm: 4, md: 3 }}>
+                  <Card
+                    shadow="sm"
+                    padding="xl"
+                    key={k}
+                    component="a"
+                    href={`/games/${game.id}`}
+                    className="hideLink"
+                  >
+                    <Card.Section>
+                      <Image
+                        src={
+                          !playersOf(game.teamOne).includes(player)
+                            ? game.teamOne.imageUrl
+                            : game.teamTwo.imageUrl
+                        }
+                        h={160}
+                        alt="logo for the other team"
+                      />
+                    </Card.Section>
 
-                  <Text fw={500} size="lg" mt="md">
-                    {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
-                    {game.teamTwoScore})
-                  </Text>
+                    <Text fw={500} size="lg" mt="md">
+                      {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
+                      {game.teamTwoScore})
+                    </Text>
 
-                  <List mt="xs" c="dimmed" size="sm">
-                    <List.Item>
-                      <strong>Points Scored: </strong>{' '}
-                      {findPlayer(game, player)?.stats?.['Points Scored']}
-                    </List.Item>
-                    <List.Item>
-                      <strong>Aces Scored: </strong>{' '}
-                      {findPlayer(game, player)?.stats?.['Aces Scored']}
-                    </List.Item>
-                    <List.Item>
-                      <strong>Elo Delta: </strong>
-                      <strong
-                        style={{
-                          color:
-                            findPlayer(game, player).stats?.['Elo Delta'] >= 0 ? 'green' : 'red',
-                        }}
-                      >
-                        {findPlayer(game, player)?.stats?.['Elo Delta'] > 0 ? '+' : ''}
-                        {findPlayer(game, player)?.stats?.['Elo Delta']}
-                      </strong>
-                    </List.Item>
-                    {isUmpireManager && (
-                      <>
-                        <List.Item>
-                          <Box display="flex">
-                            <strong>Rating: </strong>{' '}
-                            <Rating
-                              count={4}
-                              w="auto"
-                              size="sm"
-                              value={playerObj?.gameDetails?.[game.id]?.rating ?? 3}
-                              readOnly
-                            />
-                          </Box>
-                          {FEEDBACK_TEXTS[playerObj?.gameDetails?.[game.id]?.rating ?? 3]}
-                        </List.Item>
-                        <List.Item>
-                          <strong>Cards: </strong>
-                          {
-                            (game?.admin?.cards ?? []).filter(
-                              (c) => c.player?.searchableName === player
-                            ).length
-                          }
-                        </List.Item>
-                      </>
-                    )}
-                  </List>
-                </Card>
-              </Grid.Col>
-            ))}
+                    <List mt="xs" c="dimmed" size="sm">
+                      <List.Item>
+                        <strong>Points Scored: </strong>{' '}
+                        {findPlayer(game, player)?.stats?.['Points Scored']}
+                      </List.Item>
+                      <List.Item>
+                        <strong>Aces Scored: </strong>{' '}
+                        {findPlayer(game, player)?.stats?.['Aces Scored']}
+                      </List.Item>
+                      <List.Item>
+                        <strong>Elo Delta: </strong>
+                        <strong
+                          style={{
+                            color:
+                              findPlayer(game, player).stats?.['Elo Delta'] >= 0 ? 'green' : 'red',
+                          }}
+                        >
+                          {findPlayer(game, player)?.stats?.['Elo Delta'] > 0 ? '+' : ''}
+                          {findPlayer(game, player)?.stats?.['Elo Delta']}
+                        </strong>
+                      </List.Item>
+                      {isUmpireManager && (
+                        <>
+                          <List.Item>
+                            <Box display="flex">
+                              <strong>Rating: </strong>{' '}
+                              <Rating
+                                count={4}
+                                w="auto"
+                                size="sm"
+                                value={
+                                  (playersOf(game.teamOne).includes(player)
+                                    ? game?.admin!.teamOneRating
+                                    : game?.admin!.teamTwoRating) ?? 3
+                                }
+                                readOnly
+                              />
+                            </Box>
+                            {
+                              FEEDBACK_TEXTS[
+                                (playersOf(game.teamOne).includes(player)
+                                  ? game?.admin!.teamOneRating
+                                  : game?.admin!.teamTwoRating) ?? 3
+                              ]
+                            }
+                          </List.Item>
+                          <List.Item>
+                            <strong>Cards: </strong>
+                            {(game?.admin?.cards ?? [])
+                              .filter((c) => c.player?.searchableName === player)
+                              .map((card, j) => (
+                                <HoverCard key={j}>
+                                  <HoverCard.Target>{eventIcon(card)}</HoverCard.Target>
+                                  <HoverCard.Dropdown>
+                                    <i>{card.notes}</i>
+                                  </HoverCard.Dropdown>
+                                </HoverCard>
+                              ))}
+                          </List.Item>
+                        </>
+                      )}
+                    </List>
+                  </Card>
+                </Grid.Col>
+              ))}
           </Grid>
         </Tabs.Panel>
 
@@ -301,30 +330,26 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
               <Accordion.Item value="cards">
                 <Accordion.Control icon={<IconTriangleInvertedFilled />}>Cards</Accordion.Control>
                 <Accordion.Panel>
-                  {playerObj &&
-                    Object.entries(playerObj.gameDetails ?? {})
-                      .map(([, i]) => i.cards)
-                      .flat().length === 0 && (
-                      <Text>
-                        <i>No Cards Recorded Yet</i>
-                      </Text>
-                    )}
+                  {playerObj && cards.length === 0 && (
+                    <Text>
+                      <i>No Cards Recorded Yet</i>
+                    </Text>
+                  )}
                   <Timeline bulletSize={24}>
                     {playerObj &&
-                      Object.entries(playerObj.gameDetails ?? {})
-                        .map(([, i]) => i.cards)
-                        .flat()
-                        .map((card, i) => (
-                          <Timeline.Item
-                            key={i}
-                            title={`${card.eventType} for ${card.player?.name}`}
-                            bullet={eventIcon(card)}
-                          >
+                      cards.map(({ game, card }, i) => (
+                        <Timeline.Item
+                          key={i}
+                          title={`${card.eventType} for ${card.player?.name}`}
+                          bullet={eventIcon(card)}
+                        >
+                          <Link href={`/games/${game.id}`} className="hideLink">
                             <Text c="dimmed" size="sm">
                               <strong>{card.notes}</strong>
                             </Text>
-                          </Timeline.Item>
-                        ))}
+                          </Link>
+                        </Timeline.Item>
+                      ))}
                   </Timeline>
                 </Accordion.Panel>
               </Accordion.Item>
@@ -342,41 +367,61 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                     </Table.Thead>
                     <Table.Tbody>
                       {playerObj &&
-                        Object.entries(playerObj.gameDetails ?? {}).map(
-                          ([id, { notes, game, cards, rating }], i) => (
+                        games
+                          .filter(
+                            (game) =>
+                              game.admin!.cards.filter(
+                                (card) => card.player?.searchableName === player
+                              ).length > 0 ||
+                              ((playersOf(game.teamOne).includes(player)
+                                ? game.admin?.teamOneRating
+                                : game.admin?.teamTwoRating) ?? 3) < 2
+                          )
+                          .map((game, i) => (
                             <Table.Tr key={i}>
                               <Table.Th>
-                                <Link href={`/games/${id}`} className="hideLink">
-                                  {game
-                                    ? !playersOf(game.teamOne).includes(player)
-                                      ? game?.teamOne.name
-                                      : game?.teamTwo.name
-                                    : `Game ${id}`}
+                                <Link href={`/games/${game.id}`} className="hideLink">
+                                  {!playersOf(game.teamOne).includes(player)
+                                    ? game?.teamOne.name
+                                    : game?.teamTwo.name}
                                 </Link>
                               </Table.Th>
                               <Table.Td>
-                                <Link href={`/games/${id}`} className="hideLink">
-                                  <Rating readOnly value={rating} count={4}></Rating>
+                                <Link href={`/games/${game.id}`} className="hideLink">
+                                  <Rating
+                                    readOnly
+                                    value={
+                                      (playersOf(game.teamOne).includes(player)
+                                        ? game?.admin!.teamOneRating
+                                        : game?.admin!.teamTwoRating) ?? 3
+                                    }
+                                    count={4}
+                                  ></Rating>
                                 </Link>
                               </Table.Td>
                               <Table.Td>
-                                <Link href={`/games/${id}`} className="hideLink">
-                                  {cards.map((card, j) => (
-                                    <Text c="dimmed" size="sm" key={j}>
-                                      <strong>{card.eventType}:</strong>
-                                      <i>{card.notes}</i>
-                                    </Text>
-                                  ))}
+                                <Link href={`/games/${game.id}`} className="hideLink">
+                                  {game
+                                    .admin!.cards.filter(
+                                      (card) => card.player?.searchableName === player
+                                    )
+                                    .map((card, j) => (
+                                      <HoverCard key={j}>
+                                        <HoverCard.Target>{eventIcon(card)}</HoverCard.Target>
+                                        <HoverCard.Dropdown>
+                                          <i>{card.notes}</i>
+                                        </HoverCard.Dropdown>
+                                      </HoverCard>
+                                    ))}
                                 </Link>
                               </Table.Td>
                               <Table.Td>
-                                <Link href={`/games/${id}`} className="hideLink">
-                                  {notes}
+                                <Link href={`/games/${game.id}`} className="hideLink">
+                                  {game.notes}
                                 </Link>
                               </Table.Td>
                             </Table.Tr>
-                          )
-                        )}
+                          ))}
                     </Table.Tbody>
                   </Table>
                 </Accordion.Panel>

@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Box, Button, LoadingOverlay, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   del,
   endTimeout,
-  GameState,
   sync,
   undo,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GameScore } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
+import { setGameState, useGameState } from '@/components/HandballComponenets/GameState';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGame } from '@/ServerActions/GameActions';
 import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
@@ -30,7 +30,7 @@ export function playersFromGame(game: GameStructure): PlayerGameStatsStructure[]
     game.teamOne.substitute,
     game.teamTwo.captain,
     game.teamTwo.nonCaptain,
-    game.teamOne.substitute,
+    game.teamTwo.substitute,
   ].filter((pgs) => pgs !== null && pgs !== undefined);
 }
 
@@ -49,55 +49,13 @@ export function EditGame({ game }: { game: number }) {
   const [editOfficialGame, { close: iKnowWhatImDoing }] = useDisclosure(true);
   startLoading = openLoading;
   const [visibleTimeout, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-  const [faulted, setFaulted] = React.useState<boolean>(false);
-  const [started, setStarted] = React.useState<boolean>(true);
-  const [ended, setEnded] = React.useState<boolean>(false);
-  const [firstTeamServes, setFirstTeamServes] = React.useState<boolean>(false);
-  const [timeoutExpirationTime, setTimeoutExpirationTime] = React.useState<number>(-1);
+
   const [currentTime, setCurrentTime] = React.useState<number>(300);
-  const [teamOneIGA, setTeamOneIGA] = React.useState<boolean>(true);
-  const [notes, setNotes] = React.useState<string>('');
-  const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
+
+  const gameState = useGameState(gameObj || undefined);
 
   //team one state
-  const [teamOneTimeouts, setTeamOneTimeouts] = React.useState<number>(0);
-  const [teamOneNotes, setTeamOneNotes] = React.useState<string>('');
-  const [teamOneProtest, setTeamOneProtest] = React.useState<string>('');
-  const [teamOneServingLeft, setTeamOneServingLeft] = React.useState<boolean>(true);
-  const [teamOneName, setTeamOneName] = React.useState<string>('Loading...');
-  const [teamOneScore, setTeamOneScore] = React.useState<number>(0);
-  const [teamOneRating, setTeamOneRating] = React.useState<number>(0);
-  const [teamOneLeft, setTeamOneLeft] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const [teamOneRight, setTeamOneRight] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const [teamOneSub, setTeamOneSub] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  //team two state
-  const [teamTwoTimeouts, setTeamTwoTimeouts] = React.useState<number>(0);
-  const [teamTwoNotes, setTeamTwoNotes] = React.useState<string>('');
-  const [teamTwoProtest, setTeamTwoProtest] = React.useState<string>('');
 
-  const [teamTwoServingLeft, setTeamTwoServingLeft] = React.useState<boolean>(true);
-  const [teamTwoName, setTeamTwoName] = React.useState<string>('Loading...');
-  const [teamTwoScore, setTeamTwoScore] = React.useState<number>(0);
-  const [teamTwoRating, setTeamTwoRating] = React.useState<number>(0);
-  const [teamTwoLeft, setTeamTwoLeft] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const [teamTwoRight, setTeamTwoRight] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const [teamTwoSub, setTeamTwoSub] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const servingFromLeft = useMemo(
-    () => (firstTeamServes ? teamOneServingLeft : teamTwoServingLeft),
-    [firstTeamServes, teamOneServingLeft, teamTwoServingLeft]
-  );
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
@@ -106,196 +64,32 @@ export function EditGame({ game }: { game: number }) {
   }, []);
 
   useEffect(() => {
-    if (teamOneScore || teamTwoScore) {
-      const bigScore = Math.max(teamOneScore, teamTwoScore);
-      const lilScore = Math.min(teamOneScore, teamTwoScore);
-      if (bigScore < 11) return;
-      if (bigScore - lilScore <= 1) return;
-      setEnded(true);
-    }
-  }, [teamOneScore, teamTwoScore]);
-
-  useEffect(() => {
     reloadGame(game);
   }, [game]);
 
   useEffect(() => {
     if (!gameObj) return;
-    setFirstTeamServes(gameObj.firstTeamToServe);
-    setFaulted(gameObj.faulted);
-    setTeamOneIGA(gameObj.firstTeamIga ?? true);
-    setTimeoutExpirationTime(gameObj.timeoutExpirationTime);
-    setStarted(gameObj.started);
-    setEnded(gameObj.someoneHasWon);
-    setVotes(playersFromGame(gameObj));
-    //Team Specific
-    setTeamOneTimeouts(gameObj.teamOneTimeouts);
-    setTeamOneScore(gameObj.teamOneScore);
-    setTeamOneServingLeft(gameObj.teamOne.servingFromLeft!);
-    console.log(`${gameObj.teamOne.name} Left Serve is ${gameObj.teamOne.servingFromLeft}`);
-    const { teamOne, teamTwo } = gameObj;
-    if (gameObj.started) {
-      const sorted = [teamOne.captain, teamOne.nonCaptain, teamOne.substitute].toSorted((a, b) =>
-        (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
-      );
-      setTeamOneLeft(sorted[0] || undefined);
-      setTeamOneRight(sorted[1] || undefined);
-      setTeamOneSub(sorted[2] || undefined);
-    } else {
-      //trick i stole from python, if nonCaptain is null it will be replaced with undefined
-      setTeamOneLeft(teamOne.captain);
-      setTeamOneRight(teamOne.nonCaptain || undefined);
-      setTeamOneSub(teamOne.substitute || undefined);
-    }
-    setTeamOneName(gameObj.teamOne.name);
-    setTeamTwoName(gameObj.teamTwo.name);
-    setTeamTwoTimeouts(gameObj.teamTwoTimeouts);
-    setTeamTwoScore(gameObj.teamTwoScore);
-    setTeamTwoServingLeft(gameObj.teamTwo.servingFromLeft!);
-    if (gameObj.started) {
-      const sorted = [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute].toSorted((a, b) =>
-        (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
-      );
-      setTeamTwoLeft(sorted[0] || undefined);
-      setTeamTwoRight(sorted[1] || undefined);
-      setTeamTwoSub(sorted[2] || undefined);
-    } else {
-      setTeamTwoLeft(teamTwo.captain);
-      //trick i stole from python, if nonCaptain is null it will be replaced with undefined
-      setTeamTwoRight(teamTwo.nonCaptain || undefined);
-      setTeamTwoSub(teamTwo.substitute || undefined);
-    }
+    setGameState(gameObj, gameState);
     closeLoading();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeLoading, gameObj]);
 
   useEffect(() => {
-    if (timeoutExpirationTime > 0) {
+    if (gameState.timeoutExpirationTime.get > 0) {
       openTimeout();
     } else {
       closeTimeout();
     }
-  }, [closeTimeout, openTimeout, timeoutExpirationTime]);
-
-  const gameState: GameState = {
-    votes: {
-      get: votes,
-      set: setVotes,
-    },
-    badminton: gameObj?.tournament.usingBadmintonServes ?? false,
-    timeoutExpirationTime: {
-      get: timeoutExpirationTime,
-      set: setTimeoutExpirationTime,
-    },
-    teamOneIGA: {
-      get: teamOneIGA,
-      set: setTeamOneIGA,
-    },
-    started: {
-      get: started,
-      set: setStarted,
-    },
-    ended: {
-      get: ended,
-      set: setEnded,
-    },
-    firstTeamServes: {
-      get: firstTeamServes,
-      set: setFirstTeamServes,
-    },
-    faulted: {
-      get: faulted,
-      set: setFaulted,
-    },
-    id: gameObj?.id ?? -1,
-    servingFromLeft,
-    notes: {
-      get: notes,
-      set: setNotes,
-    },
-    teamOne: {
-      name: teamOneName,
-      score: {
-        get: teamOneScore,
-        set: setTeamOneScore,
-      },
-      rating: {
-        get: teamOneRating,
-        set: setTeamOneRating,
-      },
-      notes: {
-        get: teamOneNotes,
-        set: setTeamOneNotes,
-      },
-      protest: {
-        get: teamOneProtest,
-        set: setTeamOneProtest,
-      },
-      timeouts: {
-        get: teamOneTimeouts,
-        set: setTeamOneTimeouts,
-      },
-      servingFromLeft: {
-        get: teamOneServingLeft,
-        set: setTeamOneServingLeft,
-      },
-      left: {
-        get: teamOneLeft,
-        set: setTeamOneLeft,
-      },
-      right: {
-        get: teamOneRight,
-        set: setTeamOneRight,
-      },
-      sub: {
-        get: teamOneSub,
-        set: setTeamOneSub,
-      },
-    },
-    teamTwo: {
-      name: teamTwoName,
-      score: {
-        get: teamTwoScore,
-        set: setTeamTwoScore,
-      },
-      rating: {
-        get: teamTwoRating,
-        set: setTeamTwoRating,
-      },
-      notes: {
-        get: teamTwoNotes,
-        set: setTeamTwoNotes,
-      },
-      protest: {
-        get: teamTwoProtest,
-        set: setTeamTwoProtest,
-      },
-      timeouts: {
-        get: teamTwoTimeouts,
-        set: setTeamTwoTimeouts,
-      },
-      servingFromLeft: {
-        get: teamTwoServingLeft,
-        set: setTeamTwoServingLeft,
-      },
-      left: {
-        get: teamTwoLeft,
-        set: setTeamTwoLeft,
-      },
-      right: {
-        get: teamTwoRight,
-        set: setTeamTwoRight,
-      },
-      sub: {
-        get: teamTwoSub,
-        set: setTeamTwoSub,
-      },
-    },
-  };
+  }, [closeTimeout, openTimeout, gameState.timeoutExpirationTime.get]);
 
   const timeoutKids = (
     <>
-      <Title style={{ color: timeoutExpirationTime > currentTime ? '' : 'red' }} order={2}>
-        {(Math.floor((timeoutExpirationTime - currentTime) / 100) / 10).toFixed(1)} Seconds
+      <Title
+        style={{ color: gameState.timeoutExpirationTime.get > currentTime ? '' : 'red' }}
+        order={2}
+      >
+        {(Math.floor((gameState.timeoutExpirationTime.get - currentTime) / 100) / 10).toFixed(1)}{' '}
+        Seconds
       </Title>
       <br />
       <br />
@@ -358,7 +152,11 @@ export function EditGame({ game }: { game: number }) {
         }}
       />
       <Box style={{ width: '100%', height: '40%' }}>
-        {(gameState.teamOneIGA.get ? teamOneLeft && teamOneRight : teamTwoLeft && teamTwoRight) ? (
+        {(
+          gameState.teamOneIGA.get
+            ? gameState.teamOne.right.get && gameState.teamOne.left.get
+            : gameState.teamTwo.right.get && gameState.teamTwo.left.get
+        ) ? (
           <>
             <Box style={{ width: '50%', height: '90%', float: 'left' }}>
               <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
@@ -424,16 +222,16 @@ export function EditGame({ game }: { game: number }) {
         >
           <Button
             size="lg"
-            color={started ? 'blue' : 'red'}
+            color={gameState.started.get ? 'blue' : 'red'}
             onClick={() => {
-              if (started) {
+              if (gameState.started.get) {
                 undo(gameState);
               } else {
                 del(gameState);
               }
             }}
           >
-            {started ? 'Undo' : 'Delete'}
+            {gameState.started.get ? 'Undo' : 'Delete'}
           </Button>
         </Box>
       </Box>
@@ -441,7 +239,11 @@ export function EditGame({ game }: { game: number }) {
         <Box style={{ width: '100%', height: '10%', float: 'right' }}>
           <TeamButton firstTeam={false} game={gameState}></TeamButton>
         </Box>
-        {(gameState.teamOneIGA.get ? teamTwoLeft && teamTwoRight : teamOneLeft && teamOneRight) ? (
+        {(
+          gameState.teamOneIGA.get
+            ? gameState.teamTwo.right.get && gameState.teamTwo.left.get
+            : gameState.teamOne.right.get && gameState.teamOne.left.get
+        ) ? (
           <>
             <Box style={{ width: '50%', height: '90%', float: 'left' }}>
               <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>

@@ -1,4 +1,4 @@
-import { tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
 
 export function loginAction(userId: string, password: string, remember: boolean): Promise<void> {
   const body: any = {
@@ -22,7 +22,7 @@ export function loginAction(userId: string, password: string, remember: boolean)
     return response.json().then((data) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
-      localStorage.setItem('timeout', `${data.timeout * 2000}`);
+      localStorage.setItem('timeout', `${data.timeout}`);
       localStorage.setItem('permissionLevel', `${data.permissionLevel}`);
     });
   });
@@ -57,6 +57,9 @@ export function setUserImage(imageLocation: string): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();

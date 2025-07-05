@@ -1,5 +1,6 @@
-import { SERVER_ADDRESS, tokenFetch } from '@/components/HandballComponenets/ServerActions';
-import { TournamentStructure, SearchableName } from '@/ServerActions/types';
+import { SERVER_ADDRESS } from '@/app/config';
+import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
+import { SearchableName, TournamentStructure } from '@/ServerActions/types';
 
 export function getTournaments(): Promise<TournamentStructure[]> {
   const url = new URL('/api/tournaments/', SERVER_ADDRESS);
@@ -7,6 +8,9 @@ export function getTournaments(): Promise<TournamentStructure[]> {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json().then((json: { tournaments: TournamentStructure[] }) => json.tournaments);
@@ -19,6 +23,9 @@ export function getTournament(searchableName: SearchableName): Promise<Tournamen
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return response.json().then((json: { tournament: TournamentStructure }) => json.tournament);
@@ -39,6 +46,9 @@ export function noteForTournament(tournament: SearchableName, note: string): Pro
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();
@@ -65,6 +75,9 @@ export function serveStyleForTournament(
     },
   }).then((response) => {
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
       return Promise.reject(response.text());
     }
     return Promise.resolve();

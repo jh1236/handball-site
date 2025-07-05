@@ -13,9 +13,6 @@ export interface TeamStructure {
   teamColor: string | null;
   teamColorAsRGBABecauseDigbyIsLazy: number[];
   servedFromLeft?: boolean;
-  gameDetails?: {
-    [key: number]: { notes: string; cards: CardStructure[]; rating: number; game?: GameStructure };
-  };
   stats?: { [key: string]: any };
 
   [k: string]: any;
@@ -33,12 +30,10 @@ export interface PersonStructure {
   name: string;
   searchableName: string;
   imageUrl: string;
+  bigImageUrl: string;
   isAdmin?: boolean;
   team?: TeamStructure;
   prevCards?: CardStructure[];
-  gameDetails?: {
-    [key: number]: { notes: string; cards: CardStructure[]; rating: number; game?: GameStructure };
-  };
   stats?: { [key: string]: number };
 
   [k: string]: any;
@@ -109,6 +104,7 @@ export interface GameTeamStructure {
   extendedName: string;
   searchableName: string;
   imageUrl: string;
+  bigImageUrl: string;
   captain: PlayerGameStatsStructure;
   nonCaptain: PlayerGameStatsStructure | null;
   substitute: PlayerGameStatsStructure | null;
@@ -140,7 +136,7 @@ export interface GameStructure {
   scorer: OfficialStructure | null;
   firstTeamIga: boolean;
   firstTeamToServe: boolean;
-  sideToServe: string;
+  sideToServe: 'Left' | 'Right';
   startTime: number;
   serveTimer: number;
   length: number;

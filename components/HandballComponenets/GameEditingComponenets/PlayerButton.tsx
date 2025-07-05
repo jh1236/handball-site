@@ -26,7 +26,6 @@ import { makeUnique } from '@/components/HandballComponenets/GameCreatingCompone
 import {
   ace,
   fault,
-  GameState,
   greenCard,
   redCard,
   score,
@@ -34,6 +33,7 @@ import {
   warning,
   yellowCard,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { GameState } from '@/components/HandballComponenets/GameState';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface PlayerButtonProps {
