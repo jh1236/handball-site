@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IconMinus, IconPlus, IconUpload } from '@tabler/icons-react';
 import {
   ActionIcon,
@@ -11,9 +11,11 @@ import {
   Image,
   Paper,
   Stack,
+  Text,
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
+import { uploadTeamImage } from '@/ServerActions/ImageActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { getTeams } from '@/ServerActions/TeamActions';
 import {
@@ -28,6 +30,7 @@ import {
   TeamStructure,
   TournamentStructure,
 } from '@/ServerActions/types';
+import classes from './TeamCreatorPage.module.css';
 
 interface TeamCreatorPageArgs {
   tournament: SearchableName;
@@ -77,7 +80,7 @@ function CustomPlayerCard({
           marginRight: 5,
         }}
         display="inline-block"
-      />
+      ></Image>
       <b>{SIDES[index]}: </b>
       <Autocomplete
         display="inline-block"
@@ -234,6 +237,7 @@ function TeamCard({
   teamsInTournament,
   setAllTeams,
 }: TeamCardParams) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [newTeamName, setNewTeamName] = useState<string>(team.name);
   return (
     <Paper shadow="lg" m={15} pos="relative">
@@ -282,11 +286,46 @@ function TeamCard({
 
       <Group m={15}>
         <Stack>
-          <Image
-            src={team?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
-            w="100px"
-            h="100px"
-          ></Image>
+          <Box pos="relative" style={{ paddingBottom: 90 }} className={classes.hoverImage}>
+            <Image
+              pos="absolute"
+              src={team?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+              w="100px"
+              h="100px"
+            ></Image>
+            <Text
+              size="sm"
+              pos="absolute"
+              h={100}
+              w={100}
+              m="auto"
+              style={{
+                textAlign: 'center',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Change Image
+            </Text>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                uploadTeamImage(file, team.searchableName).then((t) => {
+                  setTeamsInTournament(
+                    teamsInTournament.map((t2) => (t2.searchableName === t.searchableName ? t : t2))
+                  );
+                  getTeams({}).then((teams) => setAllTeams(teams.teams));
+                });
+              }}
+            />
+          </Box>
           <Autocomplete
             display="inline-block"
             size="xs"
