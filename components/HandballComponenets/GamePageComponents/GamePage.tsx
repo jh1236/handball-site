@@ -217,7 +217,10 @@ export function GamePage({ gameID }: GamePageProps) {
             }}
           >
             <Grid.Col span={5}>
-              <Link className="hideLink" href={`/${game.tournament.searchableName}/teams/${game.teamOne.searchableName}`}>
+              <Link
+                className="hideLink"
+                href={`/${game.tournament.searchableName}/teams/${game.teamOne.searchableName}`}
+              >
                 <Title
                   c={colorScheme === 'dark' ? 'white' : 'black'}
                   order={2}
@@ -232,7 +235,10 @@ export function GamePage({ gameID }: GamePageProps) {
               vs
             </Grid.Col>
             <Grid.Col span={5}>
-              <Link className="hideLink" href={`/${game.tournament.searchableName}/teams/${game.teamTwo.searchableName}`}>
+              <Link
+                className="hideLink"
+                href={`/${game.tournament.searchableName}/teams/${game.teamTwo.searchableName}`}
+              >
                 <Title
                   c={colorScheme === 'dark' ? 'white' : 'black'}
                   className={classes.secretLink}

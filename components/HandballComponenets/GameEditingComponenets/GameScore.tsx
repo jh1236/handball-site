@@ -116,7 +116,7 @@ function getActions(
               <strong>Best Players</strong>
               {!bestPlayersOpened && <strong style={{ color: 'red' }}>*</strong>}
               <strong>: </strong>
-              {game.votes.get.map((pgs: { name: string; }) => pgs.name).join(', ')}
+              {game.votes.get.map((pgs: { name: string }) => pgs.name).join(', ')}
             </List.Item>
             <List.Item>
               <strong>Review Required: </strong>
