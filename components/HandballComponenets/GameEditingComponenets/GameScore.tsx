@@ -213,7 +213,7 @@ export function GameScore({ game }: GameScoreArgs) {
           </Accordion.Item>
         )
       ),
-    [closeEndGame, game]
+    [bestPlayersOpened, closeEndGame, game, reviewReqd, router]
   );
 
   const [playZaiahBox] = useSound(`/sounds/zaiah${Math.floor(Math.random() * 6 + 1)}.mp3`, {

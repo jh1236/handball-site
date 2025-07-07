@@ -620,14 +620,7 @@ export function PlayerButton({
       return cardedTeammates[0];
     }
     return trueLeftSide ? team.left.get : team.right.get;
-  }, [
-    team.right.get,
-    team.left.get,
-    game.ended.get,
-    game.teamOne.servingFromLeft,
-    game.teamTwo.servingFromLeft,
-    trueLeftSide,
-  ]);
+  }, [team.right.get, team.left.get, game.ended.get, game.servingFromLeft, trueLeftSide]);
   const leftSide = useMemo(
     () => (game.ended.get ? trueLeftSide : player?.sideOfCourt === 'Left'),
     [game.ended.get, player?.sideOfCourt, trueLeftSide]
@@ -655,7 +648,7 @@ export function PlayerButton({
           <Accordion.Panel>{item.content}</Accordion.Panel>
         </Accordion.Item>
       )),
-    [cardTime, close, firstTeam, game, leftSide, serving, trueLeftSide]
+    [cardTime, close, firstTeam, game, leftSide, openModal, otherReason, serving, trueLeftSide]
   );
   const name = player ? (player.isCaptain ? `${player.name} (c)` : player.name) : 'Loading...';
   return (
