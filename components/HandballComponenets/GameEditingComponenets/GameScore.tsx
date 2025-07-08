@@ -211,6 +211,10 @@ export function GameScore({ game }: GameScoreArgs) {
     if (game.practice.get) {
       game.teamOne.rating.set(3);
       game.teamTwo.rating.set(3);
+      if (!game.started.get) {
+        game.teamOneIGA.set(Math.random() > 0.5);
+        game.firstTeamServes.set(Math.random() > 0.5);
+      }
     }
     // there is no sane reason to have the deps that it wants.
     // eslint-disable-next-line react-hooks/exhaustive-deps
