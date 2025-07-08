@@ -279,7 +279,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                 ))}
               <Text>{game.admin?.teamOneNotes}</Text>
               <Divider></Divider>
-              <Title order={3}>{markIfReqd((game.admin?.teamOneProtest ?? '') !== '', 'Protest')}</Title>
+              <Title order={3}>
+                {markIfReqd((game.admin?.teamOneProtest ?? '') !== '', 'Protest')}
+              </Title>
               {!game.admin?.teamOneProtest &&
                 (!game.ended ? (
                   <Text>
@@ -340,7 +342,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                 ))}
               <Text>{game.admin?.teamTwoNotes}</Text>
               <Divider></Divider>
-              <Title order={3}>{markIfReqd((game.admin?.teamTwoProtest ?? '') !== '', 'Protest')}</Title>
+              <Title order={3}>
+                {markIfReqd((game.admin?.teamTwoProtest ?? '') !== '', 'Protest')}
+              </Title>
               {!game.admin?.teamTwoProtest &&
                 (!game.ended ? (
                   <Text>

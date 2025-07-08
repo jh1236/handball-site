@@ -13,8 +13,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { addGameEventToGame } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
-import { setGameState, TeamState, useGameState } from '@/components/HandballComponenets/GameState';
+import { TeamState, useGameState } from '@/components/HandballComponenets/GameState';
 import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 import classes from './Scoreboard.module.css';
@@ -30,7 +29,7 @@ function cardColorFromPlayer(player: PlayerGameStatsStructure) {
 }
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
-  const gameState = useGameState();
+  const { gameState, setGameForState, addGameEventToState } = useGameState();
   const [teamOneColor, setTeamOneColor] = useState<number[] | undefined>();
   const [teamTwoColor, setTeamTwoColor] = useState<number[] | undefined>();
   const [teamOneImage, setTeamOneImage] = useState<string | undefined>();
@@ -74,7 +73,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     const message = lastJsonMessage as Message;
     if (message?.type === 'update') {
       const gameUpdate = (lastJsonMessage as UpdateMessage).game;
-      setGameState(gameUpdate, gameState);
+      setGameForState(gameUpdate);
       setTeamOneColor(gameUpdate.teamOne.teamColorAsRGBABecauseDigbyIsLazy || undefined);
       setTeamTwoColor(gameUpdate.teamTwo.teamColorAsRGBABecauseDigbyIsLazy || undefined);
       setTeamOneImage(gameUpdate.teamOne.bigImageUrl ?? gameUpdate.teamOne.imageUrl);
@@ -93,13 +92,14 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       }
     } else if (message?.type === 'event') {
       const { event } = lastJsonMessage as EventMessage;
-      addGameEventToGame(gameState, event);
+      addGameEventToState(event);
       if (event.eventType === 'End Game') {
-        setTime(currentTime - time);
+        setTime(Date.now() - time);
       }
     }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeTimeout, lastJsonMessage, openTimeout]);
+    // disabling here so the same json message isn't reprocessed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeTimeout, lastJsonMessage, openTimeout, time]);
 
   if (!gameState.id) {
     return <>Loading...</>;

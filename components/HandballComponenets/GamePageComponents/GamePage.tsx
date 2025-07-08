@@ -43,11 +43,15 @@ export function GamePage({ gameID }: GamePageProps) {
     }).then((g) => {
       setGame(g);
       setPlayerSelect(g.teamOne.captain.name);
-      if (isOfficial && game && !game.admin) {
-        localLogout();
-      }
     });
   }, [gameID]);
+
+  useEffect(() => {
+    if (isOfficial && game && !game.admin) {
+      localLogout();
+    }
+  }, [game, isOfficial]);
+
   useEffect(() => {
     if (activeTab !== 'teamStats') {
       router.replace(`${window.location.href.split('?')[0]}?tab=${activeTab}`);
@@ -67,10 +71,7 @@ export function GamePage({ gameID }: GamePageProps) {
   if (game.startTime && game.startTime > 0) {
     date.setUTCMilliseconds(Math.floor(1000 * game.startTime));
   }
-  const LocaleDateIndex: number = date.toLocaleDateString().indexOf(',');
-  const localeDate: string[] = [];
-  localeDate.push(date.toLocaleDateString().slice(0, LocaleDateIndex + 1));
-  localeDate.push(date.toLocaleTimeString().slice(LocaleDateIndex + 1));
+
   const teamGradient = `linear-gradient(to right, rgba(${game.teamOne.teamColorAsRGBABecauseDigbyIsLazy ? game.teamOne.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'}), rgba(0,0,0,0), rgba(${game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy ? game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'})`;
 
   function generatePlayerStats(playerName: string) {
@@ -216,7 +217,10 @@ export function GamePage({ gameID }: GamePageProps) {
             }}
           >
             <Grid.Col span={5}>
-              <Link className="hideLink" href={`../teams/${game.teamOne.searchableName}`}>
+              <Link
+                className="hideLink"
+                href={`/${game.tournament.searchableName}/teams/${game.teamOne.searchableName}`}
+              >
                 <Title
                   c={colorScheme === 'dark' ? 'white' : 'black'}
                   order={2}
@@ -231,7 +235,10 @@ export function GamePage({ gameID }: GamePageProps) {
               vs
             </Grid.Col>
             <Grid.Col span={5}>
-              <Link className="hideLink" href={`../teams/${game.teamTwo.searchableName}`}>
+              <Link
+                className="hideLink"
+                href={`/${game.tournament.searchableName}/teams/${game.teamTwo.searchableName}`}
+              >
                 <Title
                   c={colorScheme === 'dark' ? 'white' : 'black'}
                   className={classes.secretLink}

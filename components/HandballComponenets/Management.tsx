@@ -231,7 +231,7 @@ export function Management({ tournament }: ManagementArgs) {
     if (!isUmpireManager && !loading) {
       router.push(`/${tournament}`);
     }
-  }, [isUmpireManager, loading, router]);
+  }, [isUmpireManager, loading, router, tournament]);
   useEffect(() => {
     getNoteableGames({ tournament }).then((g) => {
       setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());

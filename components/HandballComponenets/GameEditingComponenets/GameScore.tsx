@@ -116,7 +116,7 @@ function getActions(
               <strong>Best Players</strong>
               {!bestPlayersOpened && <strong style={{ color: 'red' }}>*</strong>}
               <strong>: </strong>
-              {game.votes.get.map((pgs: { name: string; }) => pgs.name).join(', ')}
+              {game.votes.get.map((pgs: { name: string }) => pgs.name).join(', ')}
             </List.Item>
             <List.Item>
               <strong>Review Required: </strong>
@@ -213,7 +213,7 @@ export function GameScore({ game }: GameScoreArgs) {
           </Accordion.Item>
         )
       ),
-    [closeEndGame, game]
+    [bestPlayersOpened, closeEndGame, game, reviewReqd, router]
   );
 
   const [playZaiahBox] = useSound(`/sounds/zaiah${Math.floor(Math.random() * 6 + 1)}.mp3`, {

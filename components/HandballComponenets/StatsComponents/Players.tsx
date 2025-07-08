@@ -46,7 +46,7 @@ export default function Players({
   }, [playersIn, tournament]);
   return (
     <DynamicTable
-      columns={columns}
+      columnsIn={columns}
       objToLink={(o) => linkTo(o, tournament)}
       sortIndexIn={sortIndex}
       data={players}

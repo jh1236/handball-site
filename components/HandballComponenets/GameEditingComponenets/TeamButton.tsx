@@ -31,8 +31,8 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { ZAIAH_BOX_FUCKERY } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
-import { PlayerGameStatsStructure } from '@/ServerActions/types';
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface TeamButtonProps {
   game: GameState;
@@ -278,6 +278,9 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
           </Accordion.Item>
         )
       ),
+    // TODO: this needs to be rewritten fully, its a mess from when I was first learning (Digby 👉👈🥺)
+    // this isn't worth fixing right now,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [game, firstTeam, serving, close]
   );
   const name = team ? team.name.get : 'Loading...';
