@@ -6,11 +6,13 @@ import {
   ActionIcon,
   Autocomplete,
   Box,
+  Button,
   Container,
   Grid,
   Group,
   Image,
   Paper,
+  Popover,
   Select,
   Stack,
   Text,
@@ -28,6 +30,7 @@ import {
   removeOfficialFromTournament,
   removeTeamFromTournament,
   renameTeamForTournament,
+  startTournament,
 } from '@/ServerActions/TournamentActions';
 import {
   OfficialStructure,
@@ -555,6 +558,25 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           />
         </Box>
         <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
+        <Popover width={200} position="top" withArrow shadow="md">
+          <Popover.Target>
+            <Button m={10} size="md" color="green" variant="outline">
+              Start
+            </Button>
+          </Popover.Target>
+          <Popover.Dropdown ta="center">
+            <Text m={5}>Are you sure you want to start?</Text>
+            <Button
+              m={5}
+              color="green"
+              onClick={() => {
+                startTournament(tournament);
+              }}
+            >
+              Confirm
+            </Button>
+          </Popover.Dropdown>
+        </Popover>
       </Container>
       <Grid w="95%">
         <Grid.Col span={{ sm: 12, md: 6 }}>
