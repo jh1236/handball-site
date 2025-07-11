@@ -31,6 +31,22 @@ function nextPoint(game: GameState, swap?: boolean) {
   game.faulted.set(false);
 }
 
+export function didWinGame(game: GameState, firstTeam: boolean) {
+  if (!game.ended.get) return false;
+  if (Math.max(game.teamOne.score.get, game.teamTwo.score.get) < 5) {
+    return false;
+  }
+  if (game.teamOne.score.get !== game.teamTwo.score.get) {
+    return firstTeam === game.teamOne.score.get > game.teamTwo.score.get;
+  }
+  return firstTeam !== game.firstTeamScoredLast.get;
+}
+
+export function decidedOnCoinToss(game: GameState) {
+  if (!game.ended.get) return false;
+  return Math.max(game.teamOne.score.get, game.teamTwo.score.get) < 5;
+}
+
 export function scoreLocal(game: GameState, firstTeam: boolean): void {
   const servingTeam = firstTeam ? game.teamOne : game.teamTwo;
   if (game.badminton.get || game.firstTeamServes.get !== firstTeam) {
@@ -63,6 +79,10 @@ export function forfeitLocal(game: GameState, firstTeam: boolean) {
   const myTeam = firstTeam ? game.teamOne : game.teamTwo;
   const otherTeam = firstTeam ? game.teamTwo : game.teamOne;
   otherTeam.score.set(Math.max(11, myTeam.score.get + 2));
+}
+
+export function abandonLocal(game: GameState) {
+  game.abandoned.set(true);
 }
 
 export function endTimeoutLocal(game: GameState): void {
