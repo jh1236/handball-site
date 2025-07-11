@@ -73,21 +73,35 @@ export function startTournament(searchableName: SearchableName): Promise<void> {
   });
 }
 
-export function renameTeamForTournament(
-  searchable: SearchableName,
-  teamSearchable: SearchableName,
-  newName: string
-): Promise<TeamStructure> {
+interface RenameTeamForTournamentParams {
+  searchable: SearchableName;
+  teamSearchable: SearchableName;
+  newName?: string;
+  newColor?: string;
+}
+
+export function renameTeamForTournament({
+  searchable,
+  teamSearchable,
+  newName,
+  newColor,
+}: RenameTeamForTournamentParams): Promise<TeamStructure> {
   const url = new URL(`/api/tournaments/${searchable}/updateTeam`, SERVER_ADDRESS);
+  const value: any = {
+    teamSearchableName: teamSearchable,
+  };
+  if (newName) {
+    value.newName = newName;
+  }
+  if (newColor) {
+    value.newColor = newColor;
+  }
   return tokenFetch(url, {
     method: 'PATCH',
     headers: {
       'Content-type': 'application/json; charset=UTF-8',
     },
-    body: JSON.stringify({
-      teamSearchableName: teamSearchable,
-      newName,
-    }),
+    body: JSON.stringify(value),
   }).then((response) => {
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {

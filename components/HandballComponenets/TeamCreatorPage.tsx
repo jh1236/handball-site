@@ -7,10 +7,12 @@ import {
   Autocomplete,
   Box,
   Button,
+  ColorPicker,
   Container,
   Grid,
   Group,
   Image,
+  luminance,
   Paper,
   Popover,
   Select,
@@ -304,9 +306,16 @@ function TeamCard({
   setAllTeams,
 }: TeamCardParams) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [color, setColor] = useState<string | undefined>(team.teamColor ?? undefined);
   const [newTeamName, setNewTeamName] = useState<string>(team.name);
   return (
-    <Paper shadow="lg" m={15} pos="relative">
+    <Paper
+      shadow="lg"
+      m={15}
+      pos="relative"
+      bg={color}
+      c={color && luminance(color) < 0.5 ? 'white' : 'black'}
+    >
       <Box
         top={5}
         right={5}
@@ -327,22 +336,26 @@ function TeamCard({
         >
           <IconMinus></IconMinus>
         </ActionIcon>
-        {newTeamName !== team.name && (
+        {(newTeamName !== team.name || color?.toLowerCase() !== team.teamColor?.toLowerCase()) && (
           <ActionIcon
             variant="subtle"
             color="blue"
             size="md"
             onClick={() => {
-              renameTeamForTournament(tournament, team.searchableName, newTeamName).then(
-                (newTeam) => {
-                  setTeamsInTournament(
-                    teamsInTournament.map((t) =>
-                      t.searchableName === team.searchableName ? newTeam : t
-                    )
-                  );
-                  getTeams({}).then((teams) => setAllTeams(teams.teams));
-                }
-              );
+              renameTeamForTournament({
+                searchable: tournament,
+                teamSearchable: team.searchableName,
+                newName: newTeamName !== team.name ? newTeamName : undefined,
+                newColor:
+                  color?.toLowerCase() !== team.teamColor?.toLowerCase() ? color : undefined,
+              }).then((newTeam) => {
+                setTeamsInTournament(
+                  teamsInTournament.map((t) =>
+                    t.searchableName === team.searchableName ? newTeam : t
+                  )
+                );
+                getTeams({}).then((teams) => setAllTeams(teams.teams));
+              });
             }}
           >
             <IconUpload></IconUpload>
@@ -405,7 +418,7 @@ function TeamCard({
             }}
           />
         </Stack>
-
+        <ColorPicker w="100px" value={color} onChange={setColor} />
         <Stack>
           {[team.captain, team.nonCaptain, team.substitute]
             .filter((t1) => t1 !== null)
