@@ -6,25 +6,31 @@ import {
   ActionIcon,
   Autocomplete,
   Box,
+  Container,
   Grid,
   Group,
   Image,
   Paper,
+  Select,
   Stack,
   Text,
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
-import { uploadTeamImage } from '@/ServerActions/ImageActions';
+import { uploadTeamImage, uploadTournamentImage } from '@/ServerActions/ImageActions';
+import { getOfficials } from '@/ServerActions/OfficialActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { getTeams } from '@/ServerActions/TeamActions';
 import {
+  addOfficialToTournament,
   addTeamToTournament,
   getTournament,
+  removeOfficialFromTournament,
   removeTeamFromTournament,
   renameTeamForTournament,
 } from '@/ServerActions/TournamentActions';
 import {
+  OfficialStructure,
   PersonStructure,
   SearchableName,
   TeamStructure,
@@ -220,6 +226,63 @@ function CustomTeamCard({
   );
 }
 
+interface CustomOfficialCardArgs {
+  allOfficials: OfficialStructure[];
+  officialsInTournament: OfficialStructure[];
+  setOfficialsInTournament: (value: OfficialStructure[]) => void;
+  tournament: string;
+}
+
+function CustomOfficialCard({
+  allOfficials,
+  tournament,
+  setOfficialsInTournament,
+  officialsInTournament,
+}: CustomOfficialCardArgs) {
+  const [official, setOfficial] = useState<OfficialStructure | undefined>();
+  return (
+    <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
+      <Group>
+        <Stack>
+          <ActionIcon
+            variant="subtle"
+            color="green"
+            size="md"
+            pos="absolute"
+            top={5}
+            right={5}
+            onClick={() => {
+              if (!official) return;
+              addOfficialToTournament(tournament, official?.searchableName);
+              setOfficialsInTournament([...officialsInTournament, official]);
+              setOfficial(undefined);
+            }}
+          >
+            <IconPlus></IconPlus>
+          </ActionIcon>
+          <Image
+            src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+            w="100px"
+            h="100px"
+          ></Image>
+          <Select
+            display="inline-block"
+            size="xs"
+            w="100px"
+            placeholder="Official Name"
+            searchable
+            value={official?.name}
+            data={allOfficials.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
+            onChange={(v) => {
+              setOfficial(allOfficials.find((o) => o.name === v));
+            }}
+          />
+        </Stack>
+      </Group>
+    </Paper>
+  );
+}
+
 interface TeamCardParams {
   tournament: string;
   team: TeamStructure;
@@ -317,7 +380,7 @@ function TeamCard({
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (!file) return;
-                uploadTeamImage(file, team.searchableName).then((t) => {
+                uploadTeamImage(file, team.searchableName, tournament).then((t) => {
                   setTeamsInTournament(
                     teamsInTournament.map((t2) => (t2.searchableName === t.searchableName ? t : t2))
                   );
@@ -352,6 +415,61 @@ function TeamCard({
   );
 }
 
+interface OfficialCardParams {
+  tournament: string;
+  official: OfficialStructure;
+  setOfficialsInTournament: (
+    value: ((prevState: OfficialStructure[]) => OfficialStructure[]) | OfficialStructure[]
+  ) => void;
+  officialsInTournament: OfficialStructure[];
+}
+
+function OfficialCard({
+  tournament,
+  official,
+  setOfficialsInTournament,
+  officialsInTournament,
+}: OfficialCardParams) {
+  return (
+    <Paper shadow="lg" m={15} pos="relative">
+      <Box
+        top={5}
+        right={5}
+        pos="absolute"
+        style={{ display: 'flex', gap: '4px', flexDirection: 'row-reverse' }}
+      >
+        <ActionIcon
+          variant="subtle"
+          color="red"
+          size="md"
+          onClick={() => {
+            removeOfficialFromTournament(tournament, official.searchableName).then(() => {
+              setOfficialsInTournament(
+                officialsInTournament.filter((t2) => t2.searchableName !== official.searchableName)
+              );
+            });
+          }}
+        >
+          <IconMinus></IconMinus>
+        </ActionIcon>
+      </Box>
+
+      <Group m={15}>
+        <Stack>
+          <Image
+            src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+            w="100px"
+            h="100px"
+          ></Image>
+          <Text display="inline-block" size="lg" w="100px" mb={10}>
+            <b>{official.name}</b>
+          </Text>
+        </Stack>
+      </Group>
+    </Paper>
+  );
+}
+
 export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [tournamentObj, setTournamentObj] = React.useState<TournamentStructure | undefined>();
   const [players, setPlayers] = React.useState<(string | undefined)[]>([
@@ -361,22 +479,88 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   ]);
   const [teamsInTournament, setTeamsInTournament] = React.useState<TeamStructure[]>([]);
   const [newTeamName, setNewTeamName] = React.useState<string | undefined>();
+  const [officialsInTournament, setOfficialsInTournament] = React.useState<OfficialStructure[]>([]);
+  const [allOfficials, setAllOfficials] = React.useState<OfficialStructure[]>([]);
   const [allTeams, setAllTeams] = React.useState<TeamStructure[]>([]);
   const [allPlayers, setAllPlayers] = React.useState<PersonStructure[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   useEffect(() => {
+    if (!tournament) return;
     getTournament(tournament).then(setTournamentObj);
     getTeams({ tournament }).then((t) => setTeamsInTournament(t.teams));
+    getOfficials({ tournament }).then((o) => setOfficialsInTournament(o.officials));
   }, [tournament]);
   useEffect(() => {
-    getPlayers({}).then((t) => setAllPlayers(t.players));
+    getPlayers({}).then((p) => setAllPlayers(p.players));
     getTeams({}).then((t) => setAllTeams(t.teams));
+    getOfficials({}).then((o) => setAllOfficials(o.officials));
   }, []);
 
   return (
     <div>
-      <Title> {tournamentObj?.name ?? 'Loading...'} </Title>
+      <Container
+        w="auto"
+        p={20}
+        display="flex"
+        pos="relative"
+        style={{
+          overflow: 'hidden',
+          margin: 'auto',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Box
+          w={100}
+          mih={100}
+          pos="relative"
+          style={{ paddingBottom: 100 }}
+          className={classes.hoverImage}
+        >
+          <Image
+            pos="absolute"
+            src={tournamentObj?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+            w="100px"
+            h="100px"
+          ></Image>
+          <Text
+            size="sm"
+            pos="absolute"
+            h={100}
+            w={100}
+            m="auto"
+            style={{
+              textAlign: 'center',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            Change Image
+          </Text>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              uploadTournamentImage(file, tournament).then((t) => {
+                setTournamentObj(t);
+              });
+            }}
+          />
+        </Box>
+        <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
+      </Container>
       <Grid w="95%">
         <Grid.Col span={{ sm: 12, md: 6 }}>
+          <Title ta="center" order={2}>
+            Teams
+          </Title>
           {teamsInTournament.map((t, index) => (
             <TeamCard
               key={index}
@@ -398,6 +582,31 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
             setTeamsInTournament={setTeamsInTournament}
             teamsInTournament={teamsInTournament}
           ></CustomTeamCard>
+        </Grid.Col>
+        <Grid.Col span={{ sm: 12, md: 6 }}>
+          <Title ta="center" order={2}>
+            Officials
+          </Title>
+          <Grid>
+            {officialsInTournament.map((t, index) => (
+              <Grid.Col key={index} span={4}>
+                <OfficialCard
+                  tournament={tournament}
+                  official={t}
+                  setOfficialsInTournament={setOfficialsInTournament}
+                  officialsInTournament={officialsInTournament}
+                />
+              </Grid.Col>
+            ))}
+            <Grid.Col span={4}>
+              <CustomOfficialCard
+                allOfficials={allOfficials}
+                officialsInTournament={officialsInTournament}
+                setOfficialsInTournament={setOfficialsInTournament}
+                tournament={tournament}
+              ></CustomOfficialCard>
+            </Grid.Col>
+          </Grid>
         </Grid.Col>
       </Grid>
     </div>
