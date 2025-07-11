@@ -3,6 +3,10 @@ import { playersFromGame } from '@/components/HandballComponenets/GameEditingCom
 import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 export interface GameState {
+  practice: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
   badminton: {
     get: boolean;
     set: (v: boolean) => void;
@@ -97,6 +101,7 @@ export function useGameState(game?: GameStructure) {
   const [timeoutExpirationTime, setTimeoutExpirationTime] = React.useState<number>(-1);
   const [teamOneIGA, setTeamOneIGA] = React.useState<boolean>(true);
   const [notes, setNotes] = React.useState<string>('');
+  const [practice, setPractice] = React.useState<boolean>(game?.tournament.editable ?? false);
   const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
   const [badminton, setBadminton] = React.useState<boolean>(false);
 
@@ -151,6 +156,10 @@ export function useGameState(game?: GameStructure) {
   }, [teamOneScore, teamTwoScore]);
 
   const gameState: GameState = {
+    practice: {
+      get: practice,
+      set: setPractice,
+    },
     votes: {
       get: votes,
       set: setVotes,
@@ -287,6 +296,7 @@ export function setGameState(gameObj: GameStructure, state: GameState) {
   state.ended.set(gameObj.someoneHasWon);
   state.votes.set(playersFromGame(gameObj));
   state.badminton.set(gameObj.tournament.usingBadmintonServes);
+  state.practice.set(gameObj.tournament.editable);
   //Team Specific
   state.teamOne.name.set(gameObj.teamOne.name);
   state.teamOne.timeouts.set(gameObj.teamOneTimeouts);

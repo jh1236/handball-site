@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { useRouter } from 'next/navigation';
 import {
@@ -98,7 +98,7 @@ function getActions(
     {
       Icon: IconTrophy,
       value: 'Rank Best Players',
-      title: markIfReqd(!bestPlayersOpened, 'Rank Best Players'),
+      title: markIfReqd(!bestPlayersOpened && !game.practice.get, 'Rank Best Players'),
       color: undefined,
       content: <OrderPlayers game={game}></OrderPlayers>,
     },
@@ -116,7 +116,7 @@ function getActions(
               <strong>Best Players</strong>
               {!bestPlayersOpened && <strong style={{ color: 'red' }}>*</strong>}
               <strong>: </strong>
-              {game.votes.get.map((pgs: { name: string; }) => pgs.name).join(', ')}
+              {game.votes.get.map((pgs: { name: string }) => pgs.name).join(', ')}
             </List.Item>
             <List.Item>
               <strong>Review Required: </strong>
@@ -136,7 +136,9 @@ function getActions(
                   {game.teamOne.protest.get ? game.teamOne.protest.get : <i>Unset</i>}
                 </List.Item>
                 <List.Item>
-                  <strong>{markIfReqd(!game.teamOne.rating.get, 'Rating')} </strong>
+                  <strong>
+                    {markIfReqd(!game.teamOne.rating.get && !game.practice.get, 'Rating')}{' '}
+                  </strong>
                   <strong>: </strong>
                   <Rating count={4} value={game.teamOne.rating.get} readOnly></Rating>
                   {FEEDBACK_TEXTS[game.teamOne.rating.get ?? 0]}
@@ -156,13 +158,17 @@ function getActions(
                   {game.teamTwo.protest.get ? game.teamTwo.protest.get : <i>Unset</i>}
                 </List.Item>
                 <List.Item>
-                  <strong>{markIfReqd(!game.teamTwo.rating.get, 'Rating')} </strong>
+                  <strong>
+                    {markIfReqd(!game.teamTwo.rating.get && !game.practice.get, 'Rating')}{' '}
+                  </strong>
                   <strong>: </strong>
                   <Rating count={4} value={game.teamTwo.rating.get} readOnly></Rating>
                   {FEEDBACK_TEXTS[game.teamTwo.rating.get ?? 0]}
                 </List.Item>
                 <List.Item>
-                  <strong>{markIfReqd(game.teamTwo.rating.get === 1, 'Notes')} </strong>
+                  <strong>
+                    {markIfReqd(game.teamTwo.rating.get === 1 && !game.practice.get, 'Notes')}{' '}
+                  </strong>
                   <strong>: </strong>
                   {game.teamTwo.notes.get ? game.teamTwo.notes.get : <i>Unset</i>}
                 </List.Item>
@@ -173,7 +179,7 @@ function getActions(
             size="lg"
             color="red"
             disabled={
-              !QUICK_GAME_END &&
+              !game.practice.get &&
               (!game.teamOne.rating.get ||
                 !game.teamTwo.rating.get ||
                 (game.teamOne.rating.get === 1 && !game.teamOne.notes.get) ||
@@ -201,6 +207,18 @@ export function GameScore({ game }: GameScoreArgs) {
   const [openMatchPoints, setOpenMatchPoints] = useState(false);
   const [bestPlayersOpened, setBestPlayersOpened] = useState(false);
   const [openZaiahBox, setOpenZaiahBox] = useState<number>(0);
+  useEffect(() => {
+    if (game.practice.get) {
+      game.teamOne.rating.set(3);
+      game.teamTwo.rating.set(3);
+      if (!game.started.get) {
+        game.teamOneIGA.set(Math.random() > 0.5);
+        game.firstTeamServes.set(Math.random() > 0.5);
+      }
+    }
+    // there is no sane reason to have the deps that it wants.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game.practice.get]);
   const items = useMemo(
     () =>
       getActions(game, closeEndGame, reviewReqd, setReviewReqd, router, bestPlayersOpened).map(
