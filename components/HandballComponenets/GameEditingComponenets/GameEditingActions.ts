@@ -4,6 +4,7 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
 import { QUICK_GAME_END } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import {
+  abandonLocal,
   aceLocal,
   cardLocal,
   endTimeoutLocal,
@@ -15,6 +16,7 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { GameState } from '@/components/HandballComponenets/GameState';
 import {
+  abandonGame,
   aceForGame,
   cardForGame,
   deleteGame,
@@ -97,6 +99,11 @@ export function timeout(game: GameState, firstTeam: boolean): void {
 export function forfeit(game: GameState, firstTeam: boolean) {
   forfeitLocal(game, firstTeam);
   forfeitGame(game.id, firstTeam).catch(() => sync(game));
+}
+
+export function abandon(game: GameState) {
+  abandonLocal(game);
+  abandonGame(game.id).catch(() => sync(game));
 }
 
 export function endTimeout(game: GameState): void {

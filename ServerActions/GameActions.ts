@@ -621,6 +621,28 @@ export function forfeitGame(gameId: number, firstTeam: boolean): Promise<void> {
   });
 }
 
+export function abandonGame(gameId: number): Promise<void> {
+  const body: any = {
+    id: gameId,
+  };
+
+  return tokenFetch('/api/games/update/abandon', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
 export function resolveGame(gameId: number): Promise<void> {
   const body: any = {
     id: gameId,

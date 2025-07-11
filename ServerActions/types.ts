@@ -122,6 +122,7 @@ export interface GameStructure {
   tournament: TournamentStructure;
   teamOne: GameTeamStructure;
   teamTwo: GameTeamStructure;
+  abandoned: boolean;
   teamOneScore: number;
   teamTwoScore: number;
   teamOneTimeouts: number;
@@ -149,6 +150,7 @@ export interface GameStructure {
   events?: GameEventStructure[];
   timeoutExpirationTime: number;
   changeCode: number;
+  firstTeamScoredLast: boolean;
   admin?: {
     notes?: string;
     cards: CardStructure[];

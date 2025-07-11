@@ -3,7 +3,15 @@ import { playersFromGame } from '@/components/HandballComponenets/GameEditingCom
 import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 export interface GameState {
+  practice: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
   badminton: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
+  abandoned: {
     get: boolean;
     set: (v: boolean) => void;
   };
@@ -23,6 +31,10 @@ export interface GameState {
   teamOne: TeamState;
   teamTwo: TeamState;
   firstTeamServes: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
+  firstTeamScoredLast: {
     get: boolean;
     set: (v: boolean) => void;
   };
@@ -93,10 +105,13 @@ export function useGameState(game?: GameStructure) {
   const [faulted, setFaulted] = React.useState<boolean>(false);
   const [started, setStarted] = React.useState<boolean>(true);
   const [ended, setEnded] = React.useState<boolean>(false);
+  const [firstTeamScoredLast, setFirstTeamScoredLast] = React.useState<boolean>(false);
   const [firstTeamServes, setFirstTeamServes] = React.useState<boolean>(false);
+  const [abandoned, setAbandoned] = React.useState<boolean>(false);
   const [timeoutExpirationTime, setTimeoutExpirationTime] = React.useState<number>(-1);
   const [teamOneIGA, setTeamOneIGA] = React.useState<boolean>(true);
   const [notes, setNotes] = React.useState<string>('');
+  const [practice, setPractice] = React.useState<boolean>(game?.tournament.editable ?? false);
   const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
   const [badminton, setBadminton] = React.useState<boolean>(false);
 
@@ -141,6 +156,10 @@ export function useGameState(game?: GameStructure) {
   );
 
   useEffect(() => {
+    if (abandoned) {
+      setEnded(true);
+      return;
+    }
     if (teamOneScore || teamTwoScore) {
       const bigScore = Math.max(teamOneScore, teamTwoScore);
       const lilScore = Math.min(teamOneScore, teamTwoScore);
@@ -148,9 +167,17 @@ export function useGameState(game?: GameStructure) {
       if (bigScore - lilScore <= 1) return;
       setEnded(true);
     }
-  }, [teamOneScore, teamTwoScore]);
+  }, [teamOneScore, teamTwoScore, abandoned]);
 
   const gameState: GameState = {
+    practice: {
+      get: practice,
+      set: setPractice,
+    },
+    abandoned: {
+      get: abandoned,
+      set: setAbandoned,
+    },
     votes: {
       get: votes,
       set: setVotes,
@@ -273,6 +300,10 @@ export function useGameState(game?: GameStructure) {
         set: setTeamTwoSub,
       },
     },
+    firstTeamScoredLast: {
+      get: firstTeamScoredLast,
+      set: setFirstTeamScoredLast,
+    },
   };
 
   return gameState;
@@ -287,6 +318,9 @@ export function setGameState(gameObj: GameStructure, state: GameState) {
   state.ended.set(gameObj.someoneHasWon);
   state.votes.set(playersFromGame(gameObj));
   state.badminton.set(gameObj.tournament.usingBadmintonServes);
+  state.practice.set(gameObj.tournament.editable);
+  state.abandoned.set(gameObj.abandoned);
+  state.firstTeamScoredLast.set(gameObj.firstTeamScoredLast);
   //Team Specific
   state.teamOne.name.set(gameObj.teamOne.name);
   state.teamOne.timeouts.set(gameObj.teamOneTimeouts);
