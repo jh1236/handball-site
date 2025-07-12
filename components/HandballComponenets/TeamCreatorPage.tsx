@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { IconMinus, IconPlus, IconRefresh, IconUpload } from '@tabler/icons-react';
 import {
   ActionIcon,
@@ -21,6 +22,7 @@ import {
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { uploadTeamImage, uploadTournamentImage } from '@/ServerActions/ImageActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
@@ -513,6 +515,8 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [allTeams, setAllTeams] = React.useState<TeamStructure[]>([]);
   const [allPlayers, setAllPlayers] = React.useState<PersonStructure[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const { loading, isUmpireManager } = useUserData();
   useEffect(() => {
     if (!tournament) return;
     getTournament(tournament).then(setTournamentObj);
@@ -524,7 +528,17 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
     getTeams({}).then((t) => setAllTeams(t.teams));
     getOfficials({}).then((o) => setAllOfficials(o.officials));
   }, []);
-
+  useEffect(() => {
+    if (!loading && !isUmpireManager) {
+      router.push('/');
+    }
+  }, [isUmpireManager, loading, router]);
+  if (!loading && !isUmpireManager) {
+    return <Text>You do not have permissions to be here!</Text>;
+  }
+  if (loading) {
+    return <Text>Loading</Text>;
+  }
   return (
     <div>
       <Container
