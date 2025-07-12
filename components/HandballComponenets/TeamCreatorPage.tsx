@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { IconMinus, IconPlus, IconUpload } from '@tabler/icons-react';
+import { IconMinus, IconPlus, IconRefresh, IconUpload } from '@tabler/icons-react';
 import {
   ActionIcon,
   Autocomplete,
@@ -314,7 +314,7 @@ function TeamCard({
       m={15}
       pos="relative"
       bg={color}
-      c={color && luminance(color) < 0.5 ? 'white' : 'black'}
+      c={color && luminance(color) > 0.5 ? 'black' : 'white'}
     >
       <Box
         top={5}
@@ -337,29 +337,42 @@ function TeamCard({
           <IconMinus></IconMinus>
         </ActionIcon>
         {(newTeamName !== team.name || color?.toLowerCase() !== team.teamColor?.toLowerCase()) && (
-          <ActionIcon
-            variant="subtle"
-            color="blue"
-            size="md"
-            onClick={() => {
-              renameTeamForTournament({
-                searchable: tournament,
-                teamSearchable: team.searchableName,
-                newName: newTeamName !== team.name ? newTeamName : undefined,
-                newColor:
-                  color?.toLowerCase() !== team.teamColor?.toLowerCase() ? color : undefined,
-              }).then((newTeam) => {
-                setTeamsInTournament(
-                  teamsInTournament.map((t) =>
-                    t.searchableName === team.searchableName ? newTeam : t
-                  )
-                );
-                getTeams({}).then((teams) => setAllTeams(teams.teams));
-              });
-            }}
-          >
-            <IconUpload></IconUpload>
-          </ActionIcon>
+          <>
+            <ActionIcon
+              variant="subtle"
+              color="yellow"
+              size="md"
+              onClick={() => {
+                setColor(team.teamColor ?? undefined);
+                setNewTeamName(team.name);
+              }}
+            >
+              <IconRefresh></IconRefresh>
+            </ActionIcon>
+            <ActionIcon
+              variant="subtle"
+              color="blue"
+              size="md"
+              onClick={() => {
+                renameTeamForTournament({
+                  searchable: tournament,
+                  teamSearchable: team.searchableName,
+                  newName: newTeamName !== team.name ? newTeamName : undefined,
+                  newColor:
+                    color?.toLowerCase() !== team.teamColor?.toLowerCase() ? color : undefined,
+                }).then((newTeam) => {
+                  setTeamsInTournament(
+                    teamsInTournament.map((t) =>
+                      t.searchableName === team.searchableName ? newTeam : t
+                    )
+                  );
+                  getTeams({}).then((teams) => setAllTeams(teams.teams));
+                });
+              }}
+            >
+              <IconUpload></IconUpload>
+            </ActionIcon>
+          </>
         )}
       </Box>
 
