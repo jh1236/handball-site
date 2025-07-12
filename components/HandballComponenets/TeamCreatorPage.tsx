@@ -1,16 +1,19 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { IconMinus, IconPlus, IconUpload } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
+import { IconMinus, IconPlus, IconRefresh, IconUpload } from '@tabler/icons-react';
 import {
   ActionIcon,
   Autocomplete,
   Box,
   Button,
+  ColorPicker,
   Container,
   Grid,
   Group,
   Image,
+  luminance,
   Paper,
   Popover,
   Select,
@@ -19,6 +22,7 @@ import {
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { uploadTeamImage, uploadTournamentImage } from '@/ServerActions/ImageActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
@@ -304,9 +308,16 @@ function TeamCard({
   setAllTeams,
 }: TeamCardParams) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [color, setColor] = useState<string | undefined>(team.teamColor ?? undefined);
   const [newTeamName, setNewTeamName] = useState<string>(team.name);
   return (
-    <Paper shadow="lg" m={15} pos="relative">
+    <Paper
+      shadow="lg"
+      m={15}
+      pos="relative"
+      bg={color}
+      c={color && luminance(color) > 0.5 ? 'black' : 'white'}
+    >
       <Box
         top={5}
         right={5}
@@ -327,26 +338,43 @@ function TeamCard({
         >
           <IconMinus></IconMinus>
         </ActionIcon>
-        {newTeamName !== team.name && (
-          <ActionIcon
-            variant="subtle"
-            color="blue"
-            size="md"
-            onClick={() => {
-              renameTeamForTournament(tournament, team.searchableName, newTeamName).then(
-                (newTeam) => {
+        {(newTeamName !== team.name || color?.toLowerCase() !== team.teamColor?.toLowerCase()) && (
+          <>
+            <ActionIcon
+              variant="subtle"
+              color="yellow"
+              size="md"
+              onClick={() => {
+                setColor(team.teamColor ?? undefined);
+                setNewTeamName(team.name);
+              }}
+            >
+              <IconRefresh></IconRefresh>
+            </ActionIcon>
+            <ActionIcon
+              variant="subtle"
+              color="blue"
+              size="md"
+              onClick={() => {
+                renameTeamForTournament({
+                  searchable: tournament,
+                  teamSearchable: team.searchableName,
+                  newName: newTeamName !== team.name ? newTeamName : undefined,
+                  newColor:
+                    color?.toLowerCase() !== team.teamColor?.toLowerCase() ? color : undefined,
+                }).then((newTeam) => {
                   setTeamsInTournament(
                     teamsInTournament.map((t) =>
                       t.searchableName === team.searchableName ? newTeam : t
                     )
                   );
                   getTeams({}).then((teams) => setAllTeams(teams.teams));
-                }
-              );
-            }}
-          >
-            <IconUpload></IconUpload>
-          </ActionIcon>
+                });
+              }}
+            >
+              <IconUpload></IconUpload>
+            </ActionIcon>
+          </>
         )}
       </Box>
 
@@ -405,7 +433,7 @@ function TeamCard({
             }}
           />
         </Stack>
-
+        <ColorPicker w="100px" value={color} onChange={setColor} />
         <Stack>
           {[team.captain, team.nonCaptain, team.substitute]
             .filter((t1) => t1 !== null)
@@ -487,6 +515,8 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [allTeams, setAllTeams] = React.useState<TeamStructure[]>([]);
   const [allPlayers, setAllPlayers] = React.useState<PersonStructure[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const { loading, isUmpireManager } = useUserData();
   useEffect(() => {
     if (!tournament) return;
     getTournament(tournament).then(setTournamentObj);
@@ -498,7 +528,17 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
     getTeams({}).then((t) => setAllTeams(t.teams));
     getOfficials({}).then((o) => setAllOfficials(o.officials));
   }, []);
-
+  useEffect(() => {
+    if (!loading && !isUmpireManager) {
+      router.push('/');
+    }
+  }, [isUmpireManager, loading, router]);
+  if (!loading && !isUmpireManager) {
+    return <Text>You do not have permissions to be here!</Text>;
+  }
+  if (loading) {
+    return <Text>Loading</Text>;
+  }
   return (
     <div>
       <Container
