@@ -16,7 +16,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { addGameEventToGame } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { setGameState, TeamState, useGameState } from '@/components/HandballComponenets/GameState';
 import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
-import { PlayerGameStatsStructure } from '@/ServerActions/types';
+import { PlayerGameStatsStructure, TeamStructure } from '@/ServerActions/types';
 import classes from './Scoreboard.module.css';
 
 interface ScoreboardProps {
@@ -75,10 +75,20 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     if (message?.type === 'update') {
       const gameUpdate = (lastJsonMessage as UpdateMessage).game;
       setGameState(gameUpdate, gameState);
-      setTeamOneColor(gameUpdate.teamOne.teamColorAsRGBABecauseDigbyIsLazy || undefined);
-      setTeamTwoColor(gameUpdate.teamTwo.teamColorAsRGBABecauseDigbyIsLazy || undefined);
-      setTeamOneImage(gameUpdate.teamOne.bigImageUrl ?? gameUpdate.teamOne.imageUrl);
-      setTeamTwoImage(gameUpdate.teamTwo.bigImageUrl ?? gameUpdate.teamTwo.imageUrl);
+      let teamOneReceived: TeamStructure;
+      let teamTwoReceived: TeamStructure;
+      if (gameUpdate.firstTeamIga) {
+        teamOneReceived = gameUpdate.teamOne;
+        teamTwoReceived = gameUpdate.teamTwo;
+      } else {
+        teamOneReceived = gameUpdate.teamTwo;
+        teamTwoReceived = gameUpdate.teamOne;
+      }
+      setTeamOneColor(teamOneReceived.teamColorAsRGBABecauseDigbyIsLazy || undefined);
+      setTeamTwoColor(teamTwoReceived.teamColorAsRGBABecauseDigbyIsLazy || undefined);
+      setTeamOneImage(teamOneReceived.bigImageUrl ?? gameUpdate.teamOne.imageUrl);
+      setTeamTwoImage(teamTwoReceived.bigImageUrl ?? gameUpdate.teamTwo.imageUrl);
+
       if (gameUpdate.ended) {
         setTime(gameUpdate.length);
       } else {
