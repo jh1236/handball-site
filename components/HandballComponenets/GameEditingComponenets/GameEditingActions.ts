@@ -30,8 +30,9 @@ import {
   timeoutForGame,
   undoForGame,
 } from '@/ServerActions/GameActions';
+import { OfficialStructure } from '@/ServerActions/types';
 
-export function begin(game: GameState) {
+export function begin(game: GameState, official?: OfficialStructure, scorer?: OfficialStructure) {
   startLoading();
   startGame(
     game.id,
@@ -46,7 +47,9 @@ export function begin(game: GameState) {
       game.teamTwo.left.get?.searchableName,
       game.teamTwo.right.get?.searchableName,
       game.teamTwo.sub.get?.searchableName,
-    ].filter((a) => typeof a === 'string')
+    ].filter((a) => typeof a === 'string'),
+    official?.searchableName,
+    scorer?.searchableName
   ).then(() => sync(game));
 }
 
@@ -140,7 +143,7 @@ export function greenCard(
   leftPlayer: boolean,
   reason: string
 ): void {
-  card(game, 'Green', firstTeam, leftPlayer, reason, 2);
+  card(game, 'Green', firstTeam, leftPlayer, reason, game.blitzGame.get ? 1 : 2);
 }
 
 export function yellowCard(

@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Button, Popover, Select } from '@mantine/core';
+import { Box, Button, Center, Checkbox, Group, Popover, Select, Stack } from '@mantine/core';
+import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { createGameWithPlayers } from '@/ServerActions/GameActions';
+import { getOfficials } from '@/ServerActions/OfficialActions';
+import { getTournaments } from '@/ServerActions/TournamentActions';
 import { OfficialStructure, TournamentStructure } from '@/ServerActions/types';
 
 interface GameSettingsArgs {
-  officials: OfficialStructure[];
-  official: OfficialStructure | undefined;
-  setOfficial: (v: OfficialStructure) => void;
-  tournament?: TournamentStructure;
-  setTournament: (v: TournamentStructure) => void;
-  tournaments: TournamentStructure[];
   playersOne: string[];
   playersTwo: string[];
   teamNameOne?: string;
@@ -18,69 +15,68 @@ interface GameSettingsArgs {
 }
 
 export function GameSettings({
-  officials,
-  official,
-  setOfficial,
-  setTournament,
-  tournament,
-  tournaments,
   playersOne,
   playersTwo,
   teamNameOne,
   teamNameTwo,
 }: GameSettingsArgs) {
-  const [openedTournaments, setOpenedTournaments] = useState(false);
-  const [openedOfficials, setOpenedOfficials] = useState(false);
+  const [officials, setOfficials] = useState<OfficialStructure[]>([]);
+  const [tournament, setTournament] = useState<TournamentStructure>();
+  const [tournaments, setTournaments] = useState<TournamentStructure[]>([]);
+  const [scorer, setScorer] = useState<OfficialStructure>();
+  const [official, setOfficial] = useState<OfficialStructure>();
+  const [blitzGame, setBlitzGame] = useState(false);
+  const { username } = useUserData();
   const router = useRouter();
+
+  useEffect(() => {
+    getOfficials({}).then((o) => setOfficials(o.officials));
+    getTournaments().then((t) => setTournaments(t.filter((t2) => t2.editable)));
+  }, []);
+
+  useEffect(() => {
+    setOfficial(officials.find((o) => o.name === username));
+  }, [username, officials]);
+
   return (
-    <Box
-      style={{
-        width: '100%',
-        height: '20%',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Box
-        style={{
-          display: 'flex',
-          flex: 'auto',
-          alignContent: 'center',
-          justifyContent: 'center',
-          width: 'fit-content',
-        }}
-      >
-        <Popover
-          opened={openedOfficials}
-          onChange={setOpenedOfficials}
-          width={300}
-          position="bottom"
-          withArrow
-          shadow="md"
-        >
+    <Group w="100%">
+      <Center w="33%">
+        <Popover width={300} position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <Button size="sm" onClick={() => setOpenedOfficials(true)}>
-              {official?.name ?? 'Pick an official'}
-            </Button>
+            <Button size="sm">Officials</Button>
           </Popover.Target>
           <Popover.Dropdown>
-            <Select
-              label="Official"
-              allowDeselect={false}
-              placeholder="Pick value"
-              data={officials.map((a) => ({ value: a.searchableName, label: a.name }))}
-              value={official?.name ?? 'Pick official'}
-              onChange={(v) => {
-                setOfficial(officials.find((a) => a.searchableName === v)!);
-                setOpenedOfficials(false);
-              }}
-              comboboxProps={{ withinPortal: false }}
-            />
+            <Center>
+              <Stack>
+                <Select
+                  label="Official"
+                  searchable
+                  allowDeselect={false}
+                  placeholder="Pick value"
+                  data={officials.map((a) => ({ value: a.searchableName, label: a.name }))}
+                  value={official?.searchableName}
+                  onChange={(v) => {
+                    setOfficial(officials.find((a) => a.searchableName === v)!);
+                  }}
+                  comboboxProps={{ withinPortal: false }}
+                />
+
+                <Select
+                  label="Scorer"
+                  allowDeselect={false}
+                  placeholder="Pick value"
+                  data={officials.map((a) => ({ value: a.searchableName, label: a.name }))}
+                  value={scorer?.searchableName}
+                  onChange={(v) => {
+                    setScorer(officials.find((a) => a.searchableName === v)!);
+                  }}
+                  comboboxProps={{ withinPortal: false }}
+                />
+              </Stack>
+            </Center>
           </Popover.Dropdown>
         </Popover>
-      </Box>
+      </Center>
       <Box
         style={{
           margin: '0px auto',
@@ -96,11 +92,12 @@ export function GameSettings({
           size="sm"
           onClick={() => {
             createGameWithPlayers(
-              tournament?.searchableName ?? 'suss_practice',
+              'suss_practice',
               playersOne,
               playersTwo,
+              blitzGame,
               official?.searchableName,
-              undefined,
+              scorer?.searchableName,
               teamNameOne,
               teamNameTwo
             )
@@ -113,44 +110,36 @@ export function GameSettings({
           Create
         </Button>
       </Box>
-
-      <Box
-        style={{
-          display: 'flex',
-          flex: 'auto',
-          alignContent: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Popover
-          opened={openedTournaments}
-          onChange={setOpenedTournaments}
-          width={300}
-          position="bottom"
-          withArrow
-          shadow="md"
-        >
+      <Center w="33%">
+        <Popover width={300} position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <Button size="sm" onClick={() => setOpenedTournaments(true)}>
-              {tournament?.name ?? 'SUSS Practice'}
-            </Button>
+            <Button size="sm">Details</Button>
           </Popover.Target>
           <Popover.Dropdown>
-            <Select
-              label="Tournament"
-              allowDeselect={false}
-              placeholder="Pick value"
-              data={tournaments.map((a) => ({ value: a.searchableName, label: a.name }))}
-              value={tournament?.name ?? 'SUSS Practice'}
-              onChange={(v) => {
-                setTournament(tournaments.find((a) => a.searchableName === v)!);
-                setOpenedTournaments(false);
-              }}
-              comboboxProps={{ withinPortal: false }}
-            />
+            <Center>
+              <Stack>
+                <Select
+                  label="Tournament"
+                  allowDeselect={false}
+                  placeholder="Pick value"
+                  data={tournaments.map((a) => ({ value: a.searchableName, label: a.name }))}
+                  value={tournament?.searchableName ?? 'suss_practice'}
+                  onChange={(v) => {
+                    setTournament(tournaments.find((a) => a.searchableName === v)!);
+                  }}
+                  comboboxProps={{ withinPortal: false }}
+                />
+                <Checkbox
+                  checked={blitzGame}
+                  onChange={(e) => setBlitzGame(e.currentTarget.checked)}
+                  label="Blitz Game"
+                  size="sm"
+                />
+              </Stack>
+            </Center>
           </Popover.Dropdown>
         </Popover>
-      </Box>
-    </Box>
+      </Center>
+    </Group>
   );
 }

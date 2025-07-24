@@ -1,8 +1,21 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Box, Button, LoadingOverlay, Title } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Center,
+  createTheme,
+  DEFAULT_THEME,
+  Group,
+  LoadingOverlay,
+  MantineProvider,
+  Popover,
+  Select,
+  Stack,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   del,
@@ -16,7 +29,8 @@ import { TeamButton } from '@/components/HandballComponenets/GameEditingComponen
 import { setGameState, useGameState } from '@/components/HandballComponenets/GameState';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGame } from '@/ServerActions/GameActions';
-import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import { getOfficials } from '@/ServerActions/OfficialActions';
+import { GameStructure, OfficialStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 let setGameFn: (game: GameStructure) => void;
 //necessary to reveal the state from the React component
@@ -42,6 +56,9 @@ export function reloadGame(gameID: number) {
 
 export function EditGame({ game }: { game: number }) {
   const { isUmpireManager, isOfficial, isLoggedIn } = useUserData();
+  const [officials, setOfficials] = useState<OfficialStructure[]>([]);
+  const [scorer, setScorer] = useState<OfficialStructure>();
+  const [official, setOfficial] = useState<OfficialStructure>();
 
   const [gameObj, setGameObj] = React.useState<GameStructure | null>(null);
   setGameFn = setGameObj;
@@ -64,11 +81,17 @@ export function EditGame({ game }: { game: number }) {
   }, []);
 
   useEffect(() => {
+    getOfficials({}).then((o) => setOfficials(o.officials));
+  }, []);
+
+  useEffect(() => {
     reloadGame(game);
   }, [game]);
 
   useEffect(() => {
     if (!gameObj) return;
+    setOfficial(gameObj?.official);
+    setScorer(gameObj?.scorer ?? undefined);
     setGameState(gameObj, gameState);
     closeLoading();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,136 +151,181 @@ export function EditGame({ game }: { game: number }) {
       </Link>
     </>
   );
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        colors: {
+          'serving-color': gameState.blitzGame.get
+            ? DEFAULT_THEME.colors.green
+            : DEFAULT_THEME.colors.teal,
+          'player-color': gameState.blitzGame.get
+            ? DEFAULT_THEME.colors.teal
+            : DEFAULT_THEME.colors.blue,
+        },
+      }),
+    [gameState.blitzGame],
+  );
+
   return (
-    <Box style={{ width: '100%', height: '100vh' }}>
-      <LoadingOverlay
-        visible={visibleLoading && isLoggedIn}
-        overlayProps={{ radius: 'sm', blur: 2 }}
-        loaderProps={{ color: 'pink', type: 'bars' }}
-      />
-      <LoadingOverlay visible={visibleTimeout} loaderProps={{ children: timeoutKids }} />
-      <LoadingOverlay
-        overlayProps={{
-          color: '#222',
-          blur: 15,
-        }}
-        visible={!isOfficial || (gameObj?.status === 'Official' && editOfficialGame)}
-        loaderProps={{
-          children:
-            gameObj?.status === 'Official'
-              ? isUmpireManager
-                ? warnAdminAboutEditing
-                : OfficialCantEdit
-              : loginProps,
-        }}
-      />
-      <Box style={{ width: '100%', height: '40%' }}>
-        {(
-          gameState.teamOneIGA.get
-            ? gameState.teamOne.right.get && gameState.teamOne.left.get
-            : gameState.teamTwo.right.get && gameState.teamTwo.left.get
-        ) ? (
-          <>
-            <Box style={{ width: '50%', height: '90%', float: 'left' }}>
-              <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
+    <MantineProvider theme={theme}>
+      <Box style={{ width: '100%', height: '100vh' }}>
+        <LoadingOverlay
+          visible={visibleLoading && isLoggedIn}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+          loaderProps={{ color: 'pink', type: 'bars' }}
+        />
+        <LoadingOverlay visible={visibleTimeout} loaderProps={{ children: timeoutKids }} />
+        <LoadingOverlay
+          overlayProps={{
+            color: '#222',
+            blur: 15,
+          }}
+          visible={!isOfficial || (gameObj?.status === 'Official' && editOfficialGame)}
+          loaderProps={{
+            children:
+              gameObj?.status === 'Official'
+                ? isUmpireManager
+                  ? warnAdminAboutEditing
+                  : OfficialCantEdit
+                : loginProps,
+          }}
+        />
+        <Box style={{ width: '100%', height: '40%' }}>
+          {(
+            gameState.teamOneIGA.get
+              ? gameState.teamOne.right.get && gameState.teamOne.left.get
+              : gameState.teamTwo.right.get && gameState.teamTwo.left.get
+          ) ? (
+            <>
+              <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+                <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
+              </Box>
+              <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+                <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
+              </Box>
+            </>
+          ) : (
+            <Box style={{ width: '100%', height: '90%', float: 'left' }}>
+              <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
             </Box>
-            <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-              <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
-            </Box>
-          </>
-        ) : (
-          <Box style={{ width: '100%', height: '90%', float: 'left' }}>
-            <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
+          )}
+
+          <Box style={{ width: '100%', height: '10%', float: 'right' }}>
+            <TeamButton firstTeam={true} game={gameState}></TeamButton>
           </Box>
-        )}
-
-        <Box style={{ width: '100%', height: '10%', float: 'right' }}>
-          <TeamButton firstTeam={true} game={gameState}></TeamButton>
         </Box>
-      </Box>
-      <Box
-        style={{
-          width: '100%',
-          height: '20%',
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
         <Box
           style={{
+            width: '100%',
+            height: '20%',
             display: 'flex',
-            flex: 'auto',
-            alignContent: 'center',
+            flexDirection: 'row',
             justifyContent: 'center',
-            width: 'fit-content',
-          }}
-        >
-          <Button size="lg" onClick={() => sync(gameState)}>
-            Sync
-          </Button>
-        </Box>
-        <Box
-          style={{
-            margin: '0px auto',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-evenly',
             alignItems: 'center',
-            flex: '5',
           }}
         >
-          <GameScore game={gameState}></GameScore>
-        </Box>
+          <Group w="100%">
+            <Center w="33%">
+              {gameState.started.get ? (
+                <Button color="player-color" size="lg" onClick={() => sync(gameState)}>
+                  Sync
+                </Button>
+              ) : (
+                <Popover width={300} position="bottom" withArrow shadow="md">
+                  <Popover.Target>
+                    <Button size="lg" color="player-color">
+                      Officials
+                    </Button>
+                  </Popover.Target>
+                  <Popover.Dropdown>
+                    <Center>
+                      <Stack>
+                        <Select
+                          label="Official"
+                          searchable
+                          allowDeselect={false}
+                          placeholder="Pick value"
+                          data={officials.map((a) => ({ value: a.searchableName, label: a.name }))}
+                          value={official?.searchableName}
+                          onChange={(v) => {
+                            setOfficial(officials.find((a) => a.searchableName === v)!);
+                          }}
+                          comboboxProps={{ withinPortal: false }}
+                        />
 
-        <Box
-          style={{
-            display: 'flex',
-            flex: 'auto',
-            alignContent: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Button
-            size="lg"
-            color={gameState.started.get ? 'blue' : 'red'}
-            onClick={() => {
-              if (gameState.started.get) {
-                undo(gameState);
-              } else {
-                del(gameState);
-              }
-            }}
-          >
-            {gameState.started.get ? 'Undo' : 'Delete'}
-          </Button>
+                        <Select
+                          label="Scorer"
+                          allowDeselect={false}
+                          placeholder="Pick value"
+                          data={officials.map((a) => ({ value: a.searchableName, label: a.name }))}
+                          value={scorer?.searchableName}
+                          onChange={(v) => {
+                            setScorer(officials.find((a) => a.searchableName === v)!);
+                          }}
+                          comboboxProps={{ withinPortal: false }}
+                        />
+                      </Stack>
+                    </Center>
+                  </Popover.Dropdown>
+                </Popover>
+              )}
+            </Center>
+            <Box
+              style={{
+                margin: '0px auto',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-evenly',
+                alignItems: 'center',
+                flex: '5',
+              }}
+            >
+              <GameScore game={gameState} official={official} scorer={scorer}></GameScore>
+            </Box>
+
+            <Center w="33%">
+              <Button
+                size="lg"
+                color={gameState.started.get ? 'player-color' : 'red'}
+                onClick={() => {
+                  if (gameState.started.get) {
+                    undo(gameState);
+                  } else {
+                    del(gameState);
+                  }
+                }}
+              >
+                {gameState.started.get ? 'Undo' : 'Delete'}
+              </Button>
+            </Center>
+          </Group>
         </Box>
-      </Box>
-      <Box style={{ width: '100%', height: '40%' }}>
-        <Box style={{ width: '100%', height: '10%', float: 'right' }}>
-          <TeamButton firstTeam={false} game={gameState}></TeamButton>
-        </Box>
-        {(
-          gameState.teamOneIGA.get
-            ? gameState.teamTwo.right.get && gameState.teamTwo.left.get
-            : gameState.teamOne.right.get && gameState.teamOne.left.get
-        ) ? (
-          <>
-            <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+        <Box style={{ width: '100%', height: '40%' }}>
+          <Box style={{ width: '100%', height: '10%', float: 'right' }}>
+            <TeamButton firstTeam={false} game={gameState}></TeamButton>
+          </Box>
+          {(
+            gameState.teamOneIGA.get
+              ? gameState.teamTwo.right.get && gameState.teamTwo.left.get
+              : gameState.teamOne.right.get && gameState.teamOne.left.get
+          ) ? (
+            <>
+              <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+                <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
+              </Box>
+              <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+                <PlayerButton game={gameState} firstTeam={false} leftSide={false}></PlayerButton>
+              </Box>
+            </>
+          ) : (
+            <Box style={{ width: '100%', height: '90%', float: 'left' }}>
               <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
             </Box>
-            <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-              <PlayerButton game={gameState} firstTeam={false} leftSide={false}></PlayerButton>
-            </Box>
-          </>
-        ) : (
-          <Box style={{ width: '100%', height: '90%', float: 'left' }}>
-            <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
-          </Box>
-        )}
+          )}
+        </Box>
       </Box>
-    </Box>
+    </MantineProvider>
   );
 }

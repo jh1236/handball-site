@@ -181,7 +181,7 @@ function getActions(
       content: (
         <Button
           size="lg"
-          color={timeoutsRemaining > 0 ? 'blue' : timeoutsRemaining === 0 ? 'grey' : 'red'}
+          color={timeoutsRemaining > 0 ? 'player-color' : timeoutsRemaining === 0 ? 'grey' : 'red'}
           onClick={() => {
             timeout(game, firstTeam);
             close();
@@ -260,7 +260,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
       <Button
         radius={0}
         size="lg"
-        color={`${didWinGame(game, firstTeam) ? 'orange.5' : decidedOnCoinToss(game) ? 'green.9' : serving ? 'teal.5' : 'blue.5'}`}
+        color={`${didWinGame(game, firstTeam) ? 'orange.5' : decidedOnCoinToss(game) ? 'green.9' : serving ? 'serving-color.5' : 'player-color.5'}`}
         style={{
           width: '100%',
           height: '100%',

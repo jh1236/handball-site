@@ -81,7 +81,7 @@ export function CreateTeamButton({
       <Button
         radius={0}
         size="lg"
-        color="blue.5"
+        color="player-color.5"
         style={{
           width: '100%',
           height: '100%',

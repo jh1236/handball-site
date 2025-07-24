@@ -7,47 +7,24 @@ import { CreatePlayerButton } from '@/components/HandballComponenets/GameCreatin
 import { CreateTeamButton } from '@/components/HandballComponenets/GameCreatingComponents/CreateTeamButton';
 import { GameSettings } from '@/components/HandballComponenets/GameCreatingComponents/GameSettings';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
-import { getOfficials } from '@/ServerActions/OfficialActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { getTeams } from '@/ServerActions/TeamActions';
-import { getTournaments } from '@/ServerActions/TournamentActions';
-import {
-  OfficialStructure,
-  PersonStructure,
-  TeamStructure,
-  TournamentStructure,
-} from '@/ServerActions/types';
+import { PersonStructure, TeamStructure } from '@/ServerActions/types';
 
 export default function CreateGamePage() {
   const [teams, setTeams] = React.useState<TeamStructure[]>([]);
-  const [officials, setOfficials] = React.useState<OfficialStructure[]>([]);
   const [players, setPlayers] = React.useState<PersonStructure[]>([]);
-  const [tournaments, setTournaments] = React.useState<TournamentStructure[]>([]);
-  const [official, setOfficial] = React.useState<OfficialStructure | undefined>(undefined);
   const [teamOneRight, setTeamOneRight] = useState<string | undefined>(undefined);
   const [teamOneLeft, setTeamOneLeft] = useState<string | undefined>(undefined);
   const [teamOneName, setTeamOneName] = useState<string | undefined>('');
   const [teamTwoRight, setTeamTwoRight] = useState<string | undefined>(undefined);
   const [teamTwoLeft, setTeamTwoLeft] = useState<string | undefined>(undefined);
   const [teamTwoName, setTeamTwoName] = useState<string | undefined>('');
-  const [selectedTournament, setSelectedTournament] = useState<TournamentStructure>();
-  const { username, isOfficial } = useUserData();
+  const { isOfficial } = useUserData();
   useEffect(() => {
-    getTournaments().then((t) => setTournaments(t.filter((a) => a.editable)));
     getPlayers({}).then((t) => setPlayers(t.players));
     getTeams({}).then((t) => setTeams(t.teams.filter((a) => !a.substitute)));
-    getOfficials({}).then((t) => setOfficials(t.officials));
   }, []);
-
-  useEffect(() => {
-    if (tournaments.length > 0) {
-      setSelectedTournament(tournaments[0]);
-    }
-  }, [tournaments]);
-
-  useEffect(() => {
-    setOfficial(officials.find((a) => a.name === username));
-  }, [officials, username]);
 
   const loginProps = (
     <>
@@ -112,14 +89,8 @@ export default function CreateGamePage() {
         }}
       >
         <GameSettings
-          officials={officials}
-          official={official}
           playersOne={[teamOneLeft, teamOneRight].filter((a) => typeof a === 'string')}
           playersTwo={[teamTwoLeft, teamTwoRight].filter((a) => typeof a === 'string')}
-          setOfficial={setOfficial}
-          tournament={selectedTournament}
-          setTournament={setSelectedTournament}
-          tournaments={tournaments}
           teamNameOne={teamOneName}
           teamNameTwo={teamTwoName}
         ></GameSettings>

@@ -33,9 +33,12 @@ import { OrderPlayers } from '@/components/HandballComponenets/GameEditingCompon
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { decidedOnCoinToss } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { OfficialStructure } from '@/ServerActions/types';
 
 interface GameScoreArgs {
   game: GameState;
+  official?: OfficialStructure;
+  scorer?: OfficialStructure;
 }
 
 export const QUICK_GAME_END = false;
@@ -237,7 +240,7 @@ function getActions(
   ];
 }
 
-export function GameScore({ game }: GameScoreArgs) {
+export function GameScore({ game, official, scorer }: GameScoreArgs) {
   const router = useRouter();
   const [reviewReqd, setReviewReqd] = useState<boolean>(false);
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
@@ -297,7 +300,7 @@ export function GameScore({ game }: GameScoreArgs) {
       {game.started.get ? (
         game.ended.get ? (
           <>
-            <Button size="lg" onClick={openEndGame}>
+            <Button color="player-color" size="lg" onClick={openEndGame}>
               End
             </Button>
           </>
@@ -372,7 +375,7 @@ export function GameScore({ game }: GameScoreArgs) {
           </>
         )
       ) : (
-        <Button size="lg" onClick={() => begin(game)}>
+        <Button color="player-color" size="lg" onClick={() => begin(game, official, scorer)}>
           Start
         </Button>
       )}
