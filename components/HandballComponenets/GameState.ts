@@ -12,7 +12,15 @@ import {
 import { GameEventStructure, GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 export interface GameState {
+  practice: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
   badminton: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
+  abandoned: {
     get: boolean;
     set: (v: boolean) => void;
   };
@@ -32,6 +40,10 @@ export interface GameState {
   teamOne: TeamState;
   teamTwo: TeamState;
   firstTeamServes: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
+  firstTeamScoredLast: {
     get: boolean;
     set: (v: boolean) => void;
   };
@@ -102,10 +114,13 @@ export function useGameState(game?: GameStructure) {
   const [faulted, setFaulted] = React.useState<boolean>(false);
   const [started, setStarted] = React.useState<boolean>(true);
   const [ended, setEnded] = React.useState<boolean>(false);
+  const [firstTeamScoredLast, setFirstTeamScoredLast] = React.useState<boolean>(false);
   const [firstTeamServes, setFirstTeamServes] = React.useState<boolean>(false);
+  const [abandoned, setAbandoned] = React.useState<boolean>(false);
   const [timeoutExpirationTime, setTimeoutExpirationTime] = React.useState<number>(-1);
   const [teamOneIGA, setTeamOneIGA] = React.useState<boolean>(true);
   const [notes, setNotes] = React.useState<string>('');
+  const [practice, setPractice] = React.useState<boolean>(game?.tournament.editable ?? false);
   const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
   const [badminton, setBadminton] = React.useState<boolean>(false);
 
@@ -118,13 +133,13 @@ export function useGameState(game?: GameStructure) {
   const [teamOneScore, setTeamOneScore] = React.useState<number>(0);
   const [teamOneRating, setTeamOneRating] = React.useState<number>(0);
   const [teamOneLeft, setTeamOneLeft] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
+    undefined,
   );
   const [teamOneRight, setTeamOneRight] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
+    undefined,
   );
   const [teamOneSub, setTeamOneSub] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
+    undefined,
   );
   //team two state
   const [teamTwoTimeouts, setTeamTwoTimeouts] = React.useState<number>(0);
@@ -136,20 +151,24 @@ export function useGameState(game?: GameStructure) {
   const [teamTwoScore, setTeamTwoScore] = React.useState<number>(0);
   const [teamTwoRating, setTeamTwoRating] = React.useState<number>(0);
   const [teamTwoLeft, setTeamTwoLeft] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
+    undefined,
   );
   const [teamTwoRight, setTeamTwoRight] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
+    undefined,
   );
   const [teamTwoSub, setTeamTwoSub] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
+    undefined,
   );
   const servingFromLeft = useMemo(
     () => (firstTeamServes ? teamOneServingLeft : teamTwoServingLeft),
-    [firstTeamServes, teamOneServingLeft, teamTwoServingLeft]
+    [firstTeamServes, teamOneServingLeft, teamTwoServingLeft],
   );
 
   useEffect(() => {
+    if (abandoned) {
+      setEnded(true);
+      return;
+    }
     if (teamOneScore || teamTwoScore) {
       const bigScore = Math.max(teamOneScore, teamTwoScore);
       const lilScore = Math.min(teamOneScore, teamTwoScore);
@@ -157,168 +176,174 @@ export function useGameState(game?: GameStructure) {
       if (bigScore - lilScore <= 1) return;
       setEnded(true);
     }
-  }, [teamOneScore, teamTwoScore]);
+  }, [teamOneScore, teamTwoScore, abandoned]);
 
-  const gameState: GameState = useMemo(
-    () => ({
-      votes: {
-        get: votes,
-        set: setVotes,
+  const gameState: GameState = useMemo(() => ({
+    practice: {
+      get: practice,
+      set: setPractice,
+    },
+    abandoned: {
+      get: abandoned,
+      set: setAbandoned,
+    },
+    votes: {
+      get: votes,
+      set: setVotes,
+    },
+    badminton: {
+      get: badminton,
+      set: setBadminton,
+    },
+    timeoutExpirationTime: {
+      get: timeoutExpirationTime,
+      set: setTimeoutExpirationTime,
+    },
+    teamOneIGA: {
+      get: teamOneIGA,
+      set: setTeamOneIGA,
+    },
+    started: {
+      get: started,
+      set: setStarted,
+    },
+    ended: {
+      get: ended,
+      set: setEnded,
+    },
+    firstTeamServes: {
+      get: firstTeamServes,
+      set: setFirstTeamServes,
+    },
+    faulted: {
+      get: faulted,
+      set: setFaulted,
+    },
+    id: game?.id ?? -1,
+    servingFromLeft,
+    notes: {
+      get: notes,
+      set: setNotes,
+    },
+    teamOne: {
+      name: {
+        get: teamOneName,
+        set: setTeamOneName,
       },
-      badminton: {
-        get: badminton,
-        set: setBadminton,
+      score: {
+        get: teamOneScore,
+        set: setTeamOneScore,
       },
-      timeoutExpirationTime: {
-        get: timeoutExpirationTime,
-        set: setTimeoutExpirationTime,
+      rating: {
+        get: teamOneRating,
+        set: setTeamOneRating,
       },
-      teamOneIGA: {
-        get: teamOneIGA,
-        set: setTeamOneIGA,
-      },
-      started: {
-        get: started,
-        set: setStarted,
-      },
-      ended: {
-        get: ended,
-        set: setEnded,
-      },
-      firstTeamServes: {
-        get: firstTeamServes,
-        set: setFirstTeamServes,
-      },
-      faulted: {
-        get: faulted,
-        set: setFaulted,
-      },
-      id: game?.id ?? -1,
-      servingFromLeft,
       notes: {
-        get: notes,
-        set: setNotes,
+        get: teamOneNotes,
+        set: setTeamOneNotes,
       },
-      teamOne: {
-        name: {
-          get: teamOneName,
-          set: setTeamOneName,
-        },
-        score: {
-          get: teamOneScore,
-          set: setTeamOneScore,
-        },
-        rating: {
-          get: teamOneRating,
-          set: setTeamOneRating,
-        },
-        notes: {
-          get: teamOneNotes,
-          set: setTeamOneNotes,
-        },
-        protest: {
-          get: teamOneProtest,
-          set: setTeamOneProtest,
-        },
-        timeouts: {
-          get: teamOneTimeouts,
-          set: setTeamOneTimeouts,
-        },
-        servingFromLeft: {
-          get: teamOneServingLeft,
-          set: setTeamOneServingLeft,
-        },
-        left: {
-          get: teamOneLeft,
-          set: setTeamOneLeft,
-        },
-        right: {
-          get: teamOneRight,
-          set: setTeamOneRight,
-        },
-        sub: {
-          get: teamOneSub,
-          set: setTeamOneSub,
-        },
+      protest: {
+        get: teamOneProtest,
+        set: setTeamOneProtest,
       },
-      teamTwo: {
-        name: {
-          get: teamTwoName,
-          set: setTeamTwoName,
-        },
-        score: {
-          get: teamTwoScore,
-          set: setTeamTwoScore,
-        },
-        rating: {
-          get: teamTwoRating,
-          set: setTeamTwoRating,
-        },
-        notes: {
-          get: teamTwoNotes,
-          set: setTeamTwoNotes,
-        },
-        protest: {
-          get: teamTwoProtest,
-          set: setTeamTwoProtest,
-        },
-        timeouts: {
-          get: teamTwoTimeouts,
-          set: setTeamTwoTimeouts,
-        },
-        servingFromLeft: {
-          get: teamTwoServingLeft,
-          set: setTeamTwoServingLeft,
-        },
-        left: {
-          get: teamTwoLeft,
-          set: setTeamTwoLeft,
-        },
-        right: {
-          get: teamTwoRight,
-          set: setTeamTwoRight,
-        },
-        sub: {
-          get: teamTwoSub,
-          set: setTeamTwoSub,
-        },
+      timeouts: {
+        get: teamOneTimeouts,
+        set: setTeamOneTimeouts,
       },
-    }),
-    //monster dependencies!!
-    [
-      badminton,
-      ended,
-      faulted,
-      firstTeamServes,
-      game?.id,
-      notes,
-      servingFromLeft,
-      started,
-      teamOneIGA,
-      teamOneLeft,
-      teamOneName,
-      teamOneNotes,
-      teamOneProtest,
-      teamOneRating,
-      teamOneRight,
-      teamOneScore,
-      teamOneServingLeft,
-      teamOneSub,
-      teamOneTimeouts,
-      teamTwoLeft,
-      teamTwoName,
-      teamTwoNotes,
-      teamTwoProtest,
-      teamTwoRating,
-      teamTwoRight,
-      teamTwoScore,
-      teamTwoServingLeft,
-      teamTwoSub,
-      teamTwoTimeouts,
-      timeoutExpirationTime,
-      votes,
-    ]
-  );
+      servingFromLeft: {
+        get: teamOneServingLeft,
+        set: setTeamOneServingLeft,
+      },
+      left: {
+        get: teamOneLeft,
+        set: setTeamOneLeft,
+      },
+      right: {
+        get: teamOneRight,
+        set: setTeamOneRight,
+      },
+      sub: {
+        get: teamOneSub,
+        set: setTeamOneSub,
+      },
+    },
+    teamTwo: {
+      name: {
+        get: teamTwoName,
+        set: setTeamTwoName,
+      },
+      score: {
+        get: teamTwoScore,
+        set: setTeamTwoScore,
+      },
+      rating: {
+        get: teamTwoRating,
+        set: setTeamTwoRating,
+      },
+      notes: {
+        get: teamTwoNotes,
+        set: setTeamTwoNotes,
+      },
+      protest: {
+        get: teamTwoProtest,
+        set: setTeamTwoProtest,
+      },
+      timeouts: {
+        get: teamTwoTimeouts,
+        set: setTeamTwoTimeouts,
+      },
+      servingFromLeft: {
+        get: teamTwoServingLeft,
+        set: setTeamTwoServingLeft,
+      },
+      left: {
+        get: teamTwoLeft,
+        set: setTeamTwoLeft,
+      },
+      right: {
+        get: teamTwoRight,
+        set: setTeamTwoRight,
+      },
+      sub: {
+        get: teamTwoSub,
+        set: setTeamTwoSub,
+      },
+    },
+    firstTeamScoredLast: {
+      get: firstTeamScoredLast,
+      set: setFirstTeamScoredLast,
+    },
+  }), [badminton,
+    ended,
+    faulted,
+    firstTeamServes,
+    game?.id,
+    notes,
+    servingFromLeft,
+    started,
+    teamOneIGA,
+    teamOneLeft,
+    teamOneName,
+    teamOneNotes,
+    teamOneProtest,
+    teamOneRating,
+    teamOneRight,
+    teamOneScore,
+    teamOneServingLeft,
+    teamOneSub,
+    teamOneTimeouts,
+    teamTwoLeft,
+    teamTwoName,
+    teamTwoNotes,
+    teamTwoProtest,
+    teamTwoRating,
+    teamTwoRight,
+    teamTwoScore,
+    teamTwoServingLeft,
+    teamTwoSub,
+    teamTwoTimeouts,
+    timeoutExpirationTime,
+    votes]);
 
   return {
     addGameEventToState: useCallback(
@@ -342,6 +367,9 @@ function setGameState(gameObj: GameStructure, state: GameState) {
   state.ended.set(gameObj.someoneHasWon);
   state.votes.set(playersFromGame(gameObj));
   state.badminton.set(gameObj.tournament.usingBadmintonServes);
+  state.practice.set(gameObj.tournament.editable);
+  state.abandoned.set(gameObj.abandoned);
+  state.firstTeamScoredLast.set(gameObj.firstTeamScoredLast);
   //Team Specific
   state.teamOne.name.set(gameObj.teamOne.name);
   state.teamOne.timeouts.set(gameObj.teamOneTimeouts);
@@ -351,7 +379,7 @@ function setGameState(gameObj: GameStructure, state: GameState) {
   const { teamOne, teamTwo } = gameObj;
   if (gameObj.started) {
     const sorted = [teamOne.captain, teamOne.nonCaptain, teamOne.substitute].toSorted((a, b) =>
-      (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
+      (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z'),
     );
     state.teamOne.left.set(sorted[0] || undefined);
     state.teamOne.right.set(sorted[1] || undefined);
@@ -369,7 +397,7 @@ function setGameState(gameObj: GameStructure, state: GameState) {
   state.teamTwo.servingFromLeft.set(gameObj.teamTwo.servingFromLeft!);
   if (gameObj.started) {
     const sorted = [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute].toSorted((a, b) =>
-      (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
+      (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z'),
     );
     state.teamTwo.left.set(sorted[0] || undefined);
     state.teamTwo.right.set(sorted[1] || undefined);

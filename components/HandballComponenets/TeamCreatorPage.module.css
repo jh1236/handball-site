@@ -1,0 +1,14 @@
+.hoverImage:hover > img {
+    transition: all 0.2s ease-in-out;
+    filter: brightness(25%);
+}
+
+.hoverImage:hover > p {
+    transition: all 0.2s ease-in-out;
+    opacity: 1;
+}
+
+.hoverImage > p {
+    opacity: 0;
+    transition: all 0.2s ease-in-out;
+}

@@ -93,8 +93,11 @@ export function NavbarNested({
           { label: 'Teams', link: `/${tournamentName}/teams` },
         ],
       });
-      if (isUmpireManager) {
+      if (isUmpireManager && myTournament?.started) {
         out[out.length - 1].links!.push({ label: 'Manage', link: `/${tournamentName}/manage` });
+      }
+      if (isAdmin && !myTournament?.started) {
+        out[out.length - 1].links!.push({ label: 'Setup', link: `/${tournamentName}/setup` });
       }
     }
     out.push(
