@@ -71,7 +71,9 @@ export function EditGame({ game }: { game: number }) {
     if (!gameObj) return;
     setGameForState(gameObj);
     closeLoading();
-  }, [closeLoading, gameObj, setGameForState]);
+    //disabled as including setGameForState will cause an infinite reload
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeLoading, gameObj]);
 
   useEffect(() => {
     if (gameState.timeoutExpirationTime.get > 0) {
