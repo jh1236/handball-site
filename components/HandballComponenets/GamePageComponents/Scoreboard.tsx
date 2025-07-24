@@ -29,7 +29,7 @@ function cardColorFromPlayer(player: PlayerGameStatsStructure) {
 }
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
-  const { gameState, setGameForState } = useGameState();
+  const { gameState, setGameForState, addGameEventToState } = useGameState();
   const [teamOneColor, setTeamOneColor] = useState<number[] | undefined>();
   const [teamTwoColor, setTeamTwoColor] = useState<number[] | undefined>();
   const [teamOneImage, setTeamOneImage] = useState<string | undefined>();

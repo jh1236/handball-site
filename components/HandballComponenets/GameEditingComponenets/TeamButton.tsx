@@ -228,10 +228,6 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
   );
-  const otherTeam = useMemo(
-    () => (firstTeam ? game.teamTwo : game.teamOne),
-    [firstTeam, game.teamOne, game.teamTwo]
-  );
   const serving = useMemo(
     () => !game.ended.get && game.firstTeamServes.get === firstTeam,
     [firstTeam, game.ended.get, game.firstTeamServes.get]
