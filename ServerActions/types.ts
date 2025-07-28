@@ -151,6 +151,7 @@ export interface GameStructure {
   timeoutExpirationTime: number;
   changeCode: number;
   firstTeamScoredLast: boolean;
+  blitzGame: boolean;
   admin?: {
     notes?: string;
     cards: CardStructure[];

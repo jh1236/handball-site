@@ -33,7 +33,7 @@ export function CreatePlayerButton({
       <Button
         size="lg"
         radius={0}
-        color={`blue.${leftSide ? 7 : 9}`}
+        color={`player-color.${leftSide ? 7 : 9}`}
         style={{
           width: '100%',
           height: '100%',

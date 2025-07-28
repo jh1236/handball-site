@@ -1,4 +1,4 @@
-import React, { ForwardRefExoticComponent, Fragment, useMemo, useState } from 'react';
+import React, { ForwardRefExoticComponent, Fragment, useEffect, useMemo, useState } from 'react';
 import {
   IconArrowsLeftRight,
   IconArrowsUpDown,
@@ -152,7 +152,7 @@ function getActions(
             size="sm"
             color="gray"
           >
-            More
+            Repeat/Other
           </Button>
 
           <Modal
@@ -175,7 +175,7 @@ function getActions(
               style={{ margin: '3px' }}
               size="sm"
               disabled={!otherReason}
-              color="blue"
+              color="player-color"
             >
               Submit
             </Button>
@@ -212,7 +212,7 @@ function getActions(
             size="sm"
             color="gray"
           >
-            More
+            Repeat/Other
           </Button>
 
           <Modal
@@ -292,7 +292,7 @@ function getActions(
             size="sm"
             color="gray"
           >
-            More
+            Repeat/Other
           </Button>
           <Modal
             opened={openModal === 'yellow'}
@@ -343,9 +343,8 @@ function getActions(
           </Modal>
           <Title order={2}>Rounds: </Title>
           <Slider
-            defaultValue={6}
-            min={6}
-            max={12}
+            min={game.blitzGame ? 3 : 6}
+            max={game.blitzGame ? 9 : 12}
             step={1}
             value={cardTime}
             onChange={(value) => setCardTime(value)}
@@ -483,7 +482,7 @@ function getActions(
             color="gray"
             onClick={() => setOpenModal(openModal ? undefined : 'score')}
           >
-            Show {openModal ? 'Less' : 'More'}
+            Show {openModal ? 'Less' : 'Repeat/Other'}
           </Button>
 
           <Collapse in={openModal === 'score'}>
@@ -492,6 +491,7 @@ function getActions(
                 <Button
                   style={{ margin: '3px' }}
                   size="sm"
+                  color="player-color"
                   onClick={() => {
                     score(game, firstTeam, leftSide, method);
                     close();
@@ -514,6 +514,7 @@ function getActions(
       color: undefined,
       content: (
         <Button
+          color="player-color"
           size="sm"
           style={{ margin: '3px' }}
           onClick={() => {
@@ -534,6 +535,7 @@ function getActions(
       content: (
         <>
           <Button
+            color="player-color"
             style={{ margin: '3px' }}
             size="sm"
             onClick={() => {
@@ -545,6 +547,7 @@ function getActions(
           </Button>
           <br />
           <Button
+            color="player-color"
             style={{ margin: '3px' }}
             size="sm"
             onClick={() => {
@@ -650,7 +653,12 @@ export function PlayerButton({
       )),
     [cardTime, close, firstTeam, game, leftSide, openModal, otherReason, serving, trueLeftSide]
   );
+  useEffect(() => {
+    setCardTime(game.blitzGame.get ? 3 : 6);
+  }, [game.blitzGame.get]);
   const name = player ? (player.isCaptain ? `${player.name} (c)` : player.name) : 'Loading...';
+  const servingColor = 'serving-color';
+  const defaultColor = 'player-color';
   return (
     <>
       <Modal opened={opened} centered onClose={close} title="Action">
@@ -662,7 +670,7 @@ export function PlayerButton({
       <Button
         size="lg"
         radius={0}
-        color={`${player?.isBestPlayer && game.ended.get ? 'yellow' : serving ? 'teal' : 'blue'}.${trueLeftSide ? 7 : 9}`}
+        color={`${player?.isBestPlayer && game.ended.get ? 'yellow' : serving ? servingColor : defaultColor}.${trueLeftSide ? 7 : 9}`}
         style={{
           width: '100%',
           height: (player?.cardTimeRemaining ?? 0) !== 0 && !game.ended.get ? '95%' : '100%',
