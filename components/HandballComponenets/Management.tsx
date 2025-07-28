@@ -1,20 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Box,
+  Button,
+  Container,
   Divider,
   Grid,
   HoverCard,
   Image,
   Paper,
+  Popover,
   Rating,
   Space,
   Text,
   Title,
 } from '@mantine/core';
+import { SERVER_ADDRESS } from '@/app/config';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import { FakeCheckbox } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
@@ -22,7 +26,8 @@ import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
 import { getNoteableGames } from '@/ServerActions/GameActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
-import { GameStructure, PersonStructure } from '@/ServerActions/types';
+import { forceNextRoundFinalsTournament, getTournament } from '@/ServerActions/TournamentActions';
+import { GameStructure, PersonStructure, TournamentStructure } from '@/ServerActions/types';
 
 interface ManagementArgs {
   tournament: string;
@@ -223,6 +228,7 @@ function gameToPaper(game: GameStructure) {
 export function Management({ tournament }: ManagementArgs) {
   const [actionableGames, setActionableGames] = useState<GameStructure[]>([]);
   const [players, setPlayers] = useState<PersonStructure[] | null>(null);
+  const [tournamentObj, setTournamentObj] = useState<TournamentStructure | undefined>();
   const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);
   const { isUmpireManager, loading } = useUserData();
   const router = useRouter();
@@ -231,8 +237,9 @@ export function Management({ tournament }: ManagementArgs) {
     if (!isUmpireManager && !loading) {
       router.push(`/${tournament}`);
     }
-  }, [isUmpireManager, loading, router]);
+  }, [isUmpireManager, loading, router, tournament]);
   useEffect(() => {
+    if (!tournament) return;
     getNoteableGames({ tournament }).then((g) => {
       setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());
       setActionableGames(g.games.filter((v) => v.admin?.requiresAction).toReversed());
@@ -242,11 +249,56 @@ export function Management({ tournament }: ManagementArgs) {
       includeStats: true,
       formatData: true,
     }).then((g) => setPlayers(g.players.filter((v) => v.stats!['Penalty Points'] >= 12)));
+    getTournament(tournament).then(setTournamentObj);
   }, [tournament]);
   return (
     <>
       <br />
-      <Divider></Divider>
+      <Container
+        w="auto"
+        p={20}
+        display="flex"
+        pos="relative"
+        style={{
+          overflow: 'hidden',
+          margin: 'auto',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Image
+          src={tournamentObj?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+          w="100px"
+          h="100px"
+        ></Image>
+
+        <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
+        {!(tournamentObj?.inFinals ?? true) && (
+          <Popover width={200} position="top" withArrow shadow="md">
+            <Popover.Target>
+              <Button m={10} size="md" color="green" variant="outline">
+                Force Finals
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown ta="center">
+              <Text m={5}>
+                Are you sure you want to force this tournament into finals?{' '}
+                <b>(This cannot be undone)</b>
+              </Text>
+              <Button
+                m={5}
+                color="green"
+                onClick={() => {
+                  forceNextRoundFinalsTournament(tournament);
+                }}
+              >
+                Confirm
+              </Button>
+            </Popover.Dropdown>
+          </Popover>
+        )}
+      </Container>
       <Grid w="97.5%">
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Box>
@@ -288,6 +340,7 @@ export function Management({ tournament }: ManagementArgs) {
           </Box>
         </Grid.Col>
       </Grid>
+      ;
     </>
   );
 }

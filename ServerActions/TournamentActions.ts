@@ -73,6 +73,24 @@ export function startTournament(searchableName: SearchableName): Promise<void> {
   });
 }
 
+export function forceNextRoundFinalsTournament(searchableName: SearchableName): Promise<void> {
+  const url = new URL(`/api/tournaments/${searchableName}/finalsNextRound`, SERVER_ADDRESS);
+  return tokenFetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
 interface RenameTeamForTournamentParams {
   searchable: SearchableName;
   teamSearchable: SearchableName;

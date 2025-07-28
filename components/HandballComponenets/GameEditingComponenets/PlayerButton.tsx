@@ -1,4 +1,4 @@
-import React, { ForwardRefExoticComponent, useEffect, useMemo, useState } from 'react';
+import React, { ForwardRefExoticComponent, Fragment, useEffect, useMemo, useState } from 'react';
 import {
   IconArrowsLeftRight,
   IconArrowsUpDown,
@@ -130,8 +130,8 @@ function getActions(
       color: 'grey',
       content: (
         <>
-          {CARDS.warning.map((reason) => (
-            <>
+          {CARDS.warning.map((reason, i) => (
+            <Fragment key={i}>
               <Button
                 style={{ margin: '3px' }}
                 size="sm"
@@ -144,7 +144,7 @@ function getActions(
                 {reason}
               </Button>
               <br />
-            </>
+            </Fragment>
           ))}
           <Button
             onClick={() => setOpenModal('warning')}
@@ -189,8 +189,8 @@ function getActions(
       value: 'Green Card',
       content: (
         <>
-          {CARDS.green.map((reason) => (
-            <>
+          {CARDS.green.map((reason, i) => (
+            <Fragment key={i}>
               <Button
                 style={{ margin: '3px' }}
                 size="sm"
@@ -204,7 +204,7 @@ function getActions(
                 {reason}
               </Button>
               <br />
-            </>
+            </Fragment>
           ))}
           <Button
             onClick={() => setOpenModal('green')}
@@ -269,8 +269,8 @@ function getActions(
       value: 'Yellow Card',
       content: (
         <Box>
-          {CARDS.yellow.map((reason) => (
-            <>
+          {CARDS.yellow.map((reason, i) => (
+            <Fragment key={i}>
               <Button
                 style={{ margin: '3px' }}
                 size="sm"
@@ -284,7 +284,7 @@ function getActions(
                 {reason}
               </Button>
               <br />
-            </>
+            </Fragment>
           ))}
           <Button
             onClick={() => setOpenModal('yellow')}
@@ -358,8 +358,8 @@ function getActions(
       value: 'Red Card',
       content: (
         <>
-          {CARDS.red.map((reason) => (
-            <>
+          {CARDS.red.map((reason, i) => (
+            <Fragment key={i}>
               <Button
                 style={{ margin: '3px' }}
                 size="sm"
@@ -372,7 +372,7 @@ function getActions(
                 {reason}
               </Button>
               <br />
-            </>
+            </Fragment>
           ))}
           <Button
             onClick={() => setOpenModal('red')}
@@ -461,8 +461,8 @@ function getActions(
     color: undefined,
     content: (
       <>
-        {SCORE_METHODS.slice(0, 3).map((method) => (
-          <>
+        {SCORE_METHODS.slice(0, 3).map((method, i) => (
+          <Fragment key={i}>
             <Button
               style={{ margin: '3px' }}
               size="sm"
@@ -474,7 +474,7 @@ function getActions(
               {method}
             </Button>
             <br />
-          </>
+          </Fragment>
         ))}
         <Box>
           <Button
@@ -486,8 +486,8 @@ function getActions(
           </Button>
 
           <Collapse in={openModal === 'score'}>
-            {SCORE_METHODS.slice(3).map((method) => (
-              <>
+            {SCORE_METHODS.slice(3).map((method, i) => (
+              <Fragment key={i}>
                 <Button
                   style={{ margin: '3px' }}
                   size="sm"
@@ -500,7 +500,7 @@ function getActions(
                   {method}
                 </Button>
                 <br />
-              </>
+              </Fragment>
             ))}
           </Collapse>
         </Box>
@@ -623,14 +623,7 @@ export function PlayerButton({
       return cardedTeammates[0];
     }
     return trueLeftSide ? team.left.get : team.right.get;
-  }, [
-    team.right.get,
-    team.left.get,
-    game.ended.get,
-    game.teamOne.servingFromLeft,
-    game.teamTwo.servingFromLeft,
-    trueLeftSide,
-  ]);
+  }, [team.right.get, team.left.get, game.ended.get, game.servingFromLeft, trueLeftSide]);
   const leftSide = useMemo(
     () => (game.ended.get ? trueLeftSide : player?.sideOfCourt === 'Left'),
     [game.ended.get, player?.sideOfCourt, trueLeftSide]
@@ -658,10 +651,10 @@ export function PlayerButton({
           <Accordion.Panel>{item.content}</Accordion.Panel>
         </Accordion.Item>
       )),
-    [cardTime, close, firstTeam, game, leftSide, serving, trueLeftSide]
+    [cardTime, close, firstTeam, game, leftSide, openModal, otherReason, serving, trueLeftSide]
   );
   useEffect(() => {
-    setCardTime(game.blitzGame ? 3 : 6);
+    setCardTime(game.blitzGame.get ? 3 : 6);
   }, [game.blitzGame.get]);
   const name = player ? (player.isCaptain ? `${player.name} (c)` : player.name) : 'Loading...';
   const servingColor = 'serving-color';

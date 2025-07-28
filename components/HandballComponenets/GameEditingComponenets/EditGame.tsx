@@ -26,7 +26,7 @@ import {
 import { GameScore } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
-import { setGameState, useGameState } from '@/components/HandballComponenets/GameState';
+import { useGameState } from '@/components/HandballComponenets/GameState';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGame } from '@/ServerActions/GameActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
@@ -69,7 +69,7 @@ export function EditGame({ game }: { game: number }) {
 
   const [currentTime, setCurrentTime] = React.useState<number>(300);
 
-  const gameState = useGameState(gameObj || undefined);
+  const { gameState, setGameForState } = useGameState(gameObj || undefined);
 
   //team one state
 
@@ -92,8 +92,9 @@ export function EditGame({ game }: { game: number }) {
     if (!gameObj) return;
     setOfficial(gameObj?.official);
     setScorer(gameObj?.scorer ?? undefined);
-    setGameState(gameObj, gameState);
+    setGameForState(gameObj);
     closeLoading();
+    //disabled as including setGameForState will cause an infinite reload
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeLoading, gameObj]);
 

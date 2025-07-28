@@ -228,10 +228,6 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
   );
-  const otherTeam = useMemo(
-    () => (firstTeam ? game.teamTwo : game.teamOne),
-    [firstTeam, game.teamOne, game.teamTwo]
-  );
   const serving = useMemo(
     () => !game.ended.get && game.firstTeamServes.get === firstTeam,
     [firstTeam, game.ended.get, game.firstTeamServes.get]
@@ -248,6 +244,10 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
           <Accordion.Panel>{item.content}</Accordion.Panel>
         </Accordion.Item>
       )),
+    // TODO: this needs to be rewritten fully, its a mess from when I was first learning (Digby 👉👈🥺)
+    // this isn't worth fixing right now,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [game, firstTeam, serving, close]
   );
   const name = team ? team.name.get : 'Loading...';

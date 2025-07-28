@@ -270,7 +270,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
           </Accordion.Item>
         )
       ),
-    [closeEndGame, game]
+    [bestPlayersOpened, closeEndGame, game, reviewReqd, router]
   );
 
   const teamOne = game.teamOneIGA.get ? game.teamOne : game.teamTwo;
