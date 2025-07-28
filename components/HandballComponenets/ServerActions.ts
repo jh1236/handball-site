@@ -49,7 +49,8 @@ export function useUserData() {
     isAdmin: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) === 5,
     isOfficial: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 2,
     isUmpireManager: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 3,
-    isTournamentDirector: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 4,
+    isTournamentDirector: (tournament?: string) =>
+      tournament && (permissions?.[tournament] ?? 0) >= 4,
     isLoggedIn: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 1,
     permissions,
     username,

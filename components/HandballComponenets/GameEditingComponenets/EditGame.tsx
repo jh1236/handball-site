@@ -170,51 +170,50 @@ export function EditGame({ game }: { game: number }) {
 
   return (
     <MantineProvider theme={theme}>
-
-    <Box style={{ width: '100%', height: '100vh' }}>
-      <LoadingOverlay
-        visible={visibleLoading}
-        overlayProps={{ radius: 'sm', blur: 2 }}
-        loaderProps={{ color: 'pink', type: 'bars' }}
-      />
-      <LoadingOverlay visible={visibleTimeout} loaderProps={{ children: timeoutKids }} />
-      <LoadingOverlay
-        overlayProps={{
-          color: '#222',
-          blur: 15,
-        }}
-        visible={
-          !isOfficial(gameObj?.tournament.searchableName) ||
-          (gameObj?.status === 'Official' && editOfficialGame)
-        }
-        loaderProps={{
-          children:
-            gameObj?.status === 'Official'
-              ? isUmpireManager(gameObj.tournament.searchableName)
-                ? warnAdminAboutEditing
-                : OfficialCantEdit
-              : loginProps,
-        }}
-      />
-      <Box style={{ width: '100%', height: '40%' }}>
-        {(
-          gameState.teamOneIGA.get
-            ? gameState.teamOne.right.get && gameState.teamOne.left.get
-            : gameState.teamTwo.right.get && gameState.teamTwo.left.get
-        ) ? (
-          <>
-            <Box style={{ width: '50%', height: '90%', float: 'left' }}>
-              <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
+      <Box style={{ width: '100%', height: '100vh' }}>
+        <LoadingOverlay
+          visible={visibleLoading}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+          loaderProps={{ color: 'pink', type: 'bars' }}
+        />
+        <LoadingOverlay visible={visibleTimeout} loaderProps={{ children: timeoutKids }} />
+        <LoadingOverlay
+          overlayProps={{
+            color: '#222',
+            blur: 15,
+          }}
+          visible={
+            !isOfficial(gameObj?.tournament.searchableName) ||
+            (gameObj?.status === 'Official' && editOfficialGame)
+          }
+          loaderProps={{
+            children:
+              gameObj?.status === 'Official'
+                ? isUmpireManager(gameObj.tournament.searchableName)
+                  ? warnAdminAboutEditing
+                  : OfficialCantEdit
+                : loginProps,
+          }}
+        />
+        <Box style={{ width: '100%', height: '40%' }}>
+          {(
+            gameState.teamOneIGA.get
+              ? gameState.teamOne.right.get && gameState.teamOne.left.get
+              : gameState.teamTwo.right.get && gameState.teamTwo.left.get
+          ) ? (
+            <>
+              <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+                <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
+              </Box>
+              <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+                <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
+              </Box>
+            </>
+          ) : (
+            <Box style={{ width: '100%', height: '90%', float: 'left' }}>
+              <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
             </Box>
-            <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-              <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
-            </Box>
-          </>
-        ) : (
-          <Box style={{ width: '100%', height: '90%', float: 'left' }}>
-            <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
-          </Box>
-        )}
+          )}
 
           <Box style={{ width: '100%', height: '10%', float: 'right' }}>
             <TeamButton firstTeam={true} game={gameState}></TeamButton>
