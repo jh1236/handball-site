@@ -34,7 +34,7 @@ export function GamePage({ gameID }: GamePageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { colorScheme } = useMantineColorScheme();
-  const { isOfficial } = useUserData();
+  const { isUmpireManager } = useUserData();
   useEffect(() => {
     getGame({
       gameID,
@@ -43,14 +43,11 @@ export function GamePage({ gameID }: GamePageProps) {
     }).then((g) => {
       setGame(g);
       setPlayerSelect(g.teamOne.captain.name);
+      if (isUmpireManager(g.tournament.searchableName) && g && !g.admin) {
+        localLogout();
+      }
     });
-  }, [gameID]);
-
-  useEffect(() => {
-    if (isOfficial && game && !game.admin) {
-      localLogout();
-    }
-  }, [game, isOfficial]);
+  }, [gameID, isUmpireManager]);
 
   useEffect(() => {
     if (activeTab !== 'teamStats') {

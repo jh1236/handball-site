@@ -213,7 +213,7 @@ export function Games({ tournament }: ManagementArgs) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isUmpireManager && !loading) {
+    if (!isUmpireManager(tournament) && !loading) {
       router.push(`/${tournament}`);
     }
   }, [isUmpireManager, loading, router, tournament]);

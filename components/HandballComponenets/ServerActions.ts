@@ -25,7 +25,7 @@ export function useUserData() {
   //   permissionLevel: 5,
   //   username: 'testing',
   // };
-  const [permissionLevel, setPermissionLevel] = React.useState<number | null>(null);
+  const [permissions, setPermissions] = React.useState<{ [key: string]: number } | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
   useEffect(() => {
     if (loggedIn()) {
@@ -36,21 +36,23 @@ export function useUserData() {
           localLogout();
         }
       }
-      setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
+      setPermissions(JSON.parse(localStorage.getItem('permissions') ?? '{}'));
       setUsername(localStorage.getItem('username'));
     } else {
-      setPermissionLevel(0);
+      setPermissions({});
     }
   }, []);
   return {
     setUsername,
-    setPermissionLevel,
-    loading: permissionLevel === null,
-    isAdmin: (permissionLevel ?? 5) === 5,
-    isOfficial: (permissionLevel ?? 5) >= 2,
-    isUmpireManager: (permissionLevel ?? 5) >= 4,
-    isLoggedIn: (permissionLevel ?? 5) !== 0,
-    permissionLevel,
+    setPermissions,
+    loading: permissions === null,
+    isAdmin: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) === 5,
+    isOfficial: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 2,
+    isUmpireManager: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 3,
+    isTournamentDirector: (tournament?: string) =>
+      tournament && (permissions?.[tournament] ?? 0) >= 4,
+    isLoggedIn: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 1,
+    permissions,
     username,
   };
 }

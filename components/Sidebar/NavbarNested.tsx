@@ -58,10 +58,9 @@ export function NavbarNested({
   const [myTournament, setMyTournament] = React.useState<TournamentStructure | undefined>(
     undefined
   );
-  const { isOfficial, isAdmin, username, isUmpireManager } = useUserData();
-  //this feels nasty
-  const [mounted, setMounted] = React.useState<boolean>(false);
+  const { isOfficial, isTournamentDirector, isAdmin, username, isUmpireManager } = useUserData();
   const [tournaments, setTournaments] = React.useState<TournamentStructure[]>([]);
+  const [mounted, setMounted] = React.useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
@@ -93,10 +92,10 @@ export function NavbarNested({
           { label: 'Teams', link: `/${tournamentName}/teams` },
         ],
       });
-      if (isUmpireManager && myTournament?.started) {
+      if (isUmpireManager(myTournament?.searchableName) && myTournament?.started) {
         out[out.length - 1].links!.push({ label: 'Manage', link: `/${tournamentName}/manage` });
       }
-      if (isAdmin && !myTournament?.started) {
+      if (isTournamentDirector(myTournament?.searchableName) && !myTournament?.started) {
         out[out.length - 1].links!.push({ label: 'Setup', link: `/${tournamentName}/setup` });
       }
     }
@@ -106,7 +105,7 @@ export function NavbarNested({
       { label: 'Lifetime Officials', icon: GiWhistle, link: '/officials' },
       { label: 'Lifetime Teams', icon: IconUsersGroup, link: '/teams' }
     );
-    if (isOfficial) {
+    if (isOfficial('suss_practice')) {
       out.push({ label: 'Create Game', icon: IconNote, link: '/games/create' });
     }
     out.push(
@@ -244,7 +243,7 @@ export function NavbarNested({
               </Popover.Target>
               <Popover.Dropdown>
                 <Button onClick={() => logoutAction().then(() => router.refresh())}>Logout</Button>
-                {isAdmin && (
+                {isAdmin('base') && (
                   <>
                     <br />
                     <br />

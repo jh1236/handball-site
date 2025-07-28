@@ -60,6 +60,7 @@ export interface TournamentStructure {
 }
 
 export interface OfficialStructure extends PersonStructure {
+  role: string;
   stats?: { [key: string]: number };
 
   [k: string]: any;

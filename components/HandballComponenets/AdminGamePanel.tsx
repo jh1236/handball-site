@@ -150,7 +150,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
           </Link>
         </Accordion.Panel>
       </Accordion.Item>
-      {isUmpireManager && (
+      {isUmpireManager(game.tournament.searchableName) && (
         <>
           <Accordion.Item value="actions">
             <Accordion.Control icon={<IconCheckbox />}>

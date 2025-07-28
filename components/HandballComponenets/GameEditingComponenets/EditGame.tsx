@@ -55,7 +55,7 @@ export function reloadGame(gameID: number) {
 }
 
 export function EditGame({ game }: { game: number }) {
-  const { isUmpireManager, isOfficial, isLoggedIn } = useUserData();
+  const { isUmpireManager, isOfficial } = useUserData();
   const [officials, setOfficials] = useState<OfficialStructure[]>([]);
   const [scorer, setScorer] = useState<OfficialStructure>();
   const [official, setOfficial] = useState<OfficialStructure>();
@@ -172,7 +172,7 @@ export function EditGame({ game }: { game: number }) {
     <MantineProvider theme={theme}>
       <Box style={{ width: '100%', height: '100vh' }}>
         <LoadingOverlay
-          visible={visibleLoading && isLoggedIn}
+          visible={visibleLoading}
           overlayProps={{ radius: 'sm', blur: 2 }}
           loaderProps={{ color: 'pink', type: 'bars' }}
         />
@@ -182,11 +182,14 @@ export function EditGame({ game }: { game: number }) {
             color: '#222',
             blur: 15,
           }}
-          visible={!isOfficial || (gameObj?.status === 'Official' && editOfficialGame)}
+          visible={
+            !isOfficial(gameObj?.tournament.searchableName) ||
+            (gameObj?.status === 'Official' && editOfficialGame)
+          }
           loaderProps={{
             children:
               gameObj?.status === 'Official'
-                ? isUmpireManager
+                ? isUmpireManager(gameObj.tournament.searchableName)
                   ? warnAdminAboutEditing
                   : OfficialCantEdit
                 : loginProps,
