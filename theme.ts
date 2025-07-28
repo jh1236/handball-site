@@ -1,5 +1,12 @@
 'use client';
 
-import { createTheme } from '@mantine/core';
+import { createTheme, DEFAULT_THEME } from '@mantine/core';
 
-export const theme = createTheme({});
+export const theme = createTheme({
+  colors: {
+    'serving-color': DEFAULT_THEME.colors.teal,
+    'player-color': DEFAULT_THEME.colors.blue,
+    'blitz-serving-color': DEFAULT_THEME.colors.green,
+    'blitz-player-color': DEFAULT_THEME.colors.teal,
+  },
+});
