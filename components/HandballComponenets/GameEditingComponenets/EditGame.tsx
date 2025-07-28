@@ -165,7 +165,7 @@ export function EditGame({ game }: { game: number }) {
             : DEFAULT_THEME.colors.blue,
         },
       }),
-    [gameState.blitzGame],
+    [gameState.blitzGame]
   );
 
   return (
