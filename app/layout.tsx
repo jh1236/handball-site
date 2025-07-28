@@ -3,8 +3,8 @@ import './global.css';
 
 import React from 'react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
-import { theme } from '@/theme';
 import { SERVER_ADDRESS } from '@/app/config';
+import { theme } from '@/theme';
 
 export const metadata = {
   title: 'Squarers United Sporting',

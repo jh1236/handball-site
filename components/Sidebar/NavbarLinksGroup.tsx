@@ -44,7 +44,7 @@ export function LinksGroup({
       action();
       setOpened(false);
     }
-  }, [opened]);
+  }, [action, opened]);
   const { colorScheme } = useMantineColorScheme();
   const out = (
     <>

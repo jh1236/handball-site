@@ -741,7 +741,7 @@ export function endGame(
     body.teamTwoNotes = notesTeamTwo;
   }
   if (markedForReview) {
-    body.markedForReview = 'true';
+    body.markedForReview = true;
   }
 
   return tokenFetch('/api/games/update/end', {

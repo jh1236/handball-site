@@ -33,6 +33,7 @@ export default function Ladder({
   const [ladder, setLadder] = React.useState<TeamStructure[]>();
   const [isPooled, setIsPooled] = React.useState<boolean>(false);
   const [poolTwo, setPoolTwo] = React.useState<TeamStructure[]>();
+  const [pooledSortIndex, setPooledSortIndex] = React.useState<number>(sortIndex ?? 0);
   useEffect(() => {
     getLadder({ tournament, includeStats: true, formatData: true }).then((o) => {
       setIsPooled(o.pooled);
@@ -50,9 +51,10 @@ export default function Ladder({
       <Box style={{ textAlign: 'center' }}>
         <Title order={4}>Pool One</Title>
         <DynamicTable<TeamStructure>
-          columns={columnState}
-          setColumns={setColumnState}
-          sortIndexIn={sortIndex}
+          columnsIn={columnState}
+          setColumnsIn={setColumnState}
+          sortIndexIn={pooledSortIndex}
+          setSortIndexIn={setPooledSortIndex}
           objToLink={(o) => linkTo(o, tournament)}
           data={ladder}
           editable={editable}
@@ -60,8 +62,9 @@ export default function Ladder({
         ></DynamicTable>
         <Title order={4}>Pool Two</Title>
         <DynamicTable
-          columns={columnState}
-          sortIndexIn={sortIndex}
+          columnsIn={columnState}
+          sortIndexIn={pooledSortIndex}
+          setSortIndexIn={setPooledSortIndex}
           objToLink={(o) => linkTo(o, tournament)}
           data={poolTwo}
           editable={false}
@@ -72,7 +75,7 @@ export default function Ladder({
   }
   return (
     <DynamicTable
-      columns={columns}
+      columnsIn={columns}
       sortIndexIn={sortIndex}
       objToLink={(o) => linkTo(o, tournament)}
       data={ladder}
