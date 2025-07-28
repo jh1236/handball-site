@@ -230,14 +230,14 @@ export function Management({ tournament }: ManagementArgs) {
   const [players, setPlayers] = useState<PersonStructure[] | null>(null);
   const [tournamentObj, setTournamentObj] = useState<TournamentStructure | undefined>();
   const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);
-  const { isUmpireManager, loading } = useUserData();
+  const { isTournamentDirector, loading } = useUserData();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isUmpireManager && !loading) {
+    if (!isTournamentDirector(tournament) && !loading) {
       router.push(`/${tournament}`);
     }
-  }, [isUmpireManager, loading, router]);
+  }, [isTournamentDirector, loading, router]);
   useEffect(() => {
     if (!tournament) return;
     getNoteableGames({ tournament }).then((g) => {

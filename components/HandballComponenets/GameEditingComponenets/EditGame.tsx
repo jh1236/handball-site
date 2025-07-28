@@ -41,7 +41,7 @@ export function reloadGame(gameID: number) {
 }
 
 export function EditGame({ game }: { game: number }) {
-  const { isUmpireManager, isOfficial, isLoggedIn } = useUserData();
+  const { isUmpireManager, isOfficial } = useUserData();
 
   const [gameObj, setGameObj] = React.useState<GameStructure | null>(null);
   setGameFn = setGameObj;
@@ -131,7 +131,7 @@ export function EditGame({ game }: { game: number }) {
   return (
     <Box style={{ width: '100%', height: '100vh' }}>
       <LoadingOverlay
-        visible={visibleLoading && isLoggedIn}
+        visible={visibleLoading}
         overlayProps={{ radius: 'sm', blur: 2 }}
         loaderProps={{ color: 'pink', type: 'bars' }}
       />
@@ -141,11 +141,14 @@ export function EditGame({ game }: { game: number }) {
           color: '#222',
           blur: 15,
         }}
-        visible={!isOfficial || (gameObj?.status === 'Official' && editOfficialGame)}
+        visible={
+          !isOfficial(gameObj?.tournament.searchableName) ||
+          (gameObj?.status === 'Official' && editOfficialGame)
+        }
         loaderProps={{
           children:
             gameObj?.status === 'Official'
-              ? isUmpireManager
+              ? isUmpireManager(gameObj.tournament.searchableName)
                 ? warnAdminAboutEditing
                 : OfficialCantEdit
               : loginProps,

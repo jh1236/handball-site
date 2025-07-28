@@ -67,7 +67,7 @@ export default function CreateGamePage() {
           color: '#222',
           blur: 15,
         }}
-        visible={!isOfficial}
+        visible={!isOfficial('suss_practice')}
         loaderProps={{ children: loginProps }}
       />
       <Box style={{ width: '100%', height: '40%' }}>

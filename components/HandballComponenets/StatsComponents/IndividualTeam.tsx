@@ -123,7 +123,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
           {/*<Tabs.Tab value="graphs" leftSection={<IconChartScatter size={12} />}>*/}
           {/*  Graphs*/}
           {/*</Tabs.Tab>*/}
-          {isUmpireManager && (
+          {isUmpireManager(tournament) && (
             <Tabs.Tab value="mgmt" leftSection={<IconAlertTriangle size={12} />}>
               Cards
             </Tabs.Tab>
@@ -191,7 +191,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                       {game.teamTwoScore})
                     </Text>
 
-                    {isUmpireManager && (
+                    {isUmpireManager(tournament) && (
                       <>
                         <Text>
                           <Box display="flex">
@@ -241,7 +241,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
 
         <Tabs.Panel value="mgmt">
           <Accordion>
-            {isUmpireManager && (
+            {isUmpireManager(tournament) && (
               <Accordion>
                 <Accordion.Item value="cards">
                   <Accordion.Control icon={<IconTriangleInvertedFilled />}>Cards</Accordion.Control>
