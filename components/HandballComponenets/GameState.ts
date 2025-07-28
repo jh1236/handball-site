@@ -11,6 +11,14 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { GameEventStructure, GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
+export function getWinningScore(game: GameState): number {
+  return game.blitzGame ? 7 : 11;
+}
+
+export function getForceWinningScore(game: GameState): number {
+  return 2 * getWinningScore(game);
+}
+
 export interface GameState {
   practice: {
     get: boolean;
@@ -35,6 +43,10 @@ export interface GameState {
   notes: {
     get: string;
     set: (v: string) => void;
+  };
+  blitzGame: {
+    get: boolean;
+    set: (v: boolean) => void;
   };
   id: number;
   teamOne: TeamState;
@@ -122,6 +134,7 @@ export function useGameState(game?: GameStructure) {
   const [notes, setNotes] = React.useState<string>('');
   const [practice, setPractice] = React.useState<boolean>(game?.tournament.editable ?? false);
   const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
+  const [blitzGame, setBlitzGame] = React.useState<boolean>(false);
   const [badminton, setBadminton] = React.useState<boolean>(false);
 
   //team one state
@@ -183,6 +196,10 @@ export function useGameState(game?: GameStructure) {
       practice: {
         get: practice,
         set: setPractice,
+      },
+      blitzGame: {
+        get: blitzGame,
+        set: setBlitzGame,
       },
       abandoned: {
         get: abandoned,
@@ -378,6 +395,7 @@ function setGameState(gameObj: GameStructure, state: GameState) {
   state.practice.set(gameObj.tournament.editable);
   state.abandoned.set(gameObj.abandoned);
   state.firstTeamScoredLast.set(gameObj.firstTeamScoredLast);
+  state.blitzGame.set(gameObj.blitzGame);
   //Team Specific
   state.teamOne.name.set(gameObj.teamOne.name);
   state.teamOne.timeouts.set(gameObj.teamOneTimeouts);

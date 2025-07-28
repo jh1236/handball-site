@@ -799,6 +799,7 @@ export function createGameWithPlayers(
   tournament: SearchableName,
   playersOne: RealName[],
   playersTwo: RealName[],
+  blitzGame: boolean,
   official?: SearchableName,
   scorer?: SearchableName,
   teamOneName?: string,
@@ -821,6 +822,9 @@ export function createGameWithPlayers(
   }
   if (teamTwoName) {
     body.teamTwo = teamTwoName;
+  }
+  if (blitzGame !== undefined) {
+    body.blitzGame = blitzGame;
   }
   return tokenFetch('/api/games/update/create', {
     method: 'POST',
