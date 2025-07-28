@@ -237,7 +237,7 @@ export function Management({ tournament }: ManagementArgs) {
     if (!isUmpireManager && !loading) {
       router.push(`/${tournament}`);
     }
-  }, [isUmpireManager, loading, router]);
+  }, [isUmpireManager, loading, router, tournament]);
   useEffect(() => {
     if (!tournament) return;
     getNoteableGames({ tournament }).then((g) => {

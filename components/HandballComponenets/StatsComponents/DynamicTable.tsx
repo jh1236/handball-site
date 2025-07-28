@@ -1,19 +1,8 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react';
 import { Image, MultiSelect, Paper, Skeleton, Table } from '@mantine/core';
 import { toTitleCase } from '@/tools/tools';
-
-function selectedToNumber(all: string[], selected: string[]): number {
-  let out = 0;
-  for (let i = 0; i < all.length; i += 1) {
-    if (selected.includes(all[i])) {
-      out += 2 ** i;
-    }
-  }
-  return out;
-}
 
 function stringToNumber(str: string | number) {
   if (typeof str === 'number') {
@@ -31,18 +20,6 @@ function stringToNumber(str: string | number) {
   return str;
 }
 
-function numberToSelected(all: string[], selected: number): string[] {
-  const out = [];
-  let tempSelected = selected;
-  for (let i = all.length; i > 0; i -= 1) {
-    if (tempSelected >= 2 ** i) {
-      tempSelected -= 2 ** i;
-      out.push(all[i]);
-    }
-  }
-  return out;
-}
-
 type InputType = {
   imageUrl: string;
   name: string;
@@ -52,13 +29,13 @@ type InputType = {
 
 interface TableProps<T extends InputType> {
   maxRows?: number;
-  columns: string[];
-  setColumns?: (v: string[]) => void;
+  columnsIn: string[];
+  setColumnsIn?: (value: React.SetStateAction<string[]>) => void;
   editable?: boolean;
   data?: T[];
   objToLink: (t: T) => string;
   sortIndexIn?: number;
-  setSortIndexIn?: (v: number) => void;
+  setSortIndexIn?: (v: React.SetStateAction<number>) => void;
 }
 
 export function DynamicTable<T extends InputType>(props: TableProps<T>) {
@@ -71,89 +48,73 @@ export function DynamicTable<T extends InputType>(props: TableProps<T>) {
 
 export function InternalDynamicTable<T extends InputType>({
   editable,
-  columns,
+  columnsIn,
   data,
   maxRows = -1,
   objToLink,
   sortIndexIn,
-  setColumns,
+  setColumnsIn,
   setSortIndexIn,
 }: TableProps<T>) {
-  const [chartData, setChartData] = React.useState<T[]>([]);
-  const [sortIndex, setSortIndex] = React.useState<number>(0);
-  const [selectedHeaders, setSelectedHeaders] = React.useState<string[]>(columns);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (data) {
-      setChartData(sortData(data, sortIndexIn ?? 0, 0));
-    }
-  }, [data, sortIndexIn]);
-
-  useEffect(() => {
-    if (setColumns) {
-      setColumns(selectedHeaders);
-    }
-  }, [selectedHeaders, setColumns]);
-
-  useEffect(() => {
-    if (setSortIndexIn) {
-      setSortIndexIn(sortIndex);
-    }
-  }, [sortIndex, setSortIndexIn]);
-
-  useEffect(() => {
-    const count = Number(searchParams?.get('cols') ?? -1);
-    if (
-      count > 0 &&
-      editable &&
-      chartData.length > 0 &&
-      count !== selectedToNumber(Object.keys(chartData[0]?.stats! ?? {}), selectedHeaders)
-    ) {
-      setSelectedHeaders(numberToSelected(Object.keys(chartData[0]?.stats! ?? {}), count));
-    }
-  }, [chartData]);
-
-  useEffect(() => {
-    if (selectedHeaders.length === 0 || !editable) {
-      setSelectedHeaders(columns);
-    }
-    if (editable && JSON.stringify(selectedHeaders) !== JSON.stringify(columns)) {
-      router.replace(
-        `${window.location.href.split('?')[0]}?cols=${selectedToNumber(Object.keys(chartData[0]?.stats! ?? {}), selectedHeaders)}`
-      );
-    }
-  }, [chartData, columns, editable, router, selectedHeaders]);
-
+  const [sortIndex, _setSortIndex] = useState<number>(sortIndexIn ?? 0);
   const getHeader = (d: T, name: string): number | string => d![name] || d!.stats![name];
+  const [columns, _setColumns] = useState<string[]>(columnsIn);
+  const setColumns = (a: React.SetStateAction<string[]>) => {
+    _setColumns(a);
+    if (setColumnsIn) setColumnsIn(a);
+  };
+  const setSortIndex = (a: number) => {
+    _setSortIndex(a);
+    if (setSortIndexIn) setSortIndexIn(a);
+  };
 
-  const sortData = (dataIn: T[], idx: number, oldFactor: number = sortIndex): T[] => {
-    if ((-idx === oldFactor && oldFactor !== -1) || (idx === oldFactor && idx === 1)) {
-      setSortIndex(0);
-      return dataIn ?? [];
+  useEffect(() => {
+    _setColumns(columnsIn);
+  }, [columnsIn]);
+
+  useEffect(() => {
+    if (sortIndexIn !== undefined) {
+      _setSortIndex(sortIndexIn);
     }
-    let factor = idx === oldFactor ? -1 : 1;
-    if (idx === 1 && idx !== Math.abs(oldFactor)) {
-      factor *= -1;
-    }
-    const sort = dataIn!.toSorted((a, b) => {
-      const valueA = stringToNumber(getHeader(a, ['name'].concat(selectedHeaders)[idx - 1]));
-      const valueB = stringToNumber(getHeader(b, ['name'].concat(selectedHeaders)[idx - 1]));
+  }, [sortIndexIn]);
+
+  const sortedData = useMemo(() => {
+    if (sortIndex === 0) return data;
+    const idx = Math.abs(sortIndex);
+    const factor = Math.sign(sortIndex);
+    return data?.toSorted((a, b) => {
+      const valueA = stringToNumber(getHeader(a, ['searchableName'].concat(columns)[idx - 1]));
+      const valueB = stringToNumber(getHeader(b, ['searchableName'].concat(columns)[idx - 1]));
       switch (typeof valueA) {
         case 'number':
           return factor * ((valueB as number) - valueA);
         case 'string': {
-          return factor * (valueB as string).localeCompare(valueA);
+          return -factor * (valueB as string).localeCompare(valueA);
         }
         default:
           return 0;
       }
     });
-    setSortIndex(factor * idx);
-    return sort;
-  };
-  const SortDirection = sortIndex > 0 ? IconCaretDown : IconCaretUp;
+    // This is actually a proper time to disable this error, if we add
+    // getHeader to the deps, the useMemo will re-calc on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortIndex, data, columns]);
+
+  const SortDirection = useMemo(() => (sortIndex > 0 ? IconCaretDown : IconCaretUp), [sortIndex]);
+
+  function cycleSortIndex(newIndex: number) {
+    if (newIndex !== Math.abs(sortIndex) && newIndex !== 0) {
+      setSortIndex(newIndex);
+      return;
+    }
+    //we know that we are clicking the same column again
+    if (sortIndex > 0) {
+      setSortIndex(-sortIndex);
+    } else {
+      setSortIndex(0);
+    }
+  }
+
   return (
     <div>
       {editable && (
@@ -161,9 +122,9 @@ export function InternalDynamicTable<T extends InputType>({
           <MultiSelect
             label="Select Columns"
             placeholder="Pick value"
-            data={Object.keys(chartData[0]?.stats! ?? {})}
-            value={selectedHeaders}
-            onChange={setSelectedHeaders}
+            data={Object.keys(sortedData?.[0]?.stats! ?? {})}
+            value={columns}
+            onChange={setColumns}
             clearable
             searchable
             nothingFoundMessage="No Such Statistic!"
@@ -174,9 +135,9 @@ export function InternalDynamicTable<T extends InputType>({
           <MultiSelect
             label="Select Columns"
             placeholder="Pick value"
-            data={Object.keys(chartData[0]?.stats! ?? {})}
-            value={selectedHeaders}
-            onChange={setSelectedHeaders}
+            data={Object.keys(sortedData?.[0]?.stats! ?? {})}
+            value={columns}
+            onChange={setColumns}
             clearable
             searchable
             nothingFoundMessage="No Such Statistic!"
@@ -186,16 +147,16 @@ export function InternalDynamicTable<T extends InputType>({
           />
         </>
       )}
-      {(data?.length ?? 0) > 0 ? (
+      {sortedData && sortedData.length > 0 ? (
         <Table striped stickyHeader>
           <Table.Thead style={{ color: 'var(--mantine-color-green-8)' }}>
             <Table.Tr>
               <Table.Th style={{ width: '20px' }}></Table.Th>
-              {['name'].concat(selectedHeaders).map((value, index) => (
+              {['name'].concat(columns).map((value, index) => (
                 <Table.Th
                   key={index}
                   style={{ width: '200px', textAlign: 'center' }}
-                  onClick={() => setChartData(sortData(data ?? [], index + 1))}
+                  onClick={() => cycleSortIndex(index + 1)}
                 >
                   {index + 1 === Math.abs(sortIndex) ? (
                     <>
@@ -210,7 +171,7 @@ export function InternalDynamicTable<T extends InputType>({
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {chartData.map((value, index) => {
+            {sortedData.map((value, index) => {
               if (index > maxRows && maxRows > 0) return null;
               return (
                 <Table.Tr key={index} style={{ textAlign: 'center' }}>
@@ -223,7 +184,7 @@ export function InternalDynamicTable<T extends InputType>({
                       ></Image>
                     </Link>
                   </Table.Td>
-                  {['name'].concat(selectedHeaders).map((value2, idx) => (
+                  {['name'].concat(columns).map((value2, idx) => (
                     <Table.Td key={idx}>
                       <Link className="hideLink" href={objToLink(value)}>
                         {getHeader(value, value2)}
@@ -241,11 +202,11 @@ export function InternalDynamicTable<T extends InputType>({
             <Table.Thead style={{ color: 'var(--mantine-color-green-8)' }}>
               <Table.Tr>
                 <Table.Th style={{ width: '20px' }}></Table.Th>
-                {['name'].concat(selectedHeaders).map((value, index) => (
+                {['name'].concat(columns).map((value, index) => (
                   <Table.Th
                     key={index}
                     style={{ width: '200px', textAlign: 'center' }}
-                    onClick={() => setChartData(sortData(data ?? [], index + 1))}
+                    onClick={() => cycleSortIndex(index + 1)}
                   >
                     {index + 1 === Math.abs(sortIndex) ? (
                       <>
