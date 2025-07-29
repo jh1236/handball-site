@@ -125,15 +125,15 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
   }, players[0]);
   return (
     <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
-      <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
+      <Link href={`/${tournament && `${tournament}/`}players/${player.searchableName}`} className="hideLink">
         <Text size="auto" fw={700} ta="center">
           {player.name}
         </Text>
       </Link>
-      <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
+      <Link href={`/${tournament && `${tournament}/`}players/${player.searchableName}`} className="hideLink">
         <Image alt={player.name} src={player.bigImageUrl} h="200" w="auto" m="auto"></Image>
       </Link>
-      <Link href={`/${tournament}/players/${player.searchableName}`} className="hideLink">
+      <Link href={`/${tournament && `${tournament}/`}players/${player.searchableName}`} className="hideLink">
         <Text ta="center">
           With {player.stats![stat.stat]} {stat.description}
         </Text>
