@@ -1,5 +1,4 @@
 import { GameState } from '@/components/HandballComponenets/GameState';
-import { GameEventStructure } from '@/ServerActions/types';
 
 function nextPoint(game: GameState, swap?: boolean) {
   for (const i of [
@@ -29,6 +28,22 @@ function nextPoint(game: GameState, swap?: boolean) {
     }
   }
   game.faulted.set(false);
+}
+
+export function didWinGame(game: GameState, firstTeam: boolean) {
+  if (!game.ended.get) return false;
+  if (Math.max(game.teamOne.score.get, game.teamTwo.score.get) < 5) {
+    return false;
+  }
+  if (game.teamOne.score.get !== game.teamTwo.score.get) {
+    return firstTeam === game.teamOne.score.get > game.teamTwo.score.get;
+  }
+  return firstTeam !== game.firstTeamScoredLast.get;
+}
+
+export function decidedOnCoinToss(game: GameState) {
+  if (!game.ended.get) return false;
+  return Math.max(game.teamOne.score.get, game.teamTwo.score.get) < 5;
 }
 
 export function scoreLocal(game: GameState, firstTeam: boolean): void {
@@ -63,6 +78,10 @@ export function forfeitLocal(game: GameState, firstTeam: boolean) {
   const myTeam = firstTeam ? game.teamOne : game.teamTwo;
   const otherTeam = firstTeam ? game.teamTwo : game.teamOne;
   otherTeam.score.set(Math.max(11, myTeam.score.get + 2));
+}
+
+export function abandonLocal(game: GameState) {
+  game.abandoned.set(true);
 }
 
 export function endTimeoutLocal(game: GameState): void {
@@ -208,46 +227,5 @@ export function cardLocal(
   player.set(outPlayer);
   if (outOtherPlayer !== otherPlayer.get!) {
     otherPlayer.set(outOtherPlayer);
-  }
-}
-
-export function addGameEventToGame(game: GameState, gameEvent: GameEventStructure) {
-  const team = gameEvent.firstTeam ? game.teamOne : game.teamTwo;
-  const leftPlayer = team.left.get?.searchableName === gameEvent.player.searchableName;
-  switch (gameEvent.eventType) {
-    case 'Score':
-      scoreLocal(game, gameEvent.firstTeam);
-      break;
-    case 'Timeout':
-      timeoutLocal(game, gameEvent.firstTeam);
-      break;
-    case 'Forfeit':
-      forfeitLocal(game, gameEvent.firstTeam);
-      break;
-    case 'End Timeout':
-      endTimeoutLocal(game);
-      break;
-    case 'Fault':
-      faultLocal(game);
-      break;
-    case 'Substitute':
-      subLocal(game, gameEvent.firstTeam, leftPlayer);
-      break;
-    case 'End Game':
-      game.ended.set(true);
-      break;
-
-    case 'Warning':
-    case 'Green Card':
-    case 'Yellow Card':
-    case 'Red Card':
-      cardLocal(
-        game,
-        gameEvent.eventType.replaceAll(' Card', '') as 'Green' | 'Yellow' | 'Red' | 'Warning',
-        gameEvent.firstTeam,
-        leftPlayer,
-        gameEvent.notes,
-        gameEvent.details
-      );
   }
 }

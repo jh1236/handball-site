@@ -61,6 +61,11 @@ function GenerateOfficialBubble(official: OfficialStructure, tournament?: string
           ></Image>
         </Link>
       </Box>
+      {tournament && (
+        <Text size="auto" ta="center">
+          <i>{official.role}</i>
+        </Text>
+      )}
     </Container>
   );
 }

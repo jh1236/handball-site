@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { SERVER_ADDRESS } from '@/app/config';
 
 export async function tokenFetcher(url: string, args: any = {}) {
@@ -25,7 +25,7 @@ export function useUserData() {
   //   permissionLevel: 5,
   //   username: 'testing',
   // };
-  const [permissionLevel, setPermissionLevel] = React.useState<number | null>(null);
+  const [permissions, setPermissions] = React.useState<{ [key: string]: number } | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
   useEffect(() => {
     if (loggedIn()) {
@@ -36,21 +36,37 @@ export function useUserData() {
           localLogout();
         }
       }
-      setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
+      setPermissions(JSON.parse(localStorage.getItem('permissions') ?? '{}'));
       setUsername(localStorage.getItem('username'));
     } else {
-      setPermissionLevel(0);
+      setPermissions({});
     }
   }, []);
   return {
+    isAdmin: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) === 5,
+      [permissions]
+    ),
+    isLoggedIn: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 1,
+      [permissions]
+    ),
+    isOfficial: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 2,
+      [permissions]
+    ),
+    isTournamentDirector: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 4,
+      [permissions]
+    ),
+    isUmpireManager: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 3,
+      [permissions]
+    ),
+    loading: permissions === null,
+    permissions,
+    setPermissions,
     setUsername,
-    setPermissionLevel,
-    loading: permissionLevel === null,
-    isAdmin: (permissionLevel ?? 5) === 5,
-    isOfficial: (permissionLevel ?? 5) >= 2,
-    isUmpireManager: (permissionLevel ?? 5) >= 4,
-    isLoggedIn: (permissionLevel ?? 5) !== 0,
-    permissionLevel,
     username,
   };
 }

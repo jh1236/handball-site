@@ -177,7 +177,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
           {/*<Tabs.Tab value="graphs" leftSection={<IconChartScatter size={12} />}>*/}
           {/*  Graphs*/}
           {/*</Tabs.Tab>*/}
-          {isUmpireManager && (
+          {isUmpireManager(tournament) && (
             <Tabs.Tab value="mgmt" leftSection={<IconAlertTriangle size={12} />}>
               Cards
             </Tabs.Tab>
@@ -275,7 +275,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                           {findPlayer(game, player)?.stats?.['Elo Delta']}
                         </strong>
                       </List.Item>
-                      {isUmpireManager && (
+                      {isUmpireManager(tournament) && (
                         <>
                           <List.Item>
                             <Box display="flex">
@@ -325,7 +325,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
         <Tabs.Panel value="charts">How did you even get here?</Tabs.Panel>
 
         <Tabs.Panel value="mgmt">
-          {isUmpireManager && (
+          {isUmpireManager(tournament) && (
             <Accordion>
               <Accordion.Item value="cards">
                 <Accordion.Control icon={<IconTriangleInvertedFilled />}>Cards</Accordion.Control>

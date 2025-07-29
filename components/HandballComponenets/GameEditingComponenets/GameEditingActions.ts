@@ -4,6 +4,7 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
 import { QUICK_GAME_END } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import {
+  abandonLocal,
   aceLocal,
   cardLocal,
   endTimeoutLocal,
@@ -15,6 +16,7 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { GameState } from '@/components/HandballComponenets/GameState';
 import {
+  abandonGame,
   aceForGame,
   cardForGame,
   deleteGame,
@@ -28,8 +30,9 @@ import {
   timeoutForGame,
   undoForGame,
 } from '@/ServerActions/GameActions';
+import { OfficialStructure } from '@/ServerActions/types';
 
-export function begin(game: GameState) {
+export function begin(game: GameState, official?: OfficialStructure, scorer?: OfficialStructure) {
   startLoading();
   startGame(
     game.id,
@@ -44,7 +47,9 @@ export function begin(game: GameState) {
       game.teamTwo.left.get?.searchableName,
       game.teamTwo.right.get?.searchableName,
       game.teamTwo.sub.get?.searchableName,
-    ].filter((a) => typeof a === 'string')
+    ].filter((a) => typeof a === 'string'),
+    official?.searchableName,
+    scorer?.searchableName
   ).then(() => sync(game));
 }
 
@@ -99,6 +104,11 @@ export function forfeit(game: GameState, firstTeam: boolean) {
   forfeitGame(game.id, firstTeam).catch(() => sync(game));
 }
 
+export function abandon(game: GameState) {
+  abandonLocal(game);
+  abandonGame(game.id).catch(() => sync(game));
+}
+
 export function endTimeout(game: GameState): void {
   endTimeoutLocal(game);
   endTimeoutForGame(game.id).catch(() => sync(game));
@@ -133,7 +143,7 @@ export function greenCard(
   leftPlayer: boolean,
   reason: string
 ): void {
-  card(game, 'Green', firstTeam, leftPlayer, reason, 2);
+  card(game, 'Green', firstTeam, leftPlayer, reason, game.blitzGame.get ? 1 : 2);
 }
 
 export function yellowCard(

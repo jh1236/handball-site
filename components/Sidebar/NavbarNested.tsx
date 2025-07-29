@@ -44,7 +44,7 @@ import { TournamentStructure } from '@/ServerActions/types';
 interface NavbarNestedProps {
   sidebarVisible?: boolean;
   tournamentName?: string;
-  setSidebarVisible: (prevState: boolean) => void;
+  setSidebarVisible: (prevState: React.SetStateAction<boolean>) => void;
   mobile?: boolean;
 }
 
@@ -58,8 +58,13 @@ export function NavbarNested({
   const [myTournament, setMyTournament] = React.useState<TournamentStructure | undefined>(
     undefined
   );
-  const { isOfficial, isAdmin, username, isUmpireManager } = useUserData();
+  const { isOfficial, isTournamentDirector, isAdmin, username, isUmpireManager } = useUserData();
   const [tournaments, setTournaments] = React.useState<TournamentStructure[]>([]);
+  const [mounted, setMounted] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   function makeSidebarLayout() {
     const out: {
@@ -87,8 +92,11 @@ export function NavbarNested({
           { label: 'Teams', link: `/${tournamentName}/teams` },
         ],
       });
-      if (isUmpireManager) {
+      if (isUmpireManager(myTournament?.searchableName) && myTournament?.started) {
         out[out.length - 1].links!.push({ label: 'Manage', link: `/${tournamentName}/manage` });
+      }
+      if (isTournamentDirector(myTournament?.searchableName) && !myTournament?.started) {
+        out[out.length - 1].links!.push({ label: 'Setup', link: `/${tournamentName}/setup` });
       }
     }
     out.push(
@@ -97,7 +105,7 @@ export function NavbarNested({
       { label: 'Lifetime Officials', icon: GiWhistle, link: '/officials' },
       { label: 'Lifetime Teams', icon: IconUsersGroup, link: '/teams' }
     );
-    if (isOfficial) {
+    if (isOfficial('suss_practice')) {
       out.push({ label: 'Create Game', icon: IconNote, link: '/games/create' });
     }
     out.push(
@@ -121,8 +129,6 @@ export function NavbarNested({
 
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
-  let IconColorScheme = IconSun;
-
   const flipColorScheme = () => {
     setColorScheme(colorScheme === 'light' ? 'dark' : 'light');
   };
@@ -131,10 +137,7 @@ export function NavbarNested({
     if (ref.current) {
       ref.current.style.transition = '0.6s cubic-bezier(0.25, 1, 0.5, 1)';
     }
-  }, [ref.current]);
-  useEffect(() => {
-    IconColorScheme = colorScheme === 'light' ? IconMoon : IconSun;
-  }, [colorScheme]);
+  }, [ref]);
 
   const router = useRouter();
 
@@ -240,7 +243,7 @@ export function NavbarNested({
               </Popover.Target>
               <Popover.Dropdown>
                 <Button onClick={() => logoutAction().then(() => router.refresh())}>Logout</Button>
-                {isAdmin && (
+                {isAdmin('base') && (
                   <>
                     <br />
                     <br />
@@ -258,7 +261,12 @@ export function NavbarNested({
             </Popover>
           </div>
           <div style={{ width: '40%', float: 'right' }}>
-            <LinksGroup label="Theme" icon={IconColorScheme} key="Theme" action={flipColorScheme} />
+            <LinksGroup
+              label="Theme"
+              icon={mounted && colorScheme === 'light' ? IconMoon : IconSun}
+              key="Theme"
+              action={flipColorScheme}
+            />
           </div>
         </div>
       </nav>
