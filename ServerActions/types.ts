@@ -47,6 +47,7 @@ export interface TournamentStructure {
   ranked: boolean;
   twoCourts: boolean;
   hasScorer: boolean;
+  started: boolean;
   finished: boolean;
   inFinals: boolean;
   isPooled: boolean;
@@ -59,6 +60,7 @@ export interface TournamentStructure {
 }
 
 export interface OfficialStructure extends PersonStructure {
+  role: string;
   stats?: { [key: string]: number };
 
   [k: string]: any;
@@ -121,6 +123,7 @@ export interface GameStructure {
   tournament: TournamentStructure;
   teamOne: GameTeamStructure;
   teamTwo: GameTeamStructure;
+  abandoned: boolean;
   teamOneScore: number;
   teamTwoScore: number;
   teamOneTimeouts: number;
@@ -148,6 +151,8 @@ export interface GameStructure {
   events?: GameEventStructure[];
   timeoutExpirationTime: number;
   changeCode: number;
+  firstTeamScoredLast: boolean;
+  blitzGame: boolean;
   admin?: {
     notes?: string;
     cards: CardStructure[];

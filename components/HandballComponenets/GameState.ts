@@ -1,9 +1,34 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { playersFromGame } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
-import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import {
+  cardLocal,
+  endTimeoutLocal,
+  faultLocal,
+  forfeitLocal,
+  scoreLocal,
+  subLocal,
+  timeoutLocal,
+} from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
+import { GameEventStructure, GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+
+export function getWinningScore(game: GameState): number {
+  return game.blitzGame ? 7 : 11;
+}
+
+export function getForceWinningScore(game: GameState): number {
+  return 2 * getWinningScore(game);
+}
 
 export interface GameState {
+  practice: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
   badminton: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
+  abandoned: {
     get: boolean;
     set: (v: boolean) => void;
   };
@@ -19,10 +44,18 @@ export interface GameState {
     get: string;
     set: (v: string) => void;
   };
+  blitzGame: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
   id: number;
   teamOne: TeamState;
   teamTwo: TeamState;
   firstTeamServes: {
+    get: boolean;
+    set: (v: boolean) => void;
+  };
+  firstTeamScoredLast: {
     get: boolean;
     set: (v: boolean) => void;
   };
@@ -93,11 +126,15 @@ export function useGameState(game?: GameStructure) {
   const [faulted, setFaulted] = React.useState<boolean>(false);
   const [started, setStarted] = React.useState<boolean>(true);
   const [ended, setEnded] = React.useState<boolean>(false);
+  const [firstTeamScoredLast, setFirstTeamScoredLast] = React.useState<boolean>(false);
   const [firstTeamServes, setFirstTeamServes] = React.useState<boolean>(false);
+  const [abandoned, setAbandoned] = React.useState<boolean>(false);
   const [timeoutExpirationTime, setTimeoutExpirationTime] = React.useState<number>(-1);
   const [teamOneIGA, setTeamOneIGA] = React.useState<boolean>(true);
   const [notes, setNotes] = React.useState<string>('');
+  const [practice, setPractice] = React.useState<boolean>(game?.tournament.editable ?? false);
   const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
+  const [blitzGame, setBlitzGame] = React.useState<boolean>(false);
   const [badminton, setBadminton] = React.useState<boolean>(false);
 
   //team one state
@@ -141,6 +178,10 @@ export function useGameState(game?: GameStructure) {
   );
 
   useEffect(() => {
+    if (abandoned) {
+      setEnded(true);
+      return;
+    }
     if (teamOneScore || teamTwoScore) {
       const bigScore = Math.max(teamOneScore, teamTwoScore);
       const lilScore = Math.min(teamOneScore, teamTwoScore);
@@ -148,137 +189,201 @@ export function useGameState(game?: GameStructure) {
       if (bigScore - lilScore <= 1) return;
       setEnded(true);
     }
-  }, [teamOneScore, teamTwoScore]);
+  }, [teamOneScore, teamTwoScore, abandoned]);
 
-  const gameState: GameState = {
-    votes: {
-      get: votes,
-      set: setVotes,
-    },
-    badminton: {
-      get: badminton,
-      set: setBadminton,
-    },
-    timeoutExpirationTime: {
-      get: timeoutExpirationTime,
-      set: setTimeoutExpirationTime,
-    },
-    teamOneIGA: {
-      get: teamOneIGA,
-      set: setTeamOneIGA,
-    },
-    started: {
-      get: started,
-      set: setStarted,
-    },
-    ended: {
-      get: ended,
-      set: setEnded,
-    },
-    firstTeamServes: {
-      get: firstTeamServes,
-      set: setFirstTeamServes,
-    },
-    faulted: {
-      get: faulted,
-      set: setFaulted,
-    },
-    id: game?.id ?? -1,
-    servingFromLeft,
-    notes: {
-      get: notes,
-      set: setNotes,
-    },
-    teamOne: {
-      name: {
-        get: teamOneName,
-        set: setTeamOneName,
+  const gameState: GameState = useMemo(
+    () => ({
+      practice: {
+        get: practice,
+        set: setPractice,
       },
-      score: {
-        get: teamOneScore,
-        set: setTeamOneScore,
+      blitzGame: {
+        get: blitzGame,
+        set: setBlitzGame,
       },
-      rating: {
-        get: teamOneRating,
-        set: setTeamOneRating,
+      abandoned: {
+        get: abandoned,
+        set: setAbandoned,
       },
+      votes: {
+        get: votes,
+        set: setVotes,
+      },
+      badminton: {
+        get: badminton,
+        set: setBadminton,
+      },
+      timeoutExpirationTime: {
+        get: timeoutExpirationTime,
+        set: setTimeoutExpirationTime,
+      },
+      teamOneIGA: {
+        get: teamOneIGA,
+        set: setTeamOneIGA,
+      },
+      started: {
+        get: started,
+        set: setStarted,
+      },
+      ended: {
+        get: ended,
+        set: setEnded,
+      },
+      firstTeamServes: {
+        get: firstTeamServes,
+        set: setFirstTeamServes,
+      },
+      faulted: {
+        get: faulted,
+        set: setFaulted,
+      },
+      id: game?.id ?? -1,
+      servingFromLeft,
       notes: {
-        get: teamOneNotes,
-        set: setTeamOneNotes,
+        get: notes,
+        set: setNotes,
       },
-      protest: {
-        get: teamOneProtest,
-        set: setTeamOneProtest,
+      teamOne: {
+        name: {
+          get: teamOneName,
+          set: setTeamOneName,
+        },
+        score: {
+          get: teamOneScore,
+          set: setTeamOneScore,
+        },
+        rating: {
+          get: teamOneRating,
+          set: setTeamOneRating,
+        },
+        notes: {
+          get: teamOneNotes,
+          set: setTeamOneNotes,
+        },
+        protest: {
+          get: teamOneProtest,
+          set: setTeamOneProtest,
+        },
+        timeouts: {
+          get: teamOneTimeouts,
+          set: setTeamOneTimeouts,
+        },
+        servingFromLeft: {
+          get: teamOneServingLeft,
+          set: setTeamOneServingLeft,
+        },
+        left: {
+          get: teamOneLeft,
+          set: setTeamOneLeft,
+        },
+        right: {
+          get: teamOneRight,
+          set: setTeamOneRight,
+        },
+        sub: {
+          get: teamOneSub,
+          set: setTeamOneSub,
+        },
       },
-      timeouts: {
-        get: teamOneTimeouts,
-        set: setTeamOneTimeouts,
+      teamTwo: {
+        name: {
+          get: teamTwoName,
+          set: setTeamTwoName,
+        },
+        score: {
+          get: teamTwoScore,
+          set: setTeamTwoScore,
+        },
+        rating: {
+          get: teamTwoRating,
+          set: setTeamTwoRating,
+        },
+        notes: {
+          get: teamTwoNotes,
+          set: setTeamTwoNotes,
+        },
+        protest: {
+          get: teamTwoProtest,
+          set: setTeamTwoProtest,
+        },
+        timeouts: {
+          get: teamTwoTimeouts,
+          set: setTeamTwoTimeouts,
+        },
+        servingFromLeft: {
+          get: teamTwoServingLeft,
+          set: setTeamTwoServingLeft,
+        },
+        left: {
+          get: teamTwoLeft,
+          set: setTeamTwoLeft,
+        },
+        right: {
+          get: teamTwoRight,
+          set: setTeamTwoRight,
+        },
+        sub: {
+          get: teamTwoSub,
+          set: setTeamTwoSub,
+        },
       },
-      servingFromLeft: {
-        get: teamOneServingLeft,
-        set: setTeamOneServingLeft,
+      firstTeamScoredLast: {
+        get: firstTeamScoredLast,
+        set: setFirstTeamScoredLast,
       },
-      left: {
-        get: teamOneLeft,
-        set: setTeamOneLeft,
-      },
-      right: {
-        get: teamOneRight,
-        set: setTeamOneRight,
-      },
-      sub: {
-        get: teamOneSub,
-        set: setTeamOneSub,
-      },
-    },
-    teamTwo: {
-      name: {
-        get: teamTwoName,
-        set: setTeamTwoName,
-      },
-      score: {
-        get: teamTwoScore,
-        set: setTeamTwoScore,
-      },
-      rating: {
-        get: teamTwoRating,
-        set: setTeamTwoRating,
-      },
-      notes: {
-        get: teamTwoNotes,
-        set: setTeamTwoNotes,
-      },
-      protest: {
-        get: teamTwoProtest,
-        set: setTeamTwoProtest,
-      },
-      timeouts: {
-        get: teamTwoTimeouts,
-        set: setTeamTwoTimeouts,
-      },
-      servingFromLeft: {
-        get: teamTwoServingLeft,
-        set: setTeamTwoServingLeft,
-      },
-      left: {
-        get: teamTwoLeft,
-        set: setTeamTwoLeft,
-      },
-      right: {
-        get: teamTwoRight,
-        set: setTeamTwoRight,
-      },
-      sub: {
-        get: teamTwoSub,
-        set: setTeamTwoSub,
-      },
-    },
+    }),
+    [
+      abandoned,
+      badminton,
+      ended,
+      faulted,
+      firstTeamScoredLast,
+      firstTeamServes,
+      game?.id,
+      notes,
+      practice,
+      servingFromLeft,
+      started,
+      teamOneIGA,
+      teamOneLeft,
+      teamOneName,
+      teamOneNotes,
+      teamOneProtest,
+      teamOneRating,
+      teamOneRight,
+      teamOneScore,
+      teamOneServingLeft,
+      teamOneSub,
+      teamOneTimeouts,
+      teamTwoLeft,
+      teamTwoName,
+      teamTwoNotes,
+      teamTwoProtest,
+      teamTwoRating,
+      teamTwoRight,
+      teamTwoScore,
+      teamTwoServingLeft,
+      teamTwoSub,
+      teamTwoTimeouts,
+      timeoutExpirationTime,
+      votes,
+    ]
+  );
+
+  return {
+    addGameEventToState: useCallback(
+      (gameEvent: GameEventStructure) => addGameEventToGame(gameState, gameEvent),
+      [gameState]
+    ),
+    gameState,
+    setGameForState: useCallback(
+      (gameIn: GameStructure) => setGameState(gameIn, gameState),
+      [gameState]
+    ),
   };
-
-  return gameState;
 }
 
-export function setGameState(gameObj: GameStructure, state: GameState) {
+function setGameState(gameObj: GameStructure, state: GameState) {
   state.firstTeamServes.set(gameObj.firstTeamToServe);
   state.faulted.set(gameObj.faulted);
   state.teamOneIGA.set(gameObj.firstTeamIga ?? true);
@@ -287,6 +392,10 @@ export function setGameState(gameObj: GameStructure, state: GameState) {
   state.ended.set(gameObj.someoneHasWon);
   state.votes.set(playersFromGame(gameObj));
   state.badminton.set(gameObj.tournament.usingBadmintonServes);
+  state.practice.set(gameObj.tournament.editable);
+  state.abandoned.set(gameObj.abandoned);
+  state.firstTeamScoredLast.set(gameObj.firstTeamScoredLast);
+  state.blitzGame.set(gameObj.blitzGame);
   //Team Specific
   state.teamOne.name.set(gameObj.teamOne.name);
   state.teamOne.timeouts.set(gameObj.teamOneTimeouts);
@@ -324,5 +433,46 @@ export function setGameState(gameObj: GameStructure, state: GameState) {
     state.teamTwo.left.set(teamTwo.captain);
     state.teamTwo.right.set(teamTwo.nonCaptain || undefined);
     state.teamTwo.sub.set(teamTwo.substitute || undefined);
+  }
+}
+
+function addGameEventToGame(game: GameState, gameEvent: GameEventStructure) {
+  const team = gameEvent.firstTeam ? game.teamOne : game.teamTwo;
+  const leftPlayer = team.left.get?.searchableName === gameEvent.player?.searchableName;
+  switch (gameEvent.eventType) {
+    case 'Score':
+      scoreLocal(game, gameEvent.firstTeam);
+      break;
+    case 'Timeout':
+      timeoutLocal(game, gameEvent.firstTeam);
+      break;
+    case 'Forfeit':
+      forfeitLocal(game, gameEvent.firstTeam);
+      break;
+    case 'End Timeout':
+      endTimeoutLocal(game);
+      break;
+    case 'Fault':
+      faultLocal(game);
+      break;
+    case 'Substitute':
+      subLocal(game, gameEvent.firstTeam, leftPlayer);
+      break;
+    case 'End Game':
+      game.ended.set(true);
+      break;
+
+    case 'Warning':
+    case 'Green Card':
+    case 'Yellow Card':
+    case 'Red Card':
+      cardLocal(
+        game,
+        gameEvent.eventType.replaceAll(' Card', '') as 'Green' | 'Yellow' | 'Red' | 'Warning',
+        gameEvent.firstTeam,
+        leftPlayer,
+        gameEvent.notes,
+        gameEvent.details
+      );
   }
 }

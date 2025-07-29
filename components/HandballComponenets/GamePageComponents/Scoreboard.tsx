@@ -13,10 +13,9 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { addGameEventToGame } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
-import { setGameState, TeamState, useGameState } from '@/components/HandballComponenets/GameState';
+import { TeamState, useGameState } from '@/components/HandballComponenets/GameState';
 import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
-import { PlayerGameStatsStructure } from '@/ServerActions/types';
+import { PlayerGameStatsStructure, TeamStructure } from '@/ServerActions/types';
 import classes from './Scoreboard.module.css';
 
 interface ScoreboardProps {
@@ -30,7 +29,7 @@ function cardColorFromPlayer(player: PlayerGameStatsStructure) {
 }
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
-  const gameState = useGameState();
+  const { gameState, setGameForState, addGameEventToState } = useGameState();
   const [teamOneColor, setTeamOneColor] = useState<number[] | undefined>();
   const [teamTwoColor, setTeamTwoColor] = useState<number[] | undefined>();
   const [teamOneImage, setTeamOneImage] = useState<string | undefined>();
@@ -74,11 +73,21 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     const message = lastJsonMessage as Message;
     if (message?.type === 'update') {
       const gameUpdate = (lastJsonMessage as UpdateMessage).game;
-      setGameState(gameUpdate, gameState);
-      setTeamOneColor(gameUpdate.teamOne.teamColorAsRGBABecauseDigbyIsLazy || undefined);
-      setTeamTwoColor(gameUpdate.teamTwo.teamColorAsRGBABecauseDigbyIsLazy || undefined);
-      setTeamOneImage(gameUpdate.teamOne.bigImageUrl ?? gameUpdate.teamOne.imageUrl);
-      setTeamTwoImage(gameUpdate.teamTwo.bigImageUrl ?? gameUpdate.teamTwo.imageUrl);
+      setGameForState(gameUpdate);
+      let teamOneReceived: TeamStructure;
+      let teamTwoReceived: TeamStructure;
+      if (gameUpdate.firstTeamIga) {
+        teamOneReceived = gameUpdate.teamOne;
+        teamTwoReceived = gameUpdate.teamTwo;
+      } else {
+        teamOneReceived = gameUpdate.teamTwo;
+        teamTwoReceived = gameUpdate.teamOne;
+      }
+      setTeamOneColor(teamOneReceived.teamColorAsRGBABecauseDigbyIsLazy || undefined);
+      setTeamTwoColor(teamTwoReceived.teamColorAsRGBABecauseDigbyIsLazy || undefined);
+      setTeamOneImage(teamOneReceived.bigImageUrl ?? gameUpdate.teamOne.imageUrl);
+      setTeamTwoImage(teamTwoReceived.bigImageUrl ?? gameUpdate.teamTwo.imageUrl);
+
       if (gameUpdate.ended) {
         setTime(gameUpdate.length);
       } else {
@@ -93,13 +102,14 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       }
     } else if (message?.type === 'event') {
       const { event } = lastJsonMessage as EventMessage;
-      addGameEventToGame(gameState, event);
+      addGameEventToState(event);
       if (event.eventType === 'End Game') {
-        setTime(currentTime - time);
+        setTime(Date.now() - time);
       }
     }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeTimeout, lastJsonMessage, openTimeout]);
+    // disabling here so the same json message isn't reprocessed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeTimeout, lastJsonMessage, openTimeout, time]);
 
   if (!gameState.id) {
     return <>Loading...</>;

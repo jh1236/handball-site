@@ -20,10 +20,11 @@ export function loginAction(userId: string, password: string, remember: boolean)
       return Promise.reject(response.text());
     }
     return response.json().then((data) => {
+      data.permissions.base = data.basePermissions;
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
       localStorage.setItem('timeout', `${data.timeout}`);
-      localStorage.setItem('permissionLevel', `${data.permissionLevel}`);
+      localStorage.setItem('permissions', JSON.stringify(data.permissions));
     });
   });
 }
@@ -36,7 +37,7 @@ export function logoutAction(): Promise<void> {
     //is that we weren't logged in anyway
     localStorage.removeItem('token');
     localStorage.removeItem('username');
-    localStorage.removeItem('permissionLevel');
+    localStorage.removeItem('permissions');
     if (!response.ok) {
       return Promise.reject(response.text());
     }

@@ -621,6 +621,28 @@ export function forfeitGame(gameId: number, firstTeam: boolean): Promise<void> {
   });
 }
 
+export function abandonGame(gameId: number): Promise<void> {
+  const body: any = {
+    id: gameId,
+  };
+
+  return tokenFetch('/api/games/update/abandon', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
 export function resolveGame(gameId: number): Promise<void> {
   const body: any = {
     id: gameId,
@@ -719,7 +741,7 @@ export function endGame(
     body.teamTwoNotes = notesTeamTwo;
   }
   if (markedForReview) {
-    body.markedForReview = 'true';
+    body.markedForReview = true;
   }
 
   return tokenFetch('/api/games/update/end', {
@@ -777,6 +799,7 @@ export function createGameWithPlayers(
   tournament: SearchableName,
   playersOne: RealName[],
   playersTwo: RealName[],
+  blitzGame: boolean,
   official?: SearchableName,
   scorer?: SearchableName,
   teamOneName?: string,
@@ -799,6 +822,9 @@ export function createGameWithPlayers(
   }
   if (teamTwoName) {
     body.teamTwo = teamTwoName;
+  }
+  if (blitzGame !== undefined) {
+    body.blitzGame = blitzGame;
   }
   return tokenFetch('/api/games/update/create', {
     method: 'POST',
