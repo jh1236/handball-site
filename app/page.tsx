@@ -105,7 +105,7 @@ export default function HomePage() {
           <Grid w="98.5%">
             <Grid.Col span={{ base: 12, lg: 6 }}>
               <Box style={{ textAlign: 'center' }}>
-                <Title order={2}>Tournaments</Title>
+                <Title order={2}>Recent Tournaments</Title>
                 <TournamentList></TournamentList>
               </Box>
               <Box style={{ textAlign: 'center' }}>
