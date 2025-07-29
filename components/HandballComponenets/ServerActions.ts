@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { SERVER_ADDRESS } from '@/app/config';
 
 export async function tokenFetcher(url: string, args: any = {}) {
@@ -43,16 +43,30 @@ export function useUserData() {
     }
   }, []);
   return {
-    setUsername,
-    setPermissions,
+    isAdmin: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) === 5,
+      [permissions]
+    ),
+    isLoggedIn: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 1,
+      [permissions]
+    ),
+    isOfficial: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 2,
+      [permissions]
+    ),
+    isTournamentDirector: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 4,
+      [permissions]
+    ),
+    isUmpireManager: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 3,
+      [permissions]
+    ),
     loading: permissions === null,
-    isAdmin: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) === 5,
-    isOfficial: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 2,
-    isUmpireManager: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 3,
-    isTournamentDirector: (tournament?: string) =>
-      tournament && (permissions?.[tournament] ?? 0) >= 4,
-    isLoggedIn: (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 1,
     permissions,
+    setPermissions,
+    setUsername,
     username,
   };
 }
