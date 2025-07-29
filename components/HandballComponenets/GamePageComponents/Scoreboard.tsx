@@ -15,8 +15,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { TeamState, useGameState } from '@/components/HandballComponenets/GameState';
 import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
-
-import {GameEventStructure,  PlayerGameStatsStructure, TeamStructure } from '@/ServerActions/types';
+import { GameEventStructure, PlayerGameStatsStructure, TeamStructure } from '@/ServerActions/types';
 import classes from './Scoreboard.module.css';
 
 interface ScoreboardProps {
