@@ -12,7 +12,7 @@ export function TournamentList() {
 
   if (!tournaments) {
     return (
-      <Tabs style={{ minHeight: 400 }} defaultValue="inProgress">
+      <Tabs style={{ minHeight: 350 }} defaultValue="inProgress">
         <Tabs.List grow>
           <Tabs.Tab value="inProgress">In Progress and Upcoming</Tabs.Tab>
           <Tabs.Tab value="done">Completed</Tabs.Tab>
@@ -40,7 +40,7 @@ export function TournamentList() {
     );
   }
   return (
-    <Tabs style={{ minHeight: 400 }} defaultValue="inProgress">
+    <Tabs style={{ minHeight: 350 }} defaultValue="inProgress">
       <Tabs.List grow>
         <Tabs.Tab value="inProgress">In Progress and Upcoming</Tabs.Tab>
         <Tabs.Tab value="done">Completed</Tabs.Tab>
