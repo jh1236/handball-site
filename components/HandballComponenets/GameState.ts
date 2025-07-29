@@ -333,6 +333,7 @@ export function useGameState(game?: GameStructure) {
       },
     }),
     [
+      blitzGame,
       abandoned,
       badminton,
       ended,
