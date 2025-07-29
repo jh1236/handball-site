@@ -1,8 +1,15 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Box, Button, LoadingOverlay } from '@mantine/core';
+import {
+  Box,
+  Button,
+  createTheme,
+  DEFAULT_THEME,
+  LoadingOverlay,
+  MantineProvider,
+} from '@mantine/core';
 import { CreatePlayerButton } from '@/components/HandballComponenets/GameCreatingComponents/CreatePlayerButton';
 import { CreateTeamButton } from '@/components/HandballComponenets/GameCreatingComponents/CreateTeamButton';
 import { GameSettings } from '@/components/HandballComponenets/GameCreatingComponents/GameSettings';
@@ -19,6 +26,7 @@ export default function CreateGamePage() {
   const [teamOneName, setTeamOneName] = useState<string | undefined>('');
   const [teamTwoRight, setTeamTwoRight] = useState<string | undefined>(undefined);
   const [teamTwoLeft, setTeamTwoLeft] = useState<string | undefined>(undefined);
+  const [blitzGame, setBlitzGame] = useState<boolean>(false);
   const [teamTwoName, setTeamTwoName] = useState<string | undefined>('');
   const { isOfficial } = useUserData();
   useEffect(() => {
@@ -36,94 +44,107 @@ export default function CreateGamePage() {
       </Link>
     </>
   );
-
+  const theme = useMemo(
+    () =>
+      createTheme({
+        colors: {
+          'serving-color': blitzGame ? DEFAULT_THEME.colors.green : DEFAULT_THEME.colors.teal,
+          'player-color': blitzGame ? DEFAULT_THEME.colors.teal : DEFAULT_THEME.colors.blue,
+        },
+      }),
+    [blitzGame]
+  );
   return (
-    <Box style={{ width: '100%', height: '100vh' }}>
-      <LoadingOverlay
-        overlayProps={{
-          color: '#222',
-          blur: 15,
-        }}
-        visible={!isOfficial('suss_practice')}
-        loaderProps={{ children: loginProps }}
-      />
-      <Box style={{ width: '100%', height: '40%' }}>
-        <Box style={{ width: '50%', height: '90%', float: 'left' }}>
-          <CreatePlayerButton
-            players={players}
-            player={teamOneRight}
-            setPlayer={(a) => {
-              setTeamOneRight(a);
-            }}
-            leftSide={false}
-          ></CreatePlayerButton>
+    <MantineProvider theme={theme}>
+      <Box style={{ width: '100%', height: '100vh' }}>
+        <LoadingOverlay
+          overlayProps={{
+            color: '#222',
+            blur: 15,
+          }}
+          visible={!isOfficial('suss_practice')}
+          loaderProps={{ children: loginProps }}
+        />
+        <Box style={{ width: '100%', height: '40%' }}>
+          <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+            <CreatePlayerButton
+              players={players}
+              player={teamOneRight}
+              setPlayer={(a) => {
+                setTeamOneRight(a);
+              }}
+              leftSide={false}
+            ></CreatePlayerButton>
+          </Box>
+          <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+            <CreatePlayerButton
+              players={players}
+              player={teamOneLeft}
+              setPlayer={setTeamOneLeft}
+              leftSide={true}
+            ></CreatePlayerButton>
+          </Box>
+          <Box style={{ width: '100%', height: '10%', float: 'right' }}>
+            <CreateTeamButton
+              teams={teams}
+              leftPlayer={teamOneLeft}
+              rightPlayer={teamOneRight}
+              setLeftPlayer={setTeamOneLeft}
+              setRightPlayer={setTeamOneRight}
+              teamName={teamOneName}
+              setTeamName={setTeamOneName}
+            ></CreateTeamButton>
+          </Box>
         </Box>
-        <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-          <CreatePlayerButton
-            players={players}
-            player={teamOneLeft}
-            setPlayer={setTeamOneLeft}
-            leftSide={true}
-          ></CreatePlayerButton>
+        <Box
+          style={{
+            width: '100%',
+            height: '20%',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <GameSettings
+            playersOne={[teamOneLeft, teamOneRight].filter((a) => typeof a === 'string')}
+            playersTwo={[teamTwoLeft, teamTwoRight].filter((a) => typeof a === 'string')}
+            teamNameOne={teamOneName}
+            teamNameTwo={teamTwoName}
+            blitzGame={blitzGame}
+            setBlitzGame={setBlitzGame}
+          ></GameSettings>
         </Box>
-        <Box style={{ width: '100%', height: '10%', float: 'right' }}>
-          <CreateTeamButton
-            teams={teams}
-            leftPlayer={teamOneLeft}
-            rightPlayer={teamOneRight}
-            setLeftPlayer={setTeamOneLeft}
-            setRightPlayer={setTeamOneRight}
-            teamName={teamOneName}
-            setTeamName={setTeamOneName}
-          ></CreateTeamButton>
+        <Box style={{ width: '100%', height: '40%' }}>
+          <Box style={{ width: '100%', height: '10%', float: 'right' }}>
+            <CreateTeamButton
+              teams={teams}
+              leftPlayer={teamTwoLeft}
+              rightPlayer={teamTwoRight}
+              setLeftPlayer={setTeamTwoLeft}
+              setRightPlayer={setTeamTwoRight}
+              setTeamName={setTeamTwoName}
+              teamName={teamTwoName}
+            ></CreateTeamButton>
+          </Box>
+          <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+            <CreatePlayerButton
+              players={players}
+              player={teamTwoLeft}
+              setPlayer={setTeamTwoLeft}
+              leftSide={true}
+            ></CreatePlayerButton>
+          </Box>
+          <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+            <CreatePlayerButton
+              players={players}
+              player={teamTwoRight}
+              setPlayer={setTeamTwoRight}
+              leftSide={false}
+            ></CreatePlayerButton>
+          </Box>
         </Box>
       </Box>
-      <Box
-        style={{
-          width: '100%',
-          height: '20%',
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <GameSettings
-          playersOne={[teamOneLeft, teamOneRight].filter((a) => typeof a === 'string')}
-          playersTwo={[teamTwoLeft, teamTwoRight].filter((a) => typeof a === 'string')}
-          teamNameOne={teamOneName}
-          teamNameTwo={teamTwoName}
-        ></GameSettings>
-      </Box>
-      <Box style={{ width: '100%', height: '40%' }}>
-        <Box style={{ width: '100%', height: '10%', float: 'right' }}>
-          <CreateTeamButton
-            teams={teams}
-            leftPlayer={teamTwoLeft}
-            rightPlayer={teamTwoRight}
-            setLeftPlayer={setTeamTwoLeft}
-            setRightPlayer={setTeamTwoRight}
-            setTeamName={setTeamTwoName}
-            teamName={teamTwoName}
-          ></CreateTeamButton>
-        </Box>
-        <Box style={{ width: '50%', height: '90%', float: 'left' }}>
-          <CreatePlayerButton
-            players={players}
-            player={teamTwoLeft}
-            setPlayer={setTeamTwoLeft}
-            leftSide={true}
-          ></CreatePlayerButton>
-        </Box>
-        <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-          <CreatePlayerButton
-            players={players}
-            player={teamTwoRight}
-            setPlayer={setTeamTwoRight}
-            leftSide={false}
-          ></CreatePlayerButton>
-        </Box>
-      </Box>
-    </Box>
+    </MantineProvider>
   );
 }
