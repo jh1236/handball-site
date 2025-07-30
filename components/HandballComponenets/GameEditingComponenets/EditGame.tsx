@@ -55,7 +55,7 @@ export function reloadGame(gameID: number) {
 }
 
 export function EditGame({ game }: { game: number }) {
-  const { isUmpireManager, isOfficial } = useUserData();
+  const { isUmpireManager, isOfficial, loading } = useUserData();
   const [officials, setOfficials] = useState<OfficialStructure[]>([]);
   const [scorer, setScorer] = useState<OfficialStructure>();
   const [official, setOfficial] = useState<OfficialStructure>();
@@ -165,7 +165,7 @@ export function EditGame({ game }: { game: number }) {
             : DEFAULT_THEME.colors.blue,
         },
       }),
-    [gameState.blitzGame]
+    [gameState.blitzGame.get]
   );
 
   return (
@@ -183,8 +183,9 @@ export function EditGame({ game }: { game: number }) {
             blur: 15,
           }}
           visible={
-            !isOfficial(gameObj?.tournament.searchableName) ||
-            (gameObj?.status === 'Official' && editOfficialGame)
+            !loading &&
+            (!isOfficial(gameObj?.tournament.searchableName) ||
+              (gameObj?.status === 'Official' && editOfficialGame))
           }
           loaderProps={{
             children:

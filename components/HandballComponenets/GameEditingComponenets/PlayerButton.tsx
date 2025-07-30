@@ -1,4 +1,11 @@
-import React, { ForwardRefExoticComponent, Fragment, useEffect, useMemo, useState } from 'react';
+import React, {
+  ForwardRefExoticComponent,
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   IconArrowsLeftRight,
   IconArrowsUpDown,
@@ -105,7 +112,7 @@ function getActions(
   firstTeam: boolean,
   leftSide: boolean,
   serving: boolean,
-  closeIn: () => void,
+  close: () => void,
   cardTime: number,
   setCardTime: (v: number) => void,
   openModal: string | undefined,
@@ -116,12 +123,6 @@ function getActions(
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const players = [team.left, team.right, team.sub].filter((a) => typeof a.get !== 'undefined');
   const currentPlayer = players.length > 1 ? players[leftSide ? 0 : 1] : players[0];
-  const close = () => {
-    closeIn();
-    setCardTime(6);
-    setOpenModal(undefined);
-    setOtherReason('');
-  };
   if (!currentPlayer?.get) return [];
   const out: AccordionSettings[] = [
     {
@@ -135,6 +136,7 @@ function getActions(
               <Button
                 style={{ margin: '3px' }}
                 size="sm"
+                color="gray.6"
                 disabled={!buttonEnabledFor(currentPlayer.get!, reason, 'Warning')}
                 onClick={() => {
                   warning(game, firstTeam, leftSide, reason);
@@ -152,7 +154,7 @@ function getActions(
             size="sm"
             color="gray"
           >
-            Repeat/Other
+            Other
           </Button>
 
           <Modal
@@ -464,6 +466,7 @@ function getActions(
         {SCORE_METHODS.slice(0, 3).map((method, i) => (
           <Fragment key={i}>
             <Button
+              color="player-color"
               style={{ margin: '3px' }}
               size="sm"
               onClick={() => {
@@ -482,7 +485,7 @@ function getActions(
             color="gray"
             onClick={() => setOpenModal(openModal ? undefined : 'score')}
           >
-            Show {openModal ? 'Less' : 'Repeat/Other'}
+            Show {openModal ? 'Less' : 'More'}
           </Button>
 
           <Collapse in={openModal === 'score'}>
@@ -574,7 +577,7 @@ export function PlayerButton({
     () => trueFirstTeam === game.teamOneIGA.get,
     [game.teamOneIGA.get, trueFirstTeam]
   );
-  const [cardTime, setCardTime] = React.useState<number>(6);
+  const [cardTime, setCardTime] = React.useState<number>(game.blitzGame.get ? 3 : 6);
   const [otherReason, setOtherReason] = React.useState<string>('');
   const team = useMemo(
     () => (firstTeam ? game.teamOne : game.teamTwo),
@@ -628,7 +631,16 @@ export function PlayerButton({
     () => (game.ended.get ? trueLeftSide : player?.sideOfCourt === 'Left'),
     [game.ended.get, player?.sideOfCourt, trueLeftSide]
   );
-  const [opened, { open, close }] = useDisclosure(false);
+  useEffect(() => {
+    setCardTime(game.blitzGame.get ? 3 : 6);
+  }, [game.blitzGame.get]);
+  const [opened, { open, close: _close }] = useDisclosure(false);
+  const close = useCallback(() => {
+    _close();
+    setCardTime(game.blitzGame.get ? 3 : 6);
+    setOpenModal(undefined);
+    setOtherReason('');
+  }, [_close, game.blitzGame.get]);
   const items = useMemo(
     () =>
       getActions(
@@ -653,9 +665,7 @@ export function PlayerButton({
       )),
     [cardTime, close, firstTeam, game, leftSide, openModal, otherReason, serving, trueLeftSide]
   );
-  useEffect(() => {
-    setCardTime(game.blitzGame.get ? 3 : 6);
-  }, [game.blitzGame.get]);
+
   const name = player ? (player.isCaptain ? `${player.name} (c)` : player.name) : 'Loading...';
   const servingColor = 'serving-color';
   const defaultColor = 'player-color';
