@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button, Text, Title } from '@mantine/core';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
-import { requestBackup } from '@/ServerActions/AdminActions';
+import { requestBackup, requestServerUpdate } from '@/ServerActions/AdminActions';
 
 export default function UniversalManagementPage() {
   const { isAdmin, loading } = useUserData();
@@ -19,6 +19,7 @@ export default function UniversalManagementPage() {
   return (
     <SidebarLayout>
       <Title>Admin Page</Title>
+      <hr />
       <Button
         onClick={() =>
           requestBackup()
@@ -27,6 +28,17 @@ export default function UniversalManagementPage() {
         }
       >
         Request Database Backup
+      </Button>
+      <br />
+      <br />
+      <Button
+        onClick={() =>
+          requestServerUpdate()
+            .then(() => setResponse('All good!'))
+            .catch(() => setResponse('Bad :('))
+        }
+      >
+        Request Server Update
       </Button>
       <Text>Response: {response ?? 'unset'}</Text>
     </SidebarLayout>
