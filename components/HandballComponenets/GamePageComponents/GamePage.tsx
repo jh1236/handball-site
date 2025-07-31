@@ -326,7 +326,7 @@ export function GamePage({ gameID }: GamePageProps) {
           </Grid>
           <Text pos="relative" bottom={20} style={{ background: 'rgba(100, 100, 100, 0.1)' }}>
             {' '}
-            Status: {game.status} | Officiated by {game.official.name}
+            Status: {game.status} | Officiated by {game.official?.name ?? 'No Official'}
           </Text>
         </Box>
         <Divider></Divider>
