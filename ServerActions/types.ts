@@ -135,7 +135,7 @@ export interface GameStructure {
   ended: boolean;
   ranked: boolean;
   bestPlayer: PersonStructure;
-  official: OfficialStructure;
+  official?: OfficialStructure;
   scorer: OfficialStructure | null;
   firstTeamIga: boolean;
   firstTeamToServe: boolean;

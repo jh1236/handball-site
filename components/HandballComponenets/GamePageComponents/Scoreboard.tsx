@@ -93,7 +93,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       } else {
         setTime(gameUpdate.startTime);
       }
-      setOfficial(gameUpdate.official.name);
+      setOfficial(gameUpdate.official?.name ?? 'No Official');
       setCourt(gameUpdate.court);
       if (gameUpdate.timeoutExpirationTime > 0) {
         openTimeout();
