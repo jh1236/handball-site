@@ -1,13 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { useRouter } from 'next/navigation';
-import {
-  IconCheckbox,
-  IconCloudUpload,
-  IconNote,
-  IconSquare,
-  IconTrophy,
-} from '@tabler/icons-react';
+import { IconCheckbox, IconCloudUpload, IconNote, IconTrophy } from '@tabler/icons-react';
 import {
   Accordion,
   Box,
@@ -42,14 +36,6 @@ interface GameScoreArgs {
 }
 
 export const QUICK_GAME_END = false;
-
-export function FakeCheckbox({ checked }: { checked: boolean }) {
-  return checked ? (
-    <IconCheckbox size="1.25em"></IconCheckbox>
-  ) : (
-    <IconSquare size="1.25em"></IconSquare>
-  );
-}
 
 function getActions(
   game: GameState,
