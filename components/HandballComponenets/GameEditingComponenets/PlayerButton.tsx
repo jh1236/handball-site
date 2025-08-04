@@ -40,6 +40,7 @@ import {
   warning,
   yellowCard,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { GAME_CONFIG } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingConfig';
 import { GameState } from '@/components/HandballComponenets/GameState';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
@@ -48,49 +49,6 @@ interface PlayerButtonProps {
   leftSide: boolean;
   firstTeam: boolean;
 }
-
-const SCORE_METHODS = [
-  'Double Bounce',
-  'Straight',
-  'Out of Court',
-  'Double Touch',
-  'Grabs',
-  'Illegal Body Part',
-  'Obstruction',
-];
-
-const CARDS = {
-  warning: [
-    'Audible Swearing',
-    'Delay of Game',
-    'Missed Post-game Handshake',
-    'Unreasonable Carry',
-  ],
-  green: [
-    'Disrespect',
-    'Audible Swearing',
-    'Dangerous Play (James)',
-    'Deliberate Delay of Game',
-    'Hindering another Player',
-    'Inappropriate Uniform',
-  ],
-  yellow: [
-    'Continuous Disrespect',
-    'Equipment Abuse',
-    'Aggressive Play (James)',
-    'Misconduct Whilst Carded',
-    'Displays of Aggression',
-    'Trying to circumvent swearing rules',
-    'Egregiously Inappropriate Uniform',
-  ],
-  red: [
-    'Violence',
-    'Disruptive Disrespect',
-    'Violent Equipment Abuse',
-    'Accusations Of Cheating',
-    'Discrimination',
-  ],
-};
 
 function buttonEnabledFor(player: PlayerGameStatsStructure, reason: string, type: string): boolean {
   if (!player) return true;
@@ -131,7 +89,7 @@ function getActions(
       color: 'grey',
       content: (
         <>
-          {CARDS.warning.map((reason, i) => (
+          {GAME_CONFIG.cards.warning.map((reason, i) => (
             <Fragment key={i}>
               <Button
                 style={{ margin: '3px' }}
@@ -191,7 +149,7 @@ function getActions(
       value: 'Green Card',
       content: (
         <>
-          {CARDS.green.map((reason, i) => (
+          {GAME_CONFIG.cards.green.map((reason, i) => (
             <Fragment key={i}>
               <Button
                 style={{ margin: '3px' }}
@@ -228,7 +186,7 @@ function getActions(
               label="Select Repeat Reason"
               allowDeselect={false}
               defaultValue="Other"
-              data={CARDS.warning.concat('Other').map((a) => ({
+              data={GAME_CONFIG.cards.warning.concat('Other').map((a) => ({
                 value: a,
                 label: a,
                 disabled: !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Green Card'),
@@ -271,7 +229,7 @@ function getActions(
       value: 'Yellow Card',
       content: (
         <Box>
-          {CARDS.yellow.map((reason, i) => (
+          {GAME_CONFIG.cards.yellow.map((reason, i) => (
             <Fragment key={i}>
               <Button
                 style={{ margin: '3px' }}
@@ -307,7 +265,7 @@ function getActions(
               label="Select Repeat Reason"
               allowDeselect={false}
               defaultValue="Other"
-              data={makeUnique(CARDS.warning.concat(CARDS.green))
+              data={makeUnique(GAME_CONFIG.cards.warning.concat(GAME_CONFIG.cards.green))
                 .concat('Other')
                 .map((a) => ({
                   value: a,
@@ -360,7 +318,7 @@ function getActions(
       value: 'Red Card',
       content: (
         <>
-          {CARDS.red.map((reason, i) => (
+          {GAME_CONFIG.cards.red.map((reason, i) => (
             <Fragment key={i}>
               <Button
                 style={{ margin: '3px' }}
@@ -395,9 +353,11 @@ function getActions(
               label="Select Repeat Reason"
               allowDeselect={false}
               defaultValue="Other"
-              data={makeUnique(CARDS.warning.concat(CARDS.green).concat(CARDS.yellow)).concat(
-                'Other'
-              )}
+              data={makeUnique(
+                GAME_CONFIG.cards.warning
+                  .concat(GAME_CONFIG.cards.green)
+                  .concat(GAME_CONFIG.cards.yellow)
+              ).concat('Other')}
               onChange={(reason) =>
                 setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
               }
@@ -463,7 +423,7 @@ function getActions(
     color: undefined,
     content: (
       <>
-        {SCORE_METHODS.slice(0, 3).map((method, i) => (
+        {GAME_CONFIG.scoreMethods.slice(0, 3).map((method, i) => (
           <Fragment key={i}>
             <Button
               color="player-color"
@@ -489,7 +449,7 @@ function getActions(
           </Button>
 
           <Collapse in={openModal === 'score'}>
-            {SCORE_METHODS.slice(3).map((method, i) => (
+            {GAME_CONFIG.scoreMethods.slice(3).map((method, i) => (
               <Fragment key={i}>
                 <Button
                   style={{ margin: '3px' }}
