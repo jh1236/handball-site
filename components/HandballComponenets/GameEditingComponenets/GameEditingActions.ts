@@ -2,7 +2,7 @@ import {
   reloadGame,
   startLoading,
 } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
-import { QUICK_GAME_END } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
+import { QUICK_GAME_END } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameScore';
 import {
   abandonLocal,
   aceLocal,

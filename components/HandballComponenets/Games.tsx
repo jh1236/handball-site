@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Box, Grid, HoverCard, Image, Paper, Rating, Space, Text } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
-import { FakeCheckbox } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
-import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
+import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
 import { GameStructure } from '@/ServerActions/types';
+import { FakeCheckbox } from '@/components/HandballComponenets/Management';
 
 interface ManagementArgs {
   tournament: string;

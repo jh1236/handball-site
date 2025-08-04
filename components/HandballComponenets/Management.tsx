@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { IconCheckbox, IconSquare } from '@tabler/icons-react';
 import {
   Box,
   Button,
@@ -20,14 +21,21 @@ import {
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
-import { FakeCheckbox } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
-import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
+import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
 import { getNoteableGames } from '@/ServerActions/GameActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { forceNextRoundFinalsTournament, getTournament } from '@/ServerActions/TournamentActions';
 import { GameStructure, PersonStructure, TournamentStructure } from '@/ServerActions/types';
+
+export function FakeCheckbox({ checked }: { checked: boolean }) {
+  return checked ? (
+    <IconCheckbox size="1.25em"></IconCheckbox>
+  ) : (
+    <IconSquare size="1.25em"></IconSquare>
+  );
+}
 
 interface ManagementArgs {
   tournament: string;
