@@ -438,6 +438,13 @@ export default function FixturesInternal({
                                 </Link>
                               </Table.Td>
                             )}
+                            {isUmpireManager(tournament) && (
+                              <Table.Td>
+                                <Link className="hideLink" href={`/games/${game.id}`}>
+                                  <Text size="sm">{game.adminStatus}</Text>
+                                </Link>
+                              </Table.Td>
+                            )}
                           </>
                         )}
                         {expandable && (
