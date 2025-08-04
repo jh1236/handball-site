@@ -8,11 +8,7 @@ import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel'
 import { localLogout, useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
-import {
-  GameStructure,
-  PersonStructure,
-  PlayerGameStatsStructure,
-} from '@/ServerActions/types';
+import { GameStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface GamePageProps {
   gameID: number;
@@ -24,7 +20,6 @@ export function GamePage({ gameID }: GamePageProps) {
   const [activeTab, setActiveTab] = useState<string | null>('teamStats');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { colorScheme } = useMantineColorScheme();
   const { isUmpireManager } = useUserData();
   useEffect(() => {
     getGame({
@@ -59,12 +54,6 @@ export function GamePage({ gameID }: GamePageProps) {
   if (game.startTime && game.startTime > 0) {
     date.setUTCMilliseconds(Math.floor(1000 * game.startTime));
   }
-  const LocaleDateIndex: number = date.toLocaleDateString().indexOf(',');
-  const localeDate: string[] = [];
-  localeDate.push(date.toLocaleDateString().slice(0, LocaleDateIndex + 1));
-  localeDate.push(date.toLocaleTimeString().slice(LocaleDateIndex + 1));
-
-  const teamGradient = `linear-gradient(to right, rgba(${game.teamOne.teamColorAsRGBABecauseDigbyIsLazy ? game.teamOne.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'}), rgba(0,0,0,0), rgba(${game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy ? game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'})`;
 
   function generatePlayerStats(playerName: string) {
     if (!game) {
@@ -180,6 +169,7 @@ export function GamePage({ gameID }: GamePageProps) {
       </Table>
     );
   }
+
   function generateScoreGraphic(): any {
     if (!game) {
       return <p> error! </p>;
@@ -193,16 +183,21 @@ export function GamePage({ gameID }: GamePageProps) {
           left: 0,
         }}
       >
-        <div className={`${classes.teamNames} ${classes.team1Name}`}><p>{game.teamOne.name}</p> </div>
+        <div className={`${classes.teamNames} ${classes.team1Name}`}>
+          <p>{game.teamOne.name}</p>
+        </div>
         <div className={`${classes.dash} ${classes.verse}`}>VS</div>
         <div className={`${classes.teamNames} ${classes.team2Name}`}>{game.teamTwo.name}</div>
-        <div className={`${classes.teamLogos} ${classes.logo1}`} style={{ justifyItems: 'flex-end' }}>
+        <div
+          className={`${classes.teamLogos} ${classes.logo1}`}
+          style={{ justifyItems: 'flex-end' }}
+        >
           <Image src={game.teamOne.imageUrl} />
         </div>
         <p className={`${classes.teamInfo} ${classes.info1}`}>
           <p> {game.teamOne.captain.name} </p>
-          { game.teamOne.nonCaptain ? <p>{game.teamOne.nonCaptain.name}</p> : ''}
-          { game.teamOne.substitute ? <p>{game.teamOne.substitute.name}</p> : ''}
+          {game.teamOne.nonCaptain ? <p>{game.teamOne.nonCaptain.name}</p> : ''}
+          {game.teamOne.substitute ? <p>{game.teamOne.substitute.name}</p> : ''}
         </p>
         <div className={`${classes.teamScores} ${classes.score1}`}>{game.teamOneScore}</div>
         <div className={`${classes.dash}`}>-</div>
@@ -215,7 +210,9 @@ export function GamePage({ gameID }: GamePageProps) {
         <div className={`${classes.teamLogos} ${classes.logo2}`}>
           <Image src={game.teamTwo.imageUrl} />
         </div>
-        <div className={`${classes.gameOfficial}`}><p>Officiated by {game.official.name}</p></div>
+        <div className={`${classes.gameOfficial}`}>
+          <p>Officiated by {game.official.name}</p>
+        </div>
       </Box>
     );
   }
