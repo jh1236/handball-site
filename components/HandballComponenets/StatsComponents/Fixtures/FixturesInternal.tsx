@@ -251,7 +251,7 @@ export default function FixturesInternal({
                     <Text size="sm">Court</Text>
                   </Table.Th>
                 )}
-                {isUmpireManager && (
+                {isUmpireManager(tournament) && (
                   <Table.Th style={{ width: '20px', textAlign: 'center' }}>
                     <Text size="sm">Status</Text>
                   </Table.Th>
@@ -337,7 +337,7 @@ export default function FixturesInternal({
                           </Link>
                         </Table.Td>
                       )}
-                      {isUmpireManager && (
+                      {isUmpireManager(tournament) && (
                         <Table.Th style={{ width: '20px', textAlign: 'center' }}>
                           <Link
                             className="hideLink"

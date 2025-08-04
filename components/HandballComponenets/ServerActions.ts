@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useEffect } from 'react';
-
-export const SERVER_ADDRESS = 'https://api.squarers.club';
-// export const SERVER_ADDRESS = 'http://localhost:5001/api';
-// export const SERVER_ADDRESS = 'http://49.192.26.182:5001';
+import React, { useCallback, useEffect } from 'react';
+import { SERVER_ADDRESS } from '@/app/config';
 
 export async function tokenFetcher(url: string, args: any = {}) {
   const res = await tokenFetch(url, args);
   return res.json();
+}
+
+export function localLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('permissionLevel');
+  localStorage.removeItem('username');
+  localStorage.removeItem('timeout');
 }
 
 export function useUserData() {
@@ -21,7 +25,7 @@ export function useUserData() {
   //   permissionLevel: 5,
   //   username: 'testing',
   // };
-  const [permissionLevel, setPermissionLevel] = React.useState<number | null>(null);
+  const [permissions, setPermissions] = React.useState<{ [key: string]: number } | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
   useEffect(() => {
     if (loggedIn()) {
@@ -29,30 +33,48 @@ export function useUserData() {
       if (timeout) {
         const ms = Number.parseFloat(timeout);
         if (ms < Date.now()) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('permissionLevel');
-          localStorage.removeItem('username');
-          localStorage.removeItem('timeout');
+          localLogout();
         }
       }
-      setPermissionLevel(+(localStorage.getItem('permissionLevel') ?? 0));
+      setPermissions(JSON.parse(localStorage.getItem('permissions') ?? '{}'));
       setUsername(localStorage.getItem('username'));
     } else {
-      setPermissionLevel(0);
+      setPermissions({});
     }
   }, []);
   return {
-    loading: permissionLevel === null,
-    isAdmin: (permissionLevel ?? 5) === 5,
-    isOfficial: (permissionLevel ?? 5) >= 2,
-    isUmpireManager: (permissionLevel ?? 5) >= 4,
-    isLoggedIn: (permissionLevel ?? 5) !== 0,
-    permissionLevel,
+    isAdmin: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) === 5,
+      [permissions]
+    ),
+    isLoggedIn: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 1,
+      [permissions]
+    ),
+    isOfficial: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 2,
+      [permissions]
+    ),
+    isTournamentDirector: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 4,
+      [permissions]
+    ),
+    isUmpireManager: useCallback(
+      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 3,
+      [permissions]
+    ),
+    loading: permissions === null,
+    permissions,
+    setPermissions,
+    setUsername,
     username,
   };
 }
 
 function loggedIn() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
   return localStorage.getItem('token') !== null;
 }
 

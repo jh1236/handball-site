@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Divider, Image, Paper, Select, Table, Tabs, Text } from '@mantine/core';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { localLogout, useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
 import {
@@ -24,7 +24,8 @@ export function GamePage({ gameID }: GamePageProps) {
   const [activeTab, setActiveTab] = useState<string | null>('teamStats');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isOfficial } = useUserData();
+  const { colorScheme } = useMantineColorScheme();
+  const { isUmpireManager } = useUserData();
   useEffect(() => {
     getGame({
       gameID,
@@ -33,8 +34,12 @@ export function GamePage({ gameID }: GamePageProps) {
     }).then((g) => {
       setGame(g);
       setPlayerSelect(g.teamOne.captain.name);
+      if (isUmpireManager(g.tournament.searchableName) && g && !g.admin) {
+        localLogout();
+      }
     });
-  }, [gameID]);
+  }, [gameID, isUmpireManager]);
+
   useEffect(() => {
     if (activeTab !== 'teamStats') {
       router.replace(`${window.location.href.split('?')[0]}?tab=${activeTab}`);
@@ -43,7 +48,7 @@ export function GamePage({ gameID }: GamePageProps) {
     }
   }, [activeTab, router]);
   useEffect(() => {
-    const tab = searchParams.get('tab') === null ? 'teamStats' : searchParams.get('tab');
+    const tab = searchParams?.get('tab') ?? 'teamStats';
     setActiveTab(tab);
   }, [searchParams]);
   if (!game) {
@@ -58,6 +63,8 @@ export function GamePage({ gameID }: GamePageProps) {
   const localeDate: string[] = [];
   localeDate.push(date.toLocaleDateString().slice(0, LocaleDateIndex + 1));
   localeDate.push(date.toLocaleTimeString().slice(LocaleDateIndex + 1));
+
+  const teamGradient = `linear-gradient(to right, rgba(${game.teamOne.teamColorAsRGBABecauseDigbyIsLazy ? game.teamOne.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'}), rgba(0,0,0,0), rgba(${game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy ? game.teamTwo.teamColorAsRGBABecauseDigbyIsLazy.toString() : '0,0,255,255'})`;
 
   function generatePlayerStats(playerName: string) {
     if (!game) {
@@ -223,7 +230,7 @@ export function GamePage({ gameID }: GamePageProps) {
             <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
               <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
               <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
-              {isOfficial && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
+              {game.admin && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
             </Paper>
             <Tabs.Panel value="teamStats">{generateTeamStatsTable()}</Tabs.Panel>
             <Tabs.Panel value="playerStats">
@@ -243,7 +250,7 @@ export function GamePage({ gameID }: GamePageProps) {
               <p>{playerSelect}</p>
               <div>{generatePlayerStats(playerSelect)}</div>
             </Tabs.Panel>
-            {isOfficial && (
+            {game.admin && (
               <Tabs.Panel value="admin">
                 <AdminGamePanel game={game}></AdminGamePanel>
               </Tabs.Panel>

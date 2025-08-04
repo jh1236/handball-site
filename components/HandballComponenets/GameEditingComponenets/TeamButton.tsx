@@ -6,15 +6,14 @@ import {
   IconClock,
   IconFlagFilled,
   IconNote,
+  IconQuestionMark,
   IconTrophy,
   IconUser,
   IconUsersGroup,
 } from '@tabler/icons-react';
-import ReCAPTCHA from 'react-google-recaptcha';
 import {
   Accordion,
   Button,
-  Group,
   List,
   Modal,
   Popover,
@@ -27,11 +26,14 @@ import { useDisclosure } from '@mantine/hooks';
 import { markIfReqd } from '@/components/HandballComponenets/AdminGamePanel';
 import {
   forfeit,
-  GameState,
   timeout,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
-import { ZAIAH_BOX_FUCKERY } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
+import {
+  decidedOnCoinToss,
+  didWinGame,
+} from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
+import { GameState } from '@/components/HandballComponenets/GameState';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface TeamButtonProps {
@@ -53,9 +55,7 @@ function getActions(
   game: GameState,
   firstTeam: boolean,
   serving: boolean,
-  close: () => void,
-  captchaPassed: boolean,
-  setCaptchaPassed: (b: boolean) => void
+  close: () => void
 ): AccordionSettings[] {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const players = [team.left.get, team.right.get, team.sub.get].filter(
@@ -181,7 +181,7 @@ function getActions(
       content: (
         <Button
           size="lg"
-          color={timeoutsRemaining > 0 ? 'blue' : timeoutsRemaining === 0 ? 'grey' : 'red'}
+          color={timeoutsRemaining > 0 ? 'player-color' : timeoutsRemaining === 0 ? 'grey' : 'red'}
           onClick={() => {
             timeout(game, firstTeam);
             close();
@@ -202,45 +202,18 @@ function getActions(
               <strong>Forfeit</strong>
             </Button>
           </Popover.Target>
-          <Popover.Dropdown>
-            <Text>Are you sure you want to forfeit?</Text>
-            {ZAIAH_BOX_FUCKERY ? (
-              <Popover width={200} position="top" withArrow shadow="md">
-                <Popover.Target>
-                  <Button color="red">Confirm</Button>
-                </Popover.Target>
-                <Popover.Dropdown w={350}>
-                  <ReCAPTCHA
-                    theme="dark"
-                    sitekey="6Lcbu8oqAAAAAOo9sSSEPuCY5chDdm-27OcF7zjp"
-                    onChange={() => setCaptchaPassed(true)}
-                  />
-                  <br />
-                  <Group justify="center">
-                    <Button
-                      color="red"
-                      disabled={!captchaPassed}
-                      onClick={() => {
-                        forfeit(game, firstTeam);
-                        close();
-                      }}
-                    >
-                      YES!
-                    </Button>
-                  </Group>
-                </Popover.Dropdown>
-              </Popover>
-            ) : (
-              <Button
-                color="red"
-                onClick={() => {
-                  forfeit(game, firstTeam);
-                  close();
-                }}
-              >
-                Confirm
-              </Button>
-            )}
+          <Popover.Dropdown ta="center">
+            <Text m={5}>Are you sure you want to forfeit?</Text>
+            <Button
+              m={5}
+              color="red"
+              onClick={() => {
+                forfeit(game, firstTeam);
+                close();
+              }}
+            >
+              Confirm
+            </Button>
           </Popover.Dropdown>
         </Popover>
       ),
@@ -251,13 +224,8 @@ function getActions(
 
 export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) {
   const firstTeam = trueFirstTeam === game.teamOneIGA.get;
-  const [captchaPassed, setCaptchaPassed] = React.useState<boolean>(false);
   const team = useMemo(
     () => (firstTeam ? game.teamOne : game.teamTwo),
-    [firstTeam, game.teamOne, game.teamTwo]
-  );
-  const otherTeam = useMemo(
-    () => (firstTeam ? game.teamTwo : game.teamOne),
     [firstTeam, game.teamOne, game.teamTwo]
   );
   const serving = useMemo(
@@ -268,19 +236,21 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
 
   const items = useMemo(
     () =>
-      getActions(game, firstTeam, serving, close, captchaPassed, setCaptchaPassed).map(
-        (item, i) => (
-          <Accordion.Item key={i} value={item.value}>
-            <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
-              {item.title ?? item.value}
-            </Accordion.Control>
-            <Accordion.Panel>{item.content}</Accordion.Panel>
-          </Accordion.Item>
-        )
-      ),
+      getActions(game, firstTeam, serving, close).map((item, i) => (
+        <Accordion.Item key={i} value={item.value}>
+          <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
+            {item.title ?? item.value}
+          </Accordion.Control>
+          <Accordion.Panel>{item.content}</Accordion.Panel>
+        </Accordion.Item>
+      )),
+    // TODO: this needs to be rewritten fully, its a mess from when I was first learning (Digby 👉👈🥺)
+    // this isn't worth fixing right now,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [game, firstTeam, serving, close]
   );
-  const name = team ? team.name : 'Loading...';
+  const name = team ? team.name.get : 'Loading...';
   return (
     <>
       <Modal opened={opened} centered onClose={close} title="Action">
@@ -290,7 +260,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
       <Button
         radius={0}
         size="lg"
-        color={`${game.ended.get && team.score.get > otherTeam.score.get ? 'orange' : serving ? 'teal' : 'blue'}.5`}
+        color={`${didWinGame(game, firstTeam) ? 'orange.5' : decidedOnCoinToss(game) ? 'green.9' : serving ? 'serving-color.5' : 'player-color.5'}`}
         style={{
           width: '100%',
           height: '100%',
@@ -300,7 +270,8 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
       >
         <b>
           {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'}){' '}
-          {game.ended.get && team.score.get > otherTeam.score.get && <IconTrophy></IconTrophy>}
+          {didWinGame(game, firstTeam) && <IconTrophy></IconTrophy>}
+          {decidedOnCoinToss(game) && <IconQuestionMark></IconQuestionMark>}
         </b>
       </Button>
     </>

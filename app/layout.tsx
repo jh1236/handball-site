@@ -3,7 +3,7 @@ import './global.css';
 
 import React from 'react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
-import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { SERVER_ADDRESS } from '@/app/config';
 import { theme } from '@/theme';
 
 export const metadata = {
