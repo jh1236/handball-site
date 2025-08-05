@@ -185,11 +185,11 @@ export function useGameState(game?: GameStructure) {
     if (teamOneScore || teamTwoScore) {
       const bigScore = Math.max(teamOneScore, teamTwoScore);
       const lilScore = Math.min(teamOneScore, teamTwoScore);
-      if (bigScore < 11) return;
-      if (bigScore - lilScore <= 1) return;
+      if (bigScore < (blitzGame ? 11 : 7)) return;
+      if (bigScore < (blitzGame ? 22 : 14) && bigScore - lilScore <= 1) return;
       setEnded(true);
     }
-  }, [teamOneScore, teamTwoScore, abandoned]);
+  }, [teamOneScore, teamTwoScore, abandoned, blitzGame]);
 
   const gameState: GameState = useMemo(
     () => ({
@@ -333,6 +333,7 @@ export function useGameState(game?: GameStructure) {
       },
     }),
     [
+      blitzGame,
       abandoned,
       badminton,
       ended,

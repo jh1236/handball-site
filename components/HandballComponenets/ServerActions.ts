@@ -44,23 +44,23 @@ export function useUserData() {
   }, []);
   return {
     isAdmin: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) === 5,
+      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) === 5,
       [permissions]
     ),
     isLoggedIn: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 1,
+      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) >= 1,
       [permissions]
     ),
     isOfficial: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 2,
+      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) >= 2,
       [permissions]
     ),
     isTournamentDirector: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 4,
+      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) >= 4,
       [permissions]
     ),
     isUmpireManager: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 3,
+      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) >= 3,
       [permissions]
     ),
     loading: permissions === null,

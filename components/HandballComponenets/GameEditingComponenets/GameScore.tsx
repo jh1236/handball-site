@@ -1,13 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { useRouter } from 'next/navigation';
-import {
-  IconCheckbox,
-  IconCloudUpload,
-  IconNote,
-  IconSquare,
-  IconTrophy,
-} from '@tabler/icons-react';
+import { IconCheckbox, IconCloudUpload, IconNote, IconTrophy } from '@tabler/icons-react';
 import {
   Accordion,
   Box,
@@ -42,14 +36,6 @@ interface GameScoreArgs {
 }
 
 export const QUICK_GAME_END = false;
-
-export function FakeCheckbox({ checked }: { checked: boolean }) {
-  return checked ? (
-    <IconCheckbox size="1.25em"></IconCheckbox>
-  ) : (
-    <IconSquare size="1.25em"></IconSquare>
-  );
-}
 
 function getActions(
   game: GameState,
@@ -277,10 +263,11 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
   const teamTwo = game.teamOneIGA.get ? game.teamTwo : game.teamOne;
   const matchPoints = useMemo(
     () =>
-      teamOne.score.get >= 10 || teamTwo.score.get >= 10
+      teamOne.score.get >= (game.blitzGame.get ? 10 : 6) ||
+      teamTwo.score.get >= (game.blitzGame.get ? 10 : 6)
         ? teamOne.score.get - teamTwo.score.get
         : 0,
-    [teamOne.score.get, teamTwo.score.get]
+    [game.blitzGame.get, teamOne.score.get, teamTwo.score.get]
   );
   return (
     <>
@@ -326,11 +313,8 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
               </Popover.Target>
 
               <Popover.Dropdown>
-                {game.ended.get ? (
-                  <>
-                    <Center>
-                      <Title>Match Point Display</Title>
-                    </Center>
+                <>
+                  {matchPoints && (
                     <Center>
                       <Text fw={700} fz={20}>
                         <i>
@@ -339,8 +323,8 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
                         </i>
                       </Text>
                     </Center>
-                  </>
-                ) : (
+                  )}
+
                   <Popover width={200} position="top" withArrow shadow="md">
                     <Popover.Target>
                       <Button size="lg" color="red">
@@ -369,7 +353,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
                       </Button>
                     </Popover.Dropdown>
                   </Popover>
-                )}
+                </>
               </Popover.Dropdown>
             </Popover>
           </>
