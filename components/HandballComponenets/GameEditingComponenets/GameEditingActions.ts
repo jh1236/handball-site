@@ -24,6 +24,7 @@ import {
   endTimeoutForGame,
   faultForGame,
   forfeitGame,
+  meritForGame,
   scoreForGame,
   startGame,
   substituteForGame,
@@ -126,6 +127,17 @@ export function sub(game: GameState, firstTeam: boolean, leftPlayer: boolean): v
   substituteForGame(game.id, firstTeam, player.get?.searchableName!, leftPlayer).catch(() =>
     sync(game)
   );
+}
+
+export function merit(
+  game: GameState,
+  firstTeam: boolean,
+  leftPlayer: boolean,
+  reason: string
+): void {
+  const team = firstTeam ? game.teamOne : game.teamTwo;
+  const player = leftPlayer ? team.left : team.right;
+  meritForGame(game.id, firstTeam, player.get?.searchableName!, reason).catch(() => sync(game));
 }
 
 export function warning(
