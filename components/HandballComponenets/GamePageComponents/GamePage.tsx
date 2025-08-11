@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Divider, Image, Paper, Select, Table, Tabs, Text } from '@mantine/core';
+import { LineChart } from '@mantine/charts';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
@@ -191,26 +192,63 @@ export function GamePage({ gameID }: GamePageProps) {
         <div className={`${classes.teamNames} ${classes.team2Name}`}>{game.teamTwo.name}</div>
         <div className={`${classes.teamLogos} ${classes.logo1}`} style={{ justifyItems: 'flex-end' }}>
           <Image src={game.teamOne.imageUrl} />
-        </div>
-        <p className={`${classes.teamInfo} ${classes.info1}`}>
+        </div><div className={`${classes.teamInfo} ${classes.info1}`}>
           <p> {game.teamOne.captain.name} </p>
           { game.teamOne.nonCaptain ? <p>{game.teamOne.nonCaptain.name}</p> : ''}
           { game.teamOne.substitute ? <p>{game.teamOne.substitute.name}</p> : ''}
-        </p>
+        </div>
         <div className={`${classes.teamScores} ${classes.score1}`}>{game.teamOneScore}</div>
         <div className={`${classes.dash}`}>-</div>
         <div className={`${classes.teamScores} ${classes.score2}`}>{game.teamTwoScore}</div>
-        <p className={`${classes.teamInfo} ${classes.info2}`}>
+        <div className={`${classes.teamInfo} ${classes.info2}`}>
           <p> {game.teamTwo.captain.name} </p>
           {game.teamTwo.nonCaptain ? <p>{game.teamTwo.nonCaptain.name}</p> : ''}
           {game.teamTwo.substitute ? <p>{game.teamTwo.substitute.name}</p> : ''}
-        </p>
+        </div>
         <div className={`${classes.teamLogos} ${classes.logo2}`}>
           <Image src={game.teamTwo.imageUrl} />
         </div>
         <div className={`${classes.gameOfficial}`}><p>Officiated by {game.official.name}</p></div>
       </Box>
     );
+  }
+
+  function createLineGraph(): React.ReactElement {
+    if (!game) { return <></>; }
+    const data: object[] = [];
+    let id: number = 0;
+    let team1Score: number = 0;
+    let team2Score: number = 0;
+    data.push({ id, team1Score, team2Score });
+    game.events!.forEach(e => {
+      if (e.eventType === 'Score') {
+        id += 1;
+        if (e.firstTeam) {
+          team1Score += 1;
+        } else {
+          team2Score += 1;
+        }
+        data.push({ id, team1Score, team2Score });
+      }
+    });
+    return <Paper style={{ padding: 'auto', alignItems: 'center', justifyContent: 'center' }}>
+      <LineChart
+        bg="#8881"
+        w="80%"
+        h={400}
+        data={data}
+        dataKey="id"
+        series={[
+          { name: 'team1Score', color: game.teamOne.teamColor! },
+          { name: 'team2Score', color: game.teamTwo.teamColor! },
+        ]}
+        curveType="stepAfter"
+        gridAxis="none"
+        withXAxis={false}
+        withYAxis={false}
+        withTooltip={false}
+      />
+    </Paper>;
   }
 
   return (
@@ -223,6 +261,7 @@ export function GamePage({ gameID }: GamePageProps) {
             <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
               <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
               <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
+              <Tabs.Tab value="testTab">Gay Time</Tabs.Tab>
               {isOfficial && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
             </Paper>
             <Tabs.Panel value="teamStats">{generateTeamStatsTable()}</Tabs.Panel>
@@ -248,6 +287,10 @@ export function GamePage({ gameID }: GamePageProps) {
                 <AdminGamePanel game={game}></AdminGamePanel>
               </Tabs.Panel>
             )}
+            <Tabs.Panel value="testTab">
+              <p>hiiii :3</p>
+              {createLineGraph()}
+            </Tabs.Panel>
           </Tabs>
           <Box></Box>
         </Box>

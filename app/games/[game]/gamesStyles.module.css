@@ -27,7 +27,7 @@
 }
 
 .teamInfo * {
-    line-height: 10px;
+    line-height: 20px;
 }
 
 .teamInfo *:first-child {
@@ -109,7 +109,7 @@
         grid-template-areas:
             'team1 team1 team1 team1 team1  vers  team2 team2 team2 team2 team2'
             'logo1 logo1 logo1 logo1 score1 dash score2 logo2 logo2 logo2 logo2'
-            'info1 info1 info1 info1 info1  gap info2 info2 info2 info2 info2'
+            'info1 info1 info1 info1 info1   gap  info2 info2 info2 info2 info2'
             'offic offic offic offic offic  offic offic offic offic offic offic'
     }
 
@@ -132,10 +132,11 @@
         margin: auto;
         padding: 10px;
         height: 100%;
+        overflow: visible;
     }
 
     .teamLogos * {
-        height: 90%
+        width: 90%;
     }
 
     .teamScores {
