@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Divider, Image, Paper, Select, Table, Tabs, Text } from '@mantine/core';
-import { LineChart } from '@mantine/charts';
+import { Legend, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
 import { localLogout, useUserData } from '@/components/HandballComponenets/ServerActions';
@@ -198,7 +198,7 @@ export function GamePage({ gameID }: GamePageProps) {
           <p> {game.teamOne.captain.name} </p>
           {game.teamOne.nonCaptain ? <p>{game.teamOne.nonCaptain.name}</p> : ''}
           {game.teamOne.substitute ? <p>{game.teamOne.substitute.name}</p> : ''}
-        </p>
+        </div>
         <div className={`${classes.teamScores} ${classes.score1}`}>{game.teamOneScore}</div>
         <div className={`${classes.dash}`}>-</div>
         <div className={`${classes.teamScores} ${classes.score2}`}>{game.teamTwoScore}</div>
@@ -235,23 +235,24 @@ export function GamePage({ gameID }: GamePageProps) {
         data.push({ id, team1Score, team2Score });
       }
     });
-    return <Paper style={{ padding: 'auto', alignItems: 'center', justifyContent: 'center' }}>
+    return <Paper
+      withBorder
+      w="fit-content"
+      bg="#8881"
+      style={{
+        padding: '20px',
+        margin: 'auto' }}>
       <LineChart
-        bg="#8881"
-        w="80%"
-        h={400}
+        height={400}
+        width={700}
         data={data}
-        dataKey="id"
-        series={[
-          { name: 'team1Score', color: game.teamOne.teamColor! },
-          { name: 'team2Score', color: game.teamTwo.teamColor! },
-        ]}
-        curveType="stepAfter"
-        gridAxis="none"
-        withXAxis={false}
-        withYAxis={false}
-        withTooltip={false}
-      />
+      >
+        <Line dataKey="team1Score" type="stepAfter" stroke={game.teamOne.teamColor!} dot={false} name={game.teamOne.name} strokeWidth={2} />
+        <Line dataKey="team2Score" type="stepAfter" stroke={game.teamTwo.teamColor!} dot={false} name={game.teamTwo.name} strokeWidth={2} />
+        <YAxis />
+        <Legend />
+        <Tooltip />
+      </LineChart>
     </Paper>;
   }
 
@@ -291,8 +292,9 @@ export function GamePage({ gameID }: GamePageProps) {
               </Tabs.Panel>
             )}
             <Tabs.Panel value="testTab">
-              <p>hiiii :3</p>
-              {createLineGraph()}
+              <Box style={{ marginTop: '30px' }} w="100%">
+                {createLineGraph()}
+              </Box>
             </Tabs.Panel>
           </Tabs>
           <Box></Box>
