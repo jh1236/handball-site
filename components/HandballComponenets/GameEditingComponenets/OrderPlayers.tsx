@@ -16,7 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Center, Paper, Text } from '@mantine/core';
-import { GameState } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { GameState } from '@/components/HandballComponenets/GameState';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface OrderPlayersProps {

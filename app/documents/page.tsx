@@ -70,15 +70,22 @@ const currentDocuments: documentInfo[] = [
     imageUrl: 'https://api.squarers.club/api/image?name=yellow_book',
   },
   {
-    title: 'The Ninth SUSS Championship UQP',
+    title: 'The Tenth SUSS Championship UQP',
     description:
       'The Briefing presented by the SUSS officiating core covering current interpretations of the rules',
-    link: 'https://docs.google.com/presentation/d/17KdW7FA45ytAue-eKcvOF_azktaFWCBbqt4pRTzk7T8/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=ninth_suss_championship',
+    link: 'https://docs.google.com/presentation/d/1-7KIau6Z-DeVF4w-2KlD3gMMei4VNTYQTjvuQbyEUnI/edit?usp=sharing',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=tenth_suss_championship',
   },
 ];
 
 const oldDocuments: documentInfo[] = [
+  {
+    title: 'The Ninth SUSS Championship UQP',
+    description:
+      'The Briefing presented by the SUSS officiating core covering current interpretations of the rules for the Ninth SUSS Championship',
+    link: 'https://docs.google.com/presentation/d/17KdW7FA45ytAue-eKcvOF_azktaFWCBbqt4pRTzk7T8/edit?usp=sharing',
+    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=ninth_suss_championship',
+  },
   {
     title: 'The Eighth SUSS Championship UQP',
     description:

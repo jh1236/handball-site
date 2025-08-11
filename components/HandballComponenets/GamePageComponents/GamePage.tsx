@@ -6,14 +6,10 @@ import { Box, Divider, Image, Paper, Select, Table, Tabs, Text } from '@mantine/
 import { LineChart } from '@mantine/charts';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { localLogout, useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
-import {
-  GameStructure,
-  PersonStructure,
-  PlayerGameStatsStructure,
-} from '@/ServerActions/types';
+import { GameStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface GamePageProps {
   gameID: number;
@@ -25,7 +21,7 @@ export function GamePage({ gameID }: GamePageProps) {
   const [activeTab, setActiveTab] = useState<string | null>('teamStats');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isOfficial } = useUserData();
+  const { isUmpireManager } = useUserData();
   useEffect(() => {
     getGame({
       gameID,
@@ -34,8 +30,12 @@ export function GamePage({ gameID }: GamePageProps) {
     }).then((g) => {
       setGame(g);
       setPlayerSelect(g.teamOne.captain.name);
+      if (isUmpireManager(g.tournament.searchableName) && g && !g.admin) {
+        localLogout();
+      }
     });
-  }, [gameID]);
+  }, [gameID, isUmpireManager]);
+
   useEffect(() => {
     if (activeTab !== 'teamStats') {
       router.replace(`${window.location.href.split('?')[0]}?tab=${activeTab}`);
@@ -44,7 +44,7 @@ export function GamePage({ gameID }: GamePageProps) {
     }
   }, [activeTab, router]);
   useEffect(() => {
-    const tab = searchParams.get('tab') === null ? 'teamStats' : searchParams.get('tab');
+    const tab = searchParams?.get('tab') ?? 'teamStats';
     setActiveTab(tab);
   }, [searchParams]);
   if (!game) {
@@ -55,10 +55,6 @@ export function GamePage({ gameID }: GamePageProps) {
   if (game.startTime && game.startTime > 0) {
     date.setUTCMilliseconds(Math.floor(1000 * game.startTime));
   }
-  const LocaleDateIndex: number = date.toLocaleDateString().indexOf(',');
-  const localeDate: string[] = [];
-  localeDate.push(date.toLocaleDateString().slice(0, LocaleDateIndex + 1));
-  localeDate.push(date.toLocaleTimeString().slice(LocaleDateIndex + 1));
 
   function generatePlayerStats(playerName: string) {
     if (!game) {
@@ -174,6 +170,7 @@ export function GamePage({ gameID }: GamePageProps) {
       </Table>
     );
   }
+
   function generateScoreGraphic(): any {
     if (!game) {
       return <p> error! </p>;
@@ -187,16 +184,21 @@ export function GamePage({ gameID }: GamePageProps) {
           left: 0,
         }}
       >
-        <div className={`${classes.teamNames} ${classes.team1Name}`}><p>{game.teamOne.name}</p> </div>
+        <div className={`${classes.teamNames} ${classes.team1Name}`}>
+          <p>{game.teamOne.name}</p>
+        </div>
         <div className={`${classes.dash} ${classes.verse}`}>VS</div>
         <div className={`${classes.teamNames} ${classes.team2Name}`}>{game.teamTwo.name}</div>
-        <div className={`${classes.teamLogos} ${classes.logo1}`} style={{ justifyItems: 'flex-end' }}>
+        <div
+          className={`${classes.teamLogos} ${classes.logo1}`}
+          style={{ justifyItems: 'flex-end' }}
+        >
           <Image src={game.teamOne.imageUrl} />
         </div><div className={`${classes.teamInfo} ${classes.info1}`}>
           <p> {game.teamOne.captain.name} </p>
-          { game.teamOne.nonCaptain ? <p>{game.teamOne.nonCaptain.name}</p> : ''}
-          { game.teamOne.substitute ? <p>{game.teamOne.substitute.name}</p> : ''}
-        </div>
+          {game.teamOne.nonCaptain ? <p>{game.teamOne.nonCaptain.name}</p> : ''}
+          {game.teamOne.substitute ? <p>{game.teamOne.substitute.name}</p> : ''}
+        </p>
         <div className={`${classes.teamScores} ${classes.score1}`}>{game.teamOneScore}</div>
         <div className={`${classes.dash}`}>-</div>
         <div className={`${classes.teamScores} ${classes.score2}`}>{game.teamTwoScore}</div>
@@ -208,7 +210,9 @@ export function GamePage({ gameID }: GamePageProps) {
         <div className={`${classes.teamLogos} ${classes.logo2}`}>
           <Image src={game.teamTwo.imageUrl} />
         </div>
-        <div className={`${classes.gameOfficial}`}><p>Officiated by {game.official.name}</p></div>
+        <div className={`${classes.gameOfficial}`}>
+          <p>Officiated by {game.official.name}</p>
+        </div>
       </Box>
     );
   }
@@ -261,8 +265,7 @@ export function GamePage({ gameID }: GamePageProps) {
             <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
               <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
               <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
-              <Tabs.Tab value="testTab">Gay Time</Tabs.Tab>
-              {isOfficial && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
+              {game.admin && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
             </Paper>
             <Tabs.Panel value="teamStats">{generateTeamStatsTable()}</Tabs.Panel>
             <Tabs.Panel value="playerStats">
@@ -282,7 +285,7 @@ export function GamePage({ gameID }: GamePageProps) {
               <p>{playerSelect}</p>
               <div>{generatePlayerStats(playerSelect)}</div>
             </Tabs.Panel>
-            {isOfficial && (
+            {game.admin && (
               <Tabs.Panel value="admin">
                 <AdminGamePanel game={game}></AdminGamePanel>
               </Tabs.Panel>

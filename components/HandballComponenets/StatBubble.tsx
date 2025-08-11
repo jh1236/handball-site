@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Center, Container, Image, Skeleton, Space, Text } from '@mantine/core';
-import { SERVER_ADDRESS } from '@/components/HandballComponenets/ServerActions';
+import { SERVER_ADDRESS } from '@/app/config';
 import { StatCategory } from '@/components/HandballComponenets/TournamentLanding';
 import { PersonStructure, TeamStructure } from '@/ServerActions/types';
 
@@ -34,7 +34,7 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
   }
   const sortMultiplier = stat.order === 'asc' ? 1 : -1;
   if (stat.type === 'team') {
-    if (teams.length === 0 || !teams.some(a => a.stats!['Games Played'] >= 1)) {
+    if (teams.length === 0 || !teams.some((a) => a.stats!['Games Played'] >= 1)) {
       return (
         <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
           <Text size="auto" fw={700} ta="center">
@@ -83,7 +83,7 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
       </Container>
     );
   }
-  if (players.length === 0 || !players.some(a => a.stats!['Games Played'] >= 1)) {
+  if (players.length === 0 || !players.some((a) => a.stats!['Games Played'] >= 1)) {
     return (
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
         <Text size="auto" fw={700} ta="center">

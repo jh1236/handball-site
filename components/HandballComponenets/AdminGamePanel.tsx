@@ -150,7 +150,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
           </Link>
         </Accordion.Panel>
       </Accordion.Item>
-      {isUmpireManager && (
+      {isUmpireManager(game.tournament.searchableName) && (
         <>
           <Accordion.Item value="actions">
             <Accordion.Control icon={<IconCheckbox />}>
@@ -279,7 +279,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                 ))}
               <Text>{game.admin?.teamOneNotes}</Text>
               <Divider></Divider>
-              <Title order={3}>{markIfReqd((game.admin?.teamOneProtest ?? '') !== '', 'Protest')}</Title>
+              <Title order={3}>
+                {markIfReqd((game.admin?.teamOneProtest ?? '') !== '', 'Protest')}
+              </Title>
               {!game.admin?.teamOneProtest &&
                 (!game.ended ? (
                   <Text>
@@ -340,7 +342,9 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                 ))}
               <Text>{game.admin?.teamTwoNotes}</Text>
               <Divider></Divider>
-              <Title order={3}>{markIfReqd((game.admin?.teamTwoProtest ?? '') !== '', 'Protest')}</Title>
+              <Title order={3}>
+                {markIfReqd((game.admin?.teamTwoProtest ?? '') !== '', 'Protest')}
+              </Title>
               {!game.admin?.teamTwoProtest &&
                 (!game.ended ? (
                   <Text>

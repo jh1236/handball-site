@@ -1,22 +1,36 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Box, Button, LoadingOverlay, Title } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Center,
+  createTheme,
+  DEFAULT_THEME,
+  Group,
+  LoadingOverlay,
+  MantineProvider,
+  Popover,
+  Select,
+  Stack,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   del,
   endTimeout,
-  GameState,
   sync,
   undo,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GameScore } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
+import { useGameState } from '@/components/HandballComponenets/GameState';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGame } from '@/ServerActions/GameActions';
-import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import { getOfficials } from '@/ServerActions/OfficialActions';
+import { GameStructure, OfficialStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 let setGameFn: (game: GameStructure) => void;
 //necessary to reveal the state from the React component
@@ -41,7 +55,10 @@ export function reloadGame(gameID: number) {
 }
 
 export function EditGame({ game }: { game: number }) {
-  const { isUmpireManager, isOfficial, isLoggedIn } = useUserData();
+  const { isUmpireManager, isOfficial } = useUserData();
+  const [officials, setOfficials] = useState<OfficialStructure[]>([]);
+  const [scorer, setScorer] = useState<OfficialStructure>();
+  const [official, setOfficial] = useState<OfficialStructure>();
 
   const [gameObj, setGameObj] = React.useState<GameStructure | null>(null);
   setGameFn = setGameObj;
@@ -49,55 +66,13 @@ export function EditGame({ game }: { game: number }) {
   const [editOfficialGame, { close: iKnowWhatImDoing }] = useDisclosure(true);
   startLoading = openLoading;
   const [visibleTimeout, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-  const [faulted, setFaulted] = React.useState<boolean>(false);
-  const [started, setStarted] = React.useState<boolean>(true);
-  const [ended, setEnded] = React.useState<boolean>(false);
-  const [firstTeamServes, setFirstTeamServes] = React.useState<boolean>(false);
-  const [timeoutExpirationTime, setTimeoutExpirationTime] = React.useState<number>(-1);
+
   const [currentTime, setCurrentTime] = React.useState<number>(300);
-  const [teamOneIGA, setTeamOneIGA] = React.useState<boolean>(true);
-  const [notes, setNotes] = React.useState<string>('');
-  const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
+
+  const { gameState, setGameForState } = useGameState(gameObj || undefined);
 
   //team one state
-  const [teamOneTimeouts, setTeamOneTimeouts] = React.useState<number>(0);
-  const [teamOneNotes, setTeamOneNotes] = React.useState<string>('');
-  const [teamOneProtest, setTeamOneProtest] = React.useState<string>('');
-  const [teamOneServingLeft, setTeamOneServingLeft] = React.useState<boolean>(true);
-  const [teamOneName, setTeamOneName] = React.useState<string>('Loading...');
-  const [teamOneScore, setTeamOneScore] = React.useState<number>(0);
-  const [teamOneRating, setTeamOneRating] = React.useState<number>(0);
-  const [teamOneLeft, setTeamOneLeft] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const [teamOneRight, setTeamOneRight] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const [teamOneSub, setTeamOneSub] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  //team two state
-  const [teamTwoTimeouts, setTeamTwoTimeouts] = React.useState<number>(0);
-  const [teamTwoNotes, setTeamTwoNotes] = React.useState<string>('');
-  const [teamTwoProtest, setTeamTwoProtest] = React.useState<string>('');
 
-  const [teamTwoServingLeft, setTeamTwoServingLeft] = React.useState<boolean>(true);
-  const [teamTwoName, setTeamTwoName] = React.useState<string>('Loading...');
-  const [teamTwoScore, setTeamTwoScore] = React.useState<number>(0);
-  const [teamTwoRating, setTeamTwoRating] = React.useState<number>(0);
-  const [teamTwoLeft, setTeamTwoLeft] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const [teamTwoRight, setTeamTwoRight] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const [teamTwoSub, setTeamTwoSub] = React.useState<PlayerGameStatsStructure | undefined>(
-    undefined
-  );
-  const servingFromLeft = useMemo(
-    () => (firstTeamServes ? teamOneServingLeft : teamTwoServingLeft),
-    [firstTeamServes, teamOneServingLeft, teamTwoServingLeft]
-  );
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
@@ -106,14 +81,8 @@ export function EditGame({ game }: { game: number }) {
   }, []);
 
   useEffect(() => {
-    if (teamOneScore || teamTwoScore) {
-      const bigScore = Math.max(teamOneScore, teamTwoScore);
-      const lilScore = Math.min(teamOneScore, teamTwoScore);
-      if (bigScore < 11) return;
-      if (bigScore - lilScore <= 1) return;
-      setEnded(true);
-    }
-  }, [teamOneScore, teamTwoScore]);
+    getOfficials({}).then((o) => setOfficials(o.officials));
+  }, []);
 
   useEffect(() => {
     reloadGame(game);
@@ -121,181 +90,30 @@ export function EditGame({ game }: { game: number }) {
 
   useEffect(() => {
     if (!gameObj) return;
-    setFirstTeamServes(gameObj.firstTeamToServe);
-    setFaulted(gameObj.faulted);
-    setTeamOneIGA(gameObj.firstTeamIga ?? true);
-    setTimeoutExpirationTime(gameObj.timeoutExpirationTime);
-    setStarted(gameObj.started);
-    setEnded(gameObj.someoneHasWon);
-    setVotes(playersFromGame(gameObj));
-    //Team Specific
-    setTeamOneTimeouts(gameObj.teamOneTimeouts);
-    setTeamOneScore(gameObj.teamOneScore);
-    setTeamOneServingLeft(gameObj.teamOne.servingFromLeft!);
-    console.log(`${gameObj.teamOne.name} Left Serve is ${gameObj.teamOne.servingFromLeft}`);
-    const { teamOne, teamTwo } = gameObj;
-    if (gameObj.started) {
-      const sorted = [teamOne.captain, teamOne.nonCaptain, teamOne.substitute].toSorted((a, b) =>
-        (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
-      );
-      setTeamOneLeft(sorted[0] || undefined);
-      setTeamOneRight(sorted[1] || undefined);
-      setTeamOneSub(sorted[2] || undefined);
-    } else {
-      //trick i stole from python, if nonCaptain is null it will be replaced with undefined
-      setTeamOneLeft(teamOne.captain);
-      setTeamOneRight(teamOne.nonCaptain || undefined);
-      setTeamOneSub(teamOne.substitute || undefined);
-    }
-    setTeamOneName(gameObj.teamOne.name);
-    setTeamTwoName(gameObj.teamTwo.name);
-    setTeamTwoTimeouts(gameObj.teamTwoTimeouts);
-    setTeamTwoScore(gameObj.teamTwoScore);
-    setTeamTwoServingLeft(gameObj.teamTwo.servingFromLeft!);
-    if (gameObj.started) {
-      const sorted = [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute].toSorted((a, b) =>
-        (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
-      );
-      setTeamTwoLeft(sorted[0] || undefined);
-      setTeamTwoRight(sorted[1] || undefined);
-      setTeamTwoSub(sorted[2] || undefined);
-    } else {
-      setTeamTwoLeft(teamTwo.captain);
-      //trick i stole from python, if nonCaptain is null it will be replaced with undefined
-      setTeamTwoRight(teamTwo.nonCaptain || undefined);
-      setTeamTwoSub(teamTwo.substitute || undefined);
-    }
+    setOfficial(gameObj?.official);
+    setScorer(gameObj?.scorer ?? undefined);
+    setGameForState(gameObj);
     closeLoading();
+    //disabled as including setGameForState will cause an infinite reload
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeLoading, gameObj]);
 
   useEffect(() => {
-    if (timeoutExpirationTime > 0) {
+    if (gameState.timeoutExpirationTime.get > 0) {
       openTimeout();
     } else {
       closeTimeout();
     }
-  }, [closeTimeout, openTimeout, timeoutExpirationTime]);
-
-  const gameState: GameState = {
-    votes: {
-      get: votes,
-      set: setVotes,
-    },
-    badminton: gameObj?.tournament.usingBadmintonServes ?? false,
-    timeoutExpirationTime: {
-      get: timeoutExpirationTime,
-      set: setTimeoutExpirationTime,
-    },
-    teamOneIGA: {
-      get: teamOneIGA,
-      set: setTeamOneIGA,
-    },
-    started: {
-      get: started,
-      set: setStarted,
-    },
-    ended: {
-      get: ended,
-      set: setEnded,
-    },
-    firstTeamServes: {
-      get: firstTeamServes,
-      set: setFirstTeamServes,
-    },
-    faulted: {
-      get: faulted,
-      set: setFaulted,
-    },
-    id: gameObj?.id ?? -1,
-    servingFromLeft,
-    notes: {
-      get: notes,
-      set: setNotes,
-    },
-    teamOne: {
-      name: teamOneName,
-      score: {
-        get: teamOneScore,
-        set: setTeamOneScore,
-      },
-      rating: {
-        get: teamOneRating,
-        set: setTeamOneRating,
-      },
-      notes: {
-        get: teamOneNotes,
-        set: setTeamOneNotes,
-      },
-      protest: {
-        get: teamOneProtest,
-        set: setTeamOneProtest,
-      },
-      timeouts: {
-        get: teamOneTimeouts,
-        set: setTeamOneTimeouts,
-      },
-      servingFromLeft: {
-        get: teamOneServingLeft,
-        set: setTeamOneServingLeft,
-      },
-      left: {
-        get: teamOneLeft,
-        set: setTeamOneLeft,
-      },
-      right: {
-        get: teamOneRight,
-        set: setTeamOneRight,
-      },
-      sub: {
-        get: teamOneSub,
-        set: setTeamOneSub,
-      },
-    },
-    teamTwo: {
-      name: teamTwoName,
-      score: {
-        get: teamTwoScore,
-        set: setTeamTwoScore,
-      },
-      rating: {
-        get: teamTwoRating,
-        set: setTeamTwoRating,
-      },
-      notes: {
-        get: teamTwoNotes,
-        set: setTeamTwoNotes,
-      },
-      protest: {
-        get: teamTwoProtest,
-        set: setTeamTwoProtest,
-      },
-      timeouts: {
-        get: teamTwoTimeouts,
-        set: setTeamTwoTimeouts,
-      },
-      servingFromLeft: {
-        get: teamTwoServingLeft,
-        set: setTeamTwoServingLeft,
-      },
-      left: {
-        get: teamTwoLeft,
-        set: setTeamTwoLeft,
-      },
-      right: {
-        get: teamTwoRight,
-        set: setTeamTwoRight,
-      },
-      sub: {
-        get: teamTwoSub,
-        set: setTeamTwoSub,
-      },
-    },
-  };
+  }, [closeTimeout, openTimeout, gameState.timeoutExpirationTime.get]);
 
   const timeoutKids = (
     <>
-      <Title style={{ color: timeoutExpirationTime > currentTime ? '' : 'red' }} order={2}>
-        {(Math.floor((timeoutExpirationTime - currentTime) / 100) / 10).toFixed(1)} Seconds
+      <Title
+        style={{ color: gameState.timeoutExpirationTime.get > currentTime ? '' : 'red' }}
+        order={2}
+      >
+        {(Math.floor((gameState.timeoutExpirationTime.get - currentTime) / 100) / 10).toFixed(1)}{' '}
+        Seconds
       </Title>
       <br />
       <br />
@@ -334,128 +152,184 @@ export function EditGame({ game }: { game: number }) {
       </Link>
     </>
   );
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        colors: {
+          'serving-color': gameState.blitzGame.get
+            ? DEFAULT_THEME.colors.green
+            : DEFAULT_THEME.colors.teal,
+          'player-color': gameState.blitzGame.get
+            ? DEFAULT_THEME.colors.teal
+            : DEFAULT_THEME.colors.blue,
+        },
+      }),
+    [gameState.blitzGame]
+  );
+
   return (
-    <Box style={{ width: '100%', height: '100vh' }}>
-      <LoadingOverlay
-        visible={visibleLoading && isLoggedIn}
-        overlayProps={{ radius: 'sm', blur: 2 }}
-        loaderProps={{ color: 'pink', type: 'bars' }}
-      />
-      <LoadingOverlay visible={visibleTimeout} loaderProps={{ children: timeoutKids }} />
-      <LoadingOverlay
-        overlayProps={{
-          color: '#222',
-          blur: 15,
-        }}
-        visible={!isOfficial || (gameObj?.status === 'Official' && editOfficialGame)}
-        loaderProps={{
-          children:
-            gameObj?.status === 'Official'
-              ? isUmpireManager
-                ? warnAdminAboutEditing
-                : OfficialCantEdit
-              : loginProps,
-        }}
-      />
-      <Box style={{ width: '100%', height: '40%' }}>
-        {(gameState.teamOneIGA.get ? teamOneLeft && teamOneRight : teamTwoLeft && teamTwoRight) ? (
-          <>
-            <Box style={{ width: '50%', height: '90%', float: 'left' }}>
-              <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
+    <MantineProvider theme={theme}>
+      <Box style={{ width: '100%', height: '100vh' }}>
+        <LoadingOverlay
+          visible={visibleLoading}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+          loaderProps={{ color: 'pink', type: 'bars' }}
+        />
+        <LoadingOverlay visible={visibleTimeout} loaderProps={{ children: timeoutKids }} />
+        <LoadingOverlay
+          overlayProps={{
+            color: '#222',
+            blur: 15,
+          }}
+          visible={
+            !isOfficial(gameObj?.tournament.searchableName) ||
+            (gameObj?.status === 'Official' && editOfficialGame)
+          }
+          loaderProps={{
+            children:
+              gameObj?.status === 'Official'
+                ? isUmpireManager(gameObj.tournament.searchableName)
+                  ? warnAdminAboutEditing
+                  : OfficialCantEdit
+                : loginProps,
+          }}
+        />
+        <Box style={{ width: '100%', height: '40%' }}>
+          {(
+            gameState.teamOneIGA.get
+              ? gameState.teamOne.right.get && gameState.teamOne.left.get
+              : gameState.teamTwo.right.get && gameState.teamTwo.left.get
+          ) ? (
+            <>
+              <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+                <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
+              </Box>
+              <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+                <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
+              </Box>
+            </>
+          ) : (
+            <Box style={{ width: '100%', height: '90%', float: 'left' }}>
+              <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
             </Box>
-            <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-              <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
-            </Box>
-          </>
-        ) : (
-          <Box style={{ width: '100%', height: '90%', float: 'left' }}>
-            <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
+          )}
+
+          <Box style={{ width: '100%', height: '10%', float: 'right' }}>
+            <TeamButton firstTeam={true} game={gameState}></TeamButton>
           </Box>
-        )}
-
-        <Box style={{ width: '100%', height: '10%', float: 'right' }}>
-          <TeamButton firstTeam={true} game={gameState}></TeamButton>
         </Box>
-      </Box>
-      <Box
-        style={{
-          width: '100%',
-          height: '20%',
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
         <Box
           style={{
+            width: '100%',
+            height: '20%',
             display: 'flex',
-            flex: 'auto',
-            alignContent: 'center',
+            flexDirection: 'row',
             justifyContent: 'center',
-            width: 'fit-content',
-          }}
-        >
-          <Button size="lg" onClick={() => sync(gameState)}>
-            Sync
-          </Button>
-        </Box>
-        <Box
-          style={{
-            margin: '0px auto',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-evenly',
             alignItems: 'center',
-            flex: '5',
           }}
         >
-          <GameScore game={gameState}></GameScore>
-        </Box>
+          <Group w="100%">
+            <Center w="33%">
+              {gameState.started.get ? (
+                <Button color="player-color" size="lg" onClick={() => sync(gameState)}>
+                  Sync
+                </Button>
+              ) : (
+                <Popover width={300} position="bottom" withArrow shadow="md">
+                  <Popover.Target>
+                    <Button size="lg" color="player-color">
+                      Officials
+                    </Button>
+                  </Popover.Target>
+                  <Popover.Dropdown>
+                    <Center>
+                      <Stack>
+                        <Select
+                          label="Official"
+                          searchable
+                          allowDeselect={false}
+                          placeholder="Pick value"
+                          data={officials.map((a) => ({ value: a.searchableName, label: a.name }))}
+                          value={official?.searchableName}
+                          onChange={(v) => {
+                            setOfficial(officials.find((a) => a.searchableName === v)!);
+                          }}
+                          comboboxProps={{ withinPortal: false }}
+                        />
 
-        <Box
-          style={{
-            display: 'flex',
-            flex: 'auto',
-            alignContent: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Button
-            size="lg"
-            color={started ? 'blue' : 'red'}
-            onClick={() => {
-              if (started) {
-                undo(gameState);
-              } else {
-                del(gameState);
-              }
-            }}
-          >
-            {started ? 'Undo' : 'Delete'}
-          </Button>
+                        <Select
+                          label="Scorer"
+                          allowDeselect={false}
+                          placeholder="Pick value"
+                          data={officials.map((a) => ({ value: a.searchableName, label: a.name }))}
+                          value={scorer?.searchableName}
+                          onChange={(v) => {
+                            setScorer(officials.find((a) => a.searchableName === v)!);
+                          }}
+                          comboboxProps={{ withinPortal: false }}
+                        />
+                      </Stack>
+                    </Center>
+                  </Popover.Dropdown>
+                </Popover>
+              )}
+            </Center>
+            <Box
+              style={{
+                margin: '0px auto',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-evenly',
+                alignItems: 'center',
+                flex: '5',
+              }}
+            >
+              <GameScore game={gameState} official={official} scorer={scorer}></GameScore>
+            </Box>
+
+            <Center w="33%">
+              <Button
+                size="lg"
+                color={gameState.started.get ? 'player-color' : 'red'}
+                onClick={() => {
+                  if (gameState.started.get) {
+                    undo(gameState);
+                  } else {
+                    del(gameState);
+                  }
+                }}
+              >
+                {gameState.started.get ? 'Undo' : 'Delete'}
+              </Button>
+            </Center>
+          </Group>
         </Box>
-      </Box>
-      <Box style={{ width: '100%', height: '40%' }}>
-        <Box style={{ width: '100%', height: '10%', float: 'right' }}>
-          <TeamButton firstTeam={false} game={gameState}></TeamButton>
-        </Box>
-        {(gameState.teamOneIGA.get ? teamTwoLeft && teamTwoRight : teamOneLeft && teamOneRight) ? (
-          <>
-            <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+        <Box style={{ width: '100%', height: '40%' }}>
+          <Box style={{ width: '100%', height: '10%', float: 'right' }}>
+            <TeamButton firstTeam={false} game={gameState}></TeamButton>
+          </Box>
+          {(
+            gameState.teamOneIGA.get
+              ? gameState.teamTwo.right.get && gameState.teamTwo.left.get
+              : gameState.teamOne.right.get && gameState.teamOne.left.get
+          ) ? (
+            <>
+              <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+                <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
+              </Box>
+              <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+                <PlayerButton game={gameState} firstTeam={false} leftSide={false}></PlayerButton>
+              </Box>
+            </>
+          ) : (
+            <Box style={{ width: '100%', height: '90%', float: 'left' }}>
               <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
             </Box>
-            <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-              <PlayerButton game={gameState} firstTeam={false} leftSide={false}></PlayerButton>
-            </Box>
-          </>
-        ) : (
-          <Box style={{ width: '100%', height: '90%', float: 'left' }}>
-            <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
-          </Box>
-        )}
+          )}
+        </Box>
       </Box>
-    </Box>
+    </MantineProvider>
   );
 }
