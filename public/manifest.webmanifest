@@ -1,0 +1,25 @@
+{
+  "short_name": "SUSS",
+  "name": "SUSS Handball",
+  "icons": [
+    {
+      "src": "https://api.squarers.club/api/image?name=SUSS",
+      "sizes": "2000x2000",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "white",
+  "background_color": "black",
+  "shortcuts": [
+      {
+        "name": "New event",
+        "url": "/new-event"
+      },
+      {
+        "name": "View today's events",
+        "url": "/today"
+      }
+    ]
+}

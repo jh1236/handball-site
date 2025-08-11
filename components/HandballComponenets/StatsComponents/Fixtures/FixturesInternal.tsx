@@ -10,7 +10,7 @@ import { GameStructure, TournamentStructure } from '@/ServerActions/types';
 
 interface FixturesProps {
   maxRounds?: number;
-  tournament: string;
+  tournament?: string;
   expanded?: boolean;
   setExpanded?: (value: boolean) => void;
   expandable?: boolean;
@@ -29,37 +29,39 @@ export default function FixturesInternal({
   const [tournamentState, setTournamentState] = React.useState<TournamentStructure>();
   const { isUmpireManager } = useUserData();
   useEffect(() => {
-    getFixtures({
-      tournament,
-      returnTournament: true,
-      separateFinals: true,
-      maxRounds: maxRounds > 0 ? maxRounds : undefined,
-    }).then((data) => {
-      if (maxRounds > 0) {
-        if ((data?.finals?.length ?? 0) > maxRounds) {
-          setFixtures([]);
-          if (maxRounds === 1) {
-            setFinals([{ games: data.finals!.map((a) => a.games).flat(), final: true }]);
+    if (tournament) {
+      getFixtures({
+        tournament,
+        returnTournament: true,
+        separateFinals: true,
+        maxRounds: maxRounds > 0 ? maxRounds : undefined,
+      }).then((data) => {
+        if (maxRounds > 0) {
+          if ((data?.finals?.length ?? 0) > maxRounds) {
+            setFixtures([]);
+            if (maxRounds === 1) {
+              setFinals([{ games: data.finals!.map((a) => a.games).flat(), final: true }]);
+            } else {
+              const temp = data.finals!.toReversed();
+              temp.length = maxRounds;
+              setFinals(temp.toReversed());
+            }
           } else {
-            const temp = data.finals!.toReversed();
-            temp.length = maxRounds;
-            setFinals(temp.toReversed());
+            setFinals(data?.finals ?? []);
+            const temp = (data.fixtures ?? []).toReversed();
+            temp.length = Math.min(
+              maxRounds - (data?.finals?.length ?? 0),
+              data?.fixtures?.length ?? 0
+            );
+            setFixtures(temp.toReversed());
           }
         } else {
+          setFixtures(data?.fixtures ?? []);
           setFinals(data?.finals ?? []);
-          const temp = (data.fixtures ?? []).toReversed();
-          temp.length = Math.min(
-            maxRounds - (data?.finals?.length ?? 0),
-            data?.fixtures?.length ?? 0
-          );
-          setFixtures(temp.toReversed());
         }
-      } else {
-        setFixtures(data?.fixtures ?? []);
-        setFinals(data?.finals ?? []);
-      }
-      setTournamentState(data.tournament!);
-    });
+        setTournamentState(data.tournament!);
+      });
+    }
   }, [maxRounds, tournament]);
 
   if (!fixtures) {

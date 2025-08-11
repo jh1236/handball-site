@@ -6,7 +6,7 @@ import FixturesInternal from '@/components/HandballComponenets/StatsComponents/F
 
 interface FixturesProps {
   maxRounds?: number;
-  tournament: string;
+  tournament?: string;
   expandable?: boolean;
 }
 

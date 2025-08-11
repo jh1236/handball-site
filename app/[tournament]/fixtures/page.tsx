@@ -9,7 +9,7 @@ export default async function FixturesPage({ params }: TournamentPageArgs) {
     <>
       <SidebarLayout tournamentName={tournament}>
         <h1>Fixtures</h1>
-        <Fixtures tournament={tournament!}></Fixtures>
+        <Fixtures tournament={tournament}></Fixtures>
       </SidebarLayout>
     </>
   );
