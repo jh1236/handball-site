@@ -1,25 +1,50 @@
 {
-  "short_name": "SUSS",
-  "name": "SUSS Handball",
-  "icons": [
-    {
-      "src": "https://api.squarers.club/api/image?name=SUSS",
-      "sizes": "2000x2000",
-      "type": "image/png"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "white",
-  "background_color": "black",
-  "shortcuts": [
-      {
-        "name": "New event",
-        "url": "/new-event"
-      },
-      {
-        "name": "View today's events",
-        "url": "/today"
-      }
+    "short_name": "SUSS",
+    "name": "SUSS Handball",
+    "icons": [
+        {
+            "src": "https://api.squarers.club/api/image?name=SUSS",
+            "sizes": "2000x2000",
+            "type": "image/png"
+        }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "white",
+    "background_color": "black",
+    "shortcuts": [
+        {
+            "name": "Fixtures",
+            "url": "/latest/fixtures",
+            "icons": [
+                {
+                    "src": "https://api.squarers.club/api/image?name=SUSS",
+                    "sizes": "2000x2000",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Ladder",
+            "url": "/latest/ladder",
+            "icons": [
+                {
+                    "src": "https://api.squarers.club/api/image?name=SUSS",
+                    "sizes": "2000x2000",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Create New Game",
+            "url": "/games/create",
+            "icons": [
+                {
+                    "src": "https://api.squarers.club/api/image?name=SUSS",
+                    "sizes": "2000x2000",
+                    "type": "image/png"
+                }
+            ]
+        }
     ]
 }
