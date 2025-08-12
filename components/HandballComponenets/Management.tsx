@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import {
   Box,
   Button,
+  Checkbox,
   Container,
   Divider,
   Grid,
@@ -20,7 +21,6 @@ import {
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
-import { FakeCheckbox } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
@@ -77,13 +77,21 @@ function gameToPaper(game: GameStructure) {
             </Text>
             <Text>
               <strong>Marked For Review: </strong>
-              <FakeCheckbox checked={Boolean(game.admin?.markedForReview)}></FakeCheckbox>
+              <Checkbox
+                style={{ verticalAlign: 'middle' }}
+                display="inline-block"
+                checked={Boolean(game.admin?.markedForReview)}
+              ></Checkbox>
             </Text>
             <HoverCard width={280} shadow="md" disabled={(game.admin!.notes ?? '') === ''}>
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin?.notes)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin?.notes)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>{game.admin?.notes ?? <i>No Notes Left</i>}</HoverCard.Dropdown>
@@ -134,7 +142,11 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin!.teamOneNotes)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin!.teamOneNotes)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -145,7 +157,11 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Protested: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin!.teamOneProtest)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin!.teamOneProtest)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -179,7 +195,11 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin!.teamTwoNotes)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin!.teamTwoNotes)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -190,7 +210,11 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Protested: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin!.teamTwoProtest)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin!.teamTwoProtest)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
