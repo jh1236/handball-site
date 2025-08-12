@@ -242,7 +242,9 @@ export function NavbarNested({
                 </UnstyledButton>
               </Popover.Target>
               <Popover.Dropdown>
-                <Button onClick={() => logoutAction().then(() => router.refresh())}>Logout</Button>
+                <Button onClick={() => logoutAction().then(() => window.location.reload())}>
+                  Logout
+                </Button>
                 {isAdmin('base') && (
                   <>
                     <br />
