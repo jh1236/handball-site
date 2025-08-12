@@ -263,7 +263,7 @@ export function Management({ tournament }: ManagementArgs) {
     }
   }, [isTournamentDirector, loading, router, tournament]);
   useEffect(() => {
-    if (!tournament) return;
+    if (!loading) return;
     getNoteableGames({ tournament }).then((g) => {
       setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());
       setActionableGames(g.games.filter((v) => v.admin?.requiresAction).toReversed());
@@ -274,7 +274,7 @@ export function Management({ tournament }: ManagementArgs) {
       formatData: true,
     }).then((g) => setPlayers(g.players.filter((v) => v.stats!['Penalty Points'] >= 12)));
     getTournament(tournament).then(setTournamentObj);
-  }, [tournament]);
+  }, [loading, tournament]);
   return (
     <>
       <br />
@@ -292,12 +292,12 @@ export function Management({ tournament }: ManagementArgs) {
         }}
       >
         <Image
-          src={tournamentObj?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+          src={tournamentObj?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=SUSS`}
           w="100px"
           h="100px"
         ></Image>
 
-        <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
+        <Title ta="center">{tournamentObj?.name ?? 'SUSS Handball'}</Title>
         {!(tournamentObj?.inFinals ?? true) && (
           <Popover width={200} position="top" withArrow shadow="md">
             <Popover.Target>
@@ -364,7 +364,6 @@ export function Management({ tournament }: ManagementArgs) {
           </Box>
         </Grid.Col>
       </Grid>
-      ;
     </>
   );
 }
