@@ -160,7 +160,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
               <Button
                 disabled={RESOLVED_STATUSES.includes(game.status)}
                 onClick={() => {
-                  resolveGame(game.id).then(() => router.refresh());
+                  resolveGame(game.id).then(() => window.location.reload());
                 }}
               >
                 Resolve
