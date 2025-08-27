@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { IconCheckbox, IconSquare } from '@tabler/icons-react';
 import {
   Box,
   Button,
+  Checkbox,
   Container,
   Divider,
   Grid,
@@ -28,14 +28,6 @@ import { getNoteableGames } from '@/ServerActions/GameActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { forceNextRoundFinalsTournament, getTournament } from '@/ServerActions/TournamentActions';
 import { GameStructure, PersonStructure, TournamentStructure } from '@/ServerActions/types';
-
-export function FakeCheckbox({ checked }: { checked: boolean }) {
-  return checked ? (
-    <IconCheckbox size="1.25em"></IconCheckbox>
-  ) : (
-    <IconSquare size="1.25em"></IconSquare>
-  );
-}
 
 interface ManagementArgs {
   tournament: string;
@@ -85,13 +77,21 @@ function gameToPaper(game: GameStructure) {
             </Text>
             <Text>
               <strong>Marked For Review: </strong>
-              <FakeCheckbox checked={Boolean(game.admin?.markedForReview)}></FakeCheckbox>
+              <Checkbox
+                style={{ verticalAlign: 'middle' }}
+                display="inline-block"
+                checked={Boolean(game.admin?.markedForReview)}
+              ></Checkbox>
             </Text>
             <HoverCard width={280} shadow="md" disabled={(game.admin!.notes ?? '') === ''}>
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin?.notes)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin?.notes)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>{game.admin?.notes ?? <i>No Notes Left</i>}</HoverCard.Dropdown>
@@ -142,7 +142,11 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin!.teamOneNotes)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin!.teamOneNotes)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -153,7 +157,11 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Protested: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin!.teamOneProtest)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin!.teamOneProtest)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -187,7 +195,11 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Notes: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin!.teamTwoNotes)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin!.teamTwoNotes)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -198,7 +210,11 @@ function gameToPaper(game: GameStructure) {
               <HoverCard.Target>
                 <Text>
                   <strong>Protested: </strong>
-                  <FakeCheckbox checked={Boolean(game.admin!.teamTwoProtest)}></FakeCheckbox>
+                  <Checkbox
+                    style={{ verticalAlign: 'middle' }}
+                    display="inline-block"
+                    checked={Boolean(game.admin!.teamTwoProtest)}
+                  ></Checkbox>
                 </Text>
               </HoverCard.Target>
               <HoverCard.Dropdown>
@@ -247,7 +263,7 @@ export function Management({ tournament }: ManagementArgs) {
     }
   }, [isTournamentDirector, loading, router, tournament]);
   useEffect(() => {
-    if (!tournament) return;
+    if (!loading) return;
     getNoteableGames({ tournament }).then((g) => {
       setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());
       setActionableGames(g.games.filter((v) => v.admin?.requiresAction).toReversed());
@@ -258,7 +274,7 @@ export function Management({ tournament }: ManagementArgs) {
       formatData: true,
     }).then((g) => setPlayers(g.players.filter((v) => v.stats!['Penalty Points'] >= 12)));
     getTournament(tournament).then(setTournamentObj);
-  }, [tournament]);
+  }, [loading, tournament]);
   return (
     <>
       <br />
@@ -276,12 +292,12 @@ export function Management({ tournament }: ManagementArgs) {
         }}
       >
         <Image
-          src={tournamentObj?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+          src={tournamentObj?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=SUSS`}
           w="100px"
           h="100px"
         ></Image>
 
-        <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
+        <Title ta="center">{tournamentObj?.name ?? 'SUSS Handball'}</Title>
         {!(tournamentObj?.inFinals ?? true) && (
           <Popover width={200} position="top" withArrow shadow="md">
             <Popover.Target>
@@ -348,7 +364,6 @@ export function Management({ tournament }: ManagementArgs) {
           </Box>
         </Grid.Col>
       </Grid>
-      ;
     </>
   );
 }

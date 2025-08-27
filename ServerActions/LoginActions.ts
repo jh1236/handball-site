@@ -20,7 +20,7 @@ export function loginAction(userId: string, password: string, remember: boolean)
       return Promise.reject(response.text());
     }
     return response.json().then((data) => {
-      data.permissions.base = data.basePermissions;
+      data.permissions.base = data.basePermission;
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
       localStorage.setItem('timeout', `${data.timeout}`);
