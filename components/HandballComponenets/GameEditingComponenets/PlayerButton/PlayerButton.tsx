@@ -1,10 +1,8 @@
 import React, { ForwardRefExoticComponent, Fragment, useMemo } from 'react';
 import { Button, Modal, Progress, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { PlayerActionList } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
-import {
-  PlayerActionList
-} from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerActionList';
 
 interface PlayerButtonProps {
   game: GameState;
