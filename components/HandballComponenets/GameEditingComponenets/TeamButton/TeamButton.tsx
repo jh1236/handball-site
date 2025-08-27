@@ -1,41 +1,13 @@
 import React, { useMemo } from 'react';
-import {
-  IconAlertTriangle,
-  IconArrowsUpDown,
-  IconBallTennis,
-  IconClock,
-  IconFlagFilled,
-  IconNote,
-  IconQuestionMark,
-  IconTrophy,
-  IconUser,
-  IconUsersGroup,
-} from '@tabler/icons-react';
-import {
-  Accordion,
-  Button,
-  List,
-  Modal,
-  Popover,
-  Rating,
-  Text,
-  Textarea,
-  Title,
-} from '@mantine/core';
+import { IconQuestionMark, IconTrophy } from '@tabler/icons-react';
+import { Button, Modal, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { markIfReqd } from '@/components/HandballComponenets/AdminGamePanel';
-import {
-  forfeit,
-  timeout,
-} from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
-import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
 import { TeamActionList } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamActionList';
 import {
   decidedOnCoinToss,
   didWinGame,
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { GameState } from '@/components/HandballComponenets/GameState';
-import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface TeamButtonProps {
   game: GameState;
