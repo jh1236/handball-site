@@ -54,12 +54,12 @@ interface PlayerActionListParams {
 }
 
 export function PlayerActionList({
-                                   game,
-                                   firstTeam,
-                                   leftSide,
-                                   serving,
-                                   close: _close,
-                                 }: PlayerActionListParams): React.ReactElement {
+  game,
+  firstTeam,
+  leftSide,
+  serving,
+  close: _close,
+}: PlayerActionListParams): React.ReactElement {
   const [cardTime, setCardTime] = React.useState<number>(game.blitzGame.get ? 3 : 6);
   const [otherReason, setOtherReason] = React.useState<string>('');
   const close = useCallback(() => {
