@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -108,10 +106,10 @@ export function NavbarNested({
     if (isOfficial('suss_practice')) {
       out.push({ label: 'Create Game', icon: IconNote, link: '/games/create' });
     }
-    out.push(
-      { label: 'Documents', icon: IconFileAnalytics, link: '/documents' },
-      { label: 'Settings', icon: IconAdjustments, link: '/settings' }
-    );
+    out.push({ label: 'Documents', icon: IconFileAnalytics, link: '/documents' });
+    if (isAdmin()) {
+      out.push({ label: 'Admin', icon: IconAdjustments, link: '/admin' });
+    }
     return out;
   }
 
@@ -242,7 +240,9 @@ export function NavbarNested({
                 </UnstyledButton>
               </Popover.Target>
               <Popover.Dropdown>
-                <Button onClick={() => logoutAction().then(() => router.refresh())}>Logout</Button>
+                <Button onClick={() => logoutAction().then(() => window.location.reload())}>
+                  Logout
+                </Button>
                 {isAdmin('base') && (
                   <>
                     <br />

@@ -41,7 +41,7 @@ import {
   Timeline,
   Title,
 } from '@mantine/core';
-import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
+import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { alertGame, deleteGame, resolveGame } from '@/ServerActions/GameActions';
 import { CardStructure, GameEventStructure, GameStructure } from '@/ServerActions/types';
@@ -160,7 +160,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
               <Button
                 disabled={RESOLVED_STATUSES.includes(game.status)}
                 onClick={() => {
-                  resolveGame(game.id).then(() => router.refresh());
+                  resolveGame(game.id).then(() => window.location.reload());
                 }}
               >
                 Resolve

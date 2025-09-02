@@ -12,6 +12,8 @@ interface GameSettingsArgs {
   playersTwo: string[];
   teamNameOne?: string;
   teamNameTwo?: string;
+  blitzGame: boolean;
+  setBlitzGame: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function GameSettings({
@@ -19,13 +21,14 @@ export function GameSettings({
   playersTwo,
   teamNameOne,
   teamNameTwo,
+  blitzGame,
+  setBlitzGame,
 }: GameSettingsArgs) {
   const [officials, setOfficials] = useState<OfficialStructure[]>([]);
   const [tournament, setTournament] = useState<TournamentStructure>();
   const [tournaments, setTournaments] = useState<TournamentStructure[]>([]);
   const [scorer, setScorer] = useState<OfficialStructure>();
   const [official, setOfficial] = useState<OfficialStructure>();
-  const [blitzGame, setBlitzGame] = useState(false);
   const { username } = useUserData();
   const router = useRouter();
 
@@ -43,7 +46,9 @@ export function GameSettings({
       <Center w="33%">
         <Popover width={300} position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <Button size="sm">Officials</Button>
+            <Button size="sm" color="player-color">
+              Officials
+            </Button>
           </Popover.Target>
           <Popover.Dropdown>
             <Center>
@@ -90,6 +95,7 @@ export function GameSettings({
       >
         <Button
           size="sm"
+          color="player-color"
           onClick={() => {
             createGameWithPlayers(
               'suss_practice',
@@ -115,7 +121,9 @@ export function GameSettings({
       <Center w="33%">
         <Popover width={300} position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <Button size="sm">Details</Button>
+            <Button size="sm" color="player-color">
+              Details
+            </Button>
           </Popover.Target>
           <Popover.Dropdown>
             <Center>

@@ -28,15 +28,16 @@ export function useUserData() {
   const [permissions, setPermissions] = React.useState<{ [key: string]: number } | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
   useEffect(() => {
-    if (loggedIn()) {
-      const timeout = localStorage.getItem('timeout');
-      if (timeout) {
-        const ms = Number.parseFloat(timeout);
-        if (ms < Date.now()) {
-          localLogout();
-        }
+    const timeout = localStorage.getItem('timeout');
+    if (timeout) {
+      const ms = Number.parseFloat(timeout);
+      if (ms < Date.now()) {
+        localLogout();
       }
-      setPermissions(JSON.parse(localStorage.getItem('permissions') ?? '{}'));
+    }
+    const tempPerms = JSON.parse(localStorage.getItem('permissions') ?? 'null');
+    if (tempPerms) {
+      setPermissions(tempPerms);
       setUsername(localStorage.getItem('username'));
     } else {
       setPermissions({});
@@ -61,6 +62,7 @@ export function useUserData() {
     ),
     isUmpireManager: useCallback(
       (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 3,
+
       [permissions]
     ),
     loading: permissions === null,
