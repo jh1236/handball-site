@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { IconCheckbox, IconSquare } from '@tabler/icons-react';
 import {
   Box,
   Button,
@@ -28,6 +29,14 @@ import { getNoteableGames } from '@/ServerActions/GameActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { forceNextRoundFinalsTournament, getTournament } from '@/ServerActions/TournamentActions';
 import { GameStructure, PersonStructure, TournamentStructure } from '@/ServerActions/types';
+
+export function FakeCheckbox({ checked }: { checked: boolean }) {
+  return checked ? (
+    <IconCheckbox size="1.25em"></IconCheckbox>
+  ) : (
+    <IconSquare size="1.25em"></IconSquare>
+  );
+}
 
 interface ManagementArgs {
   tournament: string;
