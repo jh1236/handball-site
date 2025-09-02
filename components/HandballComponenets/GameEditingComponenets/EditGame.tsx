@@ -23,9 +23,9 @@ import {
   sync,
   undo,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
-import { GameScore } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
-import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton';
-import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton';
+import { GameScore } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameScore';
+import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
+import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useGameState } from '@/components/HandballComponenets/GameState';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGame } from '@/ServerActions/GameActions';
