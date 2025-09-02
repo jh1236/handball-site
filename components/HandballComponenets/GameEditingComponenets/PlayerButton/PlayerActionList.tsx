@@ -7,6 +7,7 @@ import {
   IconExclamationMark,
   IconPlayHandball,
   IconSquareFilled,
+  IconStarFilled,
   IconTriangleInvertedFilled,
 } from '@tabler/icons-react';
 import {
@@ -25,6 +26,7 @@ import {
   ace,
   fault,
   greenCard,
+  merit,
   redCard,
   score,
   sub,
@@ -52,12 +54,12 @@ interface PlayerActionListParams {
 }
 
 export function PlayerActionList({
-  game,
-  firstTeam,
-  leftSide,
-  serving,
-  close: _close,
-}: PlayerActionListParams): React.ReactElement {
+                                   game,
+                                   firstTeam,
+                                   leftSide,
+                                   serving,
+                                   close: _close,
+                                 }: PlayerActionListParams): React.ReactElement {
   const [cardTime, setCardTime] = React.useState<number>(game.blitzGame.get ? 3 : 6);
   const [otherReason, setOtherReason] = React.useState<string>('');
   const close = useCallback(() => {
@@ -74,6 +76,32 @@ export function PlayerActionList({
   const currentPlayer = players.length > 1 ? players[leftSide ? 0 : 1] : players[0];
   if (!currentPlayer?.get) return <></>;
   let out: AccordionSettings[] = [
+    {
+      Icon: IconStarFilled,
+      value: 'Merit',
+      color: '#3262a8',
+      content: (
+        <>
+          <TextInput
+            value={otherReason}
+            onChange={(event) => setOtherReason(event.currentTarget.value)}
+            label="Explain briefly what happened"
+          ></TextInput>
+          <Button
+            onClick={() => {
+              merit(game, firstTeam, leftSide, otherReason);
+              close();
+            }}
+            style={{ margin: '3px' }}
+            size="sm"
+            disabled={!otherReason}
+            color="player-color"
+          >
+            Submit
+          </Button>
+        </>
+      ),
+    },
     {
       Icon: IconExclamationMark,
       value: 'Warning',
@@ -404,8 +432,7 @@ export function PlayerActionList({
         </Button>
       ),
     }));
-  }
-  if (!game.ended.get) {
+  } else if (!game.ended.get) {
     out.splice(0, 0, {
       Icon: IconBallTennis,
       value: 'Score',
