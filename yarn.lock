@@ -2205,9 +2205,9 @@
     "@types/unist" "*"
 
 "@types/hoist-non-react-statics@^3.3.5":
-  version "3.3.6"
-  resolved "https://registry.npmjs.org/@types/hoist-non-react-statics/-/hoist-non-react-statics-3.3.6.tgz"
-  integrity sha512-lPByRJUer/iN/xa4qpyL0qmL11DqNW81iU/IG1S3uvRUq4oKagz8VCxZjiWkumgt66YT3vOdDgZ0o32sGKtCEw==
+  version "3.3.5"
+  resolved "https://registry.npmjs.org/@types/hoist-non-react-statics/-/hoist-non-react-statics-3.3.5.tgz"
+  integrity sha512-SbcrWzkKBw2cdwRTwQAswfpB9g9LJWfjtUeW/jvNwbhC8cpmmNYVePa+ncbUe0rGTQ7G3Ff6mYUN2VMfLVr+Sg==
   dependencies:
     "@types/react" "*"
     hoist-non-react-statics "^3.3.0"
@@ -8045,9 +8045,9 @@ react-remove-scroll@^2.5.7:
     use-sidecar "^1.1.2"
 
 react-signature-canvas@^1.1.0-alpha.1:
-  version "1.1.0-alpha.2"
-  resolved "https://registry.npmjs.org/react-signature-canvas/-/react-signature-canvas-1.1.0-alpha.2.tgz"
-  integrity sha512-tKUNk3Gmh04Ug4K8p5g8Is08BFUKvbXxi0PyetQ/f8OgCBzcx4vqNf9+OArY/TdNdfHtswXQNRwZD6tyELjkjQ==
+  version "1.1.0-alpha.1"
+  resolved "https://registry.npmjs.org/react-signature-canvas/-/react-signature-canvas-1.1.0-alpha.1.tgz"
+  integrity sha512-EtUuy/e7kjYhgBx9EKjKodeaVlU82p4STKYStUfDgn4eJQ3sxnykIDdqhI1Xp8DNLdL3qMiIRdNCvC7mTcQe1w==
   dependencies:
     "@babel/runtime" "^7.17.9"
     "@types/signature_pad" "^2.3.0"

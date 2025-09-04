@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import {IconCircleFilled, IconSquareFilled, IconTriangleInvertedFilled} from '@tabler/icons-react';
+import { Dot, Legend, Line, LineChart, Rectangle, Tooltip, XAxis, YAxis } from 'recharts';
 import { Box, Divider, Image, Paper, Select, Table, Tabs, Text } from '@mantine/core';
-import { Legend, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 import classes from '@/app/games/[game]/gamesStyles.module.css';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
 import { localLogout, useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
-import { GameStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import { GameEventStructure, GameStructure, PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+
 
 interface GamePageProps {
   gameID: number;
@@ -194,7 +196,8 @@ export function GamePage({ gameID }: GamePageProps) {
           style={{ justifyItems: 'flex-end' }}
         >
           <Image src={game.teamOne.imageUrl} />
-        </div><div className={`${classes.teamInfo} ${classes.info1}`}>
+        </div>
+        <div className={`${classes.teamInfo} ${classes.info1}`}>
           <p> {game.teamOne.captain.name} </p>
           {game.teamOne.nonCaptain ? <p>{game.teamOne.nonCaptain.name}</p> : ''}
           {game.teamOne.substitute ? <p>{game.teamOne.substitute.name}</p> : ''}
@@ -217,43 +220,116 @@ export function GamePage({ gameID }: GamePageProps) {
     );
   }
 
+  const CustomDot = (props: any): ReactElement => {
+    const {
+      cx,
+      cy,
+      stroke,
+      payload,
+      fill,
+      r,
+      strokeWidth,
+      dataKey,
+    }: {
+      payload: {
+        id: number;
+        team1Score: number;
+        team2Score: number;
+        event: GameEventStructure;
+      };
+      [key: string]: any;
+    } = props;
+    const eventMatchesLine: boolean = (payload.event.firstTeam && (dataKey === 'team1Score')) || (!payload.event.firstTeam && (dataKey === 'team2Score'));
+    if (eventMatchesLine) {
+      if (payload.event.eventType === 'Score') {
+        return (
+          <Dot cx={cx} cy={cy} r={r} stroke={stroke} fill={fill} strokeWidth={strokeWidth} key={`${cx}${cy}${payload.id}`}></Dot>
+        );
+      }
+      if (payload.event.eventType === 'Yellow Card') {
+        return <IconSquareFilled x={cx - 15} y={cy - 15} width={30} height={30} fill="yellow" key={`${cx}${cy}${payload.id}`} />;
+      }
+      if (payload.event.eventType === 'Red Card') {
+        return <IconSquareFilled x={cx - 15} y={cy - 15} width={30} height={30} fill="red" key={`${cx}${cy}${payload.id}`} />;
+      }
+    }
+    return <></>;
+  };
+  function customTooltip(props:any): ReactElement {
+    const { payload } : { [key: string]: any } = props;
+    const event: GameEventStructure | undefined = payload[0]?.payload.event || payload[1]?.payload.event;
+    if (!event) { return (<></>); }
+    if (['Yellow Card', 'Red Card'].includes(event.eventType)) {
+      return (
+          <Paper bg="#fff" w={200} shadow="md" style={{ padding: '5px' }}>{event.eventType} given to {event.player.name} for {event.notes}</Paper>
+      );
+    }
+    return (
+        <></>
+    );
+  }
   function createLineGraph(): React.ReactElement {
-    if (!game) { return <></>; }
-    const data: object[] = [];
-    let id: number = 0;
+    if (!game) {
+      return <></>;
+    }
+    const data: {
+      id: number;
+      team1Score: number;
+      team2Score: number;
+      event: GameEventStructure;
+    }[] = [];
     let team1Score: number = 0;
     let team2Score: number = 0;
-    data.push({ id, team1Score, team2Score });
-    game.events!.forEach(e => {
+    game.events!.forEach((e) => {
       if (e.eventType === 'Score') {
-        id += 1;
         if (e.firstTeam) {
           team1Score += 1;
         } else {
           team2Score += 1;
         }
-        data.push({ id, team1Score, team2Score });
+      }
+      if (
+        ['Score', 'Red Card', 'Yellow Card', 'Green Card', 'Start', 'End Game'].includes(
+          e.eventType
+        )
+      ) {
+        data.push({ id: e.time - game.startTime, team1Score, team2Score, event: e });
       }
     });
-    return <Paper
-      withBorder
-      w="fit-content"
-      bg="#8881"
-      style={{
-        padding: '20px',
-        margin: 'auto' }}>
-      <LineChart
-        height={400}
-        width={700}
-        data={data}
+    return (
+      <Paper
+        withBorder
+        w="fit-content"
+        bg="#8881"
+        style={{
+          padding: '20px',
+          margin: 'auto',
+        }}
       >
-        <Line dataKey="team1Score" type="stepAfter" stroke={game.teamOne.teamColor!} dot={false} name={game.teamOne.name} strokeWidth={2} />
-        <Line dataKey="team2Score" type="stepAfter" stroke={game.teamTwo.teamColor!} dot={false} name={game.teamTwo.name} strokeWidth={2} />
-        <YAxis />
-        <Legend />
-        <Tooltip />
-      </LineChart>
-    </Paper>;
+        <LineChart height={400} width={700} data={data}>
+          <Line
+            dataKey="team1Score"
+            type="stepAfter"
+            stroke={game.teamOne.teamColor!}
+            dot={CustomDot}
+            name={game.teamOne.name}
+            strokeWidth={5}
+          />
+          <Line
+            dataKey="team2Score"
+            type="stepAfter"
+            stroke={game.teamTwo.teamColor!}
+            dot={CustomDot}
+            name={game.teamTwo.name}
+            strokeWidth={5}
+          />
+          <YAxis />
+          <Legend />
+          <Tooltip content={customTooltip} />
+          <XAxis dataKey="id" type="number" />
+        </LineChart>
+      </Paper>
+    );
   }
 
   return (
@@ -264,7 +340,7 @@ export function GamePage({ gameID }: GamePageProps) {
         <Box pos="relative">
           <Tabs value={activeTab} onChange={setActiveTab}>
             <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
-              <Tabs.Tab value="teamStats">Team Stats</Tabs.Tab>
+              <Tabs.Tab value="testTab">Team Stats</Tabs.Tab>
               <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
               {game.admin && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
             </Paper>
@@ -294,6 +370,8 @@ export function GamePage({ gameID }: GamePageProps) {
             <Tabs.Panel value="testTab">
               <Box style={{ marginTop: '30px' }} w="100%">
                 {createLineGraph()}
+                {game.events?.map((e) => <p>{e.eventType} | {e.firstTeam ? "first" : "second"}</p>)}
+                {}
               </Box>
             </Tabs.Panel>
           </Tabs>
