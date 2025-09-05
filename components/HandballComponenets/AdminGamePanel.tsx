@@ -6,6 +6,7 @@ import {
   IconArrowsLeftRight,
   IconBallTennis,
   IconBallVolleyball,
+  IconBarrierBlockFilled,
   IconBounceRightFilled,
   IconCheckbox,
   IconCircleFilled,
@@ -23,7 +24,10 @@ import {
   IconSquare1,
   IconSquare2,
   IconSquareFilled,
-  IconStopwatch,
+  IconSquareXFilled,
+  IconStarFilled,
+  IconTimeDuration0,
+  IconTimeDuration30,
   IconTimeline,
   IconTriangleInvertedFilled,
 } from '@tabler/icons-react';
@@ -72,22 +76,12 @@ const RESOLVED_STATUSES = [
 
 export const eventIcon = (e: CardStructure, props = {}) => {
   switch (e.eventType) {
-    case 'Timeout':
-      return <IconStopwatch {...props} />;
-    case 'Resolve':
-      return <IconCheckbox color="green" {...props} />;
-    case 'End Game':
-      return <PiFlagCheckeredFill {...props} />;
-    case 'Forfeit':
-      return <IconFlagFilled color="red" {...props} />;
-    case 'Notes':
-      return <IconNote />;
-    case 'Protest':
-      return <IconAlertTriangle color="yellow" {...props} />;
     case 'Start':
       return <IconFlagCheck {...props} />;
-    case 'Votes':
-      return <IconListNumbers {...props} />;
+
+    case 'End Game':
+      return <PiFlagCheckeredFill {...props} />;
+
     case 'Score':
       switch (e.notes) {
         case 'Ace':
@@ -105,22 +99,56 @@ export const eventIcon = (e: CardStructure, props = {}) => {
         case 'Illegal Body Part':
           return <IconShoe {...props} />;
         case 'Obstruction':
-          return <IconBallTennis {...props} />;
+          return <IconBarrierBlockFilled {...props} />;
       }
       return <IconBallTennis {...props} />;
+
     case 'Fault':
       return <IconPlayHandball {...props} />;
-    case 'Substitute':
-      return <IconArrowsLeftRight {...props} />;
+
+    case 'Timeout':
+      return <IconTimeDuration30 {...props} />;
+
+    case 'End Timeout':
+      return <IconTimeDuration0 {...props} />;
+
+    case 'Abandon':
+      return <IconSquareXFilled color="red" {...props} />;
+
+    case 'Forfeit':
+      return <IconFlagFilled color="red" {...props} />;
+
     case 'Warning':
       return <IconExclamationMark color="grey" {...props} />;
+
     case 'Green Card':
       return <IconTriangleInvertedFilled color="green" {...props} />;
+
     case 'Yellow Card':
       return <IconSquareFilled color="yellow" {...props} />;
+
     case 'Red Card':
       return <IconCircleFilled color="red" {...props} />;
+
+    case 'Substitute':
+      return <IconArrowsLeftRight {...props} />;
+
+    case 'Notes':
+      return <IconNote />;
+
+    case 'Protest':
+      return <IconAlertTriangle color="yellow" {...props} />;
+
+    case 'Resolve':
+      return <IconCheckbox color="green" {...props} />;
+
+    case 'Votes':
+      return <IconListNumbers {...props} />;
+
+    case 'Merit':
+      return <IconStarFilled color="blue" {...props} />;
   }
+
   return null;
 };
 
@@ -397,12 +425,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
               )}
               <Timeline bulletSize={24}>
                 {game.events
-                  ?.filter(
-                    (a) =>
-                      a.notes !== 'Penalty' &&
-                      (a.notes || a.eventType !== 'Notes') &&
-                      a.eventType !== 'End Timeout'
-                  )
+                  ?.filter((a) => a.notes !== 'Penalty' && (a.notes || a.eventType !== 'Notes'))
                   .map((e, i) => (
                     <Timeline.Item
                       key={i}
