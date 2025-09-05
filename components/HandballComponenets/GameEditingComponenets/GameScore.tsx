@@ -314,7 +314,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
 
               <Popover.Dropdown>
                 <>
-                  {matchPoints && (
+                  {!!matchPoints && (
                     <Center>
                       <Text fw={700} fz={20}>
                         <i>
