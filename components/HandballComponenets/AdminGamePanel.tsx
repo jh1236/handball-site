@@ -18,6 +18,7 @@ import {
   IconListNumbers,
   IconNote,
   IconPlayHandball,
+  IconRefresh,
   IconShoe,
   IconSquare,
   IconSquare1,
@@ -120,6 +121,8 @@ export const eventIcon = (e: CardStructure, props = {}) => {
       return <IconSquareFilled color="yellow" {...props} />;
     case 'Red Card':
       return <IconCircleFilled color="red" {...props} />;
+    case 'Replay':
+      return <IconRefresh {...props} />;
   }
   return null;
 };

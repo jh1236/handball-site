@@ -572,6 +572,27 @@ export function meritForGame(
   });
 }
 
+export function replayForGame(gameId: number): Promise<void> {
+  const body: any = {
+    id: gameId,
+  };
+  return tokenFetch('/api/games/update/replay', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
 export function substituteForGame(
   gameId: number,
   firstTeam: boolean,
