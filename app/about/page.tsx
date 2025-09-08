@@ -29,7 +29,7 @@ const people: Person[] = [
     role: 'Developer',
     description:
       'Digby has been working with the SUSS development team since the start of 2025, and has ' +
-      'been a valuable member of the team. Having won three tournaments, he knows his way around a' +
+      'been a valuable member of the team. Having won three tournaments, he knows his way around a ' +
       'handball court.',
   },
   {
@@ -55,7 +55,7 @@ const people: Person[] = [
     searchable: 'william_prozerska',
     role: 'Artist',
     description:
-      'William is a prolific artist who has created many art works for the SUSS team. since' +
+      'William is a prolific artist who has created many art works for the SUSS team. Since ' +
       'creating the Eighth SUSS Championship logo, he has been working with the team to create artwork' +
       ' for the sport we all love.',
   },
