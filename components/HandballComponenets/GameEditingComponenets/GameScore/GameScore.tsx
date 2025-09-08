@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Button, Center, Modal, Popover, Text, Title } from '@mantine/core';
+import { Box, Button, Center, Modal, Popover, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   abandon,
@@ -7,6 +7,7 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GameActionList } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { replayForGame } from '@/ServerActions/GameActions';
 import { OfficialStructure } from '@/ServerActions/types';
 
 interface GameScoreArgs {
@@ -78,7 +79,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
 
               <Popover.Dropdown>
                 <>
-                  {matchPoints && (
+                  {!!matchPoints && (
                     <Center>
                       <Text fw={700} fz={20}>
                         <i>
@@ -89,34 +90,47 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
                     </Center>
                   )}
 
-                  <Popover width={200} position="top" withArrow shadow="md">
-                    <Popover.Target>
-                      <Button size="lg" color="red">
-                        Abandon
-                      </Button>
-                    </Popover.Target>
+                  <Stack>
+                    <Popover width={200} position="top" withArrow shadow="md">
+                      <Popover.Target>
+                        <Button size="lg" color="red">
+                          Abandon
+                        </Button>
+                      </Popover.Target>
 
-                    <Popover.Dropdown ta="center">
-                      <Text m={5}>Are you sure you want to abandon this game?</Text>
-                      {Math.max(game.teamOne.score.get, game.teamTwo.score.get) < 5 && (
-                        <Text>
-                          <b style={{ color: 'red' }}>
-                            Doing so will result in the game being decided on a coin toss!
-                          </b>
-                        </Text>
-                      )}
-                      <Button
-                        m={5}
-                        color="red"
-                        onClick={() => {
-                          abandon(game);
-                          setOpenPopover(false);
-                        }}
-                      >
-                        Confirm
-                      </Button>
-                    </Popover.Dropdown>
-                  </Popover>
+                      <Popover.Dropdown ta="center">
+                        <Text m={5}>Are you sure you want to abandon this game?</Text>
+                        {Math.max(game.teamOne.score.get, game.teamTwo.score.get) < 5 && (
+                          <Text>
+                            <b style={{ color: 'red' }}>
+                              Doing so will result in the game being decided on a coin toss!
+                            </b>
+                          </Text>
+                        )}
+                        <Button
+                          m={5}
+                          color="red"
+                          onClick={() => {
+                            abandon(game);
+                            setOpenPopover(false);
+                          }}
+                        >
+                          Confirm
+                        </Button>
+                      </Popover.Dropdown>
+                    </Popover>
+
+                    <Button
+                      size="lg"
+                      color="gray"
+                      onClick={() => {
+                        replayForGame(game.id);
+                        setOpenPopover(false);
+                      }}
+                    >
+                      Replay
+                    </Button>
+                  </Stack>
                 </>
               </Popover.Dropdown>
             </Popover>
