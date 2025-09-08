@@ -18,7 +18,19 @@ import {
   IconUsersGroup,
 } from '@tabler/icons-react';
 import { GiWhistle } from 'react-icons/gi';
-import { Box, Button, Group, Image, Popover, rem, ScrollArea, ThemeIcon, Title, UnstyledButton, useMantineColorScheme } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Group,
+  Image,
+  Popover,
+  rem,
+  ScrollArea,
+  ThemeIcon,
+  Title,
+  UnstyledButton,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
@@ -27,7 +39,6 @@ import classes from '@/components/Sidebar/NavbarNested.module.css';
 import { logoutAction } from '@/ServerActions/LoginActions';
 import { getTournaments } from '@/ServerActions/TournamentActions';
 import { TournamentStructure } from '@/ServerActions/types';
-
 
 interface NavbarNestedProps {
   sidebarVisible?: boolean;
