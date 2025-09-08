@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { Card, Grid, Group, Image, Text, Title } from '@mantine/core';
+import Head from 'next/head';
 import { SERVER_ADDRESS } from '@/app/config';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
-import Head from 'next/head';
 
 interface Person {
   name: string;
