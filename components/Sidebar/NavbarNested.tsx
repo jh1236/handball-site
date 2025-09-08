@@ -14,6 +14,7 @@ import {
   IconNote,
   IconSun,
   IconUser,
+  IconUsers,
   IconUsersGroup,
 } from '@tabler/icons-react';
 import { GiWhistle } from 'react-icons/gi';
@@ -110,6 +111,7 @@ export function NavbarNested({
     if (isAdmin()) {
       out.push({ label: 'Admin', icon: IconAdjustments, link: '/admin' });
     }
+    out.push({ label: 'About us', icon: IconUsers, link: '/about' });
     return out;
   }
 
