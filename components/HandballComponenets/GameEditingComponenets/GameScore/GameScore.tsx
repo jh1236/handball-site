@@ -37,8 +37,8 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
   const teamTwo = game.teamOneIGA.get ? game.teamTwo : game.teamOne;
   const matchPoints = useMemo(
     () =>
-      teamOne.score.get >= (game.blitzGame.get ? 10 : 6) ||
-      teamTwo.score.get >= (game.blitzGame.get ? 10 : 6)
+      teamOne.score.get >= (game.blitzGame.get ? 6 : 10) ||
+      teamTwo.score.get >= (game.blitzGame.get ? 6 : 10)
         ? teamOne.score.get - teamTwo.score.get
         : 0,
     [game.blitzGame.get, teamOne.score.get, teamTwo.score.get]
@@ -62,7 +62,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
               <Popover.Target>
                 <Box
                   onClick={() => {
-                    if (!openPopover && matchPoints === 0) {
+                    if (!openPopover) {
                       setOpenPopover(true);
                     }
                   }}
@@ -80,14 +80,17 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
               <Popover.Dropdown>
                 <>
                   {!!matchPoints && (
-                    <Center>
-                      <Text fw={700} fz={20}>
-                        <i>
-                          {Math.abs(matchPoints)} match points to{' '}
-                          {matchPoints > 0 ? teamOne.name.get : teamTwo.name.get}
-                        </i>
-                      </Text>
-                    </Center>
+                    <>
+                      <Center>
+                        <Text fw={700} fz={20}>
+                          <i>
+                            {Math.abs(matchPoints)} match points to{' '}
+                            {matchPoints > 0 ? teamOne.name.get : teamTwo.name.get}
+                          </i>
+                        </Text>
+                      </Center>
+                      <br />
+                    </>
                   )}
 
                   <Stack>
