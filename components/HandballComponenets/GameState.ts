@@ -12,7 +12,7 @@ import {
 import { GameEventStructure, GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 export function getWinningScore(game: GameState): number {
-  return game.blitzGame ? 7 : 11;
+  return game.blitzGame.get ? 7 : 11;
 }
 
 export function getForceWinningScore(game: GameState): number {
@@ -185,8 +185,8 @@ export function useGameState(game?: GameStructure) {
     if (teamOneScore || teamTwoScore) {
       const bigScore = Math.max(teamOneScore, teamTwoScore);
       const lilScore = Math.min(teamOneScore, teamTwoScore);
-      if (bigScore < (blitzGame ? 11 : 7)) return;
-      if (bigScore < (blitzGame ? 22 : 14) && bigScore - lilScore <= 1) return;
+      if (bigScore < (blitzGame ? 7 : 11)) return;
+      if (bigScore < (blitzGame ? 14 : 22) && bigScore - lilScore <= 1) return;
       setEnded(true);
     }
   }, [teamOneScore, teamTwoScore, abandoned, blitzGame]);

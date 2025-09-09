@@ -322,8 +322,8 @@ export function PlayerActionList({
           </Modal>
           <Title order={2}>Rounds: </Title>
           <Slider
-            min={game.blitzGame ? 3 : 6}
-            max={game.blitzGame ? 9 : 12}
+            min={game.blitzGame.get ? 3 : 6}
+            max={game.blitzGame.get ? 9 : 12}
             step={1}
             value={cardTime}
             onChange={(value) => setCardTime(value)}
