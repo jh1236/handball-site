@@ -10,21 +10,12 @@ export async function tokenFetcher(url: string, args: any = {}) {
 
 export function localLogout() {
   localStorage.removeItem('token');
-  localStorage.removeItem('permissionLevel');
+  localStorage.removeItem('permissions');
   localStorage.removeItem('username');
   localStorage.removeItem('timeout');
 }
 
 export function useUserData() {
-  // return {
-  //   loading: false,
-  //   isAdmin: true,
-  //   isOfficial: true,
-  //   isUmpireManager: true,
-  //   isLoggedIn: true,
-  //   permissionLevel: 5,
-  //   username: 'testing',
-  // };
   const [permissions, setPermissions] = React.useState<{ [key: string]: number } | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
   useEffect(() => {
@@ -34,13 +25,15 @@ export function useUserData() {
       if (ms < Date.now()) {
         localLogout();
       }
+    } else {
+      localLogout();
     }
     const tempPerms = JSON.parse(localStorage.getItem('permissions') ?? 'null');
     if (tempPerms) {
       setPermissions(tempPerms);
       setUsername(localStorage.getItem('username'));
     } else {
-      setPermissions({});
+      setPermissions(null);
     }
   }, []);
   return {
