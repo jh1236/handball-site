@@ -11,6 +11,7 @@ import {
   faultLocal,
   forfeitLocal,
   scoreLocal,
+  startLocal,
   subLocal,
   timeoutLocal,
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
@@ -34,7 +35,7 @@ import {
 import { OfficialStructure } from '@/ServerActions/types';
 
 export function begin(game: GameState, official?: OfficialStructure, scorer?: OfficialStructure) {
-  startLoading();
+  startLocal(game);
   startGame(
     game.id,
     !game.firstTeamServes.get,
@@ -51,7 +52,7 @@ export function begin(game: GameState, official?: OfficialStructure, scorer?: Of
     ].filter((a) => typeof a === 'string'),
     official?.searchableName,
     scorer?.searchableName
-  ).then(() => sync(game));
+  );
 }
 
 export function end(game: GameState, reviewRequired: boolean) {
