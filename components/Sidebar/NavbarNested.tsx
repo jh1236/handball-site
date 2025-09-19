@@ -245,20 +245,6 @@ export function NavbarNested({
                 <Button onClick={() => logoutAction().then(() => window.location.reload())}>
                   Logout
                 </Button>
-                {isAdmin('base') && (
-                  <>
-                    <br />
-                    <br />
-                    <Button onClick={() => localStorage.setItem('permissionLevel', '4')}>
-                      Set Umpire Manager
-                    </Button>
-                    <br />
-                    <br />
-                    <Button onClick={() => localStorage.setItem('permissionLevel', '2')}>
-                      Set Official
-                    </Button>
-                  </>
-                )}
               </Popover.Dropdown>
             </Popover>
           </div>
