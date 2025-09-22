@@ -13,6 +13,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { WEBSOCKET_ADDRESS } from '@/app/config';
 import { TeamState, useGameState } from '@/components/HandballComponenets/GameState';
 import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
 import { PlayerGameStatsStructure, TeamStructure } from '@/ServerActions/types';
@@ -47,7 +48,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   );
   const [currentTime, setCurrentTime] = useState(0);
   const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-  const WS_URL = `wss://api.squarers.club/api/scoreboard?gameId=${gameID}`;
+  const WS_URL = `${WEBSOCKET_ADDRESS}/api/scoreboard?gameId=${gameID}`;
   const { sendMessage, lastJsonMessage, readyState } = useWebSocket(WS_URL, {
     share: false,
     shouldReconnect: () => true,
