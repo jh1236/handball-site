@@ -24,18 +24,19 @@ import {
 import { SERVER_ADDRESS } from '@/app/config';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { uploadTeamImage, uploadTournamentImage } from '@/ServerActions/ImageActions';
-import { getOfficials } from '@/ServerActions/OfficialActions';
-import { getPlayers } from '@/ServerActions/PlayerActions';
-import { getTeams } from '@/ServerActions/TeamActions';
 import {
   addOfficialToTournament,
-  addTeamToTournament,
-  getTournament,
+  getOfficials,
   removeOfficialFromTournament,
+} from '@/ServerActions/OfficialActions';
+import { getPlayers } from '@/ServerActions/PlayerActions';
+import {
+  addTeamToTournament,
+  getTeams,
   removeTeamFromTournament,
   renameTeamForTournament,
-  startTournament,
-} from '@/ServerActions/TournamentActions';
+} from '@/ServerActions/TeamActions';
+import { getTournament, startTournament } from '@/ServerActions/TournamentActions';
 import {
   OfficialStructure,
   PersonStructure,
@@ -164,7 +165,7 @@ function CustomTeamCard({
             onClick={() => {
               if (team && team.name === newTeamName) {
                 addTeamToTournament({
-                  tournament,
+                  tournamentSearchableName: tournament,
                   teamName: team.name,
                 }).then((t) => {
                   setTeamsInTournament([...teamsInTournament, t]);
@@ -172,7 +173,7 @@ function CustomTeamCard({
               } else {
                 const [captainName, nonCaptainName, substituteName] = players;
                 addTeamToTournament({
-                  tournament,
+                  tournamentSearchableName: tournament,
                   teamName: newTeamName,
                   captainName: players[0],
                   ...(captainName && { captainName }),
@@ -357,8 +358,8 @@ function TeamCard({
               size="md"
               onClick={() => {
                 renameTeamForTournament({
-                  searchable: tournament,
-                  teamSearchable: team.searchableName,
+                  tournamentSearchableName: tournament,
+                  teamSearchableName: team.searchableName,
                   newName: newTeamName !== team.name ? newTeamName : undefined,
                   newColor:
                     color?.toLowerCase() !== team.teamColor?.toLowerCase() ? color : undefined,
