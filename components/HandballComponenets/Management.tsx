@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { IconCheckbox, IconSquare } from '@tabler/icons-react';
 import {
   Box,
   Button,
@@ -21,28 +20,20 @@ import {
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
-import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
+import { eventIcon, RESOLVED_STATUSES } from '@/components/HandballComponenets/AdminGamePanel';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
-import { getNoteableGames } from '@/ServerActions/GameActions';
+import { getNoteableGames, resolveGame } from '@/ServerActions/GameActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { forceNextRoundFinalsTournament, getTournament } from '@/ServerActions/TournamentActions';
 import { GameStructure, PersonStructure, TournamentStructure } from '@/ServerActions/types';
-
-export function FakeCheckbox({ checked }: { checked: boolean }) {
-  return checked ? (
-    <IconCheckbox size="1.25em"></IconCheckbox>
-  ) : (
-    <IconSquare size="1.25em"></IconSquare>
-  );
-}
 
 interface ManagementArgs {
   tournament: string;
 }
 
-function gameToPaper(game: GameStructure) {
+function gameToPaper(game: GameStructure, reload: () => void) {
   const teamOneName =
     game.teamOne.name.length > 15 ? `${game.teamOne.name.substring(0, 12)}...` : game.teamOne.name;
   const teamTwoName =
@@ -198,7 +189,16 @@ function gameToPaper(game: GameStructure) {
               </HoverCard>
             </Box>
           </Grid.Col>
-          <Grid.Col span={{ base: 7, md: 5 }}></Grid.Col>
+          <Grid.Col span={{ base: 7, md: 5 }}>
+            <Button
+              disabled={RESOLVED_STATUSES.includes(game.status)}
+              onClick={() => {
+                resolveGame(game.id).then(() => reload());
+              }}
+            >
+              Resolve
+            </Button>
+          </Grid.Col>
           <Grid.Col span={{ base: 4, md: 5 }}>
             <HoverCard width={280} shadow="md" disabled={(game.admin?.teamTwoNotes ?? '') === ''}>
               <HoverCard.Target>
@@ -265,7 +265,11 @@ export function Management({ tournament }: ManagementArgs) {
   const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);
   const { isTournamentDirector, loading } = useUserData();
   const router = useRouter();
-
+  const reload = () =>
+    getNoteableGames({ tournament }).then((g) => {
+      setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());
+      setActionableGames(g.games.filter((v) => v.admin?.requiresAction).toReversed());
+    });
   useEffect(() => {
     if (!isTournamentDirector(tournament) && !loading) {
       router.push(`/${tournament}`);
@@ -273,17 +277,19 @@ export function Management({ tournament }: ManagementArgs) {
   }, [isTournamentDirector, loading, router, tournament]);
   useEffect(() => {
     if (!loading) return;
-    getNoteableGames({ tournament }).then((g) => {
-      setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());
-      setActionableGames(g.games.filter((v) => v.admin?.requiresAction).toReversed());
-    });
+    reload();
     getPlayers({
       tournament,
       includeStats: true,
       formatData: true,
     }).then((g) => setPlayers(g.players.filter((v) => v.stats!['Penalty Points'] >= 12)));
-    getTournament(tournament).then(setTournamentObj);
+    if (tournament) {
+      getTournament(tournament).then(setTournamentObj);
+    }
+    // adding the deps it wants will cause infinite page reloads
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, tournament]);
+
   return (
     <>
       <br />
@@ -343,7 +349,7 @@ export function Management({ tournament }: ManagementArgs) {
                 <i>There are no games to show</i>
               </Paper>
             )}
-            {actionableGames.map((g) => gameToPaper(g))}
+            {actionableGames.map((g) => gameToPaper(g, reload))}
             <br />
             <Divider></Divider>
             <br />
@@ -369,7 +375,7 @@ export function Management({ tournament }: ManagementArgs) {
                 <i>There are no games to show</i>
               </Paper>
             )}
-            {noteableGames.map((g) => gameToPaper(g))}
+            {noteableGames.map((g) => gameToPaper(g, reload))}
           </Box>
         </Grid.Col>
       </Grid>
