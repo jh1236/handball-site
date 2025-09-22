@@ -8,6 +8,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  Center,
   ColorPicker,
   Container,
   Grid,
@@ -251,9 +252,10 @@ function CustomOfficialCard({
 }: CustomOfficialCardArgs) {
   const [umpireProficiency, setUmpireProficiency] = useState<number>(3);
   const [scorerProficiency, setScorerProficiency] = useState<number>(3);
+  const [role, setRole] = useState<string>('Umpire');
   const [official, setOfficial] = useState<OfficialStructure | undefined>();
   return (
-    <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
+    <Paper shadow="lg" pos="relative" style={{ padding: '5px' }}>
       <ActionIcon
         variant="subtle"
         color="green"
@@ -268,6 +270,7 @@ function CustomOfficialCard({
             officialSearchableName: official?.searchableName,
             umpireProficiency,
             scorerProficiency,
+            role,
           });
           setOfficialsInTournament([...officialsInTournament, official]);
           setOfficial(undefined);
@@ -275,31 +278,45 @@ function CustomOfficialCard({
       >
         <IconPlus></IconPlus>
       </ActionIcon>
+      <Center>
+        <Image
+          display="inline-block"
+          src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+          w={50}
+          m={10}
+        ></Image>
+        <Select
+          display="inline-block"
+          size="xs"
+          w={200}
+          placeholder="Official Name"
+          searchable
+          value={official?.name}
+          data={allOfficials.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
+          onChange={(v) => {
+            setOfficial(allOfficials.find((o) => o.name === v));
+          }}
+        />{' '}
+      </Center>
       <Group>
-        <Stack>
-          <Image
-            src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
-            w="100px"
-            h="100px"
-          ></Image>
-          <Select
-            display="inline-block"
-            size="xs"
-            w="100px"
-            placeholder="Official Name"
-            searchable
-            value={official?.name}
-            data={allOfficials.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
-            onChange={(v) => {
-              setOfficial(allOfficials.find((o) => o.name === v));
-            }}
-          />{' '}
-        </Stack>
         <SegmentedControl
-          mt={30}
+          value={`${role}`}
+          onChange={(v) => setRole(v)}
+          orientation="vertical"
+          size="sm"
+          mb={15}
+          data={[
+            { value: 'Tournament Director', label: 'Tourney Director' },
+            'Umpire Manager',
+            'Umpire',
+          ]}
+        ></SegmentedControl>
+        <SegmentedControl
           value={`${umpireProficiency}`}
           onChange={(v) => setUmpireProficiency(+v)}
           orientation="vertical"
+          size="sm"
+          mb={15}
           data={[
             { label: 'Court One', value: '3' },
             { label: 'Mixed', value: '2' },
@@ -308,10 +325,11 @@ function CustomOfficialCard({
           ]}
         />
         <SegmentedControl
-          mt={30}
           value={`${scorerProficiency}`}
           onChange={(v) => setScorerProficiency(+v)}
           orientation="vertical"
+          size="sm"
+          mb={15}
           data={[
             { label: 'Scorer', value: '3' },
             { label: 'Reserve', value: '2' },
@@ -499,6 +517,7 @@ function OfficialCard({
   officialsInTournament,
   setAllOfficials,
 }: OfficialCardParams) {
+  const [role, setRole] = useState<string>(official.role!);
   const [umpireProficiency, setUmpireProficiency] = useState<number>(official.umpireProficiency!);
   const [scorerProficiency, setScorerProficiency] = useState<number>(official.scorerProficiency!);
   return (
@@ -524,7 +543,8 @@ function OfficialCard({
           <IconMinus></IconMinus>
         </ActionIcon>
         {(official.umpireProficiency !== umpireProficiency ||
-          official.scorerProficiency !== scorerProficiency) && (
+          official.scorerProficiency !== scorerProficiency ||
+          official.role !== role) && (
           <>
             <ActionIcon
               variant="subtle"
@@ -542,6 +562,7 @@ function OfficialCard({
                     umpireProficiency !== official.umpireProficiency
                       ? umpireProficiency
                       : undefined,
+                  role: role !== official.role ? role : undefined,
                 });
                 getOfficials({ tournament }).then((officials) =>
                   setAllOfficials(officials.officials)
@@ -553,25 +574,31 @@ function OfficialCard({
           </>
         )}
       </Box>
-
-      <Group m={15}>
-        <Stack>
-          <Image
-            src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
-            w="100px"
-            h="100px"
-          ></Image>
-          <Text display="inline-block" size="lg" w="100px" mb={10}>
-            <b>{official.name}</b>
-          </Text>
-        </Stack>
+      <Center>
+        <Image display="inline-block" src={official.imageUrl} m={10} w={50}></Image>
+        <Text display="inline-block" size="lg">
+          <b>{official.name}</b>
+        </Text>
+      </Center>
+      <Group>
         <SegmentedControl
-          mt={30}
-          mb={10}
+          value={`${role}`}
+          onChange={(v) => setRole(v)}
+          orientation="vertical"
+          size="sm"
+          mb={15}
+          data={[
+            { value: 'Tournament Director', label: 'Tourney Director' },
+            'Umpire Manager',
+            'Umpire',
+          ]}
+        ></SegmentedControl>
+        <SegmentedControl
           value={`${umpireProficiency}`}
           onChange={(v) => setUmpireProficiency(+v)}
           orientation="vertical"
           size="sm"
+          mb={15}
           data={[
             { label: 'Court One', value: '3' },
             { label: 'Mixed', value: '2' },
@@ -580,12 +607,11 @@ function OfficialCard({
           ]}
         />
         <SegmentedControl
-          mt={30}
-          mb={10}
           value={`${scorerProficiency}`}
           onChange={(v) => setScorerProficiency(+v)}
           orientation="vertical"
           size="sm"
+          mb={15}
           data={[
             { label: 'Scorer', value: '3' },
             { label: 'Reserve', value: '2' },

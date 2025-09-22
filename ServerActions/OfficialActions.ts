@@ -70,6 +70,7 @@ interface AddOfficialToTournament {
   officialSearchableName: string;
   umpireProficiency: number;
   scorerProficiency: number;
+  role: string;
 }
 
 export function addOfficialToTournament({
@@ -77,6 +78,7 @@ export function addOfficialToTournament({
   officialSearchableName,
   umpireProficiency,
   scorerProficiency,
+  role,
 }: AddOfficialToTournament): Promise<void> {
   const url = new URL('/api/officials/addToTournament', SERVER_ADDRESS);
   return tokenFetch(url, {
@@ -89,6 +91,7 @@ export function addOfficialToTournament({
       officialSearchableName,
       umpireProficiency,
       scorerProficiency,
+      role,
     }),
   }).then((response) => {
     if (!response.ok) {
@@ -111,6 +114,7 @@ interface UpdateOfficialForTournament {
   officialSearchableName: string;
   umpireProficiency?: number;
   scorerProficiency?: number;
+  role?: string;
 }
 
 export function updateOfficialForTournament({
@@ -118,6 +122,7 @@ export function updateOfficialForTournament({
   officialSearchableName,
   umpireProficiency,
   scorerProficiency,
+  role,
 }: UpdateOfficialForTournament): Promise<void> {
   const url = new URL('/api/officials/updateForTournament', SERVER_ADDRESS);
   const body: any = {
@@ -129,6 +134,9 @@ export function updateOfficialForTournament({
   }
   if (scorerProficiency !== undefined) {
     body.scorerProficiency = scorerProficiency;
+  }
+  if (role !== undefined) {
+    body.role = role;
   }
   return tokenFetch(url, {
     method: 'POST',

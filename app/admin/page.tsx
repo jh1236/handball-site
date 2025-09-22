@@ -3,7 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IconCheck, IconMoodSad } from '@tabler/icons-react';
-import { Button, Code, Group, Loader, Modal, Popover, TextInput, Title } from '@mantine/core';
+import {
+  Button,
+  Code,
+  Group,
+  Loader,
+  Modal,
+  Popover,
+  Select,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import {
@@ -61,18 +71,28 @@ export default function UniversalManagementPage() {
           onChange={(e) => setName(e.currentTarget.value)}
           error={!name && submitted ? 'Value must be set for name' : undefined}
         ></TextInput>
-        <TextInput
-          label="FixturesType"
+        <Select
+          label="Fixtures Type"
+          placeholder="Pick value"
+          data={[{ label: 'Round Robin', value: 'RoundRobin' }, 'Pooled', 'Swiss']}
           value={fixturesType}
-          onChange={(e) => setFixturesType(e.currentTarget.value)}
-          error={!name && submitted ? 'Value must be set for fixtures type' : undefined}
-        ></TextInput>
-        <TextInput
-          label="FinalsType"
+          onChange={(v) => setFixturesType(v!)}
+          allowDeselect={false}
+          error={!fixturesType && submitted ? 'Value must be set for fixtures type' : undefined}
+        />
+        <Select
+          label="Finals Type"
+          placeholder="Pick value"
+          data={[
+            { value: 'BasicFinals', label: 'Basic Finals' },
+            { value: 'PooledFinals', label: 'Pooled Finals' },
+            { value: 'TopThreeFinals', label: 'Top Three Finals' },
+          ]}
           value={finalsType}
-          onChange={(e) => setFinalsType(e.currentTarget.value)}
-          error={!name && submitted ? 'Value must be set for finals type' : undefined}
-        ></TextInput>
+          onChange={(v) => setFinalsType(v!)}
+          allowDeselect={false}
+          error={!finalsType && submitted ? 'Value must be set for finals type' : undefined}
+        />
         <br />
         <Button
           onClick={() => {
