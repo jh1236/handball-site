@@ -18,12 +18,16 @@ export default function UniversalManagementPage() {
   const router = useRouter();
   const [openBackup, setOpenBackup] = useState<boolean>(false);
   const [openRestart, setOpenRestart] = useState<boolean>(false);
-  const [log, _setLog] = useState<string>('\n'.repeat(20));
+  const [log, _setLog] = useState<string>('\n'.repeat(30));
   const [response, setResponse] = useState<string | null>(null);
   const setLog = (val: string): void => {
     let a = val;
-    while (a.split('\n').length <= 20) {
+    while (a.split('\n').length < 31) {
       a = `\n${a}`;
+    }
+    const split = a.split('\n');
+    if (split.length > 31) {
+      a = split.slice(split.length - 30, split.length).join('\n');
     }
     _setLog(a);
   };
