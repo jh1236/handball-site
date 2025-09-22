@@ -286,6 +286,8 @@ export function Management({ tournament }: ManagementArgs) {
     if (tournament) {
       getTournament(tournament).then(setTournamentObj);
     }
+    // adding the deps it wants will cause infinite page reloads
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, tournament]);
 
   return (
