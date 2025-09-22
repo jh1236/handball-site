@@ -33,7 +33,7 @@ interface ManagementArgs {
   tournament: string;
 }
 
-function gameToPaper(game: GameStructure) {
+function gameToPaper(game: GameStructure, reload: () => void) {
   const teamOneName =
     game.teamOne.name.length > 15 ? `${game.teamOne.name.substring(0, 12)}...` : game.teamOne.name;
   const teamTwoName =
@@ -193,7 +193,7 @@ function gameToPaper(game: GameStructure) {
             <Button
               disabled={RESOLVED_STATUSES.includes(game.status)}
               onClick={() => {
-                resolveGame(game.id).then(() => window.location.reload());
+                resolveGame(game.id).then(() => reload());
               }}
             >
               Resolve
@@ -265,7 +265,11 @@ export function Management({ tournament }: ManagementArgs) {
   const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);
   const { isTournamentDirector, loading } = useUserData();
   const router = useRouter();
-
+  const reload = () =>
+    getNoteableGames({ tournament }).then((g) => {
+      setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());
+      setActionableGames(g.games.filter((v) => v.admin?.requiresAction).toReversed());
+    });
   useEffect(() => {
     if (!isTournamentDirector(tournament) && !loading) {
       router.push(`/${tournament}`);
@@ -273,10 +277,7 @@ export function Management({ tournament }: ManagementArgs) {
   }, [isTournamentDirector, loading, router, tournament]);
   useEffect(() => {
     if (!loading) return;
-    getNoteableGames({ tournament }).then((g) => {
-      setNoteableGames(g.games.filter((v) => !v.admin?.requiresAction).toReversed());
-      setActionableGames(g.games.filter((v) => v.admin?.requiresAction).toReversed());
-    });
+    reload();
     getPlayers({
       tournament,
       includeStats: true,
@@ -286,6 +287,7 @@ export function Management({ tournament }: ManagementArgs) {
       getTournament(tournament).then(setTournamentObj);
     }
   }, [loading, tournament]);
+
   return (
     <>
       <br />
@@ -345,7 +347,7 @@ export function Management({ tournament }: ManagementArgs) {
                 <i>There are no games to show</i>
               </Paper>
             )}
-            {actionableGames.map((g) => gameToPaper(g))}
+            {actionableGames.map((g) => gameToPaper(g, reload))}
             <br />
             <Divider></Divider>
             <br />
@@ -371,7 +373,7 @@ export function Management({ tournament }: ManagementArgs) {
                 <i>There are no games to show</i>
               </Paper>
             )}
-            {noteableGames.map((g) => gameToPaper(g))}
+            {noteableGames.map((g) => gameToPaper(g, reload))}
           </Box>
         </Grid.Col>
       </Grid>
