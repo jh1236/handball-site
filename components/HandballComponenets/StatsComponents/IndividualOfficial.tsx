@@ -1,11 +1,12 @@
 'use client';
 
 import React, { Fragment, useEffect } from 'react';
+import Head from 'next/head';
 import { IconClock2, IconTable } from '@tabler/icons-react';
 import { Card, Container, Grid, Image, NumberInput, Table, Tabs, Text, Title } from '@mantine/core';
 import { getGames } from '@/ServerActions/GameActions';
 import { getOfficial } from '@/ServerActions/OfficialActions';
-import { GameStructure, OfficialStructure } from '@/ServerActions/types';
+import { GameStructure, OfficialStructure, TournamentStructure } from '@/ServerActions/types';
 
 interface OfficialProps {
   tournament?: string;
@@ -14,14 +15,15 @@ interface OfficialProps {
 
 export default function IndividualOfficial({ tournament, official }: OfficialProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-
+  const [tournamentObj, setTournamentObj] = React.useState<TournamentStructure | undefined>();
   const [gamesCount, setGamesCount] = React.useState<number>(20);
   const [games, setGames] = React.useState<GameStructure[]>([]);
   const [officialObj, setOfficialObj] = React.useState<OfficialStructure | undefined>(undefined);
 
   useEffect(() => {
-    getOfficial({ official, tournament }).then((o) => {
+    getOfficial({ official, tournament, returnTournament: true }).then((o) => {
       setOfficialObj(o.official);
+      setTournamentObj(o.tournament);
     });
   }, [official, tournament]);
 
@@ -37,6 +39,12 @@ export default function IndividualOfficial({ tournament, official }: OfficialPro
 
   return (
     <>
+      <Head>
+        <title>
+          {officialObj?.name ?? ''}
+          {!!tournamentObj && `- ${tournamentObj.name}`}
+        </title>
+      </Head>
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
         <Image
           alt="The SUSS handball Logo"

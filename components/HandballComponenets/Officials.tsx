@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import Head from 'next/head';
 import Link from 'next/link';
 import { Box, Center, Container, Grid, Image, Skeleton, Space, Text } from '@mantine/core';
 import { getOfficials } from '@/ServerActions/OfficialActions';
-import { OfficialStructure } from '@/ServerActions/types';
+import { OfficialStructure, TournamentStructure } from '@/ServerActions/types';
 
 //TODO: - Uniform Box Size
 
@@ -82,12 +83,16 @@ interface OfficialsProps {
 }
 
 export default function Officials({ tournament }: OfficialsProps) {
-  const [chartData, setchartData] = React.useState<OfficialStructure[]>();
+  const [tournamentObj, setTournamentObj] = React.useState<TournamentStructure | undefined>();
+  const [officials, setOfficials] = React.useState<OfficialStructure[]>();
   useEffect(() => {
-    getOfficials({ tournament }).then((o) => setchartData(o.officials));
+    getOfficials({ tournament, returnTournament: true }).then((o) => {
+      setOfficials(o.officials);
+      setTournamentObj(o.tournament);
+    });
   }, [tournament]);
 
-  if (!chartData) {
+  if (!officials) {
     return (
       <div>
         <Grid w="98.5%">
@@ -109,7 +114,10 @@ export default function Officials({ tournament }: OfficialsProps) {
   return (
     <div>
       <Grid w="98.5%">
-        {chartData.map((t) => (
+        <Head>
+          <title>Officials: {tournamentObj?.name ?? 'Tournament Landing Page'}</title>
+        </Head>
+        {officials.map((t) => (
           <Grid.Col
             span={{
               base: 6,

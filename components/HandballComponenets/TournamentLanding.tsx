@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import Head from 'next/head';
 import Link from 'next/link';
 import { IconRefresh } from '@tabler/icons-react';
 import { Box, Container, Grid, Image, Title } from '@mantine/core';
@@ -106,6 +107,9 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
 
   return (
     <>
+      <Head>
+        <title>{tournamentObj?.name ?? 'Tournament Landing Page'}</title>
+      </Head>
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
         <Image
           src={tournamentObj?.imageUrl ?? 'https://api.squarers.club/api/image?name=SUSS'}

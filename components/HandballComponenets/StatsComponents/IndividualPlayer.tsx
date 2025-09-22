@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Fragment, useEffect } from 'react';
+import Head from 'next/head';
 import Link from 'next/link';
 import {
   IconAlertTriangle,
@@ -37,6 +38,7 @@ import {
   GameTeamStructure,
   PersonStructure,
   PlayerGameStatsStructure,
+  TournamentStructure,
 } from '@/ServerActions/types';
 
 interface PlayersProps {
@@ -118,7 +120,7 @@ export function findPlayer(game: GameStructure, playerName: string): PlayerGameS
 }
 
 export default function IndividualPlayer({ tournament, player }: PlayersProps) {
-  // const [sort, setSort] = React.useState<number>(-1);
+  const [tournamentObj, setTournamentObj] = React.useState<TournamentStructure | undefined>();
   const [cards, setCards] = React.useState<{ game: GameStructure; card: CardStructure }[]>([]);
 
   const [gamesCount, setGamesCount] = React.useState<number>(20);
@@ -130,8 +132,9 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   >(undefined);
 
   useEffect(() => {
-    getPlayer({ player, tournament, formatData: true }).then((o) => {
+    getPlayer({ player, tournament, formatData: true, returnTournament: true }).then((o) => {
       setPlayerObj(o.player);
+      setTournamentObj(o.tournament);
     });
     getAveragePlayerStats({ tournament, formatData: true }).then((o) => {
       setAverageStats(o);
@@ -156,6 +159,12 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
 
   return (
     <>
+      <Head>
+        <title>
+          Player {playerObj?.name ?? ''}
+          {!!tournamentObj && `- ${tournamentObj.name}`}
+        </title>
+      </Head>
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
         <Image
           alt="The SUSS handball Logo"

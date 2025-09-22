@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { IconCheckbox, IconSquare } from '@tabler/icons-react';
@@ -286,6 +287,9 @@ export function Management({ tournament }: ManagementArgs) {
   }, [loading, tournament]);
   return (
     <>
+      <Head>
+        <title>Management: {tournamentObj?.name ?? ''}</title>
+      </Head>
       <br />
       <Container
         w="auto"
