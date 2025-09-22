@@ -61,7 +61,7 @@ export const markIfReqd = (b: boolean, s: string) =>
     s
   );
 
-const RESOLVED_STATUSES = [
+export const RESOLVED_STATUSES = [
   'Resolved',
   'In Progress',
   'Official',

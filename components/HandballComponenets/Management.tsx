@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { IconCheckbox, IconSquare } from '@tabler/icons-react';
 import {
   Box,
   Button,
@@ -21,22 +20,14 @@ import {
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
-import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
+import { eventIcon, RESOLVED_STATUSES } from '@/components/HandballComponenets/AdminGamePanel';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
-import { getNoteableGames } from '@/ServerActions/GameActions';
+import { getNoteableGames, resolveGame } from '@/ServerActions/GameActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { forceNextRoundFinalsTournament, getTournament } from '@/ServerActions/TournamentActions';
 import { GameStructure, PersonStructure, TournamentStructure } from '@/ServerActions/types';
-
-export function FakeCheckbox({ checked }: { checked: boolean }) {
-  return checked ? (
-    <IconCheckbox size="1.25em"></IconCheckbox>
-  ) : (
-    <IconSquare size="1.25em"></IconSquare>
-  );
-}
 
 interface ManagementArgs {
   tournament: string;
@@ -198,7 +189,16 @@ function gameToPaper(game: GameStructure) {
               </HoverCard>
             </Box>
           </Grid.Col>
-          <Grid.Col span={{ base: 7, md: 5 }}></Grid.Col>
+          <Grid.Col span={{ base: 7, md: 5 }}>
+            <Button
+              disabled={RESOLVED_STATUSES.includes(game.status)}
+              onClick={() => {
+                resolveGame(game.id).then(() => window.location.reload());
+              }}
+            >
+              Resolve
+            </Button>
+          </Grid.Col>
           <Grid.Col span={{ base: 4, md: 5 }}>
             <HoverCard width={280} shadow="md" disabled={(game.admin?.teamTwoNotes ?? '') === ''}>
               <HoverCard.Target>
@@ -282,7 +282,9 @@ export function Management({ tournament }: ManagementArgs) {
       includeStats: true,
       formatData: true,
     }).then((g) => setPlayers(g.players.filter((v) => v.stats!['Penalty Points'] >= 12)));
-    getTournament(tournament).then(setTournamentObj);
+    if (tournament) {
+      getTournament(tournament).then(setTournamentObj);
+    }
   }, [loading, tournament]);
   return (
     <>
