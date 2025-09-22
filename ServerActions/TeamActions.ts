@@ -146,7 +146,7 @@ export function renameTeamForTournament({
   newName,
   newColor,
 }: RenameTeamForTournamentParams): Promise<TeamStructure> {
-  const url = new URL('/api/tournaments/updateForTournament', SERVER_ADDRESS);
+  const url = new URL('/api/teams/updateForTournament', SERVER_ADDRESS);
   const value: any = {
     teamSearchableName,
     tournamentSearchableName,
@@ -189,7 +189,7 @@ export function addTeamToTournament({
   nonCaptainName,
   substituteName,
 }: AddTeamToTournamentArgs): Promise<TeamStructure> {
-  const url = new URL('/api/tournaments/addToTournament', SERVER_ADDRESS);
+  const url = new URL('/api/teams/addToTournament', SERVER_ADDRESS);
   const body: any = { tournamentSearchableName };
   if (teamName) {
     body.teamName = teamName;
@@ -224,7 +224,7 @@ export function removeTeamFromTournament(
   tournamentSearchableName: SearchableName,
   teamSearchableName: string
 ): Promise<void> {
-  const url = new URL('/api/tournaments/removeFromTournament', SERVER_ADDRESS);
+  const url = new URL('/api/teams/removeFromTournament', SERVER_ADDRESS);
   return tokenFetch(url, {
     method: 'DELETE',
     headers: {

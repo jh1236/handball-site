@@ -16,6 +16,7 @@ import {
   luminance,
   Paper,
   Popover,
+  SegmentedControl,
   Select,
   Stack,
   Text,
@@ -28,6 +29,7 @@ import {
   addOfficialToTournament,
   getOfficials,
   removeOfficialFromTournament,
+  updateOfficialForTournament,
 } from '@/ServerActions/OfficialActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import {
@@ -247,27 +249,34 @@ function CustomOfficialCard({
   setOfficialsInTournament,
   officialsInTournament,
 }: CustomOfficialCardArgs) {
+  const [umpireProficiency, setUmpireProficiency] = useState<number>(3);
+  const [scorerProficiency, setScorerProficiency] = useState<number>(3);
   const [official, setOfficial] = useState<OfficialStructure | undefined>();
   return (
     <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
+      <ActionIcon
+        variant="subtle"
+        color="green"
+        size="md"
+        pos="absolute"
+        top={5}
+        right={5}
+        onClick={() => {
+          if (!official) return;
+          addOfficialToTournament({
+            tournamentSearchableName: tournament,
+            officialSearchableName: official?.searchableName,
+            umpireProficiency,
+            scorerProficiency,
+          });
+          setOfficialsInTournament([...officialsInTournament, official]);
+          setOfficial(undefined);
+        }}
+      >
+        <IconPlus></IconPlus>
+      </ActionIcon>
       <Group>
         <Stack>
-          <ActionIcon
-            variant="subtle"
-            color="green"
-            size="md"
-            pos="absolute"
-            top={5}
-            right={5}
-            onClick={() => {
-              if (!official) return;
-              addOfficialToTournament(tournament, official?.searchableName);
-              setOfficialsInTournament([...officialsInTournament, official]);
-              setOfficial(undefined);
-            }}
-          >
-            <IconPlus></IconPlus>
-          </ActionIcon>
           <Image
             src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
             w="100px"
@@ -284,8 +293,32 @@ function CustomOfficialCard({
             onChange={(v) => {
               setOfficial(allOfficials.find((o) => o.name === v));
             }}
-          />
+          />{' '}
         </Stack>
+        <SegmentedControl
+          mt={30}
+          value={`${umpireProficiency}`}
+          onChange={(v) => setUmpireProficiency(+v)}
+          orientation="vertical"
+          data={[
+            { label: 'Court One', value: '3' },
+            { label: 'Mixed', value: '2' },
+            { label: 'Court Two', value: '1' },
+            { label: 'None', value: '0' },
+          ]}
+        />
+        <SegmentedControl
+          mt={30}
+          value={`${scorerProficiency}`}
+          onChange={(v) => setScorerProficiency(+v)}
+          orientation="vertical"
+          data={[
+            { label: 'Scorer', value: '3' },
+            { label: 'Reserve', value: '2' },
+            { label: 'Emergency', value: '1' },
+            { label: 'None', value: '0' },
+          ]}
+        ></SegmentedControl>
       </Group>
     </Paper>
   );
@@ -454,6 +487,9 @@ interface OfficialCardParams {
     value: ((prevState: OfficialStructure[]) => OfficialStructure[]) | OfficialStructure[]
   ) => void;
   officialsInTournament: OfficialStructure[];
+  setAllOfficials: (
+    value: ((prevState: OfficialStructure[]) => OfficialStructure[]) | OfficialStructure[]
+  ) => void;
 }
 
 function OfficialCard({
@@ -461,9 +497,12 @@ function OfficialCard({
   official,
   setOfficialsInTournament,
   officialsInTournament,
+  setAllOfficials,
 }: OfficialCardParams) {
+  const [umpireProficiency, setUmpireProficiency] = useState<number>(official.umpireProficiency!);
+  const [scorerProficiency, setScorerProficiency] = useState<number>(official.scorerProficiency!);
   return (
-    <Paper shadow="lg" m={15} pos="relative">
+    <Paper shadow="lg" pos="relative">
       <Box
         top={5}
         right={5}
@@ -484,6 +523,35 @@ function OfficialCard({
         >
           <IconMinus></IconMinus>
         </ActionIcon>
+        {(official.umpireProficiency !== umpireProficiency ||
+          official.scorerProficiency !== scorerProficiency) && (
+          <>
+            <ActionIcon
+              variant="subtle"
+              color="blue"
+              size="md"
+              onClick={() => {
+                updateOfficialForTournament({
+                  tournamentSearchableName: tournament,
+                  officialSearchableName: official.searchableName,
+                  scorerProficiency:
+                    scorerProficiency !== official.scorerProficiency
+                      ? scorerProficiency
+                      : undefined,
+                  umpireProficiency:
+                    umpireProficiency !== official.umpireProficiency
+                      ? umpireProficiency
+                      : undefined,
+                });
+                getOfficials({ tournament }).then((officials) =>
+                  setAllOfficials(officials.officials)
+                );
+              }}
+            >
+              <IconUpload></IconUpload>
+            </ActionIcon>
+          </>
+        )}
       </Box>
 
       <Group m={15}>
@@ -497,6 +565,34 @@ function OfficialCard({
             <b>{official.name}</b>
           </Text>
         </Stack>
+        <SegmentedControl
+          mt={30}
+          mb={10}
+          value={`${umpireProficiency}`}
+          onChange={(v) => setUmpireProficiency(+v)}
+          orientation="vertical"
+          size="sm"
+          data={[
+            { label: 'Court One', value: '3' },
+            { label: 'Mixed', value: '2' },
+            { label: 'Court Two', value: '1' },
+            { label: 'None', value: '0' },
+          ]}
+        />
+        <SegmentedControl
+          mt={30}
+          mb={10}
+          value={`${scorerProficiency}`}
+          onChange={(v) => setScorerProficiency(+v)}
+          orientation="vertical"
+          size="sm"
+          data={[
+            { label: 'Scorer', value: '3' },
+            { label: 'Reserve', value: '2' },
+            { label: 'Emergency', value: '1' },
+            { label: 'None', value: '0' },
+          ]}
+        ></SegmentedControl>
       </Group>
     </Paper>
   );
@@ -652,16 +748,17 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           </Title>
           <Grid>
             {officialsInTournament.map((t, index) => (
-              <Grid.Col key={index} span={4}>
+              <Grid.Col key={index} span={6}>
                 <OfficialCard
                   tournament={tournament}
                   official={t}
                   setOfficialsInTournament={setOfficialsInTournament}
                   officialsInTournament={officialsInTournament}
+                  setAllOfficials={setAllOfficials}
                 />
               </Grid.Col>
             ))}
-            <Grid.Col span={4}>
+            <Grid.Col span={6}>
               <CustomOfficialCard
                 allOfficials={allOfficials}
                 officialsInTournament={officialsInTournament}

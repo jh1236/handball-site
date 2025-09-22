@@ -108,7 +108,7 @@ export function NavbarNested({
       out.push({ label: 'Create Game', icon: IconNote, link: '/games/create' });
     }
     out.push({ label: 'Documents', icon: IconFileAnalytics, link: '/documents' });
-    if (isAdmin()) {
+    if (isAdmin) {
       out.push({ label: 'Admin', icon: IconAdjustments, link: '/admin' });
     }
     out.push({ label: 'About us', icon: IconUsers, link: '/about' });

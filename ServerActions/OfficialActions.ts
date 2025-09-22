@@ -65,10 +65,19 @@ export function getOfficial({
   });
 }
 
-export function addOfficialToTournament(
-  tournamentSearchableName: SearchableName,
-  officialSearchableName: string
-): Promise<void> {
+interface AddOfficialToTournament {
+  tournamentSearchableName: SearchableName;
+  officialSearchableName: string;
+  umpireProficiency: number;
+  scorerProficiency: number;
+}
+
+export function addOfficialToTournament({
+  tournamentSearchableName,
+  officialSearchableName,
+  umpireProficiency,
+  scorerProficiency,
+}: AddOfficialToTournament): Promise<void> {
   const url = new URL('/api/officials/addToTournament', SERVER_ADDRESS);
   return tokenFetch(url, {
     method: 'POST',
@@ -78,7 +87,55 @@ export function addOfficialToTournament(
     body: JSON.stringify({
       tournamentSearchableName,
       officialSearchableName,
+      umpireProficiency,
+      scorerProficiency,
     }),
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+interface UpdateOfficialForTournament {
+  tournamentSearchableName: SearchableName;
+  officialSearchableName: string;
+  umpireProficiency?: number;
+  scorerProficiency?: number;
+}
+
+export function updateOfficialForTournament({
+  tournamentSearchableName,
+  officialSearchableName,
+  umpireProficiency,
+  scorerProficiency,
+}: UpdateOfficialForTournament): Promise<void> {
+  const url = new URL('/api/officials/updateForTournament', SERVER_ADDRESS);
+  const body: any = {
+    tournamentSearchableName,
+    officialSearchableName,
+  };
+  if (umpireProficiency !== undefined) {
+    body.umpireProficiency = umpireProficiency;
+  }
+  if (scorerProficiency !== undefined) {
+    body.scorerProficiency = scorerProficiency;
+  }
+  return tokenFetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify(body),
   }).then((response) => {
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
@@ -100,7 +157,7 @@ export function removeOfficialFromTournament(
   tournamentSearchableName: SearchableName,
   officialSearchableName: string
 ): Promise<void> {
-  const url = new URL('/api/tournaments/removeFromTournament', SERVER_ADDRESS);
+  const url = new URL('/api/officials/removeFromTournament', SERVER_ADDRESS);
   return tokenFetch(url, {
     method: 'DELETE',
     headers: {

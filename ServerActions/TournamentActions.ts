@@ -1,6 +1,6 @@
 import { SERVER_ADDRESS } from '@/app/config';
 import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
-import { SearchableName, TeamStructure, TournamentStructure } from '@/ServerActions/types';
+import { SearchableName, TournamentStructure } from '@/ServerActions/types';
 
 export function getTournaments(): Promise<TournamentStructure[]> {
   const url = new URL('/api/tournaments/', SERVER_ADDRESS);
@@ -80,6 +80,31 @@ export function forceNextRoundFinalsTournament(searchableName: SearchableName): 
     headers: {
       'Content-type': 'application/json; charset=UTF-8',
     },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
+export interface CreateTournament {
+  name: string;
+  fixturesType: string;
+  finalsType: string;
+}
+
+export function createTournament(create: CreateTournament): Promise<void> {
+  const url = new URL('/api/tournaments/create', SERVER_ADDRESS);
+  return tokenFetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify(create),
   }).then((response) => {
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
