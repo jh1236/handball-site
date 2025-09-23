@@ -2,7 +2,20 @@
 
 import React from 'react';
 import Head from 'next/head';
-import { Card, Grid, Group, Image, Text, Title } from '@mantine/core';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  Box,
+  Card,
+  Grid,
+  Group,
+  Image,
+  Modal,
+  Stack,
+  Text,
+  Title,
+  useMatches,
+} from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
@@ -70,35 +83,65 @@ const people: Person[] = [
   },
 ];
 
-function personToPaper(person: Person) {
+function PersonToPaper({ person }: { person: Person }) {
+  const [dialogueOpen, setDialogueOpen] = React.useState(false);
+  const router = useRouter();
+  const f = useMatches({
+    base: () => {
+      setDialogueOpen(true);
+    },
+    md: () => {
+      router.push(`/players/${person.searchable}`);
+    },
+  });
   return (
-    <Card
-      shadow="sm"
-      padding="lg"
-      radius="md"
-      withBorder
-      component="a"
-      href={`/players/${person.searchable}`}
-    >
-      <Card.Section m={10}>
-        <Image
-          src={`${SERVER_ADDRESS}/api/people/image?name=${person.searchable}`}
-          height="100%"
-          alt={person.name}
-        />
-      </Card.Section>
+    <>
+      <Modal opened={dialogueOpen} onClose={() => setDialogueOpen(false)}>
+        <Box m={10}>
+          <Link className="hideLink" href={`/players/${person.searchable}`}>
+            <Image
+              src={`${SERVER_ADDRESS}/api/people/image?name=${person.searchable}&big=true`}
+              height="100%"
+              alt={person.name}
+            />
+          </Link>
+        </Box>
+        <Link className="hideLink" href={`/players/${person.searchable}`}>
+          <Stack justify="space-between" mt="md" mb="xs">
+            <Title order={2} ta="center">
+              {person.name}
+            </Title>
+            <Text ta="center">
+              <i>{person.role}</i>
+            </Text>
+          </Stack>
+        </Link>
 
-      <Group justify="space-between" mt="md" mb="xs">
-        <Title order={2}>{person.name}</Title>
-        <Text>
-          <i>{person.role}</i>
+        <Text size="sm" c="dimmed">
+          {person.description}
         </Text>
-      </Group>
+      </Modal>
+      <Card shadow="sm" component="a" href="#" padding="lg" radius="md" withBorder onClick={f}>
+        <Card.Section m={10}>
+          <Image
+            src={`${SERVER_ADDRESS}/api/people/image?name=${person.searchable}`}
+            height="100%"
+            alt={person.name}
+          />
+        </Card.Section>
 
-      <Text size="sm" c="dimmed">
-        {person.description}
-      </Text>
-    </Card>
+        <Group justify="space-between" mt="md" mb="xs">
+          <Title order={2}>{person.name}</Title>
+          <Text>
+            <i>{person.role}</i>
+          </Text>
+        </Group>
+
+        <Text size="sm" c="dimmed" visibleFrom="md">
+          {person.description}
+        </Text>
+      </Card>
+    </>
   );
 }
 
@@ -119,7 +162,7 @@ export default function CreditsPage() {
               lg: 2,
             }}
           >
-            {personToPaper(p)}
+            <PersonToPaper person={p} />
           </Grid.Col>
         ))}
       </Grid>
