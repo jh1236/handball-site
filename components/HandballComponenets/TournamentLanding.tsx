@@ -152,21 +152,20 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
           </Box>
         </Grid.Col>
         <Grid.Col span={{ base: 12, lg: 6 }}>
-          {(!tournamentObj ||
-            tournamentObj.started) && (
-              <Box style={{ textAlign: 'center' }} m={5}>
-                <Title order={2}>
-                  {STATS[statIndex]?.title ?? 'Loading...'}{' '}
-                  <IconRefresh onClick={() => setStatIndex((statIndex! + 1) % STATS.length)} />
-                </Title>
-                <StatBubble
-                  players={players}
-                  teams={teams}
-                  tournament={tournament}
-                  stat={STATS[statIndex]}
-                ></StatBubble>
-              </Box>
-            )}
+          {(!tournamentObj || tournamentObj.started) && (
+            <Box style={{ textAlign: 'center' }} m={5}>
+              <Title order={2}>
+                {STATS[statIndex]?.title ?? 'Loading...'}{' '}
+                <IconRefresh onClick={() => setStatIndex((statIndex! + 1) % STATS.length)} />
+              </Title>
+              <StatBubble
+                players={players}
+                teams={teams}
+                tournament={tournament}
+                stat={STATS[statIndex]}
+              ></StatBubble>
+            </Box>
+          )}
           <Box style={{ textAlign: 'center' }}>
             <Link className="hideLink" href={`/${tournament}/players`}>
               <Title m={5} order={2}>
@@ -182,15 +181,14 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
             ></Players>
           </Box>
         </Grid.Col>
-        {tournamentObj &&
-          (!tournamentObj.started && (
-            <Grid.Col span={12} hiddenFrom="md">
-              <Link className="hideLink" href={`/${tournament}/fixtures`}>
-                <Title order={2}>Officials</Title>
-              </Link>
-              <Officials tournament={tournament}></Officials>
-            </Grid.Col>
-          ))}
+        {tournamentObj && !tournamentObj.started && (
+          <Grid.Col span={12} hiddenFrom="md">
+            <Link className="hideLink" href={`/${tournament}/fixtures`}>
+              <Title order={2}>Officials</Title>
+            </Link>
+            <Officials tournament={tournament}></Officials>
+          </Grid.Col>
+        )}
       </Grid>
     </>
   );
