@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { IconRefresh } from '@tabler/icons-react';
 import { Box, Container, Grid, Image, Title } from '@mantine/core';
+import Officials from '@/components/HandballComponenets/Officials';
 import { StatBubble } from '@/components/HandballComponenets/StatBubble';
 import Fixtures from '@/components/HandballComponenets/StatsComponents/Fixtures/Fixtures';
 import Ladder from '@/components/HandballComponenets/StatsComponents/Ladder';
@@ -116,9 +117,9 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
         ></Image>
         <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
       </Container>
-      <Grid w="98.5%">
+      <Grid w="98.5%" h="100%">
         <Grid.Col span={{ base: 12, lg: 6 }}>
-          <Box style={{ textAlign: 'center' }}>
+          <Box style={{ textAlign: 'center' }} m={5} mih={400}>
             <Link className="hideLink" href={`/${tournament}/ladder`}>
               <Title order={2}>Ladder</Title>
             </Link>
@@ -126,43 +127,70 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
               tournament={tournament}
               maxRows={5}
               sortIndex={2}
-              columns={['Percentage', 'Games Won']}
+              columns={tournamentObj?.started ? ['Percentage', 'Games Won'] : ['Elo']}
               editable={false}
             ></Ladder>
           </Box>
-          <Box style={{ textAlign: 'center' }}>
-            <Link className="hideLink" href={`/${tournament}/fixtures`}>
-              <Title order={2}>Current Round</Title>
-            </Link>
-            <Fixtures tournament={tournament} expandable={false} maxRounds={1}></Fixtures>
+          <Box style={{ textAlign: 'center' }} m={5}>
+            {!tournamentObj || tournamentObj.started ? (
+              <>
+                <Link className="hideLink" href={`/${tournament}/fixtures`}>
+                  <Title order={2}>Current Round</Title>
+                </Link>
+                <Fixtures tournament={tournament} expandable={false} maxRounds={1}></Fixtures>
+              </>
+            ) : (
+              <Box visibleFrom="md">
+                <Link className="hideLink" href={`/${tournament}/fixtures`}>
+                  <Title order={2}>Officials</Title>
+                </Link>
+                <Box mah={350} style={{ overflow: 'scroll' }}>
+                  <Officials tournament={tournament}></Officials>
+                </Box>
+              </Box>
+            )}
           </Box>
         </Grid.Col>
         <Grid.Col span={{ base: 12, lg: 6 }}>
-          <Box style={{ textAlign: 'center' }}>
-            <Title order={2}>
-              {STATS[statIndex]?.title ?? 'Loading...'}{' '}
-              <IconRefresh onClick={() => setStatIndex((statIndex! + 1) % STATS.length)} />
-            </Title>
-            <StatBubble
-              players={players}
-              teams={teams}
-              tournament={tournament}
-              stat={STATS[statIndex]}
-            ></StatBubble>
-          </Box>
+          {(!tournamentObj ||
+            tournamentObj.started) && (
+              <Box style={{ textAlign: 'center' }} m={5}>
+                <Title order={2}>
+                  {STATS[statIndex]?.title ?? 'Loading...'}{' '}
+                  <IconRefresh onClick={() => setStatIndex((statIndex! + 1) % STATS.length)} />
+                </Title>
+                <StatBubble
+                  players={players}
+                  teams={teams}
+                  tournament={tournament}
+                  stat={STATS[statIndex]}
+                ></StatBubble>
+              </Box>
+            )}
           <Box style={{ textAlign: 'center' }}>
             <Link className="hideLink" href={`/${tournament}/players`}>
-              <Title order={2}>Players</Title>
+              <Title m={5} order={2}>
+                Players
+              </Title>
             </Link>
             <Players
               tournament={tournament}
-              maxRows={5}
+              maxRows={(tournamentObj?.started ?? true) ? 5 : 10}
               sortIndex={2}
               columns={['B&F Votes', 'Points Scored']}
               editable={false}
             ></Players>
           </Box>
         </Grid.Col>
+        {tournamentObj &&
+          (!tournamentObj.started && (
+            <Grid.Col span={12} hiddenFrom="md">
+              <Link className="hideLink" href={`/${tournament}/fixtures`}>
+                <Title order={2}>Officials</Title>
+              </Link>
+              <Officials tournament={tournament}></Officials>
+            </Grid.Col>
+          ))}
       </Grid>
     </>
   );

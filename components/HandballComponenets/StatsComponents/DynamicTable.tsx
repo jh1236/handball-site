@@ -236,9 +236,21 @@ export function InternalDynamicTable<T extends InputType>({
           </Table>
         </>
       ) : (
-        <Paper shadow="lg" radius="md" p="xl" ta="center" ml={30} mr={30} mih={300}>
-          {' '}
-          There is no data to show
+        <Paper
+          shadow="lg"
+          radius="md"
+          p="xl"
+          ta="center"
+          ml={30}
+          mr={30}
+          mih={300}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <i>There is no data to show</i>
         </Paper>
       )}
     </div>
