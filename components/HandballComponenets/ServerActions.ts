@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { SERVER_ADDRESS } from '@/app/config';
 
 export async function tokenFetcher(url: string, args: any = {}) {
@@ -36,26 +36,24 @@ export function useUserData() {
       setPermissions(null);
     }
   }, []);
+  const isAdmin = useMemo(() => (permissions?.base ?? 0) >= 5, [permissions]);
   return {
-    isAdmin: useCallback(
-      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) >= 5,
-      [permissions]
-    ),
+    isAdmin,
     isLoggedIn: useCallback(
-      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) >= 1,
-      [permissions]
+      (tournament?: string) => isAdmin || (permissions?.[tournament ?? 'base'] ?? 0) >= 1,
+      [isAdmin, permissions]
     ),
     isOfficial: useCallback(
-      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) >= 2,
-      [permissions]
+      (tournament?: string) => isAdmin || (permissions?.[tournament ?? 'base'] ?? 0) >= 2,
+      [isAdmin, permissions]
     ),
     isTournamentDirector: useCallback(
-      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) >= 4,
-      [permissions]
+      (tournament?: string) => isAdmin || (permissions?.[tournament ?? 'base'] ?? 0) >= 4,
+      [isAdmin, permissions]
     ),
     isUmpireManager: useCallback(
-      (tournament?: string) => (permissions?.[tournament ?? 'base'] ?? 0) >= 3,
-      [permissions]
+      (tournament?: string) => isAdmin || (permissions?.[tournament ?? 'base'] ?? 0) >= 3,
+      [isAdmin, permissions]
     ),
     loading: permissions === null,
     permissions,

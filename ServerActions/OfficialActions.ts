@@ -64,3 +64,121 @@ export function getOfficial({
     return response.json();
   });
 }
+
+interface AddOfficialToTournament {
+  tournamentSearchableName: SearchableName;
+  officialSearchableName: string;
+  umpireProficiency: number;
+  scorerProficiency: number;
+  role: string;
+}
+
+export function addOfficialToTournament({
+  tournamentSearchableName,
+  officialSearchableName,
+  umpireProficiency,
+  scorerProficiency,
+  role,
+}: AddOfficialToTournament): Promise<void> {
+  const url = new URL('/api/officials/addToTournament', SERVER_ADDRESS);
+  return tokenFetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify({
+      tournamentSearchableName,
+      officialSearchableName,
+      umpireProficiency,
+      scorerProficiency,
+      role,
+    }),
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+interface UpdateOfficialForTournament {
+  tournamentSearchableName: SearchableName;
+  officialSearchableName: string;
+  umpireProficiency?: number;
+  scorerProficiency?: number;
+  role?: string;
+}
+
+export function updateOfficialForTournament({
+  tournamentSearchableName,
+  officialSearchableName,
+  umpireProficiency,
+  scorerProficiency,
+  role,
+}: UpdateOfficialForTournament): Promise<void> {
+  const url = new URL('/api/officials/updateForTournament', SERVER_ADDRESS);
+  const body: any = {
+    tournamentSearchableName,
+    officialSearchableName,
+  };
+  if (umpireProficiency !== undefined) {
+    body.umpireProficiency = umpireProficiency;
+  }
+  if (scorerProficiency !== undefined) {
+    body.scorerProficiency = scorerProficiency;
+  }
+  if (role !== undefined) {
+    body.role = role;
+  }
+  return tokenFetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify(body),
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
+export function removeOfficialFromTournament(
+  tournamentSearchableName: SearchableName,
+  officialSearchableName: string
+): Promise<void> {
+  const url = new URL('/api/officials/removeFromTournament', SERVER_ADDRESS);
+  return tokenFetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify({ officialSearchableName, tournamentSearchableName }),
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}

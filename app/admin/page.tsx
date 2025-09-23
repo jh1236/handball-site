@@ -3,7 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IconCheck, IconMoodSad } from '@tabler/icons-react';
-import { Button, Code, Group, Loader, Popover, Title } from '@mantine/core';
+import {
+  Button,
+  Code,
+  Group,
+  Loader,
+  Modal,
+  Popover,
+  Select,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import {
@@ -12,10 +22,16 @@ import {
   requestClearLog,
   requestServerUpdate,
 } from '@/ServerActions/AdminActions';
+import { createTournament } from '@/ServerActions/TournamentActions';
 
 export default function UniversalManagementPage() {
   const { isAdmin, loading } = useUserData();
   const router = useRouter();
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const [name, setName] = useState<string>();
+  const [fixturesType, setFixturesType] = useState<string>();
+  const [finalsType, setFinalsType] = useState<string>();
+  const [openCreateTournament, setOpenCreateTournament] = useState<boolean>(false);
   const [openBackup, setOpenBackup] = useState<boolean>(false);
   const [openRestart, setOpenRestart] = useState<boolean>(false);
   const [log, _setLog] = useState<string>('\n'.repeat(30));
@@ -32,7 +48,7 @@ export default function UniversalManagementPage() {
     _setLog(a);
   };
   useEffect(() => {
-    if (!loading && !isAdmin()) {
+    if (!loading && !isAdmin) {
       router.push('/');
     } else {
       getLog().then(setLog);
@@ -41,6 +57,57 @@ export default function UniversalManagementPage() {
   return (
     <SidebarLayout>
       <Title>Admin Page</Title>
+      <Modal
+        opened={openCreateTournament}
+        onClose={() => {
+          setOpenCreateTournament(false);
+          setSubmitted(false);
+        }}
+      >
+        <Title>Create Tournament</Title>
+        <TextInput
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.currentTarget.value)}
+          error={!name && submitted ? 'Value must be set for name' : undefined}
+        ></TextInput>
+        <Select
+          label="Fixtures Type"
+          placeholder="Pick value"
+          data={[{ label: 'Round Robin', value: 'RoundRobin' }, 'Pooled', 'Swiss']}
+          value={fixturesType}
+          onChange={(v) => setFixturesType(v!)}
+          allowDeselect={false}
+          error={!fixturesType && submitted ? 'Value must be set for fixtures type' : undefined}
+        />
+        <Select
+          label="Finals Type"
+          placeholder="Pick value"
+          data={[
+            { value: 'BasicFinals', label: 'Basic Finals' },
+            { value: 'PooledFinals', label: 'Pooled Finals' },
+            { value: 'TopThreeFinals', label: 'Top Three Finals' },
+          ]}
+          value={finalsType}
+          onChange={(v) => setFinalsType(v!)}
+          allowDeselect={false}
+          error={!finalsType && submitted ? 'Value must be set for finals type' : undefined}
+        />
+        <br />
+        <Button
+          onClick={() => {
+            setSubmitted(true);
+            if (!name || !fixturesType || !finalsType) {
+              return;
+            }
+            createTournament({ name, fixturesType, finalsType }).then(() =>
+              setOpenCreateTournament(false)
+            );
+          }}
+        >
+          Create
+        </Button>
+      </Modal>
       <Group>
         <Popover opened={openBackup} onClose={() => setOpenBackup(false)}>
           <Popover.Target>
@@ -82,6 +149,13 @@ export default function UniversalManagementPage() {
             {response === 'Bad :(' && <IconMoodSad></IconMoodSad>}
           </Popover.Dropdown>
         </Popover>
+        <Button
+          onClick={() => {
+            setOpenCreateTournament(true);
+          }}
+        >
+          Create Tournament
+        </Button>
       </Group>
       <br />
       <Code block h="100%">

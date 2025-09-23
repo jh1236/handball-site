@@ -147,9 +147,11 @@ export default function FixturesInternal({
             )}
 
             <Table.Tr>
-              <Table.Th colSpan={99999} style={{ textAlign: 'center' }}>
-                <Title>Finals</Title>
-              </Table.Th>
+              {maxRounds > 1 && (
+                <Table.Th colSpan={99999} style={{ textAlign: 'center' }}>
+                  <Title>Finals</Title>
+                </Table.Th>
+              )}
             </Table.Tr>
             {Array.from({ length: maxRounds < 0 ? 2 : Math.min(maxRounds, 2) }).map((_, index) => {
               if (index > maxRounds && maxRounds > 0) return null;
