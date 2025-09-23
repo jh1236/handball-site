@@ -22,5 +22,6 @@ module.exports = {
     'no-continue': 'off',
     'react/jsx-closing-tag-location': 'off',
     'linebreak-style': 'off',
+    'no-plusplus': 'off',
   },
 };
