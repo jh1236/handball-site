@@ -1,4 +1,5 @@
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { PersonStructure } from '@/ServerActions/types';
 
 function nextPoint(game: GameState, swap?: boolean) {
   for (const i of [
@@ -51,9 +52,10 @@ export function startLocal(game: GameState) {
   for (const i of [game.teamOne, game.teamTwo]) {
     for (const j of Object.keys(i)) {
       if (!['left', 'right', 'sub'].includes(j)) continue;
-      const temp = i[j].get;
+      const temp: PersonStructure = i[j].get;
       if (!temp) continue;
       temp.sideOfCourt = j.slice(0, 1).toUpperCase() + j.slice(1);
+      temp.startSide = j.slice(0, 1).toUpperCase() + j.slice(1);
       i[j].set(temp);
     }
   }
