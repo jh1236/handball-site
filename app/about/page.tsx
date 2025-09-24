@@ -4,18 +4,7 @@ import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  Box,
-  Card,
-  Grid,
-  Group,
-  Image,
-  Modal,
-  Stack,
-  Text,
-  Title,
-  useMatches,
-} from '@mantine/core';
+import { Box, Card, Grid, Image, Modal, Stack, Text, Title, useMatches } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
@@ -130,12 +119,14 @@ function PersonToPaper({ person }: { person: Person }) {
           />
         </Card.Section>
 
-        <Group justify="space-between" mt="md" mb="xs">
-          <Title order={2}>{person.name}</Title>
-          <Text>
+        <Stack justify="space-between" mt="md" mb="xs">
+          <Title order={2} ta="center">
+            {person.name}
+          </Title>
+          <Text ta="center">
             <i>{person.role}</i>
           </Text>
-        </Group>
+        </Stack>
 
         <Text size="sm" c="dimmed" visibleFrom="md">
           {person.description}
