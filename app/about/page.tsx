@@ -4,17 +4,7 @@ import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  Box,
-  Card,
-  Grid,
-  Image,
-  Modal,
-  Stack,
-  Text,
-  Title,
-  useMatches,
-} from '@mantine/core';
+import { Box, Card, Grid, Image, Modal, Stack, Text, Title, useMatches } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 
