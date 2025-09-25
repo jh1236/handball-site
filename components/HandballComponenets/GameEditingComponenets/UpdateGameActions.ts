@@ -1,4 +1,5 @@
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { PersonStructure } from '@/ServerActions/types';
 
 function nextPoint(game: GameState, swap?: boolean) {
   for (const i of [
@@ -44,6 +45,21 @@ export function didWinGame(game: GameState, firstTeam: boolean) {
 export function decidedOnCoinToss(game: GameState) {
   if (!game.ended.get) return false;
   return Math.max(game.teamOne.score.get, game.teamTwo.score.get) < 5;
+}
+
+export function startLocal(game: GameState) {
+  if (game.started.get) throw new Error('Game already started');
+  for (const i of [game.teamOne, game.teamTwo]) {
+    for (const j of Object.keys(i)) {
+      if (!['left', 'right', 'sub'].includes(j)) continue;
+      const temp: PersonStructure = i[j].get;
+      if (!temp) continue;
+      temp.sideOfCourt = j.slice(0, 1).toUpperCase() + j.slice(1);
+      temp.startSide = j.slice(0, 1).toUpperCase() + j.slice(1);
+      i[j].set(temp);
+    }
+  }
+  game.started.set(true);
 }
 
 export function scoreLocal(game: GameState, firstTeam: boolean): void {
