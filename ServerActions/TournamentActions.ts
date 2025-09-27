@@ -124,7 +124,7 @@ export interface UpdateTournament {
 }
 
 export function updateTournament(update: UpdateTournament): Promise<void> {
-  const url = new URL('/api/tournaments/create', SERVER_ADDRESS);
+  const url = new URL('/api/tournaments/update', SERVER_ADDRESS);
   return tokenFetch(url, {
     method: 'POST',
     headers: {

@@ -775,7 +775,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
                 name: newTournamentName,
                 fixturesType,
                 finalsType,
-              })
+              }).then(() => setOpenTournamentEdit(false))
             }
           >
             Submit
