@@ -23,7 +23,11 @@ import {
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
-import { uploadTeamImage, uploadTournamentImage } from '@/ServerActions/ImageActions';
+import {
+  uploadPlayerImage,
+  uploadTeamImage,
+  uploadTournamentImage,
+} from '@/ServerActions/ImageActions';
 import {
   addOfficialToTournament,
   getOfficials,
@@ -54,19 +58,56 @@ interface TeamCreatorPageArgs {
 const SIDES = ['Captain', 'Non-Captain', 'Substitute'];
 
 function PlayerCard({ player, index }: { player: PersonStructure; index: number }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   return (
-    <div>
-      <Image
-        src={player.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
-        style={{
-          width: 50,
-          verticalAlign: 'middle',
-          marginRight: 5,
-        }}
-        display="inline-block"
-      />
-      <b>{SIDES[index]}: </b>
-      {player.name}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <Box
+        pos="relative"
+        w="50px" // fixed width instead of 20% for consistency
+        h="50px"
+        className={classes.hoverImage}
+      >
+        <Image
+          pos="absolute"
+          src={player?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+          w={50}
+          h={50}
+        />
+        <Text
+          size="sm"
+          pos="absolute"
+          h={50}
+          w={50}
+          m="auto"
+          style={{
+            textAlign: 'center',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          Change Image
+        </Text>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            uploadPlayerImage(file, player.searchableName).then(() => {
+              router.refresh();
+            });
+          }}
+        />
+      </Box>
+
+      <span>
+        <b>{SIDES[index]}: </b> {player.name}
+      </span>
     </div>
   );
 }
