@@ -8,7 +8,6 @@ import {
   Autocomplete,
   Box,
   Button,
-  Center,
   ColorPicker,
   Container,
   Grid,
@@ -17,7 +16,6 @@ import {
   luminance,
   Paper,
   Popover,
-  SegmentedControl,
   Select,
   Stack,
   Text,
@@ -255,7 +253,7 @@ function CustomOfficialCard({
   const [role, setRole] = useState<string>('Umpire');
   const [official, setOfficial] = useState<OfficialStructure | undefined>();
   return (
-    <Paper shadow="lg" pos="relative" style={{ padding: '5px' }}>
+    <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
       <ActionIcon
         variant="subtle"
         color="green"
@@ -278,66 +276,64 @@ function CustomOfficialCard({
       >
         <IconPlus></IconPlus>
       </ActionIcon>
-      <Center>
-        <Image
-          display="inline-block"
-          src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
-          w={50}
-          m={10}
-        ></Image>
-        <Select
-          display="inline-block"
-          size="xs"
-          w={200}
-          placeholder="Official Name"
-          searchable
-          value={official?.name}
-          data={allOfficials.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
-          onChange={(v) => {
-            setOfficial(allOfficials.find((o) => o.name === v));
-          }}
-        />{' '}
-      </Center>
       <Group>
-        <SegmentedControl
-          value={`${role}`}
-          onChange={(v) => setRole(v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { value: 'Tournament Director', label: 'Tourney Director' },
-            'Umpire Manager',
-            'Umpire',
-          ]}
-        ></SegmentedControl>
-        <SegmentedControl
-          value={`${umpireProficiency}`}
-          onChange={(v) => setUmpireProficiency(+v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { label: 'Court One', value: '3' },
-            { label: 'Mixed', value: '2' },
-            { label: 'Court Two', value: '1' },
-            { label: 'Emergency', value: '-1' },
-            { label: 'None', value: '0' },
-          ]}
-        />
-        <SegmentedControl
-          value={`${scorerProficiency}`}
-          onChange={(v) => setScorerProficiency(+v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { label: 'Scorer', value: '3' },
-            { label: 'Reserve', value: '2' },
-            { label: 'Emergency', value: '1' },
-            { label: 'None', value: '0' },
-          ]}
-        ></SegmentedControl>
+        <Stack w={{ base: '100%', md: '30%' }}>
+          <Image
+            src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+            w="100px"
+            h="100px"
+          ></Image>
+          <Select
+            display="inline-block"
+            size="xs"
+            w="100px"
+            placeholder="Official Name"
+            searchable
+            value={official?.name}
+            data={allOfficials.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
+            onChange={(v) => {
+              setOfficial(allOfficials.find((o) => o.name === v));
+            }}
+          />
+        </Stack>
+        <Stack w={{ base: '100%', md: '60%' }}>
+          <Select
+            value={`${role}`}
+            label="Role"
+            onChange={(v) => setRole(v!)}
+            size="sm"
+            data={[
+              { value: 'Tournament Director', label: 'Tourney Director' },
+              'Umpire Manager',
+              'Umpire',
+            ]}
+          ></Select>
+          <Select
+            label="Umpire Proficiency"
+            value={`${umpireProficiency}`}
+            onChange={(v) => setUmpireProficiency(+v!)}
+            size="sm"
+            data={[
+              { label: 'Court One', value: '3' },
+              { label: 'Mixed', value: '2' },
+              { label: 'Court Two', value: '1' },
+              { label: 'Emergency', value: '-1' },
+              { label: 'None', value: '0' },
+            ]}
+          />
+          <Select
+            value={`${scorerProficiency}`}
+            onChange={(v) => setScorerProficiency(+v!)}
+            label="Scorer Proficiency"
+            size="sm"
+            data={[
+              { label: 'Scorer', value: '3' },
+              { label: 'Reserve', value: '2' },
+              { label: 'Emergency', value: '1' },
+              { label: 'None', value: '0' },
+            ]}
+          ></Select>
+        </Stack>
       </Group>
     </Paper>
   );
@@ -522,7 +518,7 @@ function OfficialCard({
   const [umpireProficiency, setUmpireProficiency] = useState<number>(official.umpireProficiency!);
   const [scorerProficiency, setScorerProficiency] = useState<number>(official.scorerProficiency!);
   return (
-    <Paper shadow="lg" pos="relative">
+    <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
       <Box
         top={5}
         right={5}
@@ -575,52 +571,55 @@ function OfficialCard({
           </>
         )}
       </Box>
-      <Center>
-        <Image display="inline-block" src={official.imageUrl} m={10} w={50}></Image>
-        <Text display="inline-block" size="lg">
-          <b>{official.name}</b>
-        </Text>
-      </Center>
       <Group>
-        <SegmentedControl
-          value={`${role}`}
-          onChange={(v) => setRole(v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { value: 'Tournament Director', label: 'Tourney Director' },
-            'Umpire Manager',
-            'Umpire',
-          ]}
-        ></SegmentedControl>
-        <SegmentedControl
-          value={`${umpireProficiency}`}
-          onChange={(v) => setUmpireProficiency(+v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { label: 'Court One', value: '3' },
-            { label: 'Mixed', value: '2' },
-            { label: 'Court Two', value: '1' },
-            { label: 'None', value: '0' },
-            { label: 'Emergency', value: '-1' },
-          ]}
-        />
-        <SegmentedControl
-          value={`${scorerProficiency}`}
-          onChange={(v) => setScorerProficiency(+v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { label: 'Scorer', value: '3' },
-            { label: 'Reserve', value: '2' },
-            { label: 'Emergency', value: '1' },
-            { label: 'None', value: '0' },
-          ]}
-        ></SegmentedControl>
+        <Stack w={{ base: '100%', md: '30%' }}>
+          <Image
+            src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+            w="100px"
+            h="100px"
+          ></Image>
+          <Text display="inline-block" size="lg">
+            <b>{official.name}</b>
+          </Text>
+        </Stack>
+        <Stack w={{ base: '100%', md: '60%' }}>
+          <Select
+            value={`${role}`}
+            label="Role"
+            onChange={(v) => setRole(v!)}
+            size="sm"
+            data={[
+              { value: 'Tournament Director', label: 'Tourney Director' },
+              'Umpire Manager',
+              'Umpire',
+            ]}
+          ></Select>
+          <Select
+            label="Umpire Proficiency"
+            value={`${umpireProficiency}`}
+            onChange={(v) => setUmpireProficiency(+v!)}
+            size="sm"
+            data={[
+              { label: 'Court One', value: '3' },
+              { label: 'Mixed', value: '2' },
+              { label: 'Court Two', value: '1' },
+              { label: 'Emergency', value: '-1' },
+              { label: 'None', value: '0' },
+            ]}
+          />
+          <Select
+            value={`${scorerProficiency}`}
+            onChange={(v) => setScorerProficiency(+v!)}
+            label="Scorer Proficiency"
+            size="sm"
+            data={[
+              { label: 'Scorer', value: '3' },
+              { label: 'Reserve', value: '2' },
+              { label: 'Emergency', value: '1' },
+              { label: 'None', value: '0' },
+            ]}
+          ></Select>
+        </Stack>
       </Group>
     </Paper>
   );
