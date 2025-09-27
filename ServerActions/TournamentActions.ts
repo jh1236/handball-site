@@ -115,3 +115,29 @@ export function createTournament(create: CreateTournament): Promise<void> {
     return Promise.resolve();
   });
 }
+
+export interface UpdateTournament {
+  searchableName: string;
+  name?: string;
+  fixturesType?: string;
+  finalsType?: string;
+}
+
+export function updateTournament(update: UpdateTournament): Promise<void> {
+  const url = new URL('/api/tournaments/create', SERVER_ADDRESS);
+  return tokenFetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify(update),
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}

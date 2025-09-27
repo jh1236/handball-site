@@ -14,11 +14,13 @@ import {
   Group,
   Image,
   luminance,
+  Modal,
   Paper,
   Popover,
   Select,
   Stack,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
@@ -41,7 +43,11 @@ import {
   removeTeamFromTournament,
   renameTeamForTournament,
 } from '@/ServerActions/TeamActions';
-import { getTournament, startTournament } from '@/ServerActions/TournamentActions';
+import {
+  getTournament,
+  startTournament,
+  updateTournament,
+} from '@/ServerActions/TournamentActions';
 import {
   OfficialStructure,
   PersonStructure,
@@ -543,9 +549,6 @@ interface OfficialCardParams {
     value: ((prevState: OfficialStructure[]) => OfficialStructure[]) | OfficialStructure[]
   ) => void;
   officialsInTournament: OfficialStructure[];
-  setAllOfficials: (
-    value: ((prevState: OfficialStructure[]) => OfficialStructure[]) | OfficialStructure[]
-  ) => void;
 }
 
 function OfficialCard({
@@ -553,7 +556,6 @@ function OfficialCard({
   official,
   setOfficialsInTournament,
   officialsInTournament,
-  setAllOfficials,
 }: OfficialCardParams) {
   const [role, setRole] = useState<string>(official.role!);
   const [umpireProficiency, setUmpireProficiency] = useState<number>(official.umpireProficiency!);
@@ -601,10 +603,19 @@ function OfficialCard({
                       ? umpireProficiency
                       : undefined,
                   role: role !== official.role ? role : undefined,
+                }).then(() => {
+                  setOfficialsInTournament(
+                    officialsInTournament.map((o) =>
+                      o.searchableName === official.searchableName
+                        ? {
+                            ...official,
+                            umpireProficiency,
+                            scorerProficiency,
+                          }
+                        : o
+                    )
+                  );
                 });
-                getOfficials({ tournament }).then((officials) =>
-                  setAllOfficials(officials.officials)
-                );
               }}
             >
               <IconUpload></IconUpload>
@@ -673,6 +684,10 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
     undefined,
     undefined,
   ]);
+  const [newTournamentName, setNewTournamentName] = useState<string>();
+  const [openTournamentEdit, setOpenTournamentEdit] = useState<boolean>(false);
+  const [fixturesType, setFixturesType] = useState<string>();
+  const [finalsType, setFinalsType] = useState<string>();
   const [teamsInTournament, setTeamsInTournament] = React.useState<TeamStructure[]>([]);
   const [newTeamName, setNewTeamName] = React.useState<string | undefined>();
   const [officialsInTournament, setOfficialsInTournament] = React.useState<OfficialStructure[]>([]);
@@ -684,7 +699,12 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const { loading, isTournamentDirector } = useUserData();
   useEffect(() => {
     if (!tournament) return;
-    getTournament(tournament).then(setTournamentObj);
+    getTournament(tournament).then((t) => {
+      setTournamentObj(t);
+      setFixturesType(t.fixturesType);
+      setFinalsType(t.finalsType);
+      setNewTournamentName(t.name);
+    });
     getTeams({ tournament }).then((t) => setTeamsInTournament(t.teams));
     getOfficials({ tournament }).then((o) => setOfficialsInTournament(o.officials));
   }, [tournament]);
@@ -719,6 +739,48 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           alignItems: 'center',
         }}
       >
+        <Modal opened={openTournamentEdit} onClose={() => setOpenTournamentEdit(false)}>
+          <Title>Edit Tournament</Title>
+          <TextInput
+            label="Name"
+            value={newTournamentName}
+            onChange={(e) => setNewTournamentName(e.target.value)}
+          />
+          <Select
+            label="Fixtures Type"
+            placeholder="Pick value"
+            data={[{ label: 'Round Robin', value: 'RoundRobin' }, 'Pooled', 'Swiss']}
+            value={fixturesType}
+            onChange={(v) => setFixturesType(v!)}
+            allowDeselect={false}
+          />
+          <Select
+            label="Finals Type"
+            placeholder="Pick value"
+            data={[
+              { value: 'BasicFinals', label: 'Basic Finals' },
+              { value: 'PooledFinals', label: 'Pooled Finals' },
+              { value: 'TopThreeFinals', label: 'Top Three Finals' },
+            ]}
+            value={finalsType}
+            onChange={(v) => setFinalsType(v!)}
+            allowDeselect={false}
+          />
+          <Button
+            m={5}
+            color="green"
+            onClick={() =>
+              updateTournament({
+                searchableName: tournament,
+                name: newTournamentName,
+                fixturesType,
+                finalsType,
+              })
+            }
+          >
+            Submit
+          </Button>
+        </Modal>
         <Box
           w={100}
           mih={100}
@@ -763,25 +825,37 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           />
         </Box>
         <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
-        <Popover width={200} position="top" withArrow shadow="md">
-          <Popover.Target>
-            <Button m={10} size="md" color="green" variant="outline">
-              Start
-            </Button>
-          </Popover.Target>
-          <Popover.Dropdown ta="center">
-            <Text m={5}>Are you sure you want to start?</Text>
-            <Button
-              m={5}
-              color="green"
-              onClick={() => {
-                startTournament(tournament);
-              }}
-            >
-              Confirm
-            </Button>
-          </Popover.Dropdown>
-        </Popover>
+
+        <Group>
+          <Button
+            m={10}
+            size="md"
+            color="blue"
+            variant="outline"
+            onClick={() => setOpenTournamentEdit(true)}
+          >
+            Edit
+          </Button>
+          <Popover width={200} position="top" withArrow shadow="md">
+            <Popover.Target>
+              <Button m={10} size="md" color="green" variant="outline">
+                Start
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown ta="center">
+              <Text m={5}>Are you sure you want to start?</Text>
+              <Button
+                m={5}
+                color="green"
+                onClick={() => {
+                  startTournament(tournament);
+                }}
+              >
+                Confirm
+              </Button>
+            </Popover.Dropdown>
+          </Popover>
+        </Group>
       </Container>
       <Grid w="95%">
         <Grid.Col span={{ sm: 12, md: 6 }}>
@@ -822,7 +896,6 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
                   official={t}
                   setOfficialsInTournament={setOfficialsInTournament}
                   officialsInTournament={officialsInTournament}
-                  setAllOfficials={setAllOfficials}
                 />
               </Grid.Col>
             ))}
