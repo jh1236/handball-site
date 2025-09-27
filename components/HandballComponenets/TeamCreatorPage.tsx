@@ -321,6 +321,7 @@ function CustomOfficialCard({
             { label: 'Court One', value: '3' },
             { label: 'Mixed', value: '2' },
             { label: 'Court Two', value: '1' },
+            { label: 'Emergency', value: '-1' },
             { label: 'None', value: '0' },
           ]}
         />
@@ -604,6 +605,7 @@ function OfficialCard({
             { label: 'Mixed', value: '2' },
             { label: 'Court Two', value: '1' },
             { label: 'None', value: '0' },
+            { label: 'Emergency', value: '-1' },
           ]}
         />
         <SegmentedControl
