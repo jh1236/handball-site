@@ -5,25 +5,30 @@ import {
   IconBallTennis,
   IconCircleFilled,
   IconExclamationMark,
+  IconMasksTheater,
   IconPlayHandball,
   IconSquareFilled,
   IconStarFilled,
   IconTriangleInvertedFilled,
 } from '@tabler/icons-react';
+import { ImEvil } from 'react-icons/im';
 import {
   Accordion,
+  Autocomplete,
   Box,
   Button,
   Collapse,
   Modal,
   Select,
   Slider,
+  Tabs,
   TextInput,
   Title,
 } from '@mantine/core';
 import { makeUnique } from '@/components/HandballComponenets/GameCreatingComponents/CreateTeamButton';
 import {
   ace,
+  demerit,
   fault,
   greenCard,
   merit,
@@ -36,6 +41,7 @@ import {
 import { GAME_CONFIG } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingConfig';
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { IconHandballCards } from '@/components/icons/IconCards';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
 function buttonEnabledFor(player: PlayerGameStatsStructure, reason: string, type: string): boolean {
@@ -77,336 +83,411 @@ export function PlayerActionList({
   if (!currentPlayer?.get) return <></>;
   let out: AccordionSettings[] = [
     {
-      Icon: IconStarFilled,
-      value: 'Merit',
-      color: '#3262a8',
+      Icon: IconHandballCards,
+      value: 'Cards',
       content: (
-        <>
-          <TextInput
-            value={otherReason}
-            onChange={(event) => setOtherReason(event.currentTarget.value)}
-            label="Explain briefly what happened"
-          ></TextInput>
-          <Button
-            onClick={() => {
-              merit(game, firstTeam, leftSide, otherReason);
-              close();
-            }}
-            style={{ margin: '3px' }}
-            size="sm"
-            disabled={!otherReason}
-            color="player-color"
-          >
-            Submit
-          </Button>
-        </>
-      ),
-    },
-    {
-      Icon: IconExclamationMark,
-      value: 'Warning',
-      color: 'grey',
-      content: (
-        <>
-          {GAME_CONFIG.cards.warning.map((reason, i) => (
-            <Fragment key={i}>
-              <Button
-                style={{ margin: '3px' }}
-                size="sm"
-                color="gray.6"
-                disabled={!buttonEnabledFor(currentPlayer.get!, reason, 'Warning')}
-                onClick={() => {
-                  warning(game, firstTeam, leftSide, reason);
-                  close();
-                }}
-              >
-                {reason}
-              </Button>
-              <br />
-            </Fragment>
-          ))}
-          <Button
-            onClick={() => setOpenModal('warning')}
-            style={{ margin: '3px' }}
-            size="sm"
-            color="gray"
-          >
-            Other
-          </Button>
-
-          <Modal
-            opened={openModal === 'warning'}
-            onClose={() => {
-              setOpenModal(undefined);
-              setOtherReason('');
-            }}
-          >
-            <TextInput
-              value={otherReason}
-              onChange={(event) => setOtherReason(event.currentTarget.value)}
-              label="Select Other Reason"
-            ></TextInput>
+        <Tabs defaultValue="Warn">
+          <Tabs.List grow style={{ flexWrap: 'nowrap' }}>
+            <Tabs.Tab
+              size="sm"
+              color="grey"
+              value="Warn"
+              leftSection={<IconExclamationMark color="grey" size={12} stroke={3} />}
+            >
+              Warn
+            </Tabs.Tab>
+            <Tabs.Tab
+              size="sm"
+              color="green"
+              value="Green"
+              leftSection={<IconTriangleInvertedFilled color="green" size={12} />}
+            >
+              Green
+            </Tabs.Tab>
+            <Tabs.Tab
+              size="sm"
+              color="yellow"
+              value="Yellow"
+              leftSection={<IconSquareFilled color="yellow" size={12} />}
+            >
+              Yellow
+            </Tabs.Tab>
+            <Tabs.Tab
+              size="sm"
+              color="red"
+              value="Red"
+              leftSection={<IconCircleFilled color="red" size={12} />}
+            >
+              Red
+            </Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value="Warn">
+            {GAME_CONFIG.cards.warning.map((reason, i) => (
+              <Fragment key={i}>
+                <Button
+                  style={{ margin: '3px' }}
+                  size="sm"
+                  color="gray.6"
+                  disabled={
+                    !game.practice.get && !buttonEnabledFor(currentPlayer.get!, reason, 'Warning')
+                  }
+                  onClick={() => {
+                    warning(game, firstTeam, leftSide, reason);
+                    close();
+                  }}
+                >
+                  {reason}
+                </Button>
+                <br />
+              </Fragment>
+            ))}
             <Button
-              onClick={() => {
-                warning(game, firstTeam, leftSide, otherReason);
-                close();
-              }}
+              onClick={() => setOpenModal('warning')}
               style={{ margin: '3px' }}
               size="sm"
-              disabled={!otherReason}
+              color="gray"
+            >
+              Other
+            </Button>
+
+            <Modal
+              opened={openModal === 'warning'}
+              onClose={() => {
+                setOpenModal(undefined);
+                setOtherReason('');
+              }}
+            >
+              <TextInput
+                value={otherReason}
+                onChange={(event) => setOtherReason(event.currentTarget.value)}
+                label="Select Other Reason"
+              ></TextInput>
+              <Button
+                onClick={() => {
+                  warning(game, firstTeam, leftSide, otherReason);
+                  close();
+                }}
+                style={{ margin: '3px' }}
+                size="sm"
+                disabled={!otherReason}
+                color="player-color"
+              >
+                Submit
+              </Button>
+            </Modal>
+          </Tabs.Panel>
+          <Tabs.Panel value="Green">
+            {GAME_CONFIG.cards.green.map((reason, i) => (
+              <Fragment key={i}>
+                <Button
+                  style={{ margin: '3px' }}
+                  size="sm"
+                  disabled={
+                    !game.practice.get &&
+                    !buttonEnabledFor(currentPlayer.get!, reason, 'Green Card')
+                  }
+                  color="green"
+                  onClick={() => {
+                    greenCard(game, firstTeam, leftSide, reason);
+                    close();
+                  }}
+                >
+                  {reason}
+                </Button>
+                <br />
+              </Fragment>
+            ))}
+            <Button
+              onClick={() => setOpenModal('green')}
+              style={{ margin: '3px' }}
+              size="sm"
+              color="gray"
+            >
+              Repeat/Other
+            </Button>
+
+            <Modal
+              opened={openModal === 'green'}
+              onClose={() => {
+                setOpenModal(undefined);
+                setOtherReason('');
+              }}
+            >
+              <Select
+                label="Select Repeat Reason"
+                allowDeselect={false}
+                defaultValue="Other"
+                data={GAME_CONFIG.cards.warning.concat('Other').map((a) => ({
+                  value: a,
+                  label: a,
+                  disabled:
+                    !game.practice.get &&
+                    !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Green Card'),
+                }))}
+                onChange={(reason) =>
+                  setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
+                }
+              ></Select>
+              <TextInput
+                value={
+                  otherReason.startsWith('Repeated ')
+                    ? '-'
+                    : otherReason === 'Other'
+                      ? ''
+                      : otherReason
+                }
+                disabled={otherReason.startsWith('Repeated ')}
+                onChange={(event) => setOtherReason(event.currentTarget.value)}
+                label="Select Other Reason"
+              ></TextInput>
+              <Button
+                onClick={() => {
+                  greenCard(game, firstTeam, leftSide, otherReason);
+                  close();
+                }}
+                style={{ margin: '3px' }}
+                size="sm"
+                disabled={!otherReason}
+                color="green"
+              >
+                Submit
+              </Button>
+            </Modal>
+          </Tabs.Panel>
+          <Tabs.Panel value="Yellow">
+            <Title m={5} order={2}>
+              Rounds:{' '}
+            </Title>
+            <Slider
+              min={game.blitzGame.get ? 3 : 6}
+              max={game.blitzGame.get ? 9 : 12}
+              step={1}
+              value={cardTime}
+              onChange={(value) => setCardTime(value)}
+            />
+            <br />
+            {GAME_CONFIG.cards.yellow.map((reason, i) => (
+              <Fragment key={i}>
+                <Button
+                  style={{ margin: '3px' }}
+                  size="sm"
+                  disabled={
+                    !game.practice.get &&
+                    !buttonEnabledFor(currentPlayer.get!, reason, 'Yellow Card')
+                  }
+                  color="orange"
+                  onClick={() => {
+                    yellowCard(game, firstTeam, leftSide, reason, cardTime);
+                    close();
+                  }}
+                >
+                  {reason}
+                </Button>
+                <br />
+              </Fragment>
+            ))}
+            <Button
+              onClick={() => setOpenModal('yellow')}
+              style={{ margin: '3px' }}
+              size="sm"
+              color="gray"
+            >
+              Repeat/Other
+            </Button>
+            <Modal
+              opened={openModal === 'yellow'}
+              onClose={() => {
+                setOpenModal(undefined);
+                setOtherReason('');
+              }}
+            >
+              <Select
+                label="Select Repeat Reason"
+                allowDeselect={false}
+                defaultValue="Other"
+                data={makeUnique(GAME_CONFIG.cards.warning.concat(GAME_CONFIG.cards.green))
+                  .concat('Other')
+                  .map((a) => ({
+                    value: a,
+                    label: a,
+                    disabled:
+                      !game.practice.get &&
+                      !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Yellow Card'),
+                  }))}
+                onChange={(reason) =>
+                  setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
+                }
+              ></Select>
+              <TextInput
+                value={
+                  otherReason.startsWith('Repeated ')
+                    ? '-'
+                    : otherReason === 'Other'
+                      ? ''
+                      : otherReason
+                }
+                disabled={otherReason.startsWith('Repeated ')}
+                onChange={(event) => setOtherReason(event.currentTarget.value)}
+                label="Select Other Reason"
+              ></TextInput>
+              <Button
+                onClick={() => {
+                  yellowCard(game, firstTeam, leftSide, otherReason);
+                  close();
+                }}
+                style={{ margin: '3px' }}
+                size="sm"
+                disabled={!otherReason}
+                color="orange"
+              >
+                Submit
+              </Button>
+            </Modal>
+          </Tabs.Panel>
+          <Tabs.Panel value="Red">
+            {GAME_CONFIG.cards.red.map((reason, i) => (
+              <Fragment key={i}>
+                <Button
+                  style={{ margin: '3px' }}
+                  size="sm"
+                  color="red"
+                  onClick={() => {
+                    redCard(game, firstTeam, leftSide, reason);
+                    close();
+                  }}
+                >
+                  {reason}
+                </Button>
+                <br />
+              </Fragment>
+            ))}
+            <Button
+              onClick={() => setOpenModal('red')}
+              style={{ margin: '3px' }}
+              size="sm"
+              color="gray"
+            >
+              Repeat/Other
+            </Button>
+            <Modal
+              opened={openModal === 'red'}
+              onClose={() => {
+                setOpenModal(undefined);
+                setOtherReason('');
+              }}
+            >
+              <Select
+                label="Select Repeat Reason"
+                allowDeselect={false}
+                defaultValue="Other"
+                data={makeUnique(
+                  GAME_CONFIG.cards.warning
+                    .concat(GAME_CONFIG.cards.green)
+                    .concat(GAME_CONFIG.cards.yellow)
+                ).concat('Other')}
+                onChange={(reason) =>
+                  setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
+                }
+              ></Select>
+              <TextInput
+                value={
+                  otherReason.startsWith('Repeated ')
+                    ? '-'
+                    : otherReason === 'Other'
+                      ? ''
+                      : otherReason
+                }
+                disabled={otherReason.startsWith('Repeated ')}
+                onChange={(event) => setOtherReason(event.currentTarget.value)}
+                label="Select Other Reason"
+              ></TextInput>
+              <Button
+                onClick={() => {
+                  redCard(game, firstTeam, leftSide, otherReason);
+                  close();
+                }}
+                style={{ margin: '3px' }}
+                size="sm"
+                disabled={!otherReason}
+                color="red"
+              >
+                Submit
+              </Button>
+            </Modal>
+          </Tabs.Panel>
+        </Tabs>
+      ),
+      color: 'white',
+    },
+    {
+      Icon: IconMasksTheater,
+      value: 'Other',
+      color: 'white',
+      content: (
+        <Tabs defaultValue="Merit">
+          <Tabs.List grow>
+            <Tabs.Tab
+              size="sm"
+              color="#3262a8"
+              value="Merit"
+              leftSection={<IconStarFilled color="#3262a8" size={16} stroke={3} />}
+            >
+              Merit
+            </Tabs.Tab>
+            <Tabs.Tab
+              size="sm"
+              color="#C00000"
+              value="Demerit"
+              leftSection={<ImEvil color="#C00000" size={16} />}
+            >
+              Demerit
+            </Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value="Merit">
+            <Autocomplete
+              label="Select Reason"
+              placeholder="Write something or pick from the list"
+              data={[
+                'Above and Beyond Effort',
+                'Cool Body Part',
+                'Good Sportsmanship',
+                'Trick Shot',
+                'Well Placed Ball',
+              ]}
+              onChange={setOtherReason}
+            ></Autocomplete>
+            <Button
+              onClick={() => {
+                merit(game, firstTeam, leftSide, otherReason);
+                close();
+              }}
+              m={5}
+              size="sm"
               color="player-color"
             >
               Submit
             </Button>
-          </Modal>
-        </>
-      ),
-    },
-    {
-      Icon: IconTriangleInvertedFilled,
-      color: 'green',
-      value: 'Green Card',
-      content: (
-        <>
-          {GAME_CONFIG.cards.green.map((reason, i) => (
-            <Fragment key={i}>
-              <Button
-                style={{ margin: '3px' }}
-                size="sm"
-                disabled={!buttonEnabledFor(currentPlayer.get!, reason, 'Green Card')}
-                color="green"
-                onClick={() => {
-                  greenCard(game, firstTeam, leftSide, reason);
-                  close();
-                }}
-              >
-                {reason}
-              </Button>
-              <br />
-            </Fragment>
-          ))}
-          <Button
-            onClick={() => setOpenModal('green')}
-            style={{ margin: '3px' }}
-            size="sm"
-            color="gray"
-          >
-            Repeat/Other
-          </Button>
-
-          <Modal
-            opened={openModal === 'green'}
-            onClose={() => {
-              setOpenModal(undefined);
-              setOtherReason('');
-            }}
-          >
-            <Select
-              label="Select Repeat Reason"
-              allowDeselect={false}
-              defaultValue="Other"
-              data={GAME_CONFIG.cards.warning.concat('Other').map((a) => ({
-                value: a,
-                label: a,
-                disabled: !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Green Card'),
-              }))}
-              onChange={(reason) =>
-                setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
-              }
-            ></Select>
-            <TextInput
-              value={
-                otherReason.startsWith('Repeated ')
-                  ? '-'
-                  : otherReason === 'Other'
-                    ? ''
-                    : otherReason
-              }
-              disabled={otherReason.startsWith('Repeated ')}
-              onChange={(event) => setOtherReason(event.currentTarget.value)}
-              label="Select Other Reason"
-            ></TextInput>
+          </Tabs.Panel>
+          <Tabs.Panel value="Demerit">
+            <Autocomplete
+              label="Select Reason"
+              placeholder="Write something or pick from the list"
+              data={['Nefarious Laugh', 'Devious Joke', 'Sinister Rage Bait', 'Abominable Play']}
+              onChange={setOtherReason}
+            ></Autocomplete>
             <Button
               onClick={() => {
-                greenCard(game, firstTeam, leftSide, otherReason);
+                demerit(game, firstTeam, leftSide, otherReason);
                 close();
               }}
-              style={{ margin: '3px' }}
+              m={5}
               size="sm"
-              disabled={!otherReason}
-              color="green"
+              color="#C00000"
             >
               Submit
             </Button>
-          </Modal>
-        </>
-      ),
-    },
-    {
-      Icon: IconSquareFilled,
-      color: 'yellow',
-      value: 'Yellow Card',
-      content: (
-        <Box>
-          {GAME_CONFIG.cards.yellow.map((reason, i) => (
-            <Fragment key={i}>
-              <Button
-                style={{ margin: '3px' }}
-                size="sm"
-                disabled={!buttonEnabledFor(currentPlayer.get!, reason, 'Yellow Card')}
-                color="orange"
-                onClick={() => {
-                  yellowCard(game, firstTeam, leftSide, reason, cardTime);
-                  close();
-                }}
-              >
-                {reason}
-              </Button>
-              <br />
-            </Fragment>
-          ))}
-          <Button
-            onClick={() => setOpenModal('yellow')}
-            style={{ margin: '3px' }}
-            size="sm"
-            color="gray"
-          >
-            Repeat/Other
-          </Button>
-          <Modal
-            opened={openModal === 'yellow'}
-            onClose={() => {
-              setOpenModal(undefined);
-              setOtherReason('');
-            }}
-          >
-            <Select
-              label="Select Repeat Reason"
-              allowDeselect={false}
-              defaultValue="Other"
-              data={makeUnique(GAME_CONFIG.cards.warning.concat(GAME_CONFIG.cards.green))
-                .concat('Other')
-                .map((a) => ({
-                  value: a,
-                  label: a,
-                  disabled: !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Yellow Card'),
-                }))}
-              onChange={(reason) =>
-                setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
-              }
-            ></Select>
-            <TextInput
-              value={
-                otherReason.startsWith('Repeated ')
-                  ? '-'
-                  : otherReason === 'Other'
-                    ? ''
-                    : otherReason
-              }
-              disabled={otherReason.startsWith('Repeated ')}
-              onChange={(event) => setOtherReason(event.currentTarget.value)}
-              label="Select Other Reason"
-            ></TextInput>
-            <Button
-              onClick={() => {
-                yellowCard(game, firstTeam, leftSide, otherReason);
-                close();
-              }}
-              style={{ margin: '3px' }}
-              size="sm"
-              disabled={!otherReason}
-              color="orange"
-            >
-              Submit
-            </Button>
-          </Modal>
-          <Title order={2}>Rounds: </Title>
-          <Slider
-            min={game.blitzGame.get ? 3 : 6}
-            max={game.blitzGame.get ? 9 : 12}
-            step={1}
-            value={cardTime}
-            onChange={(value) => setCardTime(value)}
-          />
-        </Box>
-      ),
-    },
-    {
-      Icon: IconCircleFilled,
-      color: 'red',
-      value: 'Red Card',
-      content: (
-        <>
-          {GAME_CONFIG.cards.red.map((reason, i) => (
-            <Fragment key={i}>
-              <Button
-                style={{ margin: '3px' }}
-                size="sm"
-                color="red"
-                onClick={() => {
-                  redCard(game, firstTeam, leftSide, reason);
-                  close();
-                }}
-              >
-                {reason}
-              </Button>
-              <br />
-            </Fragment>
-          ))}
-          <Button
-            onClick={() => setOpenModal('red')}
-            style={{ margin: '3px' }}
-            size="sm"
-            color="gray"
-          >
-            Repeat Offence
-          </Button>
-          <Modal
-            opened={openModal === 'red'}
-            onClose={() => {
-              setOpenModal(undefined);
-              setOtherReason('');
-            }}
-          >
-            <Select
-              label="Select Repeat Reason"
-              allowDeselect={false}
-              defaultValue="Other"
-              data={makeUnique(
-                GAME_CONFIG.cards.warning
-                  .concat(GAME_CONFIG.cards.green)
-                  .concat(GAME_CONFIG.cards.yellow)
-              ).concat('Other')}
-              onChange={(reason) =>
-                setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
-              }
-            ></Select>
-            <TextInput
-              value={
-                otherReason.startsWith('Repeated ')
-                  ? '-'
-                  : otherReason === 'Other'
-                    ? ''
-                    : otherReason
-              }
-              disabled={otherReason.startsWith('Repeated ')}
-              onChange={(event) => setOtherReason(event.currentTarget.value)}
-              label="Select Other Reason"
-            ></TextInput>
-            <Button
-              onClick={() => {
-                redCard(game, firstTeam, leftSide, otherReason);
-                close();
-              }}
-              style={{ margin: '3px' }}
-              size="sm"
-              disabled={!otherReason}
-              color="red"
-            >
-              Submit
-            </Button>
-          </Modal>
-        </>
+          </Tabs.Panel>
+        </Tabs>
       ),
     },
   ];

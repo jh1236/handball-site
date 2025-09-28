@@ -21,6 +21,7 @@ import {
   aceForGame,
   cardForGame,
   deleteGame,
+  demeritForGame,
   endGame,
   endTimeoutForGame,
   faultForGame,
@@ -66,8 +67,7 @@ export function end(game: GameState, reviewRequired: boolean) {
     game.teamTwo.protest.get,
     game.teamOne.notes.get,
     game.teamTwo.notes.get,
-    reviewRequired,
-    game.evilVotes.get.map((i) => i.searchableName)
+    reviewRequired
   );
 }
 
@@ -140,6 +140,17 @@ export function merit(
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const player = leftPlayer ? team.left : team.right;
   meritForGame(game.id, firstTeam, player.get?.searchableName!, reason).catch(() => sync(game));
+}
+
+export function demerit(
+  game: GameState,
+  firstTeam: boolean,
+  leftPlayer: boolean,
+  reason: string
+): void {
+  const team = firstTeam ? game.teamOne : game.teamTwo;
+  const player = leftPlayer ? team.left : team.right;
+  demeritForGame(game.id, firstTeam, player.get?.searchableName!, reason).catch(() => sync(game));
 }
 
 export function warning(

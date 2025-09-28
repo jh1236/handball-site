@@ -1,13 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  IconCheckbox,
-  IconCloudUpload,
-  IconNote,
-  IconPentagram,
-  IconTrophy,
-} from '@tabler/icons-react';
-import { ImEvil } from 'react-icons/im';
+import { IconCheckbox, IconCloudUpload, IconNote, IconTrophy } from '@tabler/icons-react';
 import { Accordion, Button, Checkbox, List, Popover, Rating, Text, Textarea } from '@mantine/core';
 import { markIfReqd } from '@/components/HandballComponenets/AdminGamePanel';
 import { end } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
@@ -67,41 +60,6 @@ export function GameActionList({ game, close }: GameActionListParams): React.Rea
       title: markIfReqd(!bestPlayersOpened && !game.practice.get, 'Rank Best Players'),
       color: undefined,
       content: <OrderPlayers game={game}></OrderPlayers>,
-    },
-    {
-      Icon: IconPentagram,
-      value: 'Nefarious Votes',
-      title: 'Assign Evil Players',
-      color: undefined,
-      content: (
-        <>
-          {game.evilVotes.get.map((vote, i) => (
-            <Fragment key={i}>
-              <Checkbox
-                m={10}
-                size="lg"
-                icon={ImEvil}
-                color="#E00000"
-                iconColor="#500000"
-                label={vote.name}
-                style={{
-                  color: vote.isEvil ? '#E00000' : undefined,
-                  fontStyle: vote.isEvil ? 'italic' : undefined,
-                }}
-                onChange={(e) =>
-                  game.evilVotes.set(
-                    game.evilVotes.get.map((v) =>
-                      v.searchableName === vote.searchableName
-                        ? { ...v, isEvil: e.target.checked }
-                        : v
-                    )
-                  )
-                }
-              ></Checkbox>
-            </Fragment>
-          ))}
-        </>
-      ),
     },
     {
       Icon: IconCloudUpload,
