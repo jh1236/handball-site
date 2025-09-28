@@ -8,24 +8,28 @@ import {
   Autocomplete,
   Box,
   Button,
-  Center,
   ColorPicker,
   Container,
   Grid,
   Group,
   Image,
   luminance,
+  Modal,
   Paper,
   Popover,
-  SegmentedControl,
   Select,
   Stack,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
-import { uploadTeamImage, uploadTournamentImage } from '@/ServerActions/ImageActions';
+import {
+  uploadPlayerImage,
+  uploadTeamImage,
+  uploadTournamentImage,
+} from '@/ServerActions/ImageActions';
 import {
   addOfficialToTournament,
   getOfficials,
@@ -39,7 +43,11 @@ import {
   removeTeamFromTournament,
   renameTeamForTournament,
 } from '@/ServerActions/TeamActions';
-import { getTournament, startTournament } from '@/ServerActions/TournamentActions';
+import {
+  getTournament,
+  startTournament,
+  updateTournament,
+} from '@/ServerActions/TournamentActions';
 import {
   OfficialStructure,
   PersonStructure,
@@ -56,19 +64,56 @@ interface TeamCreatorPageArgs {
 const SIDES = ['Captain', 'Non-Captain', 'Substitute'];
 
 function PlayerCard({ player, index }: { player: PersonStructure; index: number }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   return (
-    <div>
-      <Image
-        src={player.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
-        style={{
-          width: 50,
-          verticalAlign: 'middle',
-          marginRight: 5,
-        }}
-        display="inline-block"
-      />
-      <b>{SIDES[index]}: </b>
-      {player.name}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <Box
+        pos="relative"
+        w="50px" // fixed width instead of 20% for consistency
+        h="50px"
+        className={classes.hoverImage}
+      >
+        <Image
+          pos="absolute"
+          src={player?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+          w={50}
+          h={50}
+        />
+        <Text
+          size="sm"
+          pos="absolute"
+          h={50}
+          w={50}
+          m="auto"
+          style={{
+            textAlign: 'center',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          Change Image
+        </Text>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            uploadPlayerImage(file, player.searchableName).then(() => {
+              router.refresh();
+            });
+          }}
+        />
+      </Box>
+
+      <span>
+        <b>{SIDES[index]}: </b> {player.name}
+      </span>
     </div>
   );
 }
@@ -255,7 +300,7 @@ function CustomOfficialCard({
   const [role, setRole] = useState<string>('Umpire');
   const [official, setOfficial] = useState<OfficialStructure | undefined>();
   return (
-    <Paper shadow="lg" pos="relative" style={{ padding: '5px' }}>
+    <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
       <ActionIcon
         variant="subtle"
         color="green"
@@ -278,65 +323,64 @@ function CustomOfficialCard({
       >
         <IconPlus></IconPlus>
       </ActionIcon>
-      <Center>
-        <Image
-          display="inline-block"
-          src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
-          w={50}
-          m={10}
-        ></Image>
-        <Select
-          display="inline-block"
-          size="xs"
-          w={200}
-          placeholder="Official Name"
-          searchable
-          value={official?.name}
-          data={allOfficials.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
-          onChange={(v) => {
-            setOfficial(allOfficials.find((o) => o.name === v));
-          }}
-        />{' '}
-      </Center>
       <Group>
-        <SegmentedControl
-          value={`${role}`}
-          onChange={(v) => setRole(v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { value: 'Tournament Director', label: 'Tourney Director' },
-            'Umpire Manager',
-            'Umpire',
-          ]}
-        ></SegmentedControl>
-        <SegmentedControl
-          value={`${umpireProficiency}`}
-          onChange={(v) => setUmpireProficiency(+v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { label: 'Court One', value: '3' },
-            { label: 'Mixed', value: '2' },
-            { label: 'Court Two', value: '1' },
-            { label: 'None', value: '0' },
-          ]}
-        />
-        <SegmentedControl
-          value={`${scorerProficiency}`}
-          onChange={(v) => setScorerProficiency(+v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { label: 'Scorer', value: '3' },
-            { label: 'Reserve', value: '2' },
-            { label: 'Emergency', value: '1' },
-            { label: 'None', value: '0' },
-          ]}
-        ></SegmentedControl>
+        <Stack w={{ base: '100%', md: '30%' }}>
+          <Image
+            src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+            w="100px"
+            h="100px"
+          ></Image>
+          <Select
+            display="inline-block"
+            size="xs"
+            w="100px"
+            placeholder="Official Name"
+            searchable
+            value={official?.name}
+            data={allOfficials.map((a) => a.name).filter((v, i, a) => a.indexOf(v) === i)}
+            onChange={(v) => {
+              setOfficial(allOfficials.find((o) => o.name === v));
+            }}
+          />
+        </Stack>
+        <Stack w={{ base: '100%', md: '60%' }}>
+          <Select
+            value={`${role}`}
+            label="Role"
+            onChange={(v) => setRole(v!)}
+            size="sm"
+            data={[
+              { value: 'Tournament Director', label: 'Tourney Director' },
+              'Umpire Manager',
+              'Umpire',
+            ]}
+          ></Select>
+          <Select
+            label="Umpire Proficiency"
+            value={`${umpireProficiency}`}
+            onChange={(v) => setUmpireProficiency(+v!)}
+            size="sm"
+            data={[
+              { label: 'Court One', value: '3' },
+              { label: 'Mixed', value: '2' },
+              { label: 'Court Two', value: '1' },
+              { label: 'Emergency', value: '-1' },
+              { label: 'None', value: '0' },
+            ]}
+          />
+          <Select
+            value={`${scorerProficiency}`}
+            onChange={(v) => setScorerProficiency(+v!)}
+            label="Scorer Proficiency"
+            size="sm"
+            data={[
+              { label: 'Scorer', value: '3' },
+              { label: 'Reserve', value: '2' },
+              { label: 'Emergency', value: '1' },
+              { label: 'None', value: '0' },
+            ]}
+          ></Select>
+        </Stack>
       </Group>
     </Paper>
   );
@@ -505,9 +549,6 @@ interface OfficialCardParams {
     value: ((prevState: OfficialStructure[]) => OfficialStructure[]) | OfficialStructure[]
   ) => void;
   officialsInTournament: OfficialStructure[];
-  setAllOfficials: (
-    value: ((prevState: OfficialStructure[]) => OfficialStructure[]) | OfficialStructure[]
-  ) => void;
 }
 
 function OfficialCard({
@@ -515,13 +556,12 @@ function OfficialCard({
   official,
   setOfficialsInTournament,
   officialsInTournament,
-  setAllOfficials,
 }: OfficialCardParams) {
   const [role, setRole] = useState<string>(official.role!);
   const [umpireProficiency, setUmpireProficiency] = useState<number>(official.umpireProficiency!);
   const [scorerProficiency, setScorerProficiency] = useState<number>(official.scorerProficiency!);
   return (
-    <Paper shadow="lg" pos="relative">
+    <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
       <Box
         top={5}
         right={5}
@@ -563,10 +603,19 @@ function OfficialCard({
                       ? umpireProficiency
                       : undefined,
                   role: role !== official.role ? role : undefined,
+                }).then(() => {
+                  setOfficialsInTournament(
+                    officialsInTournament.map((o) =>
+                      o.searchableName === official.searchableName
+                        ? {
+                            ...official,
+                            umpireProficiency,
+                            scorerProficiency,
+                          }
+                        : o
+                    )
+                  );
                 });
-                getOfficials({ tournament }).then((officials) =>
-                  setAllOfficials(officials.officials)
-                );
               }}
             >
               <IconUpload></IconUpload>
@@ -574,51 +623,55 @@ function OfficialCard({
           </>
         )}
       </Box>
-      <Center>
-        <Image display="inline-block" src={official.imageUrl} m={10} w={50}></Image>
-        <Text display="inline-block" size="lg">
-          <b>{official.name}</b>
-        </Text>
-      </Center>
       <Group>
-        <SegmentedControl
-          value={`${role}`}
-          onChange={(v) => setRole(v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { value: 'Tournament Director', label: 'Tourney Director' },
-            'Umpire Manager',
-            'Umpire',
-          ]}
-        ></SegmentedControl>
-        <SegmentedControl
-          value={`${umpireProficiency}`}
-          onChange={(v) => setUmpireProficiency(+v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { label: 'Court One', value: '3' },
-            { label: 'Mixed', value: '2' },
-            { label: 'Court Two', value: '1' },
-            { label: 'None', value: '0' },
-          ]}
-        />
-        <SegmentedControl
-          value={`${scorerProficiency}`}
-          onChange={(v) => setScorerProficiency(+v)}
-          orientation="vertical"
-          size="sm"
-          mb={15}
-          data={[
-            { label: 'Scorer', value: '3' },
-            { label: 'Reserve', value: '2' },
-            { label: 'Emergency', value: '1' },
-            { label: 'None', value: '0' },
-          ]}
-        ></SegmentedControl>
+        <Stack w={{ base: '100%', md: '30%' }}>
+          <Image
+            src={official?.imageUrl ?? `${SERVER_ADDRESS}/api/image?name=blank`}
+            w="100px"
+            h="100px"
+          ></Image>
+          <Text display="inline-block" size="lg">
+            <b>{official.name}</b>
+          </Text>
+        </Stack>
+        <Stack w={{ base: '100%', md: '60%' }}>
+          <Select
+            value={`${role}`}
+            label="Role"
+            onChange={(v) => setRole(v!)}
+            size="sm"
+            data={[
+              { value: 'Tournament Director', label: 'Tourney Director' },
+              'Umpire Manager',
+              'Umpire',
+            ]}
+          ></Select>
+          <Select
+            label="Umpire Proficiency"
+            value={`${umpireProficiency}`}
+            onChange={(v) => setUmpireProficiency(+v!)}
+            size="sm"
+            data={[
+              { label: 'Court One', value: '3' },
+              { label: 'Mixed', value: '2' },
+              { label: 'Court Two', value: '1' },
+              { label: 'Emergency', value: '-1' },
+              { label: 'None', value: '0' },
+            ]}
+          />
+          <Select
+            value={`${scorerProficiency}`}
+            onChange={(v) => setScorerProficiency(+v!)}
+            label="Scorer Proficiency"
+            size="sm"
+            data={[
+              { label: 'Scorer', value: '3' },
+              { label: 'Reserve', value: '2' },
+              { label: 'Emergency', value: '1' },
+              { label: 'None', value: '0' },
+            ]}
+          ></Select>
+        </Stack>
       </Group>
     </Paper>
   );
@@ -631,6 +684,10 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
     undefined,
     undefined,
   ]);
+  const [newTournamentName, setNewTournamentName] = useState<string>();
+  const [openTournamentEdit, setOpenTournamentEdit] = useState<boolean>(false);
+  const [fixturesType, setFixturesType] = useState<string>();
+  const [finalsType, setFinalsType] = useState<string>();
   const [teamsInTournament, setTeamsInTournament] = React.useState<TeamStructure[]>([]);
   const [newTeamName, setNewTeamName] = React.useState<string | undefined>();
   const [officialsInTournament, setOfficialsInTournament] = React.useState<OfficialStructure[]>([]);
@@ -642,7 +699,12 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const { loading, isTournamentDirector } = useUserData();
   useEffect(() => {
     if (!tournament) return;
-    getTournament(tournament).then(setTournamentObj);
+    getTournament(tournament).then((t) => {
+      setTournamentObj(t);
+      setFixturesType(t.fixturesType);
+      setFinalsType(t.finalsType);
+      setNewTournamentName(t.name);
+    });
     getTeams({ tournament }).then((t) => setTeamsInTournament(t.teams));
     getOfficials({ tournament }).then((o) => setOfficialsInTournament(o.officials));
   }, [tournament]);
@@ -677,6 +739,48 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           alignItems: 'center',
         }}
       >
+        <Modal opened={openTournamentEdit} onClose={() => setOpenTournamentEdit(false)}>
+          <Title>Edit Tournament</Title>
+          <TextInput
+            label="Name"
+            value={newTournamentName}
+            onChange={(e) => setNewTournamentName(e.target.value)}
+          />
+          <Select
+            label="Fixtures Type"
+            placeholder="Pick value"
+            data={[{ label: 'Round Robin', value: 'RoundRobin' }, 'Pooled', 'Swiss']}
+            value={fixturesType}
+            onChange={(v) => setFixturesType(v!)}
+            allowDeselect={false}
+          />
+          <Select
+            label="Finals Type"
+            placeholder="Pick value"
+            data={[
+              { value: 'BasicFinals', label: 'Basic Finals' },
+              { value: 'PooledFinals', label: 'Pooled Finals' },
+              { value: 'TopThreeFinals', label: 'Top Three Finals' },
+            ]}
+            value={finalsType}
+            onChange={(v) => setFinalsType(v!)}
+            allowDeselect={false}
+          />
+          <Button
+            m={5}
+            color="green"
+            onClick={() =>
+              updateTournament({
+                searchableName: tournament,
+                name: newTournamentName,
+                fixturesType,
+                finalsType,
+              }).then(() => setOpenTournamentEdit(false))
+            }
+          >
+            Submit
+          </Button>
+        </Modal>
         <Box
           w={100}
           mih={100}
@@ -721,25 +825,37 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           />
         </Box>
         <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
-        <Popover width={200} position="top" withArrow shadow="md">
-          <Popover.Target>
-            <Button m={10} size="md" color="green" variant="outline">
-              Start
-            </Button>
-          </Popover.Target>
-          <Popover.Dropdown ta="center">
-            <Text m={5}>Are you sure you want to start?</Text>
-            <Button
-              m={5}
-              color="green"
-              onClick={() => {
-                startTournament(tournament);
-              }}
-            >
-              Confirm
-            </Button>
-          </Popover.Dropdown>
-        </Popover>
+
+        <Group>
+          <Button
+            m={10}
+            size="md"
+            color="blue"
+            variant="outline"
+            onClick={() => setOpenTournamentEdit(true)}
+          >
+            Edit
+          </Button>
+          <Popover width={200} position="top" withArrow shadow="md">
+            <Popover.Target>
+              <Button m={10} size="md" color="green" variant="outline">
+                Start
+              </Button>
+            </Popover.Target>
+            <Popover.Dropdown ta="center">
+              <Text m={5}>Are you sure you want to start?</Text>
+              <Button
+                m={5}
+                color="green"
+                onClick={() => {
+                  startTournament(tournament);
+                }}
+              >
+                Confirm
+              </Button>
+            </Popover.Dropdown>
+          </Popover>
+        </Group>
       </Container>
       <Grid w="95%">
         <Grid.Col span={{ sm: 12, md: 6 }}>
@@ -780,7 +896,6 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
                   official={t}
                   setOfficialsInTournament={setOfficialsInTournament}
                   officialsInTournament={officialsInTournament}
-                  setAllOfficials={setAllOfficials}
                 />
               </Grid.Col>
             ))}
