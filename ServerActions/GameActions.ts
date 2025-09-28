@@ -772,7 +772,8 @@ export function endGame(
   protestTeamTwo?: string,
   notesTeamOne?: string,
   notesTeamTwo?: string,
-  markedForReview?: boolean
+  markedForReview?: boolean,
+  nefariousVotes?: SearchableName[]
 ): Promise<void> {
   const body: any = {
     id: gameId,
@@ -798,6 +799,9 @@ export function endGame(
   }
   if (markedForReview) {
     body.markedForReview = true;
+  }
+  if (nefariousVotes) {
+    body.nefariousVotes = nefariousVotes;
   }
 
   return tokenFetch('/api/games/update/end', {
