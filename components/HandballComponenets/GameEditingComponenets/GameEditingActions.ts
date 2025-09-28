@@ -67,7 +67,7 @@ export function end(game: GameState, reviewRequired: boolean) {
     game.teamOne.notes.get,
     game.teamTwo.notes.get,
     reviewRequired,
-    game.evilVotes.get.map((i) => i.searchableName)
+    game.evilVotes.get.map(i => i.searchableName),
   );
 }
 
