@@ -19,8 +19,6 @@ export function getForceWinningScore(game: GameState): number {
   return 2 * getWinningScore(game);
 }
 
-export type EvilVote = { name: string; searchableName: string; isEvil: boolean };
-
 export interface GameState {
   practice: {
     get: boolean;
@@ -41,10 +39,6 @@ export interface GameState {
   votes: {
     get: PlayerGameStatsStructure[];
     set: (v: PlayerGameStatsStructure[]) => void;
-  };
-  evilVotes: {
-    get: EvilVote[];
-    set: (v: EvilVote[]) => void;
   };
   notes: {
     get: string;
@@ -139,7 +133,6 @@ export function useGameState(game?: GameStructure) {
   const [teamOneIGA, setTeamOneIGA] = React.useState<boolean>(true);
   const [notes, setNotes] = React.useState<string>('');
   const [practice, setPractice] = React.useState<boolean>(game?.tournament.editable ?? false);
-  const [evilVotes, setEvilVotes] = React.useState<EvilVote[]>([]);
   const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
   const [blitzGame, setBlitzGame] = React.useState<boolean>(false);
   const [badminton, setBadminton] = React.useState<boolean>(false);
@@ -207,10 +200,6 @@ export function useGameState(game?: GameStructure) {
       blitzGame: {
         get: blitzGame,
         set: setBlitzGame,
-      },
-      evilVotes: {
-        get: evilVotes,
-        set: setEvilVotes,
       },
       abandoned: {
         get: abandoned,
@@ -346,7 +335,6 @@ export function useGameState(game?: GameStructure) {
     [
       practice,
       blitzGame,
-      evilVotes,
       abandoned,
       votes,
       badminton,
@@ -404,13 +392,6 @@ function setGameState(gameObj: GameStructure, state: GameState) {
   state.started.set(gameObj.started);
   state.ended.set(gameObj.someoneHasWon);
   state.votes.set(playersFromGame(gameObj));
-  state.evilVotes.set(
-    playersFromGame(gameObj).map((pgs) => ({
-      name: pgs.name,
-      searchableName: pgs.searchableName,
-      isEvil: false,
-    }))
-  );
   state.badminton.set(gameObj.tournament.usingBadmintonServes);
   state.practice.set(gameObj.tournament.editable);
   state.abandoned.set(gameObj.abandoned);
