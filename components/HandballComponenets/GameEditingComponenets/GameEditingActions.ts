@@ -68,7 +68,6 @@ export function end(game: GameState, reviewRequired: boolean) {
     game.teamOne.notes.get,
     game.teamTwo.notes.get,
     reviewRequired,
-    game.evilVotes.get.filter((i) => i.isEvil).map((i) => i.searchableName)
   );
 }
 
