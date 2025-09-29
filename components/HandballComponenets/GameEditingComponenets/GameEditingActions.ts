@@ -67,7 +67,7 @@ export function end(game: GameState, reviewRequired: boolean) {
     game.teamTwo.protest.get,
     game.teamOne.notes.get,
     game.teamTwo.notes.get,
-    reviewRequired,
+    reviewRequired
   );
 }
 
