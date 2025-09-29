@@ -696,7 +696,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [allPlayers, setAllPlayers] = React.useState<PersonStructure[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const { loading, isTournamentDirector } = useUserData();
+  const { loading, isUmpireManager } = useUserData();
   useEffect(() => {
     if (!tournament) return;
     getTournament(tournament).then((t) => {
@@ -714,11 +714,11 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
     getOfficials({}).then((o) => setAllOfficials(o.officials));
   }, []);
   useEffect(() => {
-    if (!loading && !isTournamentDirector(tournament)) {
+    if (!loading && !isUmpireManager(tournament)) {
       router.push('/');
     }
-  }, [isTournamentDirector, loading, router, tournament]);
-  if (!loading && !isTournamentDirector) {
+  }, [isUmpireManager, loading, router, tournament]);
+  if (!loading && !isUmpireManager(tournament)) {
     return <Text>You do not have permissions to be here!</Text>;
   }
   if (loading) {

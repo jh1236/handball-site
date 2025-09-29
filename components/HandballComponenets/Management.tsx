@@ -263,7 +263,7 @@ export function Management({ tournament }: ManagementArgs) {
   const [players, setPlayers] = useState<PersonStructure[] | null>(null);
   const [tournamentObj, setTournamentObj] = useState<TournamentStructure | undefined>();
   const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);
-  const { isTournamentDirector, loading } = useUserData();
+  const { isUmpireManager, loading } = useUserData();
   const router = useRouter();
   const reload = () =>
     getNoteableGames({ tournament }).then((g) => {
@@ -271,10 +271,10 @@ export function Management({ tournament }: ManagementArgs) {
       setActionableGames(g.games.filter((v) => v.admin?.requiresAction).toReversed());
     });
   useEffect(() => {
-    if (!isTournamentDirector(tournament) && !loading) {
+    if (!isUmpireManager(tournament) && !loading) {
       router.push(`/${tournament}`);
     }
-  }, [isTournamentDirector, loading, router, tournament]);
+  }, [isUmpireManager, loading, router, tournament]);
   useEffect(() => {
     if (!loading) return;
     reload();
