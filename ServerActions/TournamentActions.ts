@@ -117,7 +117,7 @@ export function createTournament(create: CreateTournament): Promise<void> {
 }
 
 export interface UpdateTournament {
-  searchableName: string;
+  tournament: string;
   name?: string;
   fixturesType?: string;
   finalsType?: string;

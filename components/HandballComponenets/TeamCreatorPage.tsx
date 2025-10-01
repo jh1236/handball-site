@@ -213,7 +213,7 @@ function CustomTeamCard({
             onClick={() => {
               if (team && team.name === newTeamName) {
                 addTeamToTournament({
-                  tournamentSearchableName: tournament,
+                  tournament,
                   teamName: team.name,
                 }).then((t) => {
                   setTeamsInTournament([...teamsInTournament, t]);
@@ -221,7 +221,7 @@ function CustomTeamCard({
               } else {
                 const [captainName, nonCaptainName, substituteName] = players;
                 addTeamToTournament({
-                  tournamentSearchableName: tournament,
+                  tournament,
                   teamName: newTeamName,
                   captainName: players[0],
                   ...(captainName && { captainName }),
@@ -311,7 +311,7 @@ function CustomOfficialCard({
         onClick={() => {
           if (!official) return;
           addOfficialToTournament({
-            tournamentSearchableName: tournament,
+            tournament,
             officialSearchableName: official?.searchableName,
             umpireProficiency,
             scorerProficiency,
@@ -453,7 +453,7 @@ function TeamCard({
               size="md"
               onClick={() => {
                 renameTeamForTournament({
-                  tournamentSearchableName: tournament,
+                  tournament,
                   teamSearchableName: team.searchableName,
                   newName: newTeamName !== team.name ? newTeamName : undefined,
                   newColor:
@@ -592,7 +592,7 @@ function OfficialCard({
               size="md"
               onClick={() => {
                 updateOfficialForTournament({
-                  tournamentSearchableName: tournament,
+                  tournament,
                   officialSearchableName: official.searchableName,
                   scorerProficiency:
                     scorerProficiency !== official.scorerProficiency
@@ -771,7 +771,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
             color="green"
             onClick={() =>
               updateTournament({
-                searchableName: tournament,
+                tournament,
                 name: newTournamentName,
                 fixturesType,
                 finalsType,

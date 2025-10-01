@@ -134,14 +134,14 @@ export function getLadder({
 }
 
 interface RenameTeamForTournamentParams {
-  tournamentSearchableName: SearchableName;
+  tournament: SearchableName;
   teamSearchableName: SearchableName;
   newName?: string;
   newColor?: string;
 }
 
 export function renameTeamForTournament({
-  tournamentSearchableName,
+  tournament,
   teamSearchableName,
   newName,
   newColor,
@@ -149,7 +149,7 @@ export function renameTeamForTournament({
   const url = new URL('/api/teams/updateForTournament', SERVER_ADDRESS);
   const value: any = {
     teamSearchableName,
-    tournamentSearchableName,
+    tournament,
   };
   if (newName) {
     value.newName = newName;
@@ -175,7 +175,7 @@ export function renameTeamForTournament({
 }
 
 interface AddTeamToTournamentArgs {
-  tournamentSearchableName: SearchableName;
+  tournament: SearchableName;
   teamName?: string;
   captainName?: string;
   nonCaptainName?: string;
@@ -183,14 +183,14 @@ interface AddTeamToTournamentArgs {
 }
 
 export function addTeamToTournament({
-  tournamentSearchableName,
+  tournament,
   teamName,
   captainName,
   nonCaptainName,
   substituteName,
 }: AddTeamToTournamentArgs): Promise<TeamStructure> {
   const url = new URL('/api/teams/addToTournament', SERVER_ADDRESS);
-  const body: any = { tournamentSearchableName };
+  const body: any = { tournament };
   if (teamName) {
     body.teamName = teamName;
   }
@@ -221,7 +221,7 @@ export function addTeamToTournament({
 }
 
 export function removeTeamFromTournament(
-  tournamentSearchableName: SearchableName,
+  tournament: SearchableName,
   teamSearchableName: string
 ): Promise<void> {
   const url = new URL('/api/teams/removeFromTournament', SERVER_ADDRESS);
@@ -230,7 +230,7 @@ export function removeTeamFromTournament(
     headers: {
       'Content-type': 'application/json; charset=UTF-8',
     },
-    body: JSON.stringify({ tournamentSearchableName, teamSearchableName }),
+    body: JSON.stringify({ tournament, teamSearchableName }),
   }).then((response) => {
     if (!response.ok) return Promise.reject(response.text());
     return Promise.resolve();
