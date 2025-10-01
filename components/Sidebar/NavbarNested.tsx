@@ -57,7 +57,7 @@ export function NavbarNested({
   const [myTournament, setMyTournament] = React.useState<TournamentStructure | undefined>(
     undefined
   );
-  const { isOfficial, isTournamentDirector, isAdmin, username, isUmpireManager } = useUserData();
+  const { isOfficial, isAdmin, username, isUmpireManager } = useUserData();
   const [tournaments, setTournaments] = React.useState<TournamentStructure[]>([]);
   const [mounted, setMounted] = React.useState<boolean>(false);
 
@@ -94,7 +94,7 @@ export function NavbarNested({
       if (isUmpireManager(myTournament?.searchableName) && myTournament?.started) {
         out[out.length - 1].links!.push({ label: 'Manage', link: `/${tournamentName}/manage` });
       }
-      if (isTournamentDirector(myTournament?.searchableName) && !myTournament?.started) {
+      if (isUmpireManager(myTournament?.searchableName) && !myTournament?.started) {
         out[out.length - 1].links!.push({ label: 'Setup', link: `/${tournamentName}/setup` });
       }
     }

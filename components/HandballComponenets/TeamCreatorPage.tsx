@@ -213,7 +213,7 @@ function CustomTeamCard({
             onClick={() => {
               if (team && team.name === newTeamName) {
                 addTeamToTournament({
-                  tournamentSearchableName: tournament,
+                  tournament,
                   teamName: team.name,
                 }).then((t) => {
                   setTeamsInTournament([...teamsInTournament, t]);
@@ -221,7 +221,7 @@ function CustomTeamCard({
               } else {
                 const [captainName, nonCaptainName, substituteName] = players;
                 addTeamToTournament({
-                  tournamentSearchableName: tournament,
+                  tournament,
                   teamName: newTeamName,
                   captainName: players[0],
                   ...(captainName && { captainName }),
@@ -298,6 +298,7 @@ function CustomOfficialCard({
   const [umpireProficiency, setUmpireProficiency] = useState<number>(3);
   const [scorerProficiency, setScorerProficiency] = useState<number>(3);
   const [role, setRole] = useState<string>('Umpire');
+  const { isAdmin, isTournamentDirector } = useUserData();
   const [official, setOfficial] = useState<OfficialStructure | undefined>();
   return (
     <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
@@ -311,7 +312,7 @@ function CustomOfficialCard({
         onClick={() => {
           if (!official) return;
           addOfficialToTournament({
-            tournamentSearchableName: tournament,
+            tournament,
             officialSearchableName: official?.searchableName,
             umpireProficiency,
             scorerProficiency,
@@ -350,9 +351,13 @@ function CustomOfficialCard({
             onChange={(v) => setRole(v!)}
             size="sm"
             data={[
-              { value: 'Tournament Director', label: 'Tourney Director' },
-              'Umpire Manager',
-              'Umpire',
+              { value: 'Tournament Director', label: 'Tourney Director', disabled: !isAdmin },
+              {
+                value: 'Umpire Manager',
+                label: 'Umpire Manager',
+                disabled: !isTournamentDirector(tournament),
+              },
+              { value: 'Umpire', label: 'Umpire' },
             ]}
           ></Select>
           <Select
@@ -453,7 +458,7 @@ function TeamCard({
               size="md"
               onClick={() => {
                 renameTeamForTournament({
-                  tournamentSearchableName: tournament,
+                  tournament,
                   teamSearchableName: team.searchableName,
                   newName: newTeamName !== team.name ? newTeamName : undefined,
                   newColor:
@@ -560,6 +565,7 @@ function OfficialCard({
   const [role, setRole] = useState<string>(official.role!);
   const [umpireProficiency, setUmpireProficiency] = useState<number>(official.umpireProficiency!);
   const [scorerProficiency, setScorerProficiency] = useState<number>(official.scorerProficiency!);
+  const { isAdmin, isTournamentDirector } = useUserData();
   return (
     <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
       <Box
@@ -568,20 +574,26 @@ function OfficialCard({
         pos="absolute"
         style={{ display: 'flex', gap: '4px', flexDirection: 'row-reverse' }}
       >
-        <ActionIcon
-          variant="subtle"
-          color="red"
-          size="md"
-          onClick={() => {
-            removeOfficialFromTournament(tournament, official.searchableName).then(() => {
-              setOfficialsInTournament(
-                officialsInTournament.filter((t2) => t2.searchableName !== official.searchableName)
-              );
-            });
-          }}
-        >
-          <IconMinus></IconMinus>
-        </ActionIcon>
+        {(isAdmin ||
+          (role === 'Umpire Manager' && isTournamentDirector(tournament)) ||
+          role === 'Umpire') && (
+          <ActionIcon
+            variant="subtle"
+            color="red"
+            size="md"
+            onClick={() => {
+              removeOfficialFromTournament(tournament, official.searchableName).then(() => {
+                setOfficialsInTournament(
+                  officialsInTournament.filter(
+                    (t2) => t2.searchableName !== official.searchableName
+                  )
+                );
+              });
+            }}
+          >
+            <IconMinus></IconMinus>
+          </ActionIcon>
+        )}
         {(official.umpireProficiency !== umpireProficiency ||
           official.scorerProficiency !== scorerProficiency ||
           official.role !== role) && (
@@ -592,7 +604,7 @@ function OfficialCard({
               size="md"
               onClick={() => {
                 updateOfficialForTournament({
-                  tournamentSearchableName: tournament,
+                  tournament,
                   officialSearchableName: official.searchableName,
                   scorerProficiency:
                     scorerProficiency !== official.scorerProficiency
@@ -640,10 +652,18 @@ function OfficialCard({
             label="Role"
             onChange={(v) => setRole(v!)}
             size="sm"
+            disabled={
+              (role === 'Tournament Director' && !isAdmin) ||
+              (role === 'Umpire Manager' && !isTournamentDirector(tournament))
+            }
             data={[
-              { value: 'Tournament Director', label: 'Tourney Director' },
-              'Umpire Manager',
-              'Umpire',
+              { value: 'Tournament Director', label: 'Tourney Director', disabled: !isAdmin },
+              {
+                value: 'Umpire Manager',
+                label: 'Umpire Manager',
+                disabled: !isTournamentDirector(tournament),
+              },
+              { value: 'Umpire', label: 'Umpire' },
             ]}
           ></Select>
           <Select
@@ -696,7 +716,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [allPlayers, setAllPlayers] = React.useState<PersonStructure[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const { loading, isTournamentDirector } = useUserData();
+  const { loading, isUmpireManager, isTournamentDirector } = useUserData();
   useEffect(() => {
     if (!tournament) return;
     getTournament(tournament).then((t) => {
@@ -714,11 +734,11 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
     getOfficials({}).then((o) => setAllOfficials(o.officials));
   }, []);
   useEffect(() => {
-    if (!loading && !isTournamentDirector(tournament)) {
+    if (!loading && !isUmpireManager(tournament)) {
       router.push('/');
     }
-  }, [isTournamentDirector, loading, router, tournament]);
-  if (!loading && !isTournamentDirector) {
+  }, [isUmpireManager, loading, router, tournament]);
+  if (!loading && !isUmpireManager(tournament)) {
     return <Text>You do not have permissions to be here!</Text>;
   }
   if (loading) {
@@ -771,7 +791,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
             color="green"
             onClick={() =>
               updateTournament({
-                searchableName: tournament,
+                tournament,
                 name: newTournamentName,
                 fixturesType,
                 finalsType,
@@ -825,11 +845,11 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           />
         </Box>
         <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
-
         <Group>
           <Button
             m={10}
             size="md"
+            disabled={!isTournamentDirector(tournament)}
             color="blue"
             variant="outline"
             onClick={() => setOpenTournamentEdit(true)}

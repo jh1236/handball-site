@@ -66,7 +66,7 @@ export function getOfficial({
 }
 
 interface AddOfficialToTournament {
-  tournamentSearchableName: SearchableName;
+  tournament: SearchableName;
   officialSearchableName: string;
   umpireProficiency: number;
   scorerProficiency: number;
@@ -74,7 +74,7 @@ interface AddOfficialToTournament {
 }
 
 export function addOfficialToTournament({
-  tournamentSearchableName,
+  tournament,
   officialSearchableName,
   umpireProficiency,
   scorerProficiency,
@@ -87,7 +87,7 @@ export function addOfficialToTournament({
       'Content-type': 'application/json; charset=UTF-8',
     },
     body: JSON.stringify({
-      tournamentSearchableName,
+      tournament,
       officialSearchableName,
       umpireProficiency,
       scorerProficiency,
@@ -110,7 +110,7 @@ export function addOfficialToTournament({
   });
 }
 interface UpdateOfficialForTournament {
-  tournamentSearchableName: SearchableName;
+  tournament: SearchableName;
   officialSearchableName: string;
   umpireProficiency?: number;
   scorerProficiency?: number;
@@ -118,7 +118,7 @@ interface UpdateOfficialForTournament {
 }
 
 export function updateOfficialForTournament({
-  tournamentSearchableName,
+  tournament,
   officialSearchableName,
   umpireProficiency,
   scorerProficiency,
@@ -126,7 +126,7 @@ export function updateOfficialForTournament({
 }: UpdateOfficialForTournament): Promise<void> {
   const url = new URL('/api/officials/updateForTournament', SERVER_ADDRESS);
   const body: any = {
-    tournamentSearchableName,
+    tournament,
     officialSearchableName,
   };
   if (umpireProficiency !== undefined) {
@@ -162,7 +162,7 @@ export function updateOfficialForTournament({
 }
 
 export function removeOfficialFromTournament(
-  tournamentSearchableName: SearchableName,
+  tournament: SearchableName,
   officialSearchableName: string
 ): Promise<void> {
   const url = new URL('/api/officials/removeFromTournament', SERVER_ADDRESS);
@@ -171,7 +171,7 @@ export function removeOfficialFromTournament(
     headers: {
       'Content-type': 'application/json; charset=UTF-8',
     },
-    body: JSON.stringify({ officialSearchableName, tournamentSearchableName }),
+    body: JSON.stringify({ officialSearchableName, tournament }),
   }).then((response) => {
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
