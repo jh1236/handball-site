@@ -94,7 +94,7 @@ export function NavbarNested({
       if (isUmpireManager(myTournament?.searchableName) && myTournament?.started) {
         out[out.length - 1].links!.push({ label: 'Manage', link: `/${tournamentName}/manage` });
       }
-      if (isTournamentDirector(myTournament?.searchableName) && !myTournament?.started) {
+      if (isUmpireManager(myTournament?.searchableName) && !myTournament?.started) {
         out[out.length - 1].links!.push({ label: 'Setup', link: `/${tournamentName}/setup` });
       }
     }
