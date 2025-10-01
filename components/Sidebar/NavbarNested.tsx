@@ -57,7 +57,7 @@ export function NavbarNested({
   const [myTournament, setMyTournament] = React.useState<TournamentStructure | undefined>(
     undefined
   );
-  const { isOfficial, isTournamentDirector, isAdmin, username, isUmpireManager } = useUserData();
+  const { isOfficial, isAdmin, username, isUmpireManager } = useUserData();
   const [tournaments, setTournaments] = React.useState<TournamentStructure[]>([]);
   const [mounted, setMounted] = React.useState<boolean>(false);
 

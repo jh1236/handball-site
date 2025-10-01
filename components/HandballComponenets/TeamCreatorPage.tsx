@@ -298,7 +298,7 @@ function CustomOfficialCard({
   const [umpireProficiency, setUmpireProficiency] = useState<number>(3);
   const [scorerProficiency, setScorerProficiency] = useState<number>(3);
   const [role, setRole] = useState<string>('Umpire');
-  const { isAdmin, isTournamentDirector, isUmpireManager } = useUserData();
+  const { isAdmin, isTournamentDirector } = useUserData();
   const [official, setOfficial] = useState<OfficialStructure | undefined>();
   return (
     <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
@@ -348,11 +348,6 @@ function CustomOfficialCard({
           <Select
             value={`${role}`}
             label="Role"
-            disabled={
-              !isAdmin &&
-              !(isTournamentDirector(tournament) && role !== 'Tournament Director') &&
-              !(isUmpireManager(tournament) && role === 'Umpire')
-            }
             onChange={(v) => setRole(v!)}
             size="sm"
             data={[
@@ -570,6 +565,7 @@ function OfficialCard({
   const [role, setRole] = useState<string>(official.role!);
   const [umpireProficiency, setUmpireProficiency] = useState<number>(official.umpireProficiency!);
   const [scorerProficiency, setScorerProficiency] = useState<number>(official.scorerProficiency!);
+  const { isAdmin, isTournamentDirector } = useUserData();
   return (
     <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
       <Box
@@ -578,20 +574,26 @@ function OfficialCard({
         pos="absolute"
         style={{ display: 'flex', gap: '4px', flexDirection: 'row-reverse' }}
       >
-        <ActionIcon
-          variant="subtle"
-          color="red"
-          size="md"
-          onClick={() => {
-            removeOfficialFromTournament(tournament, official.searchableName).then(() => {
-              setOfficialsInTournament(
-                officialsInTournament.filter((t2) => t2.searchableName !== official.searchableName)
-              );
-            });
-          }}
-        >
-          <IconMinus></IconMinus>
-        </ActionIcon>
+        {isAdmin ||
+          (((role === 'Umpire Manager' && isTournamentDirector(tournament)) ||
+            role === 'Umpire') && (
+            <ActionIcon
+              variant="subtle"
+              color="red"
+              size="md"
+              onClick={() => {
+                removeOfficialFromTournament(tournament, official.searchableName).then(() => {
+                  setOfficialsInTournament(
+                    officialsInTournament.filter(
+                      (t2) => t2.searchableName !== official.searchableName
+                    )
+                  );
+                });
+              }}
+            >
+              <IconMinus></IconMinus>
+            </ActionIcon>
+          ))}
         {(official.umpireProficiency !== umpireProficiency ||
           official.scorerProficiency !== scorerProficiency ||
           official.role !== role) && (
@@ -650,10 +652,18 @@ function OfficialCard({
             label="Role"
             onChange={(v) => setRole(v!)}
             size="sm"
+            disabled={
+              (role === 'Tournament Director' && !isAdmin) ||
+              (role === 'Umpire Manager' && !isTournamentDirector(tournament))
+            }
             data={[
-              { value: 'Tournament Director', label: 'Tourney Director' },
-              'Umpire Manager',
-              'Umpire',
+              { value: 'Tournament Director', label: 'Tourney Director', disabled: !isAdmin },
+              {
+                value: 'Umpire Manager',
+                label: 'Umpire Manager',
+                disabled: !isTournamentDirector(tournament),
+              },
+              { value: 'Umpire', label: 'Umpire' },
             ]}
           ></Select>
           <Select
