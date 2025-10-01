@@ -298,6 +298,7 @@ function CustomOfficialCard({
   const [umpireProficiency, setUmpireProficiency] = useState<number>(3);
   const [scorerProficiency, setScorerProficiency] = useState<number>(3);
   const [role, setRole] = useState<string>('Umpire');
+  const { isAdmin, isTournamentDirector, isUmpireManager } = useUserData();
   const [official, setOfficial] = useState<OfficialStructure | undefined>();
   return (
     <Paper shadow="lg" m={15} pos="relative" style={{ padding: '5px' }}>
@@ -347,12 +348,21 @@ function CustomOfficialCard({
           <Select
             value={`${role}`}
             label="Role"
+            disabled={
+              !isAdmin &&
+              !(isTournamentDirector(tournament) && role !== 'Tournament Director') &&
+              !(isUmpireManager(tournament) && role === 'Umpire')
+            }
             onChange={(v) => setRole(v!)}
             size="sm"
             data={[
-              { value: 'Tournament Director', label: 'Tourney Director' },
-              'Umpire Manager',
-              'Umpire',
+              { value: 'Tournament Director', label: 'Tourney Director', disabled: !isAdmin },
+              {
+                value: 'Umpire Manager',
+                label: 'Umpire Manager',
+                disabled: !isTournamentDirector(tournament),
+              },
+              { value: 'Umpire', label: 'Umpire' },
             ]}
           ></Select>
           <Select
@@ -696,7 +706,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [allPlayers, setAllPlayers] = React.useState<PersonStructure[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const { loading, isUmpireManager } = useUserData();
+  const { loading, isUmpireManager, isTournamentDirector } = useUserData();
   useEffect(() => {
     if (!tournament) return;
     getTournament(tournament).then((t) => {
@@ -825,11 +835,11 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           />
         </Box>
         <Title ta="center">{tournamentObj?.name ?? 'Loading...'}</Title>
-
         <Group>
           <Button
             m={10}
             size="md"
+            disabled={!isTournamentDirector(tournament)}
             color="blue"
             variant="outline"
             onClick={() => setOpenTournamentEdit(true)}
