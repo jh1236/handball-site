@@ -574,26 +574,26 @@ function OfficialCard({
         pos="absolute"
         style={{ display: 'flex', gap: '4px', flexDirection: 'row-reverse' }}
       >
-        {isAdmin ||
-          (((role === 'Umpire Manager' && isTournamentDirector(tournament)) ||
-            role === 'Umpire') && (
-            <ActionIcon
-              variant="subtle"
-              color="red"
-              size="md"
-              onClick={() => {
-                removeOfficialFromTournament(tournament, official.searchableName).then(() => {
-                  setOfficialsInTournament(
-                    officialsInTournament.filter(
-                      (t2) => t2.searchableName !== official.searchableName
-                    )
-                  );
-                });
-              }}
-            >
-              <IconMinus></IconMinus>
-            </ActionIcon>
-          ))}
+        {(isAdmin ||
+          (role === 'Umpire Manager' && isTournamentDirector(tournament)) ||
+          role === 'Umpire') && (
+          <ActionIcon
+            variant="subtle"
+            color="red"
+            size="md"
+            onClick={() => {
+              removeOfficialFromTournament(tournament, official.searchableName).then(() => {
+                setOfficialsInTournament(
+                  officialsInTournament.filter(
+                    (t2) => t2.searchableName !== official.searchableName
+                  )
+                );
+              });
+            }}
+          >
+            <IconMinus></IconMinus>
+          </ActionIcon>
+        )}
         {(official.umpireProficiency !== umpireProficiency ||
           official.scorerProficiency !== scorerProficiency ||
           official.role !== role) && (
