@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import {
   IconArrowsLeftRight,
   IconArrowsUpDown,
@@ -74,6 +74,8 @@ export function PlayerActionList({
     setOpenModal(undefined);
     setOtherReason('');
   }, [_close, game.blitzGame.get]);
+
+  const subsAllowedScore = useMemo(() => (game.blitzGame.get ? 5 : 9), [game.blitzGame.get]);
   const [openModal, setOpenModal] = useState<
     undefined | 'green' | 'yellow' | 'red' | 'score' | 'warning'
   >(undefined);
@@ -574,10 +576,10 @@ export function PlayerActionList({
         </>
       ),
     });
-    if (team.sub.get && game.teamOne.score.get + game.teamTwo.score.get < 9) {
+    if (team.sub.get && game.teamOne.score.get + game.teamTwo.score.get < subsAllowedScore) {
       out.splice(1, 0, {
         Icon: IconArrowsLeftRight,
-        value: `Substitute (${9 - (game.teamOne.score.get + game.teamTwo.score.get)} points remaining)`,
+        value: `Substitute (${subsAllowedScore - (game.teamOne.score.get + game.teamTwo.score.get)} points remaining)`,
         color: undefined,
         content: (
           <Button
