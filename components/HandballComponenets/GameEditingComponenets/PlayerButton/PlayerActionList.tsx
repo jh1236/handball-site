@@ -474,7 +474,14 @@ export function PlayerActionList({
             <Autocomplete
               label="Select Reason"
               placeholder="Write something or pick from the list"
-              data={['Nefarious Laugh', 'Devious Joke', 'Sinister Rage Bait', 'Abominable Play']}
+              data={[
+                'Nefarious Laugh',
+                'Devious Joke',
+                'Sinister Rage Bait',
+                'Abominable Play',
+                'Conniving Conspiracy',
+                'Speaking in Tongues',
+              ]}
               onChange={setOtherReason}
             ></Autocomplete>
             <Button
