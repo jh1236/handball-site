@@ -93,6 +93,7 @@ export function forceNextRoundFinalsTournament(searchableName: SearchableName): 
 
 export interface CreateTournament {
   name: string;
+  color: string
   fixturesType: string;
   finalsType: string;
 }
@@ -121,6 +122,7 @@ export interface UpdateTournament {
   name?: string;
   fixturesType?: string;
   finalsType?: string;
+  color?: string;
 }
 
 export function updateTournament(update: UpdateTournament): Promise<void> {
