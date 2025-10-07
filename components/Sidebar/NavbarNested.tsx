@@ -84,6 +84,7 @@ export function NavbarNested({
         label: 'Current Tournament',
         icon: IconChartPie,
         links: [
+          { label: 'Home', link: `/${tournamentName}` },
           { label: 'Fixtures', link: `/${tournamentName}/fixtures` },
           { label: 'Ladder', link: `/${tournamentName}/ladder` },
           { label: 'Players', link: `/${tournamentName}/players` },
@@ -91,11 +92,12 @@ export function NavbarNested({
           { label: 'Teams', link: `/${tournamentName}/teams` },
         ],
       });
-      if (isUmpireManager(myTournament?.searchableName) && myTournament?.started) {
-        out[out.length - 1].links!.push({ label: 'Manage', link: `/${tournamentName}/manage` });
-      }
-      if (isUmpireManager(myTournament?.searchableName) && !myTournament?.started) {
-        out[out.length - 1].links!.push({ label: 'Setup', link: `/${tournamentName}/setup` });
+      if (isUmpireManager(myTournament?.searchableName)) {
+        if (myTournament?.started) {
+          out[out.length - 1].links!.push({ label: 'Manage', link: `/${tournamentName}/manage` });
+        } else {
+          out[out.length - 1].links!.push({ label: 'Setup', link: `/${tournamentName}/setup` });
+        }
       }
     }
     out.push(
