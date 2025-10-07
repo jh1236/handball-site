@@ -157,8 +157,7 @@ export function NavbarNested({
             onClick={() => setSidebarVisible(!sidebarVisible)}
           >
             <ThemeIcon
-              color="green"
-              variant={colorScheme ? 'light' : undefined}
+              color="tournament"
               size={30}
               style={{
                 float: 'right',
