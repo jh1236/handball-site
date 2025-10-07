@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import Link from 'next/link';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
-import { Skeleton, Table, Text, Title } from '@mantine/core';
+import { Skeleton, Table, Text, Title, useMantineTheme } from '@mantine/core';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getFixtures } from '@/ServerActions/GameActions';
 import { GameStructure, TournamentStructure } from '@/ServerActions/types';
@@ -23,7 +23,7 @@ export default function FixturesInternal({
   setExpanded,
   expandable,
 }: FixturesProps) {
-  // const [sort, setSort] = React.useState<number>(-1);
+  const theme = useMantineTheme();
   const [finals, setFinals] = React.useState<{ games: GameStructure[]; final: boolean }[]>();
   const [fixtures, setFixtures] = React.useState<{ games: GameStructure[]; final: boolean }[]>();
   const [tournamentState, setTournamentState] = React.useState<TournamentStructure>();
@@ -66,7 +66,7 @@ export default function FixturesInternal({
     return (
       <div>
         <Table stickyHeader>
-          <Table.Thead style={{ color: 'var(--mantine-color-green-8)' }}>
+          <Table.Thead color={theme.colors.tournament[8]}>
             <Table.Tr>
               {maxRounds !== 1 && <Table.Th visibleFrom="md" style={{ width: '10px' }}></Table.Th>}
               <Table.Th style={{ width: '50px', textAlign: 'center' }}>
@@ -105,9 +105,9 @@ export default function FixturesInternal({
           <Table.Tbody>
             {Array.from({ length: maxRounds < 0 ? 6 : Math.max(maxRounds - 2, 0) }).map(
               (_, index) => (
-                <>
+                <Fragment key={index}>
                   {maxRounds !== 1 && (
-                    <Table.Tr key={100 * index - 1}>
+                    <Table.Tr key={10_000 * index - 1}>
                       <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
                         <Text size="sm">
                           <b>Round {index + 1}</b>
@@ -121,7 +121,7 @@ export default function FixturesInternal({
                     </Table.Tr>
                   )}
                   {Array.from({ length: 4 }).map((__, index2) => (
-                    <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
+                    <Table.Tr key={10_000 * index + index2} style={{ textAlign: 'center' }}>
                       <Table.Td>
                         <Skeleton h={8} mt={6}></Skeleton>
                       </Table.Td>
@@ -142,7 +142,7 @@ export default function FixturesInternal({
                       )}
                     </Table.Tr>
                   ))}
-                </>
+                </Fragment>
               )
             )}
 
@@ -156,9 +156,9 @@ export default function FixturesInternal({
             {Array.from({ length: maxRounds < 0 ? 2 : Math.min(maxRounds, 2) }).map((_, index) => {
               if (index > maxRounds && maxRounds > 0) return null;
               return (
-                <>
+                <Fragment key={index}>
                   {maxRounds !== 1 && (
-                    <Table.Tr key={100 * index - 1}>
+                    <Table.Tr key={10_000 * index - 1}>
                       <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
                         <Text size="sm">
                           <b>Round {index + 1}</b>
@@ -176,7 +176,7 @@ export default function FixturesInternal({
                     </Table.Tr>
                   )}
                   {Array.from({ length: 4 / (index + 1) }).map((__, index2) => (
-                    <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
+                    <Table.Tr key={10_000 * index + index2} style={{ textAlign: 'center' }}>
                       <Table.Td>
                         <Skeleton h={8} mt={6}></Skeleton>
                       </Table.Td>
@@ -197,7 +197,7 @@ export default function FixturesInternal({
                       )}
                     </Table.Tr>
                   ))}
-                </>
+                </Fragment>
               );
             })}
           </Table.Tbody>
@@ -209,7 +209,7 @@ export default function FixturesInternal({
   return (
     <div>
       <Table stickyHeader>
-        <Table.Thead style={{ color: 'var(--mantine-color-green-8)' }}>
+        <Table.Thead style={{ color: 'var(--mantine-color-tournament-8)' }}>
           <Table.Tr>
             {maxRounds !== 1 && <Table.Th visibleFrom="md" style={{ width: '10px' }}></Table.Th>}
             <Table.Th style={{ width: '50px', textAlign: 'center' }}>
@@ -272,9 +272,9 @@ export default function FixturesInternal({
         </Table.Thead>
         <Table.Tbody>
           {fixtures.map((value, index) => (
-            <>
+            <Fragment key={index}>
               {maxRounds !== 1 && (
-                <Table.Tr key={100 * index - 1}>
+                <Table.Tr key={10_000 * index - 1}>
                   <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
                     <Text size="sm">
                       <b>Round {index + 1}</b>
@@ -292,7 +292,7 @@ export default function FixturesInternal({
                 </Table.Tr>
               )}
               {value.games.map((game, index2) => (
-                <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
+                <Table.Tr key={10_000 * index + index2} style={{ textAlign: 'center' }}>
                   <Table.Td>
                     <Link className="hideLink" href={!game.isBye ? `/games/${game.id}` : '#'}>
                       <Text size="sm">{game.teamOne.name}</Text>
@@ -359,7 +359,7 @@ export default function FixturesInternal({
                   )}
                 </Table.Tr>
               ))}
-            </>
+            </Fragment>
           ))}
           {finals!.length !== 0 && (
             <>
@@ -373,9 +373,9 @@ export default function FixturesInternal({
               {finals!.map((value, index) => {
                 if (index > maxRounds && maxRounds > 0) return null;
                 return (
-                  <>
+                  <Fragment key={index}>
                     {maxRounds !== 1 && (
-                      <Table.Tr key={100 * index - 1}>
+                      <Table.Tr key={10_000 * index - 1}>
                         <Table.Th hiddenFrom="md" colSpan={10} style={{ textAlign: 'center' }}>
                           <Text size="sm">
                             <b>Round {index + 1}</b>
@@ -393,7 +393,7 @@ export default function FixturesInternal({
                       </Table.Tr>
                     )}
                     {value.games.map((game, index2) => (
-                      <Table.Tr key={100 * index + index2} style={{ textAlign: 'center' }}>
+                      <Table.Tr key={10_000 * index + index2} style={{ textAlign: 'center' }}>
                         <Table.Td>
                           <Link className="hideLink" href={`/games/${game.id}`}>
                             <Text size="sm">{game.teamOne.name}</Text>
@@ -457,7 +457,7 @@ export default function FixturesInternal({
                         )}
                       </Table.Tr>
                     ))}
-                  </>
+                  </Fragment>
                 );
               })}
             </>

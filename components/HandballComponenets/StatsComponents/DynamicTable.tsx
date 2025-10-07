@@ -149,7 +149,7 @@ export function InternalDynamicTable<T extends InputType>({
       )}
       {sortedData && sortedData.length > 0 ? (
         <Table striped stickyHeader>
-          <Table.Thead style={{ color: 'var(--mantine-color-green-8)' }}>
+          <Table.Thead style={{ color: 'var(--mantine-color-tournament-8)' }}>
             <Table.Tr>
               <Table.Th style={{ width: '20px' }}></Table.Th>
               {['name'].concat(columns).map((value, index) => (
@@ -199,7 +199,7 @@ export function InternalDynamicTable<T extends InputType>({
       ) : data === undefined ? (
         <>
           <Table striped stickyHeader>
-            <Table.Thead style={{ color: 'var(--mantine-color-green-8)' }}>
+            <Table.Thead style={{ color: 'var(--mantine-color-tournament-8)' }}>
               <Table.Tr>
                 <Table.Th style={{ width: '20px' }}></Table.Th>
                 {['name'].concat(columns).map((value, index) => (
