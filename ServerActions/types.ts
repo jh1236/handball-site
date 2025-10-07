@@ -55,6 +55,7 @@ export interface TournamentStructure {
   imageUrl: string;
   usingBadmintonServes: boolean;
   editable: boolean;
+  color: string;
 
   [k: string]: any;
 }

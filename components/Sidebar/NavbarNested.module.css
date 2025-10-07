@@ -1,11 +1,11 @@
 .navbar {
-    background-color: light-dark(var(--mantine-color-green-2), var(--mantine-color-green-9));
+    background-color: light-dark(var(--mantine-color-tournament-2), var(--mantine-color-tournament-9));
     height: 100vh;
     padding: var(--mantine-spacing-md);
     padding-bottom: 0;
     display: flex;
     flex-direction: column;
-    border-right: rem(1px) solid light-dark(var(--mantine-color-green-3), var(--mantine-color-green-3));
+    border-right: rem(1px) solid light-dark(var(--mantine-color-tournament-3), var(--mantine-color-tournament-3));
 }
 
 .header {
@@ -14,7 +14,7 @@
     margin-left: calc(var(--mantine-spacing-md) * -1);
     margin-right: calc(var(--mantine-spacing-md) * -1);
     color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-    border-bottom: rem(1px) solid light-dark(var(--mantine-color-green-3), var(--mantine-color-green-8));
+    border-bottom: rem(1px) solid light-dark(var(--mantine-color-tournament-3), var(--mantine-color-tournament-8));
 }
 
 .links {
@@ -31,5 +31,5 @@
 .footer {
     margin-left: calc(var(--mantine-spacing-md) * -1);
     margin-right: calc(var(--mantine-spacing-md) * -1);
-    border-top: rem(1px) solid light-dark(var(--mantine-color-green-3), var(--mantine-color-green-8));
+    border-top: rem(1px) solid light-dark(var(--mantine-color-tournament-3), var(--mantine-color-tournament-8));
 }

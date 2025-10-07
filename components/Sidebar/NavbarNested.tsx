@@ -37,28 +37,25 @@ import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import buttonClasses from '@/components/Sidebar/NavbarLinksGroup.module.css';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
 import { logoutAction } from '@/ServerActions/LoginActions';
-import { getTournaments } from '@/ServerActions/TournamentActions';
 import { TournamentStructure } from '@/ServerActions/types';
 
 interface NavbarNestedProps {
   sidebarVisible?: boolean;
-  tournamentName?: string;
+  currentTournament?: TournamentStructure;
+  tournaments: TournamentStructure[];
   setSidebarVisible: (prevState: React.SetStateAction<boolean>) => void;
   mobile?: boolean;
 }
 
 export function NavbarNested({
   sidebarVisible,
-  tournamentName,
+  currentTournament,
+  tournaments = [],
   setSidebarVisible,
   mobile = false,
 }: NavbarNestedProps) {
   const [openUserActions, setOpenUserActions] = React.useState<boolean>(false);
-  const [myTournament, setMyTournament] = React.useState<TournamentStructure | undefined>(
-    undefined
-  );
   const { isOfficial, isAdmin, username, isUmpireManager } = useUserData();
-  const [tournaments, setTournaments] = React.useState<TournamentStructure[]>([]);
   const [mounted, setMounted] = React.useState<boolean>(false);
 
   useEffect(() => {
@@ -69,33 +66,44 @@ export function NavbarNested({
     const out: {
       label: string;
       icon: React.ElementType;
-      links?: { label: string; link: string }[];
+      links?: { label: string; link: string; color?: string }[];
       link?: string;
     }[] = [
       { label: 'Home', icon: IconHome, link: '/' },
       {
         label: 'Tournaments',
         icon: IconAddressBook,
-        links: tournaments.map((t) => ({ link: `/${t.searchableName}`, label: t.name })),
+        links: tournaments.map((t) => ({
+          link: `/${t.searchableName}`,
+          label: t.name,
+          color: t.color,
+        })),
       },
     ];
-    if (tournamentName) {
+    if (currentTournament) {
       out.push({
         label: 'Current Tournament',
         icon: IconChartPie,
         links: [
-          { label: 'Fixtures', link: `/${tournamentName}/fixtures` },
-          { label: 'Ladder', link: `/${tournamentName}/ladder` },
-          { label: 'Players', link: `/${tournamentName}/players` },
-          { label: 'Officials', link: `/${tournamentName}/officials` },
-          { label: 'Teams', link: `/${tournamentName}/teams` },
+          { label: 'Fixtures', link: `/${currentTournament.searchableName}/fixtures` },
+          { label: 'Ladder', link: `/${currentTournament.searchableName}/ladder` },
+          { label: 'Players', link: `/${currentTournament.searchableName}/players` },
+          { label: 'Officials', link: `/${currentTournament.searchableName}/officials` },
+          { label: 'Teams', link: `/${currentTournament.searchableName}/teams` },
         ],
       });
-      if (isUmpireManager(myTournament?.searchableName) && myTournament?.started) {
-        out[out.length - 1].links!.push({ label: 'Manage', link: `/${tournamentName}/manage` });
-      }
-      if (isUmpireManager(myTournament?.searchableName) && !myTournament?.started) {
-        out[out.length - 1].links!.push({ label: 'Setup', link: `/${tournamentName}/setup` });
+      if (isUmpireManager(currentTournament?.searchableName)) {
+        if (currentTournament?.started) {
+          out[out.length - 1].links!.push({
+            label: 'Manage',
+            link: `/${currentTournament.searchableName}/manage`,
+          });
+        } else {
+          out[out.length - 1].links!.push({
+            label: 'Setup',
+            link: `/${currentTournament.searchableName}/setup`,
+          });
+        }
       }
     }
     out.push(
@@ -116,16 +124,6 @@ export function NavbarNested({
   }
 
   const links = makeSidebarLayout().map((item) => <LinksGroup {...item} key={item.label} />);
-  useEffect(() => {
-    getTournaments().then(setTournaments);
-  }, []);
-  useEffect(() => {
-    if (tournaments.length > 0) {
-      if (tournamentName) {
-        setMyTournament(tournaments.find((t) => t.searchableName === tournamentName));
-      }
-    }
-  }, [tournamentName, tournaments]);
 
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
@@ -184,13 +182,13 @@ export function NavbarNested({
                 height={40}
                 style={{ width: '40px', margin: 0 }}
                 src={
-                  myTournament?.imageUrl ||
+                  currentTournament?.imageUrl ||
                   `${SERVER_ADDRESS}/api/image?name=SUSS${colorScheme === 'dark' ? '' : '_light'}`
                 }
               />
               <Box style={{ overflowWrap: 'break-word', width: '70%', margin: 0 }}>
                 <Title order={4}>
-                  {myTournament?.name || 'Squarers United Sporting Syndicate'}
+                  {currentTournament?.name || 'Squarers United Sporting Syndicate'}
                 </Title>
               </Box>
             </Group>
@@ -225,7 +223,7 @@ export function NavbarNested({
                       }}
                     >
                       <ThemeIcon
-                        color="green"
+                        color="tournament"
                         variant={colorScheme ? 'light' : undefined}
                         size={30}
                       >

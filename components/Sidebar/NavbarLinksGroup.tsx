@@ -1,18 +1,9 @@
 'use client';
 
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IconChevronRight } from '@tabler/icons-react';
-import {
-  Box,
-  Collapse,
-  Group,
-  rem,
-  Text,
-  ThemeIcon,
-  UnstyledButton,
-  useMantineColorScheme,
-} from '@mantine/core';
+import { Box, Collapse, Group, rem, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
 import classes from '@/components/Sidebar/NavbarLinksGroup.module.css';
 
 interface LinksGroupProps {
@@ -45,7 +36,6 @@ export function LinksGroup({
       setOpened(false);
     }
   }, [action, opened]);
-  const { colorScheme } = useMantineColorScheme();
   const out = (
     <>
       <UnstyledButton onClick={() => setOpened((o) => !o)} className={classes.control}>
@@ -56,7 +46,7 @@ export function LinksGroup({
               alignItems: 'center',
             }}
           >
-            <ThemeIcon color="green" variant={colorScheme ? 'light' : undefined} size={30}>
+            <ThemeIcon color="tournament" variant="light" size={30}>
               <Icon
                 style={{
                   width: rem(18),
