@@ -93,7 +93,7 @@ export function forceNextRoundFinalsTournament(searchableName: SearchableName): 
 
 export interface CreateTournament {
   name: string;
-  color: string
+  color: string;
   fixturesType: string;
   finalsType: string;
 }
