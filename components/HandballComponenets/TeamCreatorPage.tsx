@@ -708,6 +708,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [openTournamentEdit, setOpenTournamentEdit] = useState<boolean>(false);
   const [fixturesType, setFixturesType] = useState<string>();
   const [finalsType, setFinalsType] = useState<string>();
+  const [tournamentColor, setTournamentColor] = useState<string>();
   const [teamsInTournament, setTeamsInTournament] = React.useState<TeamStructure[]>([]);
   const [newTeamName, setNewTeamName] = React.useState<string | undefined>();
   const [officialsInTournament, setOfficialsInTournament] = React.useState<OfficialStructure[]>([]);
@@ -724,6 +725,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
       setFixturesType(t.fixturesType);
       setFinalsType(t.finalsType);
       setNewTournamentName(t.name);
+      setTournamentColor(t.color);
     });
     getTeams({ tournament }).then((t) => setTeamsInTournament(t.teams));
     getOfficials({ tournament }).then((o) => setOfficialsInTournament(o.officials));
@@ -786,6 +788,21 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
             onChange={(v) => setFinalsType(v!)}
             allowDeselect={false}
           />
+          <Box>
+            <TextInput
+              label="Tournament Color"
+              value={tournamentColor}
+              onChange={(e) => setTournamentColor(e.currentTarget.value)}
+              error={!/^#([0-9A-F]{3}){1,2}$/i.test(tournamentColor!)}
+            ></TextInput>
+            <ColorPicker
+              mt={5}
+              format="hex"
+              onChange={setTournamentColor}
+              value={tournamentColor}
+              fullWidth
+            ></ColorPicker>
+          </Box>
           <Button
             m={5}
             color="green"
@@ -795,6 +812,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
                 name: newTournamentName,
                 fixturesType,
                 finalsType,
+                color: tournamentColor,
               }).then(() => setOpenTournamentEdit(false))
             }
           >
