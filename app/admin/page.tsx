@@ -24,7 +24,7 @@ import {
   requestClearLog,
   requestServerUpdate,
 } from '@/ServerActions/AdminActions';
-import { createTournament } from '@/ServerActions/TournamentActions';
+import { createTournament, getFixtureTypes } from '@/ServerActions/TournamentActions';
 
 export default function UniversalManagementPage() {
   const { isAdmin, loading } = useUserData();
@@ -36,6 +36,8 @@ export default function UniversalManagementPage() {
   const [validTournamentColor, setValidTournamentColor] = useState<boolean>(false);
   const [openCreateTournament, setOpenCreateTournament] = useState<boolean>(false);
   const [openBackup, setOpenBackup] = useState<boolean>(false);
+  const [fixturesTypes, setFixturesTypes] = useState<string[]>([]);
+  const [finalsTypes, setFinalsTypes] = useState<string[]>([]);
   const [openRestart, setOpenRestart] = useState<boolean>(false);
   const [log, _setLog] = useState<string>('\n'.repeat(30));
   const [response, setResponse] = useState<string | null>(null);
@@ -50,6 +52,12 @@ export default function UniversalManagementPage() {
     }
     _setLog(a);
   };
+  useEffect(() => {
+    getFixtureTypes().then((f) => {
+      setFixturesTypes(f.fixturesTypes);
+      setFinalsTypes(f.finalsTypes);
+    });
+  }, []);
   useEffect(() => {
     if (!loading && !isAdmin) {
       router.push('/');
@@ -83,14 +91,7 @@ export default function UniversalManagementPage() {
         <Select
           label="Fixtures Type"
           placeholder="Pick value"
-          data={[
-            {
-              label: 'Round Robin',
-              value: 'RoundRobin',
-            },
-            'Pooled',
-            'Swiss',
-          ]}
+          data={fixturesTypes}
           value={fixturesType}
           onChange={(v) => setFixturesType(v!)}
           allowDeselect={false}
@@ -98,20 +99,7 @@ export default function UniversalManagementPage() {
         <Select
           label="Finals Type"
           placeholder="Pick value"
-          data={[
-            {
-              value: 'BasicFinals',
-              label: 'Basic Finals',
-            },
-            {
-              value: 'PooledFinals',
-              label: 'Pooled Finals',
-            },
-            {
-              value: 'TopThreeFinals',
-              label: 'Top Three Finals',
-            },
-          ]}
+          data={finalsTypes}
           value={finalsType}
           onChange={(v) => setFinalsType(v!)}
           allowDeselect={false}

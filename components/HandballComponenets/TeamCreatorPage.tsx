@@ -44,6 +44,7 @@ import {
   renameTeamForTournament,
 } from '@/ServerActions/TeamActions';
 import {
+  getFixtureTypes,
   getTournament,
   startTournament,
   updateTournament,
@@ -708,6 +709,8 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [openTournamentEdit, setOpenTournamentEdit] = useState<boolean>(false);
   const [fixturesType, setFixturesType] = useState<string>();
   const [finalsType, setFinalsType] = useState<string>();
+  const [fixturesTypes, setFixturesTypes] = useState<string[]>([]);
+  const [finalsTypes, setFinalsTypes] = useState<string[]>([]);
   const [tournamentColor, setTournamentColor] = useState<string>();
   const [teamsInTournament, setTeamsInTournament] = React.useState<TeamStructure[]>([]);
   const [newTeamName, setNewTeamName] = React.useState<string | undefined>();
@@ -726,6 +729,10 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
       setFinalsType(t.finalsType);
       setNewTournamentName(t.name);
       setTournamentColor(t.color);
+    });
+    getFixtureTypes().then((f) => {
+      setFixturesTypes(f.fixturesTypes);
+      setFinalsTypes(f.finalsTypes);
     });
     getTeams({ tournament }).then((t) => setTeamsInTournament(t.teams));
     getOfficials({ tournament }).then((o) => setOfficialsInTournament(o.officials));
@@ -771,7 +778,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           <Select
             label="Fixtures Type"
             placeholder="Pick value"
-            data={[{ label: 'Round Robin', value: 'RoundRobin' }, 'Pooled', 'Swiss']}
+            data={fixturesTypes}
             value={fixturesType}
             onChange={(v) => setFixturesType(v!)}
             allowDeselect={false}
@@ -779,11 +786,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           <Select
             label="Finals Type"
             placeholder="Pick value"
-            data={[
-              { value: 'BasicFinals', label: 'Basic Finals' },
-              { value: 'PooledFinals', label: 'Pooled Finals' },
-              { value: 'TopThreeFinals', label: 'Top Three Finals' },
-            ]}
+            data={finalsTypes}
             value={finalsType}
             onChange={(v) => setFinalsType(v!)}
             allowDeselect={false}
