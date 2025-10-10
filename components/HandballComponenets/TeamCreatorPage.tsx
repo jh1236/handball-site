@@ -730,7 +730,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
       setNewTournamentName(t.name);
       setTournamentColor(t.color);
     });
-    getFixtureTypes().then(f => {
+    getFixtureTypes().then((f) => {
       setFixturesTypes(f.fixturesTypes);
       setFinalsTypes(f.finalsTypes);
     });
