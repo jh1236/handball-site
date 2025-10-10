@@ -32,6 +32,21 @@ export function getTournament(searchableName: SearchableName): Promise<Tournamen
   });
 }
 
+export function getFixtureTypes(): Promise<{ fixturesTypes: string[]; finalsTypes: string[] }> {
+  const url = new URL('/api/tournaments/fixtureTypes', SERVER_ADDRESS);
+  return tokenFetch(url, {
+    method: 'GET',
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return response.json();
+  });
+}
+
 export function noteForTournament(tournament: SearchableName, note: string): Promise<void> {
   const body: any = {
     tournament,
