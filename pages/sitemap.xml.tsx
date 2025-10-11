@@ -28,6 +28,9 @@ function generateSiteMap(
      <url>
        <loc>https://squarers.club/ladder</loc>
      </url>
+     <url>
+       <loc>https://squarers.club/credits</loc>
+     </url>
      ${tournaments
        .map(
          ({ searchableName }) => `

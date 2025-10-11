@@ -537,6 +537,99 @@ export function cardForGame(
   });
 }
 
+export function meritForGame(
+  gameId: number,
+  firstTeam: boolean,
+  playerSearchable: SearchableName,
+  reason: string,
+  leftPlayer?: boolean
+): Promise<void> {
+  const body: any = {
+    id: gameId,
+    firstTeam,
+    playerSearchable,
+    reason,
+  };
+
+  if (leftPlayer !== undefined) {
+    body.leftPlayer = leftPlayer;
+  }
+
+  return tokenFetch('/api/games/update/merit', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
+export function demeritForGame(
+  gameId: number,
+  firstTeam: boolean,
+  playerSearchable: SearchableName,
+  reason?: string,
+  leftPlayer?: boolean
+): Promise<void> {
+  const body: any = {
+    id: gameId,
+    firstTeam,
+    playerSearchable,
+  };
+
+  if (leftPlayer !== undefined) {
+    body.leftPlayer = leftPlayer;
+  }
+  if (reason !== undefined) {
+    body.reason = reason;
+  }
+
+  return tokenFetch('/api/games/update/demerit', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
+export function replayForGame(gameId: number): Promise<void> {
+  const body: any = {
+    id: gameId,
+  };
+  return tokenFetch('/api/games/update/replay', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return Promise.resolve();
+  });
+}
+
 export function substituteForGame(
   gameId: number,
   firstTeam: boolean,

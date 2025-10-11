@@ -36,7 +36,7 @@ export function AuthenticationTitle() {
         router.push(`/players/${searchableOf(localStorage.getItem('username')!)}`);
       })
       .catch((passwordError: string) => {
-        setError(passwordError);
+        setError(passwordError.toString());
       });
   }
 

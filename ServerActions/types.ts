@@ -55,12 +55,15 @@ export interface TournamentStructure {
   imageUrl: string;
   usingBadmintonServes: boolean;
   editable: boolean;
+  color: string;
 
   [k: string]: any;
 }
 
 export interface OfficialStructure extends PersonStructure {
   role: string;
+  umpireProficiency?: number;
+  scorerProficiency?: number;
   stats?: { [key: string]: number };
 
   [k: string]: any;
@@ -135,7 +138,7 @@ export interface GameStructure {
   ended: boolean;
   ranked: boolean;
   bestPlayer: PersonStructure;
-  official: OfficialStructure;
+  official?: OfficialStructure;
   scorer: OfficialStructure | null;
   firstTeamIga: boolean;
   firstTeamToServe: boolean;

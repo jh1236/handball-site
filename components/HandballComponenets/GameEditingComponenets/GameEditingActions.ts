@@ -2,7 +2,7 @@ import {
   reloadGame,
   startLoading,
 } from '@/components/HandballComponenets/GameEditingComponenets/EditGame';
-import { QUICK_GAME_END } from '@/components/HandballComponenets/GameEditingComponenets/GameScore';
+import { QUICK_GAME_END } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameScore';
 import {
   abandonLocal,
   aceLocal,
@@ -11,6 +11,7 @@ import {
   faultLocal,
   forfeitLocal,
   scoreLocal,
+  startLocal,
   subLocal,
   timeoutLocal,
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
@@ -20,10 +21,12 @@ import {
   aceForGame,
   cardForGame,
   deleteGame,
+  demeritForGame,
   endGame,
   endTimeoutForGame,
   faultForGame,
   forfeitGame,
+  meritForGame,
   scoreForGame,
   startGame,
   substituteForGame,
@@ -33,7 +36,7 @@ import {
 import { OfficialStructure } from '@/ServerActions/types';
 
 export function begin(game: GameState, official?: OfficialStructure, scorer?: OfficialStructure) {
-  startLoading();
+  startLocal(game);
   startGame(
     game.id,
     !game.firstTeamServes.get,
@@ -50,7 +53,7 @@ export function begin(game: GameState, official?: OfficialStructure, scorer?: Of
     ].filter((a) => typeof a === 'string'),
     official?.searchableName,
     scorer?.searchableName
-  ).then(() => sync(game));
+  );
 }
 
 export function end(game: GameState, reviewRequired: boolean) {
@@ -126,6 +129,28 @@ export function sub(game: GameState, firstTeam: boolean, leftPlayer: boolean): v
   substituteForGame(game.id, firstTeam, player.get?.searchableName!, leftPlayer).catch(() =>
     sync(game)
   );
+}
+
+export function merit(
+  game: GameState,
+  firstTeam: boolean,
+  leftPlayer: boolean,
+  reason: string
+): void {
+  const team = firstTeam ? game.teamOne : game.teamTwo;
+  const player = leftPlayer ? team.left : team.right;
+  meritForGame(game.id, firstTeam, player.get?.searchableName!, reason).catch(() => sync(game));
+}
+
+export function demerit(
+  game: GameState,
+  firstTeam: boolean,
+  leftPlayer: boolean,
+  reason: string
+): void {
+  const team = firstTeam ? game.teamOne : game.teamTwo;
+  const player = leftPlayer ? team.left : team.right;
+  demeritForGame(game.id, firstTeam, player.get?.searchableName!, reason).catch(() => sync(game));
 }
 
 export function warning(

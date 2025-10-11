@@ -2,23 +2,14 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Box, Center, Container, Grid, Image, Skeleton, Space, Text } from '@mantine/core';
+import { Box, Center, Grid, Image, Paper, Skeleton, Space, Text } from '@mantine/core';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { OfficialStructure } from '@/ServerActions/types';
 
 //TODO: - Uniform Box Size
 
 const loadingBubble = (
-  <Container
-    bg="blue.7"
-    w="auto"
-    h={300}
-    p={20}
-    m={10}
-    bd="2 solid black"
-    pos="relative"
-    style={{ overflow: 'hidden' }}
-  >
+  <Paper w="auto" h={300} shadow="xl" p={20} m={10} pos="relative" style={{ overflow: 'hidden' }}>
     <Center>
       <Skeleton h={16} mt={6} radius="xl" w="20%"></Skeleton>
     </Center>
@@ -32,21 +23,12 @@ const loadingBubble = (
     <Center>
       <Skeleton h={8} mt={6} radius="xl" w="60%"></Skeleton>
     </Center>
-  </Container>
+  </Paper>
 );
 
-function GenerateOfficialBubble(official: OfficialStructure, tournament?: string) {
+function OfficialBubble(official: OfficialStructure, tournament?: string) {
   return (
-    <Container
-      bg="blue.7"
-      w="auto"
-      h={300}
-      p={20}
-      m={10}
-      bd="2 solid black"
-      pos="relative"
-      style={{ overflow: 'hidden' }}
-    >
+    <Paper w="auto" h={300} shadow="xl" p={20} m={10} pos="relative" style={{ overflow: 'hidden' }}>
       <Text size="auto" fw={700} ta="center">
         {official.name}
       </Text>
@@ -66,7 +48,7 @@ function GenerateOfficialBubble(official: OfficialStructure, tournament?: string
           <i>{official.role}</i>
         </Text>
       )}
-    </Container>
+    </Paper>
   );
 }
 
@@ -117,7 +99,7 @@ export default function Officials({ tournament }: OfficialsProps) {
               lg: 3,
             }}
           >
-            {GenerateOfficialBubble(t, tournament)}
+            {OfficialBubble(t, tournament)}
           </Grid.Col>
         ))}
       </Grid>

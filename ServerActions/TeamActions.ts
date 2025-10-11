@@ -132,3 +132,107 @@ export function getLadder({
     return response.json();
   });
 }
+
+interface RenameTeamForTournamentParams {
+  tournament: SearchableName;
+  teamSearchableName: SearchableName;
+  newName?: string;
+  newColor?: string;
+}
+
+export function renameTeamForTournament({
+  tournament,
+  teamSearchableName,
+  newName,
+  newColor,
+}: RenameTeamForTournamentParams): Promise<TeamStructure> {
+  const url = new URL('/api/teams/updateForTournament', SERVER_ADDRESS);
+  const value: any = {
+    teamSearchableName,
+    tournament,
+  };
+  if (newName) {
+    value.newName = newName;
+  }
+  if (newColor) {
+    value.newColor = newColor;
+  }
+  return tokenFetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify(value),
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return response.json().then((j: { team: TeamStructure }) => j.team);
+  });
+}
+
+interface AddTeamToTournamentArgs {
+  tournament: SearchableName;
+  teamName?: string;
+  captainName?: string;
+  nonCaptainName?: string;
+  substituteName?: string;
+}
+
+export function addTeamToTournament({
+  tournament,
+  teamName,
+  captainName,
+  nonCaptainName,
+  substituteName,
+}: AddTeamToTournamentArgs): Promise<TeamStructure> {
+  const url = new URL('/api/teams/addToTournament', SERVER_ADDRESS);
+  const body: any = { tournament };
+  if (teamName) {
+    body.teamName = teamName;
+  }
+  if (captainName) {
+    body.captainName = captainName;
+  }
+  if (nonCaptainName) {
+    body.nonCaptainName = nonCaptainName;
+  }
+  if (substituteName) {
+    body.substituteName = substituteName;
+  }
+  return tokenFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return response.json().then((j: { team: TeamStructure }) => j.team);
+  });
+}
+
+export function removeTeamFromTournament(
+  tournament: SearchableName,
+  teamSearchableName: string
+): Promise<void> {
+  const url = new URL('/api/teams/removeFromTournament', SERVER_ADDRESS);
+  return tokenFetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    body: JSON.stringify({ tournament, teamSearchableName }),
+  }).then((response) => {
+    if (!response.ok) return Promise.reject(response.text());
+    return Promise.resolve();
+  });
+}

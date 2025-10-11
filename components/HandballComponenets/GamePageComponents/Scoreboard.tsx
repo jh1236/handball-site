@@ -13,9 +13,10 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { WEBSOCKET_ADDRESS } from '@/app/config';
 import { TeamState, useGameState } from '@/components/HandballComponenets/GameState';
 import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
-import { PlayerGameStatsStructure, TeamStructure } from '@/ServerActions/types';
+import { GameEventStructure, PlayerGameStatsStructure, TeamStructure } from '@/ServerActions/types';
 import classes from './Scoreboard.module.css';
 
 interface ScoreboardProps {
@@ -26,6 +27,16 @@ function cardColorFromPlayer(player: PlayerGameStatsStructure) {
   if (player.cardTime < 0) return 'red';
   if (player.cardTime === 2) return 'green';
   return 'orange';
+}
+
+function eventToClass(event: GameEventStructure) {
+  switch (event.eventType) {
+    case 'Score':
+      if (event.notes === 'Ace') return classes.ace;
+      return classes.score;
+    default:
+      return undefined;
+  }
 }
 
 export function Scoreboard({ gameID }: ScoreboardProps) {
@@ -47,7 +58,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   );
   const [currentTime, setCurrentTime] = useState(0);
   const [isTimeoutOpen, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-  const WS_URL = `wss://api.squarers.club/api/scoreboard?gameId=${gameID}`;
+  const WS_URL = `${WEBSOCKET_ADDRESS}/api/scoreboard?gameId=${gameID}`;
   const { sendMessage, lastJsonMessage, readyState } = useWebSocket(WS_URL, {
     share: false,
     shouldReconnect: () => true,
@@ -93,7 +104,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       } else {
         setTime(gameUpdate.startTime);
       }
-      setOfficial(gameUpdate.official.name);
+      setOfficial(gameUpdate.official?.name ?? 'No Official');
       setCourt(gameUpdate.court);
       if (gameUpdate.timeoutExpirationTime > 0) {
         openTimeout();
@@ -132,6 +143,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
 
   function createNamePlate(team: TeamState, side: 'left' | 'right' | 'sub') {
     const servingSidePlayer = gameState.servingFromLeft ? team.left.get : team.right.get;
+    const firstTeam = team.name.get === teamOne.name.get;
     let p: PlayerGameStatsStructure | undefined = team[side].get;
     if (servingSidePlayer?.cardTimeRemaining !== 0) {
       if (side === 'left') p = team.right.get;
@@ -146,112 +158,94 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     }
     const serving =
       gameState.firstTeamServes.get === gameState.teamOneIGA.get
-        ? team.name.get === teamOne?.name.get &&
-          side === (gameState.servingFromLeft ? 'left' : 'right')
-        : team.name.get === teamTwo?.name.get &&
-          side === (gameState.servingFromLeft ? 'left' : 'right');
+        ? firstTeam && side === (gameState.servingFromLeft ? 'left' : 'right')
+        : firstTeam && side === (gameState.servingFromLeft ? 'left' : 'right');
 
     let name: React.JSX.Element = <>{p.name}</>;
 
     if (serving && gameState.faulted.get) {
       name = <i>{name}*</i>;
     }
-    const color = team.name.get === gameState.teamOne.name.get ? teamOneColor : teamTwoColor;
+    const color = firstTeam ? teamOneColor : teamTwoColor;
     const newColor = [...(color ?? [0.7, 0.7, 0.7, 1.0])].map((a) => a * 0.7);
     newColor[3] = 0.7;
     const cardPercent = p.cardTimeRemaining > 0 ? p.cardTimeRemaining / p.cardTime : 1;
     let background: string;
     if (p.cardTimeRemaining !== 0) {
-      if (team === teamOne) {
+      if (firstTeam) {
         background = `linear-gradient(90deg, ${cardColorFromPlayer(p)} ${75 * cardPercent}%, rgba(0,0,0,0) ${100 * cardPercent}%)`;
       } else {
         background = `linear-gradient(90deg, rgba(0,0,0,0) ${100 - 100 * cardPercent}%, ${cardColorFromPlayer(p)} ${100 - 75 * cardPercent}%)`;
       }
-    } else if (team === teamOne) {
+    } else if (firstTeam) {
       background = `linear-gradient(90deg, rgba(${newColor}) 0%, rgba(0,0,0,0) 70%)`;
     } else {
       background = `linear-gradient(90deg, rgba(0,0,0,0) 30%, rgba(${newColor}) 100%)`;
     }
-    name =
-      team.name.get === teamOne.name.get ? (
-        <div
+    const image = (
+      <>
+        <Image
+          src={p.imageUrl}
           style={{
-            textAlign: 'left',
-            display: 'inline-block',
-            width: '100%',
+            width: 120,
+            verticalAlign: 'middle',
             margin: 10,
-            position: 'relative',
-            minWidth: 600,
-            background,
+            marginRight: firstTeam ? 20 : undefined,
+            marginLeft: firstTeam ? undefined : 20,
           }}
-        >
+          display="inline-block"
+          className={
+            (lastJsonMessage as EventMessage)?.event?.player?.searchableName === p.searchableName
+              ? eventToClass((lastJsonMessage as EventMessage)?.event)
+              : undefined
+          }
+        />
+        {p.cardTimeRemaining !== 0 && (
           <Image
-            src={p.imageUrl}
+            pos="absolute"
+            top={0}
+            right={0}
+            className={classes.floating}
             style={{
               width: 120,
               verticalAlign: 'middle',
               margin: 10,
               marginRight: 20,
             }}
-            display="inline-block"
-          />
-          {p.cardTimeRemaining !== 0 && (
-            <Image
-              pos="absolute"
-              top={0}
-              left={0}
-              className={classes.floating}
-              style={{
-                width: 120,
-                verticalAlign: 'middle',
-                margin: 10,
-                marginRight: 20,
-              }}
-              src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
-            ></Image>
-          )}
-          [{p.cardTimeRemaining ? '-' : side[0].toUpperCase()}] {name}
-        </div>
-      ) : (
-        <div
-          style={{
-            textAlign: 'right',
-            display: 'inline-block',
-            minWidth: 600,
-            width: '100%',
-            margin: 10,
-            position: 'relative',
-            background,
-          }}
-        >
-          {name} [{p.cardTimeRemaining ? '-' : side[0].toUpperCase()}]
-          <Image
-            src={p.imageUrl}
-            style={{
-              margin: 10,
-              width: 120,
-              marginLeft: 20,
-              verticalAlign: 'middle',
-            }}
-            display="inline-block"
-          />
-          {p.cardTimeRemaining !== 0 && (
-            <Image
-              pos="absolute"
-              top={0}
-              right={0}
-              className={classes.floating}
-              style={{
-                width: 120,
-                verticalAlign: 'middle',
-                margin: 10,
-                marginRight: 20,
-              }}
-              src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
-            ></Image>
-          )}
-        </div>
-      );
+            src="https://static.vecteezy.com/system/resources/previews/027/391/874/non_2x/red-cross-checkmark-isolated-on-a-transparent-background-free-png.png"
+          ></Image>
+        )}
+      </>
+    );
+    name = firstTeam ? (
+      <div
+        style={{
+          textAlign: 'left',
+          display: 'inline-block',
+          width: '100%',
+          margin: 10,
+          position: 'relative',
+          minWidth: 600,
+          background,
+        }}
+      >
+        {image}[{p.cardTimeRemaining ? '-' : side[0].toUpperCase()}] {name} {p.isCaptain && ' (c)'}
+      </div>
+    ) : (
+      <div
+        style={{
+          textAlign: 'right',
+          display: 'inline-block',
+          minWidth: 600,
+          width: '100%',
+          margin: 10,
+          position: 'relative',
+          background,
+        }}
+      >
+        {name} {p.isCaptain && ' (c)'} [{p.cardTimeRemaining ? '-' : side[0].toUpperCase()}] {image}
+      </div>
+    );
 
     return (
       <Text

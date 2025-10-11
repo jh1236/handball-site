@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { SERVER_ADDRESS } from '@/app/config';
 
 export async function tokenFetcher(url: string, args: any = {}) {
@@ -10,58 +10,50 @@ export async function tokenFetcher(url: string, args: any = {}) {
 
 export function localLogout() {
   localStorage.removeItem('token');
-  localStorage.removeItem('permissionLevel');
+  localStorage.removeItem('permissions');
   localStorage.removeItem('username');
   localStorage.removeItem('timeout');
 }
 
 export function useUserData() {
-  // return {
-  //   loading: false,
-  //   isAdmin: true,
-  //   isOfficial: true,
-  //   isUmpireManager: true,
-  //   isLoggedIn: true,
-  //   permissionLevel: 5,
-  //   username: 'testing',
-  // };
   const [permissions, setPermissions] = React.useState<{ [key: string]: number } | null>(null);
   const [username, setUsername] = React.useState<string | null>(null);
   useEffect(() => {
-    if (loggedIn()) {
-      const timeout = localStorage.getItem('timeout');
-      if (timeout) {
-        const ms = Number.parseFloat(timeout);
-        if (ms < Date.now()) {
-          localLogout();
-        }
+    const timeout = localStorage.getItem('timeout');
+    if (timeout) {
+      const ms = Number.parseFloat(timeout);
+      if (ms < Date.now()) {
+        localLogout();
       }
-      setPermissions(JSON.parse(localStorage.getItem('permissions') ?? '{}'));
+    } else {
+      localLogout();
+    }
+    const tempPerms = JSON.parse(localStorage.getItem('permissions') ?? 'null');
+    if (tempPerms) {
+      setPermissions(tempPerms);
       setUsername(localStorage.getItem('username'));
     } else {
-      setPermissions({});
+      setPermissions(null);
     }
   }, []);
+  const isAdmin = useMemo(() => (permissions?.base ?? 0) >= 5, [permissions]);
   return {
-    isAdmin: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) === 5,
-      [permissions]
-    ),
+    isAdmin,
     isLoggedIn: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 1,
-      [permissions]
+      (tournament?: string) => isAdmin || (permissions?.[tournament ?? 'base'] ?? 0) >= 1,
+      [isAdmin, permissions]
     ),
     isOfficial: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 2,
-      [permissions]
+      (tournament?: string) => isAdmin || (permissions?.[tournament ?? 'base'] ?? 0) >= 2,
+      [isAdmin, permissions]
     ),
     isTournamentDirector: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 4,
-      [permissions]
+      (tournament?: string) => isAdmin || (permissions?.[tournament ?? 'base'] ?? 0) >= 4,
+      [isAdmin, permissions]
     ),
     isUmpireManager: useCallback(
-      (tournament?: string) => tournament && (permissions?.[tournament] ?? 0) >= 3,
-      [permissions]
+      (tournament?: string) => isAdmin || (permissions?.[tournament ?? 'base'] ?? 0) >= 3,
+      [isAdmin, permissions]
     ),
     loading: permissions === null,
     permissions,

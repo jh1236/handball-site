@@ -12,7 +12,7 @@ import {
 import { GameEventStructure, GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 export function getWinningScore(game: GameState): number {
-  return game.blitzGame ? 7 : 11;
+  return game.blitzGame.get ? 7 : 11;
 }
 
 export function getForceWinningScore(game: GameState): number {
@@ -185,11 +185,11 @@ export function useGameState(game?: GameStructure) {
     if (teamOneScore || teamTwoScore) {
       const bigScore = Math.max(teamOneScore, teamTwoScore);
       const lilScore = Math.min(teamOneScore, teamTwoScore);
-      if (bigScore < 11) return;
-      if (bigScore - lilScore <= 1) return;
+      if (bigScore < (blitzGame ? 7 : 11)) return;
+      if (bigScore < (blitzGame ? 14 : 22) && bigScore - lilScore <= 1) return;
       setEnded(true);
     }
-  }, [teamOneScore, teamTwoScore, abandoned]);
+  }, [teamOneScore, teamTwoScore, abandoned, blitzGame]);
 
   const gameState: GameState = useMemo(
     () => ({
@@ -333,40 +333,41 @@ export function useGameState(game?: GameStructure) {
       },
     }),
     [
-      abandoned,
-      badminton,
-      ended,
-      faulted,
-      firstTeamScoredLast,
-      firstTeamServes,
-      game?.id,
-      notes,
       practice,
-      servingFromLeft,
-      started,
+      blitzGame,
+      abandoned,
+      votes,
+      badminton,
+      timeoutExpirationTime,
       teamOneIGA,
-      teamOneLeft,
+      started,
+      ended,
+      firstTeamServes,
+      faulted,
+      game?.id,
+      servingFromLeft,
+      notes,
       teamOneName,
+      teamOneScore,
+      teamOneRating,
       teamOneNotes,
       teamOneProtest,
-      teamOneRating,
-      teamOneRight,
-      teamOneScore,
-      teamOneServingLeft,
-      teamOneSub,
       teamOneTimeouts,
-      teamTwoLeft,
+      teamOneServingLeft,
+      teamOneLeft,
+      teamOneRight,
+      teamOneSub,
       teamTwoName,
+      teamTwoScore,
+      teamTwoRating,
       teamTwoNotes,
       teamTwoProtest,
-      teamTwoRating,
-      teamTwoRight,
-      teamTwoScore,
-      teamTwoServingLeft,
-      teamTwoSub,
       teamTwoTimeouts,
-      timeoutExpirationTime,
-      votes,
+      teamTwoServingLeft,
+      teamTwoLeft,
+      teamTwoRight,
+      teamTwoSub,
+      firstTeamScoredLast,
     ]
   );
 
