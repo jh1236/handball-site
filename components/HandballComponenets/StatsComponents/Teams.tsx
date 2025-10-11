@@ -2,17 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import {
-  Box,
-  Center,
-  Container,
-  Grid,
-  Image,
-  luminance,
-  Skeleton,
-  Space,
-  Text,
-} from '@mantine/core';
+import { Box, Center, Grid, Image, luminance, Paper, Skeleton, Space, Text } from '@mantine/core';
 import { getTeams } from '@/ServerActions/TeamActions';
 import { TeamStructure } from '@/ServerActions/types';
 
@@ -20,13 +10,15 @@ import { TeamStructure } from '@/ServerActions/types';
 
 function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
   return (
-    <Container
-      bg={team.teamColor ? team.teamColor : 'blue.7'}
+    <Paper
+      bg={team.teamColor ? team.teamColor : undefined}
       w="auto"
       h={350}
       p={20}
       m={10}
-      bd="2 solid black"
+      shadow="xl"
+      // bd="1 solid black"
+      withBorder={!team.teamColor}
       pos="relative"
       style={{ overflow: 'hidden' }}
     >
@@ -54,18 +46,18 @@ function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
       <Text ta="center" c={team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black'}>
         {team.nonCaptain?.name} {team.substitute && `& ${team.substitute.name}`}
       </Text>
-    </Container>
+    </Paper>
   );
 }
 
 const loadingBubble = (
-  <Container
-    bg="blue.7"
+  <Paper
     w="auto"
-    h={300}
+    h={350}
     p={20}
     m={10}
-    bd="2 solid black"
+    shadow="xl"
+    withBorder={true}
     pos="relative"
     style={{ overflow: 'hidden' }}
   >
@@ -85,7 +77,7 @@ const loadingBubble = (
     <Center>
       <Skeleton h={8} mt={6} radius="xl" w="70%"></Skeleton>
     </Center>
-  </Container>
+  </Paper>
 );
 
 function getLinkForTeam(team: TeamStructure, tournament?: string) {
