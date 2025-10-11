@@ -22,7 +22,8 @@ function PlayerName({ player }: PlayerNameParams) {
     <p>
       {player.name}{' '}
       <span style={{ color }}>
-        {eloDelta > 0 ? '+' : ''}{eloDelta.toFixed(2)}
+        {eloDelta > 0 ? '+' : ''}
+        {eloDelta.toFixed(2)}
       </span>
     </p>
   );

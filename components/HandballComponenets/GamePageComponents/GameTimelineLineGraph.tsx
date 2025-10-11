@@ -25,7 +25,9 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
     }
     return out;
   }, [showCards]);
-  function smallScreen() { return window.innerWidth < 800; }
+  function smallScreen() {
+    return window.innerWidth < 800;
+  }
   const CustomDot = (props: any): ReactElement => {
     const {
       cx,
@@ -136,7 +138,12 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
       );
     }
     return (
-      <Paper bg={scheme.colorScheme === 'dark' ? '#333' : 'fff'} w={200} shadow="md" style={{ padding: '5px' }}>
+      <Paper
+        bg={scheme.colorScheme === 'dark' ? '#333' : 'fff'}
+        w={200}
+        shadow="md"
+        style={{ padding: '5px' }}
+      >
         Point given to {event.player?.name} {event.notes ? `for ${event.notes}` : ''}
       </Paper>
     );
@@ -200,7 +207,10 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
           style={{
             pos: 'relative',
             left: '0',
-            visibility: game?.events!.map((e) => e.eventType).some(i => i.endsWith('Card')) ? 'visible' : 'hidden' }}
+            visibility: game?.events!.map((e) => e.eventType).some((i) => i.endsWith('Card'))
+              ? 'visible'
+              : 'hidden',
+          }}
           onClick={() => setShowCards(!showCards)}
           bg={showCards ? 'blue' : 'gray'}
         >

@@ -103,14 +103,13 @@ function playersOfSearchable(team?: GameTeamStructure): string[] {
   return playersOf(team).map((a) => a?.searchableName);
 }
 
-export function playersOF(team?: GameTeamStructure): 'looking at tha dirttyyyy yyyyyy' {
+export function playersOF(): 'looking at tha dirttyyyy yyyyyy' {
   return 'looking at tha dirttyyyy yyyyyy';
 }
 
 export function playersOf(team?: GameTeamStructure): PlayerGameStatsStructure[] {
   if (!team) return [];
-  return [team.captain, team.nonCaptain, team.substitute]
-      .filter((a) => a !== null);
+  return [team.captain, team.nonCaptain, team.substitute].filter((a) => a !== null);
 }
 
 export function findPlayer(game: GameStructure, playerName: string): PlayerGameStatsStructure {

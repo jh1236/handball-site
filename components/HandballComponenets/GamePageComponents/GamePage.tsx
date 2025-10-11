@@ -62,7 +62,7 @@ export function GamePage({ gameID }: GamePageProps) {
         <ScoreGraphic game={game} />
         <Divider></Divider>
         <Box pos="relative">
-          <Tabs value={activeTab} onChange={setActiveTab}>
+          <Tabs value={activeTab} onChange={setActiveTab} defaultValue="stats">
             <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
               <Tabs.Tab value="stats">Stats</Tabs.Tab>
               <Tabs.Tab value="gameGraph">Game Overview</Tabs.Tab>

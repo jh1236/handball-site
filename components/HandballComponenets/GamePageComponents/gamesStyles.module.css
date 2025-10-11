@@ -180,10 +180,18 @@
         margin-left: 10px;
     }
 
+    .info1 * {
+        font-size: 10px
+    }
+
     .info2 {
         grid-area: info2;
         margin-right: 10px;
         margin-left: calc(40px + 1vw);
+    }
+
+    .info2 * {
+        font-size: 10px
     }
 
 }
