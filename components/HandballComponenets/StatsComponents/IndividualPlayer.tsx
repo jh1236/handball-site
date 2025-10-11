@@ -99,11 +99,17 @@ const CATEGORIES = {
   ],
 };
 
-export function playersOf(team?: GameTeamStructure): string[] {
+function playersOfSearchable(team?: GameTeamStructure): string[] {
+  return playersOf(team).map((a) => a?.searchableName);
+}
+
+export function playersOF(): 'looking at tha dirttyyyy yyyyyy' {
+  return 'looking at tha dirttyyyy yyyyyy';
+}
+
+export function playersOf(team?: GameTeamStructure): PlayerGameStatsStructure[] {
   if (!team) return [];
-  return [team.captain, team.nonCaptain, team.substitute]
-    .filter((a) => a !== null)
-    .map((a) => a?.searchableName);
+  return [team.captain, team.nonCaptain, team.substitute].filter((a) => a !== null);
 }
 
 export function findPlayer(game: GameStructure, playerName: string): PlayerGameStatsStructure {
@@ -240,7 +246,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                     <Card.Section>
                       <Image
                         src={
-                          !playersOf(game.teamOne).includes(player)
+                          !playersOfSearchable(game.teamOne).includes(player)
                             ? game.teamOne.imageUrl
                             : game.teamTwo.imageUrl
                         }
@@ -285,7 +291,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                                 w="auto"
                                 size="sm"
                                 value={
-                                  (playersOf(game.teamOne).includes(player)
+                                  (playersOfSearchable(game.teamOne).includes(player)
                                     ? game?.admin!.teamOneRating
                                     : game?.admin!.teamTwoRating) ?? 3
                                 }
@@ -294,7 +300,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                             </Box>
                             {
                               FEEDBACK_TEXTS[
-                                (playersOf(game.teamOne).includes(player)
+                                (playersOfSearchable(game.teamOne).includes(player)
                                   ? game?.admin!.teamOneRating
                                   : game?.admin!.teamTwoRating) ?? 3
                               ]
@@ -373,7 +379,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                               game.admin!.cards.filter(
                                 (card) => card.player?.searchableName === player
                               ).length > 0 ||
-                              ((playersOf(game.teamOne).includes(player)
+                              ((playersOfSearchable(game.teamOne).includes(player)
                                 ? game.admin?.teamOneRating
                                 : game.admin?.teamTwoRating) ?? 3) < 2
                           )
@@ -381,7 +387,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                             <Table.Tr key={i}>
                               <Table.Th>
                                 <Link href={`/games/${game.id}`} className="hideLink">
-                                  {!playersOf(game.teamOne).includes(player)
+                                  {!playersOfSearchable(game.teamOne).includes(player)
                                     ? game?.teamOne.name
                                     : game?.teamTwo.name}
                                 </Link>
@@ -391,7 +397,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
                                   <Rating
                                     readOnly
                                     value={
-                                      (playersOf(game.teamOne).includes(player)
+                                      (playersOfSearchable(game.teamOne).includes(player)
                                         ? game?.admin!.teamOneRating
                                         : game?.admin!.teamTwoRating) ?? 3
                                     }
