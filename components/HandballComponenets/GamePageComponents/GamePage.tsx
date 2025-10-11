@@ -37,14 +37,14 @@ export function GamePage({ gameID }: GamePageProps) {
   }, [gameID, isUmpireManager]);
 
   useEffect(() => {
-    if (activeTab !== 'teamStats') {
+    if (activeTab !== 'stats') {
       router.replace(`${window.location.href.split('?')[0]}?tab=${activeTab}`);
     } else {
       router.replace(`${window.location.href.split('?')[0]}`);
     }
   }, [activeTab, router]);
   useEffect(() => {
-    const tab = searchParams?.get('tab') ?? 'teamStats';
+    const tab = searchParams?.get('tab') ?? 'stats';
     setActiveTab(tab);
   }, [searchParams]);
   if (!game) {
