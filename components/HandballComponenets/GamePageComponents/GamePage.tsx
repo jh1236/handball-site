@@ -18,7 +18,7 @@ interface GamePageProps {
 
 export function GamePage({ gameID }: GamePageProps) {
   const [game, setGame] = React.useState<GameStructure>();
-  const [activeTab, setActiveTab] = useState<string | null>('teamStats');
+  const [activeTab, setActiveTab] = useState<string | null>('stats');
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isUmpireManager } = useUserData();

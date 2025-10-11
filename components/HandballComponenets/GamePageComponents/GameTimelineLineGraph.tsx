@@ -14,6 +14,16 @@ interface GameTimelineLineGraphInterface {
   game: GameStructure;
 }
 
+type CustomDotArgs = {
+  payload: {
+    id: number;
+    team1Score: number;
+    team2Score: number;
+    event: GameEventStructure;
+  };
+  [key: string]: any;
+};
+
 export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) {
   const isTimed = !!game?.events![0].time;
   const scheme = useMantineColorScheme();
@@ -28,25 +38,8 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
   function smallScreen() {
     return window.innerWidth < 800;
   }
-  const CustomDot = (props: any): ReactElement => {
-    const {
-      cx,
-      cy,
-      stroke,
-      payload,
-      fill,
-      r,
-      strokeWidth,
-      dataKey,
-    }: {
-      payload: {
-        id: number;
-        team1Score: number;
-        team2Score: number;
-        event: GameEventStructure;
-      };
-      [key: string]: any;
-    } = props;
+  const CustomDot = (props: CustomDotArgs): ReactElement => {
+    const { cx, cy, stroke, payload, fill, r, strokeWidth, dataKey } = props;
     const eventMatchesLine: boolean =
       (payload.event.firstTeam && dataKey === 'team1Score') ||
       (!payload.event.firstTeam && dataKey === 'team2Score');
@@ -149,109 +142,105 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
     );
   }
 
-  function createLineGraph(): React.ReactElement {
-    if (!game) {
-      return <></>;
-    }
-    const data: {
-      id: number;
-      team1Score: number;
-      team2Score: number;
-      event: GameEventStructure;
-    }[] = [];
-    let team1Score: number = 0;
-    let team2Score: number = 0;
-    let count = 0;
-    game.events!.forEach((e) => {
-      if (e.eventType === 'Score') {
-        if (e.firstTeam) {
-          team1Score += 1;
-        } else {
-          team2Score += 1;
-        }
-      }
-      if (shownEvents.includes(e.eventType)) {
-        const id = isTimed ? e.time - game.startTime : count++;
-        data.push({ id, team1Score, team2Score, event: e });
-      }
-    });
-
-    const gameTime = data[data.length - 1].event.time - game.startTime;
-    const tickSize = 30;
-    let tickData: number[] = [];
-    if (isTimed) {
-      tickData = Array.from(Array(Math.ceil(gameTime / tickSize) + 1).keys()).map(
-        (i) => i * tickSize
-      );
-      if (gameTime % tickSize !== 0) {
-        tickData.push(gameTime);
+  if (!game) {
+    return <></>;
+  }
+  const data: {
+    id: number;
+    team1Score: number;
+    team2Score: number;
+    event: GameEventStructure;
+  }[] = [];
+  let team1Score: number = 0;
+  let team2Score: number = 0;
+  let count = 0;
+  game.events!.forEach((e) => {
+    if (e.eventType === 'Score') {
+      if (e.firstTeam) {
+        team1Score += 1;
+      } else {
+        team2Score += 1;
       }
     }
-
-    function tickFormatter(n: number) {
-      if (isTimed) {
-        return `${Math.floor(n / 60)}:${n % 60 <= 9 ? `0${n % 60}` : n % 60}`;
-      }
-      return '';
+    if (shownEvents.includes(e.eventType)) {
+      const id = isTimed ? e.time - game.startTime : count++;
+      data.push({ id, team1Score, team2Score, event: e });
     }
+  });
 
-    return (
-      <Paper
-        bg=""
-        style={{
-          padding: '20px',
-          margin: 'auto',
-        }}
-      >
-        <ActionIcon
-          style={{
-            pos: 'relative',
-            left: '0',
-            visibility: game?.events!.map((e) => e.eventType).some((i) => i.endsWith('Card'))
-              ? 'visible'
-              : 'hidden',
-          }}
-          onClick={() => setShowCards(!showCards)}
-          bg={showCards ? 'blue' : 'gray'}
-        >
-          <IconCards></IconCards>
-        </ActionIcon>
-        <Box h={{ base: 300, md: 600 }}>
-          <ResponsiveContainer width="95%" height="100%">
-            <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <Line
-                dataKey="team1Score"
-                type="stepAfter"
-                stroke={game.teamOne.teamColor ?? '#000'}
-                dot={CustomDot}
-                name={game.teamOne.name}
-                strokeWidth={5}
-              />
-              <Line
-                dataKey="team2Score"
-                type="stepAfter"
-                stroke={game.teamTwo.teamColor ?? '#000'}
-                dot={CustomDot}
-                name={game.teamTwo.name}
-                strokeWidth={5}
-              />
-              <YAxis />
-              <Legend />
-              <Tooltip content={customTooltip} />
-              <XAxis
-                dataKey="id"
-                type="number"
-                scale="time"
-                domain={[0, gameTime]}
-                tickFormatter={tickFormatter}
-                ticks={isTimed ? tickData : undefined}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </Box>
-      </Paper>
+  const gameTime = data[data.length - 1].event.time - game.startTime;
+  const tickSize = 30;
+  let tickData: number[] = [];
+  if (isTimed) {
+    tickData = Array.from(Array(Math.ceil(gameTime / tickSize) + 1).keys()).map(
+      (i) => i * tickSize
     );
+    if (gameTime % tickSize !== 0) {
+      tickData.push(gameTime);
+    }
   }
 
-  return createLineGraph();
+  function tickFormatter(n: number) {
+    if (isTimed) {
+      return `${Math.floor(n / 60)}:${n % 60 <= 9 ? `0${n % 60}` : n % 60}`;
+    }
+    return '';
+  }
+
+  return (
+    <Paper
+      bg=""
+      style={{
+        padding: '20px',
+        margin: 'auto',
+      }}
+    >
+      <ActionIcon
+        style={{
+          pos: 'relative',
+          left: '0',
+          visibility: game?.events!.map((e) => e.eventType).some((i) => i.endsWith('Card'))
+            ? 'visible'
+            : 'hidden',
+        }}
+        onClick={() => setShowCards(!showCards)}
+        bg={showCards ? 'blue' : 'gray'}
+      >
+        <IconCards></IconCards>
+      </ActionIcon>
+      <Box h={{ base: 300, md: 600 }}>
+        <ResponsiveContainer width="95%" height="100%">
+          <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <Line
+              dataKey="team1Score"
+              type="stepAfter"
+              stroke={game.teamOne.teamColor ?? '#000'}
+              dot={CustomDot}
+              name={game.teamOne.name}
+              strokeWidth={5}
+            />
+            <Line
+              dataKey="team2Score"
+              type="stepAfter"
+              stroke={game.teamTwo.teamColor ?? '#000'}
+              dot={CustomDot}
+              name={game.teamTwo.name}
+              strokeWidth={5}
+            />
+            <YAxis />
+            <Legend />
+            <Tooltip content={customTooltip} />
+            <XAxis
+              dataKey="id"
+              type="number"
+              scale="time"
+              domain={[0, gameTime]}
+              tickFormatter={tickFormatter}
+              ticks={isTimed ? tickData : undefined}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </Box>
+    </Paper>
+  );
 }
