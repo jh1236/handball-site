@@ -190,8 +190,7 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
 
     return (
       <Paper
-        withBorder
-        bg="#8881"
+        bg=""
         style={{
           padding: '20px',
           margin: 'auto',

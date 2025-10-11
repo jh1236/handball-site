@@ -2,19 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Box, Divider, Image, Paper, Select, Table, Tabs, Text } from '@mantine/core';
-import classes from '@/app/games/[game]/gamesStyles.module.css';
+import { Box, Divider, Paper, Tabs } from '@mantine/core';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
+import { GameTimelineLineGraph } from '@/components/HandballComponenets/GamePageComponents/GameTimelineLineGraph';
+import { ScoreGraphic } from '@/components/HandballComponenets/GamePageComponents/ScoreGraphic';
 import { localLogout, useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
-import {
-  GameStructure,
-  PersonStructure,
-  PlayerGameStatsStructure,
-} from '@/ServerActions/types';
+import { GameStructure } from '@/ServerActions/types';
 import { PlayerStats } from './PlayerStats';
-import { GameTimelineLineGraph } from "@/components/HandballComponenets/GamePageComponents/GameTimelineLineGraph";
 
 interface GamePageProps {
   gameID: number;
@@ -22,7 +18,6 @@ interface GamePageProps {
 
 export function GamePage({ gameID }: GamePageProps) {
   const [game, setGame] = React.useState<GameStructure>();
-  const [playerSelect, setPlayerSelect] = React.useState('');
   const [activeTab, setActiveTab] = useState<string | null>('teamStats');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,9 +27,9 @@ export function GamePage({ gameID }: GamePageProps) {
       gameID,
       includeStats: true,
       includeGameEvents: true,
+      formatData: false,
     }).then((g) => {
       setGame(g);
-      setPlayerSelect(g.teamOne.captain.name);
       if (isUmpireManager(g.tournament.searchableName) && g && !g.admin) {
         localLogout();
       }
@@ -61,211 +56,31 @@ export function GamePage({ gameID }: GamePageProps) {
     date.setUTCMilliseconds(Math.floor(1000 * game.startTime));
   }
 
-  function generatePlayerStats(playerName: string) {
-    if (!game) {
-      return <p>error</p>;
-    }
-    const allPlayers: PlayerGameStatsStructure[] = [
-      game.teamOne.captain,
-      game.teamOne.nonCaptain,
-      game.teamOne.substitute,
-      game.teamTwo.captain,
-      game.teamTwo.nonCaptain,
-      game.teamTwo.substitute,
-    ].filter((a) => typeof a !== 'undefined' && a !== null);
-    const player: PersonStructure = allPlayers.find(
-      (p: PlayerGameStatsStructure) => p.name === playerName
-    )!;
-    if (!player) {
-      return <p> Select a player to see their stats :)</p>;
-    }
-    const statsTable = [];
-    if (!player.stats) {
-      return <p> could not find {playerName}&#39;s stats</p>;
-    }
-    for (const k of Object.keys(player.stats)) {
-      statsTable.push({
-        stat: k,
-        playerStat: player.stats[k],
-      });
-    }
-    const rows = statsTable.map((s) => (
-      <Table.Tr key={s.stat}>
-        <Table.Td>{s.stat}</Table.Td>
-        <Table.Td>{s.playerStat}</Table.Td>
-      </Table.Tr>
-    ));
-    return (
-      <Table>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Statistic</Table.Th>
-            <Table.Th>Player Stats (Game)</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
-      </Table>
-    );
-  }
-
-  function generateTeamStatsTable(): any {
-    if (!game || !game.teamOne || !game.teamTwo || !game.teamOne.stats || !game.teamTwo.stats) {
-      return <p> error </p>;
-    }
-    const statsTable: any[] = [];
-    for (const k of Object.keys(game.teamOne.stats)) {
-      if (k !== 'Elo Delta') {
-        statsTable.push({
-          teamOneStat: game.teamOne.stats[k],
-          stat: k,
-          teamTwoStat: game.teamTwo.stats[k],
-        });
-      }
-    }
-    const rows = statsTable.map((s) => (
-      <Table.Tr key={s.stat}>
-        <Table.Td>
-          {s.teamOneStat} {/*handles the displaying the delta elo*/ ' '}
-          {s.stat === 'Elo' && (
-            <Text
-              fz="sm"
-              fw="bold"
-              display="inline"
-              c={Number(game.teamOne.stats!['Elo Delta']) < 0 ? 'red' : 'green'}
-            >
-              {game.teamOne.stats!['Elo Delta'] > 0
-                ? `+${game.teamOne.stats!['Elo Delta']}`
-                : game.teamOne.stats!['Elo Delta']}
-            </Text>
-          )}
-        </Table.Td>
-        <Table.Td>{s.stat}</Table.Td>
-        <Table.Td>
-          {s.teamTwoStat}{' '}
-          {s.stat === 'Elo' && (
-            <Text
-              fw="bold"
-              display="inline"
-              c={Number(game.teamTwo.stats!['Elo Delta']) < 0 ? 'red' : 'green'}
-            >
-              {game.teamTwo.stats!['Elo Delta'] > 0
-                ? `+${game.teamTwo.stats!['Elo Delta']}`
-                : game.teamTwo.stats!['Elo Delta']}
-            </Text>
-          )}
-        </Table.Td>
-      </Table.Tr>
-    ));
-    return (
-      <Table striped="odd" withColumnBorders>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th w="37.5%" style={{ textAlign: 'center' }}>
-              {game.teamOne.name}
-            </Table.Th>
-            <Table.Th w="25%" style={{ textAlign: 'center' }}>
-              Statistic
-            </Table.Th>
-            <Table.Th w="37.5%" style={{ textAlign: 'center' }}>
-              {game.teamTwo.name}
-            </Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
-      </Table>
-    );
-  }
-
-  function generateScoreGraphic(): any {
-    if (!game) {
-      return <p> error! </p>;
-    }
-    return (
-      <Box
-        className={classes.teamGradient}
-        style={{
-          '--team-one-col': game.teamOne.teamColor || '#5c9865',
-          '--team-two-col': game.teamTwo.teamColor || '#5c9865',
-          left: 0,
-        }}
-      >
-        <div className={`${classes.teamNames} ${classes.team1Name}`}>
-          <p>{game.teamOne.name}</p>
-        </div>
-        <div className={`${classes.dash} ${classes.verse}`}>VS</div>
-        <div className={`${classes.teamNames} ${classes.team2Name}`}>{game.teamTwo.name}</div>
-        <div
-          className={`${classes.teamLogos} ${classes.logo1}`}
-          style={{ justifyItems: 'flex-end' }}
-        >
-          <Image src={game.teamOne.imageUrl} />
-        </div>
-        <div className={`${classes.teamInfo} ${classes.info1}`}>
-          <p> {game.teamOne.captain.name} </p>
-          {game.teamOne.nonCaptain ? <p>{game.teamOne.nonCaptain.name}</p> : ''}
-          {game.teamOne.substitute ? <p>{game.teamOne.substitute.name}</p> : ''}
-        </div>
-        <div className={`${classes.teamScores} ${classes.score1}`}>{game.teamOneScore}</div>
-        <div className={`${classes.dash}`}>-</div>
-        <div className={`${classes.teamScores} ${classes.score2}`}>{game.teamTwoScore}</div>
-        <div className={`${classes.teamInfo} ${classes.info2}`}>
-          <p> {game.teamTwo.captain.name} </p>
-          {game.teamTwo.nonCaptain ? <p>{game.teamTwo.nonCaptain.name}</p> : ''}
-          {game.teamTwo.substitute ? <p>{game.teamTwo.substitute.name}</p> : ''}
-        </div>
-        <div className={`${classes.teamLogos} ${classes.logo2}`}>
-          <Image src={game.teamTwo.imageUrl} />
-        </div>
-        <div className={`${classes.gameOfficial}`}>
-          <p>Officiated by {game.official.name}</p>
-        </div>
-      </Box>
-    );
-  }
-
   return (
     <SidebarLayout tournamentName={game.tournament.searchableName}>
       <Box ta="center" w="100%">
-        {generateScoreGraphic()}
+        <ScoreGraphic game={game} />
         <Divider></Divider>
         <Box pos="relative">
           <Tabs value={activeTab} onChange={setActiveTab}>
             <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
-              <Tabs.Tab value="testTab">Team Stats</Tabs.Tab>
-              <Tabs.Tab value="playerStats">Player Stats</Tabs.Tab>
+              <Tabs.Tab value="stats">Stats</Tabs.Tab>
+              <Tabs.Tab value="gameGraph">Game Overview</Tabs.Tab>
               {game.admin && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
             </Paper>
-            <Tabs.Panel value="teamStats">{generateTeamStatsTable()}</Tabs.Panel>
-            <Tabs.Panel value="oldPlayerStats">
-              <Select
-                label="Select Player"
-                placeholder="Select Player"
-                data={[
-                  game.teamOne.captain.name,
-                  game.teamOne.nonCaptain?.name,
-                  game.teamTwo.captain.name,
-                  game.teamTwo.nonCaptain?.name,
-                ].filter((a) => typeof a === 'string')}
-                onSearchChange={setPlayerSelect}
-                allowDeselect={false}
-                searchValue={playerSelect}
-              ></Select>
-              <p>{playerSelect}</p>
-              <div>{generatePlayerStats(playerSelect)}</div>
-            </Tabs.Panel>
-            <Tabs.Panel value="playerStats">
+            <Tabs.Panel value="stats">
               <PlayerStats game={game}></PlayerStats>
+            </Tabs.Panel>
+            <Tabs.Panel value="gameGraph">
+              <Box style={{ marginTop: '30px' }} w="100%">
+                <GameTimelineLineGraph game={game} />
+              </Box>
             </Tabs.Panel>
             {game.admin && (
               <Tabs.Panel value="admin">
                 <AdminGamePanel game={game}></AdminGamePanel>
               </Tabs.Panel>
             )}
-            <Tabs.Panel value="testTab">
-              <Box style={{ marginTop: '30px' }} w="100%">
-                <GameTimelineLineGraph game={game} />
-              </Box>
-            </Tabs.Panel>
           </Tabs>
           <Box></Box>
         </Box>
