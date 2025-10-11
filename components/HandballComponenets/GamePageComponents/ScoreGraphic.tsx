@@ -16,13 +16,27 @@ function PlayerName({ player }: PlayerNameParams) {
     return <p>ERROR!</p>;
   }
   const eloDelta = player.stats['Elo Delta'] as number;
-
-  const color = eloDelta > 0 ? 'green' : 'red';
+  if (eloDelta === null) {
+    return <p> {player.name} </p>;
+  }
+  let color;
+  let prefix;
+  if (eloDelta < 0) {
+    color = 'red';
+    prefix = '';
+  } else if (eloDelta > 0) {
+    color = 'green';
+    prefix = '+';
+  } else {
+    color = 'lightgray';
+    prefix = '±';
+  }
   return (
     <p>
-      {player.name}{' '}
+      {player.name}
+      {'  '}
       <span style={{ color }}>
-        {eloDelta > 0 ? '+' : ''}
+        {prefix}
         {eloDelta.toFixed(2)}
       </span>
     </p>
