@@ -111,6 +111,8 @@ export interface CreateTournament {
   color: string;
   fixturesType: string;
   finalsType: string;
+  twoCourts?: boolean;
+  hasScorer?: boolean;
 }
 
 export function createTournament(create: CreateTournament): Promise<void> {
@@ -138,6 +140,8 @@ export interface UpdateTournament {
   fixturesType?: string;
   finalsType?: string;
   color?: string;
+  twoCourts?: boolean;
+  hasScorer?: boolean;
 }
 
 export function updateTournament(update: UpdateTournament): Promise<void> {
