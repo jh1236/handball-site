@@ -7,7 +7,7 @@ export function requestBackup(): Promise<void> {
     method: 'POST',
     body: JSON.stringify({}),
   }).then((response) => {
-    if (!response.ok) {
+    if (response.status === 401) {
       localLogout();
       return Promise.reject();
     }
@@ -21,7 +21,7 @@ export function requestServerUpdate(): Promise<void> {
     method: 'POST',
     body: JSON.stringify({}),
   }).then((response) => {
-    if (!response.ok) {
+    if (response.status === 401) {
       localLogout();
       return Promise.reject();
     }
@@ -35,7 +35,7 @@ export function requestClearLog(): Promise<void> {
     method: 'POST',
     body: JSON.stringify({}),
   }).then((response) => {
-    if (!response.ok) {
+    if (response.status === 401) {
       localLogout();
       return Promise.reject();
     }
@@ -48,7 +48,7 @@ export function getLog(): Promise<string> {
   return tokenFetch(url, {
     method: 'GET',
   }).then((response) => {
-    if (!response.ok) {
+    if (response.status === 401) {
       localLogout();
       return Promise.reject();
     }

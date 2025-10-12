@@ -19,7 +19,7 @@ export function uploadTeamImage(
     body: formData,
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject();
@@ -38,7 +38,7 @@ export function uploadTournamentImage(file: File, name: string): Promise<Tournam
     body: formData,
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject();
@@ -57,7 +57,7 @@ export function uploadPlayerImage(file: File, name: string): Promise<void> {
     body: formData,
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject();
