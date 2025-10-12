@@ -12,7 +12,7 @@ export function getChangeCode(gameID: number): Promise<number> {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -26,7 +26,7 @@ export function getNextGameId(gameID: number): Promise<number> {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -70,7 +70,7 @@ export function getGame({
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -142,7 +142,7 @@ export function getGames({
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -197,7 +197,7 @@ export function getNoteableGames({
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -276,7 +276,7 @@ export function getFixtures({
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -320,7 +320,7 @@ export function startGame(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -356,7 +356,7 @@ export function scoreForGame(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -378,7 +378,7 @@ export function aceForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -400,7 +400,7 @@ export function faultForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -423,7 +423,7 @@ export function timeoutForGame(gameId: number, firstTeam: boolean): Promise<void
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -445,7 +445,7 @@ export function officalTimeoutForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -467,7 +467,7 @@ export function endTimeoutForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -489,7 +489,7 @@ export function undoForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -528,7 +528,7 @@ export function cardForGame(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -563,7 +563,7 @@ export function meritForGame(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -600,7 +600,7 @@ export function demeritForGame(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -621,7 +621,7 @@ export function replayForGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -654,7 +654,7 @@ export function substituteForGame(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -682,7 +682,7 @@ export function pardonForGame(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -705,7 +705,7 @@ export function forfeitGame(gameId: number, firstTeam: boolean): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -727,7 +727,7 @@ export function abandonGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -749,7 +749,7 @@ export function resolveGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -790,7 +790,7 @@ export function deleteGame(gameId: number): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -845,7 +845,7 @@ export function endGame(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -879,7 +879,7 @@ export function createGameWithTeams(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -927,7 +927,7 @@ export function createGameWithPlayers(
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());

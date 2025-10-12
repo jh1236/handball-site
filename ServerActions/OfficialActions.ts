@@ -22,7 +22,7 @@ export function getOfficials({ tournament, returnTournament = false }: GetOffici
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -56,7 +56,7 @@ export function getOfficial({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -95,13 +95,13 @@ export function addOfficialToTournament({
     }),
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
     }
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -146,13 +146,13 @@ export function updateOfficialForTournament({
     body: JSON.stringify(body),
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
     }
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -174,7 +174,7 @@ export function removeOfficialFromTournament(
     body: JSON.stringify({ officialSearchableName, tournament }),
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
