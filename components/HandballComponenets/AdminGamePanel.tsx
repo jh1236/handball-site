@@ -1,51 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  IconAlertTriangle,
-  IconArrowsLeftRight,
-  IconBallTennis,
-  IconBallVolleyball,
-  IconBarrierBlockFilled,
-  IconBounceRightFilled,
-  IconCheckbox,
-  IconCircleFilled,
-  IconDeviceTv,
-  IconExclamationMark,
-  IconFilePencil,
-  IconFlagCheck,
-  IconFlagFilled,
-  IconHandGrab,
-  IconListNumbers,
-  IconNote,
-  IconPlayHandball,
-  IconRefresh,
-  IconShoe,
-  IconSquare,
-  IconSquare1,
-  IconSquare2,
-  IconSquareFilled,
-  IconSquareXFilled,
-  IconStarFilled,
-  IconTimeDuration0,
-  IconTimeDuration30,
-  IconTimeline,
-  IconTriangleInvertedFilled,
-} from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowsLeftRight, IconBallTennis, IconBallVolleyball, IconBarrierBlockFilled, IconBounceRightFilled, IconCheckbox, IconCircleFilled, IconDeviceTv, IconExclamationMark, IconFilePencil, IconFlagCheck, IconFlagFilled, IconHandGrab, IconListNumbers, IconNote, IconPlayHandball, IconRefresh, IconShoe, IconSquare, IconSquare1, IconSquare2, IconSquareFilled, IconSquareXFilled, IconStarFilled, IconTimeDuration0, IconTimeDuration30, IconTimeline, IconTriangleInvertedFilled } from '@tabler/icons-react';
 import { GiTennisCourt } from 'react-icons/gi';
 import { PiFlagCheckeredFill, PiHandshakeFill } from 'react-icons/pi';
-import {
-  Accordion,
-  Button,
-  Center,
-  Divider,
-  Group,
-  Popover,
-  Rating,
-  Text,
-  Timeline,
-  Title,
-} from '@mantine/core';
+import { Accordion, Button, Center, Divider, Group, Popover, Rating, Text, Timeline, Title } from '@mantine/core';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { alertGame, deleteGame, resolveGame } from '@/ServerActions/GameActions';
@@ -75,7 +34,7 @@ export const RESOLVED_STATUSES = [
   undefined,
 ];
 
-export const eventIcon = (e: CardStructure, props = {}) => {
+export const eventIcon = (e: GameEventStructure | CardStructure, props = {}) => {
   switch (e.eventType) {
     case 'Start':
       return <IconFlagCheck {...props} />;
