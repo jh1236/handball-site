@@ -8,6 +8,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   ColorPicker,
   Container,
   Grid,
@@ -705,6 +706,8 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
     undefined,
     undefined,
   ]);
+  const [hasScorer, setHasScorer] = useState<boolean>(true);
+  const [twoCourts, setTwoCourts] = useState<boolean>(true);
   const [newTournamentName, setNewTournamentName] = useState<string>();
   const [openTournamentEdit, setOpenTournamentEdit] = useState<boolean>(false);
   const [fixturesType, setFixturesType] = useState<string>();
@@ -729,6 +732,8 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
       setFinalsType(t.finalsType);
       setNewTournamentName(t.name);
       setTournamentColor(t.color);
+      setTwoCourts(t.twoCourts);
+      setHasScorer(t.hasScorer);
     });
     getFixtureTypes().then((f) => {
       setFixturesTypes(f.fixturesTypes);
@@ -791,6 +796,16 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
             onChange={(v) => setFinalsType(v!)}
             allowDeselect={false}
           />
+          <Checkbox
+            label="Has Scorer"
+            checked={hasScorer}
+            onChange={(e) => setHasScorer(e.target.checked)}
+          ></Checkbox>
+          <Checkbox
+            label="Two Courts"
+            checked={twoCourts}
+            onChange={(e) => setTwoCourts(e.target.checked)}
+          ></Checkbox>
           <Box>
             <TextInput
               label="Tournament Color"
@@ -816,6 +831,8 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
                 fixturesType,
                 finalsType,
                 color: tournamentColor,
+                hasScorer,
+                twoCourts,
               }).then(() => setOpenTournamentEdit(false))
             }
           >

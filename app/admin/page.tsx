@@ -6,6 +6,7 @@ import { IconCheck, IconMoodSad } from '@tabler/icons-react';
 import {
   Box,
   Button,
+  Checkbox,
   Code,
   ColorPicker,
   Group,
@@ -30,6 +31,8 @@ export default function UniversalManagementPage() {
   const { isAdmin, loading } = useUserData();
   const router = useRouter();
   const [name, setName] = useState<string>();
+  const [hasScorer, setHasScorer] = useState<boolean>(true);
+  const [twoCourts, setTwoCourts] = useState<boolean>(true);
   const [fixturesType, setFixturesType] = useState<string>();
   const [finalsType, setFinalsType] = useState<string>();
   const [color, setColor] = useState<string>('#5c9865');
@@ -104,6 +107,16 @@ export default function UniversalManagementPage() {
           onChange={(v) => setFinalsType(v!)}
           allowDeselect={false}
         />
+        <Checkbox
+          label="Has Scorer"
+          checked={hasScorer}
+          onChange={(e) => setHasScorer(e.target.checked)}
+        ></Checkbox>
+        <Checkbox
+          label="Two Courts"
+          checked={twoCourts}
+          onChange={(e) => setTwoCourts(e.target.checked)}
+        ></Checkbox>
         <Box>
           <TextInput
             label="Tournament Color"
@@ -131,6 +144,8 @@ export default function UniversalManagementPage() {
               color,
               fixturesType,
               finalsType,
+              twoCourts,
+              hasScorer,
             }).then(() => setOpenCreateTournament(false));
           }}
         >
