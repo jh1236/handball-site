@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Cell, LabelList, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { generateColors } from '@mantine/colors-generator';
-import { useMantineTheme } from '@mantine/core';
+import { useMantineTheme, useMatches } from '@mantine/core';
 import { playersOf } from '@/components/HandballComponenets/StatsComponents/IndividualPlayer';
 import { GameStructure, TeamStructure } from '@/ServerActions/types';
 
@@ -58,10 +58,20 @@ export function GamePlayerPointsGraph({ game }: { game: GameStructure }): React.
         .toSorted((a, b) => +(!a.teamOne && b.teamOne)),
     [game]
   );
+  const size = useMatches({
+    base: 90,
+    md: undefined,
+  });
   return (
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
-        <Pie data={pointsData} fill="#8884d8" dataKey="value" label={renderPercentage}>
+        <Pie
+          outerRadius={size}
+          data={pointsData}
+          fill="#8884d8"
+          dataKey="value"
+          label={renderPercentage}
+        >
           <LabelList dataKey="name" position="outside" offset={25} fill="#888" />
           {pointsData?.map((entry) => (
             <Cell
