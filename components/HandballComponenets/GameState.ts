@@ -440,15 +440,16 @@ function setGameState(gameObj: GameStructure, state: GameState) {
 function addGameEventToGame(game: GameState, gameEvent: GameEventStructure) {
   const team = gameEvent.firstTeam ? game.teamOne : game.teamTwo;
   const leftPlayer = team.left.get?.searchableName === gameEvent.player?.searchableName;
+  if (typeof gameEvent.firstTeam === undefined) { return; }
   switch (gameEvent.eventType) {
     case 'Score':
-      scoreLocal(game, gameEvent.firstTeam);
+      scoreLocal(game, gameEvent.firstTeam!);
       break;
     case 'Timeout':
-      timeoutLocal(game, gameEvent.firstTeam);
+      timeoutLocal(game, gameEvent.firstTeam!);
       break;
     case 'Forfeit':
-      forfeitLocal(game, gameEvent.firstTeam);
+      forfeitLocal(game, gameEvent.firstTeam!);
       break;
     case 'End Timeout':
       endTimeoutLocal(game);
@@ -457,7 +458,7 @@ function addGameEventToGame(game: GameState, gameEvent: GameEventStructure) {
       faultLocal(game);
       break;
     case 'Substitute':
-      subLocal(game, gameEvent.firstTeam, leftPlayer);
+      subLocal(game, gameEvent.firstTeam!, leftPlayer);
       break;
     case 'End Game':
       game.ended.set(true);
@@ -470,9 +471,9 @@ function addGameEventToGame(game: GameState, gameEvent: GameEventStructure) {
       cardLocal(
         game,
         gameEvent.eventType.replaceAll(' Card', '') as 'Green' | 'Yellow' | 'Red' | 'Warning',
-        gameEvent.firstTeam,
+        gameEvent.firstTeam!,
         leftPlayer,
-        gameEvent.notes,
+        gameEvent.notes ?? 'No reason given',
         gameEvent.details
       );
   }

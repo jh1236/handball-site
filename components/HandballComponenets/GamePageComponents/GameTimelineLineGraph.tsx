@@ -8,7 +8,7 @@ import {
 import { Dot, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ActionIcon, Box, Paper, useMantineColorScheme } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
-import { GameEventStructure, GameStructure } from '@/ServerActions/types';
+import { CardStructure, GameEventStructure, GameStructure } from '@/ServerActions/types';
 
 interface GameTimelineLineGraphInterface {
   game: GameStructure;
@@ -52,7 +52,7 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
     };
     if (eventMatchesLine) {
       if (payload.event.eventType === 'Score') {
-        const icon = eventIcon(payload.event, {
+        const icon = eventIcon(payload.event as CardStructure, {
           x: iconProps.x,
           y: iconProps.y,
           width: iconProps.size,
@@ -126,7 +126,7 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
     if (['Green Card', 'Yellow Card', 'Red Card'].includes(event.eventType)) {
       return (
         <Paper bg="#fff" w={200} shadow="md" style={{ padding: '5px' }}>
-          {event.eventType} given to {event.player.name} for {event.notes}
+          {event.eventType} given to {event.player?.name ?? 'Unknown'} for {event.notes}
         </Paper>
       );
     }

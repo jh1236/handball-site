@@ -70,7 +70,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
   const { isUmpireManager } = useUserData();
   useEffect(() => {
     getTeam({
-      teamOne: team,
+      team,
       tournament,
       formatData: true,
     }).then((o) => {
@@ -80,7 +80,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
   useEffect(() => {
     setGames([]);
     getGames({
-      teamOne: [team],
+      team: [team],
       tournament,
       includePlayerStats: true,
     }).then((g) => {
