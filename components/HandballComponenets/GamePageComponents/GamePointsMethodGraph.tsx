@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Cell, LabelList, Pie, PieChart, ResponsiveContainer } from 'recharts';
+import { useMatches } from '@mantine/core';
 import { GameStructure } from '@/ServerActions/types';
 
 export function GamePointsMethodGraph({ game }: { game: GameStructure }): React.ReactElement {
@@ -55,11 +56,21 @@ export function GamePointsMethodGraph({ game }: { game: GameStructure }): React.
       })),
     [game]
   );
+  const size = useMatches({
+    base: 90,
+    md: undefined,
+  });
   return (
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
-        <Pie data={pointsData} fill="#8884d8" dataKey="value" label={renderPercentage}>
-          <LabelList dataKey="name" position="outside" offset={50} fill="#888" />
+        <Pie
+          outerRadius={size}
+          data={pointsData}
+          fill="#8884d8"
+          dataKey="value"
+          label={renderPercentage}
+        >
+          <LabelList dataKey="name" position="outside" offset={25} fill="#888" />
           {pointsData?.map((entry, i) => <Cell key={`cell-${entry.name}`} fill={COLORS[i]} />)}
         </Pie>
       </PieChart>

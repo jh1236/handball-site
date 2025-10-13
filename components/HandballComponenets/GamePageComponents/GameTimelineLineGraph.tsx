@@ -6,7 +6,7 @@ import {
   IconTriangleInverted,
 } from '@tabler/icons-react';
 import { Dot, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { ActionIcon, Box, Paper, useMantineColorScheme } from '@mantine/core';
+import { ActionIcon, Box, Paper, useMantineColorScheme, useMatches } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import { GameEventStructure, GameStructure } from '@/ServerActions/types';
 
@@ -35,15 +35,15 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
     }
     return out;
   }, [showCards]);
-  function smallScreen() {
-    return window.innerWidth < 800;
-  }
   const CustomDot = (props: CustomDotArgs): ReactElement => {
     const { cx, cy, stroke, payload, fill, r, strokeWidth, dataKey } = props;
     const eventMatchesLine: boolean =
       (payload.event.firstTeam && dataKey === 'team1Score') ||
       (!payload.event.firstTeam && dataKey === 'team2Score');
-    const size = smallScreen() ? 25 : 30;
+    const size = useMatches({
+      base: 25,
+      md: 30,
+    });
     const iconProps = {
       x: cx - size / 2,
       y: cy - size / 2,
