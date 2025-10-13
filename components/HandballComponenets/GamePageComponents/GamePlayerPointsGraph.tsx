@@ -62,7 +62,7 @@ export function GamePlayerPointsGraph({ game }: { game: GameStructure }): React.
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie data={pointsData} fill="#8884d8" dataKey="value" label={renderPercentage}>
-          <LabelList dataKey="name" position="outside" offset={50} fill="#888" />
+          <LabelList dataKey="name" position="outside" offset={25} fill="#888" />
           {pointsData?.map((entry) => (
             <Cell
               key={`cell-${entry.name}`}
