@@ -38,7 +38,7 @@ export default function Players({
     } else {
       getPlayers({
         tournament,
-        team: undefined,
+        teamOne: undefined,
         includeStats: true,
         formatData: true,
       }).then((o) => setPlayers(o.players));
