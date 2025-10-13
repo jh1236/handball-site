@@ -25,7 +25,7 @@ type CustomDotArgs = {
 };
 
 export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) {
-  const isTimed = !!game?.events![0].time;
+  const isTimed = !!game?.events![0]?.time;
   const scheme = useMantineColorScheme();
   const [showCards, setShowCards] = React.useState<boolean>(true);
   const shownEvents = useMemo(() => {
@@ -168,7 +168,7 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
     }
   });
 
-  const gameTime = data[data.length - 1].event.time - game.startTime;
+  const gameTime = data.length ? data[data.length - 1].event.time - game.startTime : 0;
   const tickSize = 30;
   let tickData: number[] = [];
   if (isTimed) {
