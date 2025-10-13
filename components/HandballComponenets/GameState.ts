@@ -440,7 +440,9 @@ function setGameState(gameObj: GameStructure, state: GameState) {
 function addGameEventToGame(game: GameState, gameEvent: GameEventStructure) {
   const team = gameEvent.firstTeam ? game.teamOne : game.teamTwo;
   const leftPlayer = team.left.get?.searchableName === gameEvent.player?.searchableName;
-  if (typeof gameEvent.firstTeam === undefined) { return; }
+  if (typeof gameEvent.firstTeam === undefined) {
+    return;
+  }
   switch (gameEvent.eventType) {
     case 'Score':
       scoreLocal(game, gameEvent.firstTeam!);
