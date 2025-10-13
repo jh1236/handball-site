@@ -434,7 +434,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                     <Timeline.Item
                       key={i}
                       title={`${e.eventType} ${e.player ? `for ${e.player.name}` : e.firstTeam !== null ? `for ${e.firstTeam ? game.teamOne.name : game.teamTwo.name}` : ''}`}
-                      bullet={eventIcon(e)}
+                      bullet={eventIcon(e as CardStructure)}
                     >
                       <Text c="dimmed" size="sm">
                         <strong>

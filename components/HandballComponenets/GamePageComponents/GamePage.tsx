@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Cell, LabelList, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { Box, Divider, Paper, Tabs } from '@mantine/core';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
 import { GamePlayerPointsGraph } from '@/components/HandballComponenets/GamePageComponents/GamePlayerPointsGraph';
@@ -10,7 +9,6 @@ import { GamePointsMethodGraph } from '@/components/HandballComponenets/GamePage
 import { GameTimelineLineGraph } from '@/components/HandballComponenets/GamePageComponents/GameTimelineLineGraph';
 import { ScoreGraphic } from '@/components/HandballComponenets/GamePageComponents/ScoreGraphic';
 import { localLogout, useUserData } from '@/components/HandballComponenets/ServerActions';
-import { playersOf } from '@/components/HandballComponenets/StatsComponents/IndividualPlayer';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame } from '@/ServerActions/GameActions';
 import { GameStructure } from '@/ServerActions/types';
