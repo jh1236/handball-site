@@ -126,7 +126,7 @@ export function GameTimelineLineGraph({ game }: GameTimelineLineGraphInterface) 
     if (['Green Card', 'Yellow Card', 'Red Card'].includes(event.eventType)) {
       return (
         <Paper bg="#fff" w={200} shadow="md" style={{ padding: '5px' }}>
-          {event.eventType} given to {event.player.name} for {event.notes}
+          {event.eventType} given to {event.player?.name ?? 'Unknown'} for {event.notes}
         </Paper>
       );
     }

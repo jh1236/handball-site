@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Divider, Paper, Tabs } from '@mantine/core';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
+import { GamePlayerPointsGraph } from '@/components/HandballComponenets/GamePageComponents/GamePlayerPointsGraph';
+import { GamePointsMethodGraph } from '@/components/HandballComponenets/GamePageComponents/GamePointsMethodGraph';
 import { GameTimelineLineGraph } from '@/components/HandballComponenets/GamePageComponents/GameTimelineLineGraph';
 import { ScoreGraphic } from '@/components/HandballComponenets/GamePageComponents/ScoreGraphic';
 import { localLogout, useUserData } from '@/components/HandballComponenets/ServerActions';
@@ -22,6 +24,7 @@ export function GamePage({ gameID }: GamePageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isUmpireManager } = useUserData();
+
   useEffect(() => {
     getGame({
       gameID,
@@ -72,9 +75,29 @@ export function GamePage({ gameID }: GamePageProps) {
               <PlayerStats game={game}></PlayerStats>
             </Tabs.Panel>
             <Tabs.Panel value="gameGraph">
-              <Box style={{ marginTop: '30px' }} w="100%">
-                <GameTimelineLineGraph game={game} />
-              </Box>
+              <Tabs defaultValue="worm">
+                <Tabs.List grow>
+                  <Tabs.Tab value="worm">Worm</Tabs.Tab>
+                  <Tabs.Tab value="playerPoints">Points by Player</Tabs.Tab>
+                  <Tabs.Tab value="methodPoints">Points by Score Method</Tabs.Tab>
+                </Tabs.List>
+
+                <Tabs.Panel value="worm">
+                  <Box style={{ marginTop: '30px' }} w="100%">
+                    <GameTimelineLineGraph game={game} />
+                  </Box>
+                </Tabs.Panel>
+                <Tabs.Panel value="playerPoints">
+                  <Box style={{ marginTop: '30px' }} w="100%" h={{ base: 300, md: 600 }}>
+                    <GamePlayerPointsGraph game={game} />
+                  </Box>
+                </Tabs.Panel>
+                <Tabs.Panel value="methodPoints">
+                  <Box style={{ marginTop: '30px' }} w="100%" h={{ base: 300, md: 600 }}>
+                    <GamePointsMethodGraph game={game} />
+                  </Box>
+                </Tabs.Panel>
+              </Tabs>
             </Tabs.Panel>
             {game.admin && (
               <Tabs.Panel value="admin">
