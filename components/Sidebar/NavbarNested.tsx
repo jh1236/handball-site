@@ -85,12 +85,12 @@ export function NavbarNested({
         label: 'Current Tournament',
         icon: IconChartPie,
         links: [
-          { label: 'Home', link: `/${tournamentName}` },
-          { label: 'Fixtures', link: `/${tournamentName}/fixtures` },
-          { label: 'Ladder', link: `/${tournamentName}/ladder` },
-          { label: 'Players', link: `/${tournamentName}/players` },
-          { label: 'Officials', link: `/${tournamentName}/officials` },
-          { label: 'Teams', link: `/${tournamentName}/teams` },
+          { label: 'Home', link: `/${currentTournament.searchableName}` },
+          { label: 'Fixtures', link: `/${currentTournament.searchableName}/fixtures` },
+          { label: 'Ladder', link: `/${currentTournament.searchableName}/ladder` },
+          { label: 'Players', link: `/${currentTournament.searchableName}/players` },
+          { label: 'Officials', link: `/${currentTournament.searchableName}/officials` },
+          { label: 'Teams', link: `/${currentTournament.searchableName}/teams` },
         ],
       });
       if (isUmpireManager(currentTournament?.searchableName)) {
