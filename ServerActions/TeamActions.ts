@@ -49,6 +49,34 @@ export function getTeams({
   });
 }
 
+interface GetWinningTeamsArgs {
+  tournament: SearchableName;
+  returnTournament?: boolean;
+}
+
+export function getWinningTeams({ tournament, returnTournament }: GetWinningTeamsArgs): Promise<{
+  topThree: TeamStructure[];
+  tournament?: TournamentStructure;
+}> {
+  const url = new URL('/api/teams/standings', SERVER_ADDRESS);
+  url.searchParams.set('tournament', tournament);
+
+  if (returnTournament) {
+    url.searchParams.set('returnTournament', 'true');
+  }
+  return tokenFetch(url, {
+    method: 'GET',
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return response.json();
+  });
+}
+
 interface GetTeamArgs {
   team: SearchableName;
   tournament?: SearchableName;
