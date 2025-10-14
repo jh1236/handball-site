@@ -27,6 +27,24 @@ type documentInfo = {
   link: string;
 };
 
+const loadingBubble = (
+  <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Space h="md"></Space>
+    <Center>
+      <Skeleton circle height={200}></Skeleton>
+    </Center>
+    <Center mb={5}>
+      <Skeleton h={8} mt={6} radius="xl" w="90%"></Skeleton>
+    </Center>
+    <Center>
+      <Skeleton h={6} mt={6} radius="xl" w="90%"></Skeleton>
+    </Center>
+    <Center>
+      <Skeleton h={6} mt={6} radius="xl" w="90%"></Skeleton>
+    </Center>
+  </Card>
+);
+
 function BasicDocumentBubble({ link, imageUrl, description, title }: documentInfo) {
   return (
     <Card
@@ -52,23 +70,7 @@ function BasicDocumentBubble({ link, imageUrl, description, title }: documentInf
     </Card>
   );
 }
-const loadingBubble = (
-  <Paper w="auto" h={300} shadow="xl" p={20} m={10} pos="relative" style={{ overflow: 'hidden' }}>
-    <Space h="md"></Space>
-    <Center>
-      <Skeleton circle height={200}></Skeleton>
-    </Center>
-    <Center mb={5}>
-      <Skeleton h={8} mt={6} radius="xl" w="90%"></Skeleton>
-    </Center>
-    <Center>
-      <Skeleton h={6} mt={6} radius="xl" w="90%"></Skeleton>
-    </Center>
-    <Center>
-      <Skeleton h={6} mt={6} radius="xl" w="90%"></Skeleton>
-    </Center>
-  </Paper>
-);
+
 function TournamentDocumentBubble({
   tournament,
   documents,
@@ -93,7 +95,7 @@ function TournamentDocumentBubble({
             target={doc.link !== '#' ? '_blank' : undefined}
           >
             <Flex flex="space-between" align="center" justify="left" p={10}>
-              <Avatar src={tournament.imageUrl} alt={tournament.imageUrl} mr={15} />
+              <Avatar src={doc.imageUrl} alt={tournament.imageUrl} mr={15} />
               <Text>{doc.name}</Text>
             </Flex>
           </Paper>
@@ -105,7 +107,7 @@ function TournamentDocumentBubble({
         </Card.Section>
 
         <Group justify="space-between" mt="md" mb="xs">
-          <Text fw={500}>{document.title}</Text>
+          <Text fw={500}>{tournament.name}</Text>
         </Group>
 
         <Text size="sm" c="dimmed">
@@ -181,7 +183,7 @@ export default function DocumentPage() {
             <BasicDocumentBubble
               title={d.name}
               description={d.description}
-              imageUrl=""
+              imageUrl={d.imageUrl}
               link={d.link}
             />
           </Grid.Col>
