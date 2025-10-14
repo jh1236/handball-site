@@ -1,8 +1,24 @@
 'use client';
 
-import React from 'react';
-import { Card, Grid, Group, Image, Text, Title } from '@mantine/core';
+import React, { useEffect } from 'react';
+import {
+  Avatar,
+  Card,
+  Center,
+  Flex,
+  Grid,
+  Group,
+  Image,
+  Modal,
+  Paper,
+  Skeleton,
+  Space,
+  Text,
+  Title,
+} from '@mantine/core';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
+import { getDocumentsIndex } from '@/ServerActions/DocumentActions';
+import { DocumentStructure, TournamentStructure } from '@/ServerActions/types';
 
 type documentInfo = {
   title: string;
@@ -11,7 +27,25 @@ type documentInfo = {
   link: string;
 };
 
-function GenerateDocumentBubble(document: documentInfo) {
+const loadingBubble = (
+  <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Space h="md"></Space>
+    <Center>
+      <Skeleton circle height={200}></Skeleton>
+    </Center>
+    <Center mb={5}>
+      <Skeleton h={8} mt={6} radius="xl" w="90%"></Skeleton>
+    </Center>
+    <Center>
+      <Skeleton h={6} mt={6} radius="xl" w="90%"></Skeleton>
+    </Center>
+    <Center>
+      <Skeleton h={6} mt={6} radius="xl" w="90%"></Skeleton>
+    </Center>
+  </Card>
+);
+
+function BasicDocumentBubble({ link, imageUrl, description, title }: documentInfo) {
   return (
     <Card
       shadow="sm"
@@ -19,128 +53,125 @@ function GenerateDocumentBubble(document: documentInfo) {
       radius="md"
       withBorder
       component="a"
-      href={document.link}
-      target={document.link !== '#' ? '_blank' : undefined}
+      href={link}
+      target={link !== '#' ? '_blank' : undefined}
     >
       <Card.Section>
-        <Image src={document.imageUrl} height="100%" alt={document.title} />
+        <Image src={imageUrl} height="100%" alt={title} />
       </Card.Section>
 
       <Group justify="space-between" mt="md" mb="xs">
-        <Text fw={500}>{document.title}</Text>
+        <Text fw={500}>{title}</Text>
       </Group>
 
       <Text size="sm" c="dimmed">
-        {document.description}
+        {description}
       </Text>
     </Card>
   );
 }
 
-const currentDocuments: documentInfo[] = [
-  {
-    title: 'Current Rules',
-    description: 'The Rules governing a game of SUSS Handball',
-    link: 'https://api.squarers.club/api/documents/rules',
-    imageUrl: 'https://api.squarers.club/api/image?name=umpire&big=true',
-  },
-  {
-    title: 'Simplified Rules',
-    description: 'The most important rules of handball.  Good for new players!',
-    link: 'https://api.squarers.club/api/documents/simplified_rules',
-    imageUrl: 'https://api.squarers.club/api/image?name=SUSS_dark',
-  },
-  {
-    title: 'Code of Conduct',
-    description: 'The Code of Conduct that binds all SUSS players, officials and spectators',
-    link: 'https://api.squarers.club/api/documents/code_of_conduct',
-    imageUrl: 'https://api.squarers.club/api/image?name=SUSS_dark',
-  },
-  {
-    title: 'Tournament Regulations',
-    description: 'The Code of Conduct that binds all SUSS players, officials and spectators',
-    link: 'https://api.squarers.club/api/documents/tournament_regulations',
-    imageUrl: 'https://api.squarers.club/api/image?name=SUSS_dark',
-  },
-  {
-    title: 'The Yellow Book',
-    description:
-      'A catchall of any unusual decisions that have happened on a handball court, for the sake of keeping precedents',
-    link: 'https://docs.google.com/spreadsheets/d/1KwNG112JWU1BIHHj3_LEIhRbPKLNAMla5SdO-SOaotE/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/image?name=yellow_book',
-  },
-  {
-    title: 'The Tenth SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering current interpretations of the rules',
-    link: 'https://docs.google.com/presentation/d/1-7KIau6Z-DeVF4w-2KlD3gMMei4VNTYQTjvuQbyEUnI/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=tenth_suss_championship',
-  },
-];
+function TournamentDocumentBubble({
+  tournament,
+  documents,
+}: {
+  tournament: TournamentStructure;
+  documents: DocumentStructure[];
+}) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <>
+      <Modal opened={open} onClose={() => setOpen(false)}>
+        <Title order={2} ta="center">
+          Documents for {tournament.name}
+        </Title>
+        {documents.map((doc) => (
+          <Paper
+            shadow="xl"
+            m={5}
+            component="a"
+            href={doc.link}
+            className="hideLink"
+            target={doc.link !== '#' ? '_blank' : undefined}
+          >
+            <Flex flex="space-between" align="center" justify="left" p={10}>
+              <Avatar src={doc.imageUrl} alt={tournament.imageUrl} mr={15} />
+              <Text>{doc.name}</Text>
+            </Flex>
+          </Paper>
+        ))}
+      </Modal>
+      <Card shadow="sm" padding="lg" radius="md" withBorder onClick={() => setOpen(true)}>
+        <Card.Section>
+          <Image src={tournament.imageUrl} height="100%" alt={tournament.name} />
+        </Card.Section>
 
-const oldDocuments: documentInfo[] = [
-  {
-    title: 'The Ninth SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering current interpretations of the rules for the Ninth SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/17KdW7FA45ytAue-eKcvOF_azktaFWCBbqt4pRTzk7T8/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=ninth_suss_championship',
-  },
-  {
-    title: 'The Eighth SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Eighth SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/1tlqWqJ-WxU8Dl97ELQhfw72ztPIUvP6jwIwdfz9UiaA/edit?usp=sharing',
-    imageUrl: 'https://api.squarers.club/api/tournaments/image?name=eighth_suss_championship',
-  },
-  {
-    title: 'The Seventh SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Seventh SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/1mxQUzKvw147NF-bWqrQKwa62t20wfL2Ls4f91EYNH1Y/edit?usp=sharing',
-    imageUrl:
-      'https://api.squarers.club/api/tournaments/image?name=seventh_suss_championship&big=true',
-  },
-  {
-    title: 'The Sixth SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Sixth SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/11w2Y5xxK0YuzQu2AhZvCv4zwsjtgIibLtGypKbicdnI/edit?usp=sharing',
-    imageUrl:
-      'https://api.squarers.club/api/tournaments/image?name=sixth_suss_championship&big=true',
-  },
-  {
-    title: 'The Fifth SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Fifth SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/1VkYuVcabr1jVMfTHc7EyL6Q0DGcPTJmXHYd2NUz3pFA/edit?usp=sharing',
-    imageUrl:
-      'https://api.squarers.club/api/tournaments/image?name=fifth_suss_championship&big=true',
-  },
-  {
-    title: 'The Fourth SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Fourth SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/19f1aP1ucWNLmslApekfMef_Lu1qsh8ckf3zTYA2P-VE/edit?usp=sharing',
-    imageUrl:
-      'https://api.squarers.club/api/tournaments/image?name=fourth_suss_championship&big=true',
-  },
-  {
-    title: 'The Third SUSS Championship UQP',
-    description:
-      'The Briefing presented by the SUSS officiating core covering the interpretations of the rules for the Third SUSS Championship',
-    link: 'https://docs.google.com/presentation/d/1rHmIFjmRfNyh9SzVVY89OGPxwplXc3-R4JXnSIa03Sk/edit?usp=sharing',
-    imageUrl:
-      'https://api.squarers.club/api/tournaments/image?name=third_suss_championship&big=true',
-  },
-];
+        <Group justify="space-between" mt="md" mb="xs">
+          <Text fw={500}>{tournament.name}</Text>
+        </Group>
+
+        <Text size="sm" c="dimmed">
+          The archived documents from {tournament.name}
+        </Text>
+      </Card>
+    </>
+  );
+}
 
 export default function DocumentPage() {
+  const [index, setIndex] = React.useState<
+    | {
+        tournamentDocuments: { tournament: TournamentStructure; documents: DocumentStructure[] }[];
+        otherDocuments: DocumentStructure[];
+      }
+    | undefined
+  >(undefined);
+  useEffect(() => {
+    getDocumentsIndex().then(setIndex);
+  }, []);
+
+  if (!index) {
+    return (
+      <SidebarLayout>
+        <Title>Current Documents</Title>
+        <Grid w="98.5%">
+          {Array.from({ length: 5 }).map(() => (
+            <Grid.Col
+              span={{
+                base: 6,
+                sm: 4,
+                md: 3,
+                lg: 2,
+              }}
+            >
+              {loadingBubble}
+            </Grid.Col>
+          ))}
+        </Grid>
+        <Title>Archived Documents</Title>
+        <Grid w="98.5%">
+          {Array.from({ length: 10 }).map(() => (
+            <Grid.Col
+              span={{
+                base: 6,
+                sm: 4,
+                md: 3,
+                lg: 2,
+              }}
+            >
+              {loadingBubble}
+            </Grid.Col>
+          ))}
+        </Grid>
+      </SidebarLayout>
+    );
+  }
+
   return (
     <SidebarLayout>
       <Title>Current Documents</Title>
       <Grid w="98.5%">
-        {currentDocuments.map((t) => (
+        {index?.otherDocuments.map((d) => (
           <Grid.Col
             span={{
               base: 6,
@@ -149,13 +180,18 @@ export default function DocumentPage() {
               lg: 2,
             }}
           >
-            {GenerateDocumentBubble(t)}
+            <BasicDocumentBubble
+              title={d.name}
+              description={d.description}
+              imageUrl={d.imageUrl}
+              link={d.link}
+            />
           </Grid.Col>
         ))}
       </Grid>
       <Title>Archived Documents</Title>
       <Grid w="98.5%">
-        {oldDocuments.map((t) => (
+        {index?.tournamentDocuments.toReversed().map((t) => (
           <Grid.Col
             span={{
               base: 6,
@@ -164,7 +200,7 @@ export default function DocumentPage() {
               lg: 2,
             }}
           >
-            {GenerateDocumentBubble(t)}
+            <TournamentDocumentBubble tournament={t.tournament} documents={t.documents} />
           </Grid.Col>
         ))}
       </Grid>
