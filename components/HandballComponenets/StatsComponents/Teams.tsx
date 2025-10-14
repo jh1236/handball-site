@@ -3,12 +3,18 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Box, Center, Grid, Image, luminance, Paper, Skeleton, Space, Text } from '@mantine/core';
-import { getTeams } from '@/ServerActions/TeamActions';
+import { getTeams, getWinningTeams } from '@/ServerActions/TeamActions';
 import { TeamStructure } from '@/ServerActions/types';
 
 //TODO: - Uniform Box Size
 
-function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
+interface TeamBubbleParams {
+  team: TeamStructure;
+  tournament?: string;
+  [key: string]: any;
+}
+
+function TeamBubble({ team, tournament, ...props }: TeamBubbleParams) {
   return (
     <Paper
       bg={team.teamColor ? team.teamColor : undefined}
@@ -21,6 +27,7 @@ function GenerateTeamBubble(team: TeamStructure, tournament?: string) {
       withBorder={!team.teamColor}
       pos="relative"
       style={{ overflow: 'hidden' }}
+      {...props}
     >
       <Text
         size="auto"
@@ -92,17 +99,24 @@ interface TeamsProps {
 }
 
 export default function Teams({ tournament }: TeamsProps) {
-  const [chartData, setchartData] = React.useState<TeamStructure[]>();
+  const [winningTeams, setWinningTeams] = React.useState<TeamStructure[]>([]);
+  const [teams, setTeams] = React.useState<TeamStructure[]>();
   useEffect(() => {
-    getTeams({ tournament }).then((o) => setchartData(o.teams));
+    getTeams({ tournament }).then((o) => setTeams(o.teams));
+    if (tournament) {
+      getWinningTeams({ tournament })
+        .then((r) => setWinningTeams(r.topThree))
+        .catch();
+    }
   }, [tournament]);
 
-  if (!chartData) {
+  if (!teams) {
     return (
       <div>
         <Grid w="98.5%">
-          {Array.from({ length: 10 }).map(() => (
+          {Array.from({ length: 10 }).map((_, i) => (
             <Grid.Col
+              key={i}
               span={{
                 base: 6,
                 md: 4,
@@ -117,20 +131,43 @@ export default function Teams({ tournament }: TeamsProps) {
     );
   }
   return (
-    <div>
-      <Grid w="98.5%">
-        {chartData.map((t) => (
-          <Grid.Col
-            span={{
-              base: 6,
-              md: 4,
-              lg: 3,
-            }}
-          >
-            {GenerateTeamBubble(t, tournament)}
-          </Grid.Col>
-        ))}
+    <Box w="98.5%">
+      {!!winningTeams.length && (
+        <>
+          <Image
+            pos="relative"
+            left={{ base: 'calc(50% - 75px)', md: 'calc(50% - 100px)' }}
+            top="20px"
+            src="/images/crown.png"
+            w={{ base: 150, md: 200 }}
+            style={{ zIndex: 999 }}
+          ></Image>
+          <Center>
+            <TeamBubble
+              team={winningTeams[0]}
+              tournament={tournament}
+              w={{ base: '46.5%', md: '30.5%', lg: '22%' }}
+              style={{ boxShadow: '0 0 20px gold' }}
+            ></TeamBubble>
+          </Center>
+        </>
+      )}
+      <Grid>
+        {teams
+          .filter((t) => winningTeams[0]?.searchableName !== t.searchableName)
+          .map((t, i) => (
+            <Grid.Col
+              key={i}
+              span={{
+                base: 6,
+                md: 4,
+                lg: 3,
+              }}
+            >
+              <TeamBubble team={t} tournament={tournament}></TeamBubble>
+            </Grid.Col>
+          ))}
       </Grid>
-    </div>
+    </Box>
   );
 }
