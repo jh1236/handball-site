@@ -4,8 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IconCheck, IconMoodSad } from '@tabler/icons-react';
 import {
+  Box,
   Button,
+  Checkbox,
   Code,
+  ColorPicker,
   Group,
   Loader,
   Modal,
@@ -22,17 +25,22 @@ import {
   requestClearLog,
   requestServerUpdate,
 } from '@/ServerActions/AdminActions';
-import { createTournament } from '@/ServerActions/TournamentActions';
+import { createTournament, getFixtureTypes } from '@/ServerActions/TournamentActions';
 
 export default function UniversalManagementPage() {
   const { isAdmin, loading } = useUserData();
   const router = useRouter();
-  const [submitted, setSubmitted] = useState<boolean>(false);
   const [name, setName] = useState<string>();
+  const [hasScorer, setHasScorer] = useState<boolean>(true);
+  const [twoCourts, setTwoCourts] = useState<boolean>(true);
   const [fixturesType, setFixturesType] = useState<string>();
   const [finalsType, setFinalsType] = useState<string>();
+  const [color, setColor] = useState<string>('#5c9865');
+  const [validTournamentColor, setValidTournamentColor] = useState<boolean>(false);
   const [openCreateTournament, setOpenCreateTournament] = useState<boolean>(false);
   const [openBackup, setOpenBackup] = useState<boolean>(false);
+  const [fixturesTypes, setFixturesTypes] = useState<string[]>([]);
+  const [finalsTypes, setFinalsTypes] = useState<string[]>([]);
   const [openRestart, setOpenRestart] = useState<boolean>(false);
   const [log, _setLog] = useState<string>('\n'.repeat(30));
   const [response, setResponse] = useState<string | null>(null);
@@ -48,12 +56,26 @@ export default function UniversalManagementPage() {
     _setLog(a);
   };
   useEffect(() => {
+    getFixtureTypes().then((f) => {
+      setFixturesTypes(f.fixturesTypes);
+      setFinalsTypes(f.finalsTypes);
+    });
+  }, []);
+  useEffect(() => {
     if (!loading && !isAdmin) {
       router.push('/');
     } else {
       getLog().then(setLog);
     }
   }, [isAdmin, loading, router]);
+  useEffect(() => {
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(color)) {
+      /*checks that the string fits within hex format*/
+      setValidTournamentColor(true);
+    } else {
+      setValidTournamentColor(false);
+    }
+  }, [color]);
   return (
     <SidebarLayout>
       <Title>Admin Page</Title>
@@ -61,7 +83,6 @@ export default function UniversalManagementPage() {
         opened={openCreateTournament}
         onClose={() => {
           setOpenCreateTournament(false);
-          setSubmitted(false);
         }}
       >
         <Title>Create Tournament</Title>
@@ -69,40 +90,63 @@ export default function UniversalManagementPage() {
           label="Name"
           value={name}
           onChange={(e) => setName(e.currentTarget.value)}
-          error={!name && submitted ? 'Value must be set for name' : undefined}
         ></TextInput>
         <Select
           label="Fixtures Type"
           placeholder="Pick value"
-          data={[{ label: 'Round Robin', value: 'RoundRobin' }, 'Pooled', 'Swiss']}
+          data={fixturesTypes}
           value={fixturesType}
           onChange={(v) => setFixturesType(v!)}
           allowDeselect={false}
-          error={!fixturesType && submitted ? 'Value must be set for fixtures type' : undefined}
         />
         <Select
           label="Finals Type"
           placeholder="Pick value"
-          data={[
-            { value: 'BasicFinals', label: 'Basic Finals' },
-            { value: 'PooledFinals', label: 'Pooled Finals' },
-            { value: 'TopThreeFinals', label: 'Top Three Finals' },
-          ]}
+          data={finalsTypes}
           value={finalsType}
           onChange={(v) => setFinalsType(v!)}
           allowDeselect={false}
-          error={!finalsType && submitted ? 'Value must be set for finals type' : undefined}
         />
+        <Checkbox
+          label="Has Scorer"
+          checked={hasScorer}
+          onChange={(e) => setHasScorer(e.target.checked)}
+        ></Checkbox>
+        <Checkbox
+          label="Two Courts"
+          checked={twoCourts}
+          onChange={(e) => setTwoCourts(e.target.checked)}
+        ></Checkbox>
+        <Box>
+          <TextInput
+            label="Tournament Color"
+            value={color}
+            onChange={(e) => setColor(e.currentTarget.value)}
+            error={!validTournamentColor}
+          ></TextInput>
+          <ColorPicker
+            mt={5}
+            format="hex"
+            onChange={setColor}
+            value={color}
+            fullWidth
+          ></ColorPicker>
+        </Box>
         <br />
         <Button
+          data-disabled={!validTournamentColor || !name || !finalsType || !fixturesType}
           onClick={() => {
-            setSubmitted(true);
-            if (!name || !fixturesType || !finalsType) {
+            if (!name || !fixturesType || !finalsType || !color) {
               return;
             }
-            createTournament({ name, fixturesType, finalsType }).then(() =>
-              setOpenCreateTournament(false)
-            );
+            createTournament({
+              name,
+              color,
+              fixturesType,
+              finalsType,
+              twoCourts,
+              hasScorer,
+            }).then(() => setOpenCreateTournament(false));
           }}
         >
           Create

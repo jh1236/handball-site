@@ -55,6 +55,7 @@ export interface TournamentStructure {
   imageUrl: string;
   usingBadmintonServes: boolean;
   editable: boolean;
+  color: string;
 
   [k: string]: any;
 }
@@ -87,10 +88,10 @@ export interface PlayerGameStatsStructure extends PersonStructure {
 export interface GameEventStructure {
   id: number;
   eventType: string;
-  firstTeam: boolean;
-  player: PersonStructure;
-  details: number;
-  notes: string;
+  firstTeam?: boolean;
+  player?: PersonStructure;
+  details?: number;
+  notes?: string;
   firstTeamJustServed: boolean;
   sideServed: string;
   firstTeamToServe: boolean;

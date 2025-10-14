@@ -58,7 +58,7 @@ export function setUserImage(imageLocation: string): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());

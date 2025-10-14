@@ -8,7 +8,7 @@ export function getTournaments(): Promise<TournamentStructure[]> {
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -23,12 +23,27 @@ export function getTournament(searchableName: SearchableName): Promise<Tournamen
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
     }
     return response.json().then((json: { tournament: TournamentStructure }) => json.tournament);
+  });
+}
+
+export function getFixtureTypes(): Promise<{ fixturesTypes: string[]; finalsTypes: string[] }> {
+  const url = new URL('/api/tournaments/fixtureTypes', SERVER_ADDRESS);
+  return tokenFetch(url, {
+    method: 'GET',
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return response.json();
   });
 }
 
@@ -46,7 +61,7 @@ export function noteForTournament(tournament: SearchableName, note: string): Pro
     body: JSON.stringify(body),
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -64,7 +79,7 @@ export function startTournament(searchableName: SearchableName): Promise<void> {
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -82,7 +97,7 @@ export function forceNextRoundFinalsTournament(searchableName: SearchableName): 
     },
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -93,8 +108,11 @@ export function forceNextRoundFinalsTournament(searchableName: SearchableName): 
 
 export interface CreateTournament {
   name: string;
+  color: string;
   fixturesType: string;
   finalsType: string;
+  twoCourts?: boolean;
+  hasScorer?: boolean;
 }
 
 export function createTournament(create: CreateTournament): Promise<void> {
@@ -107,7 +125,7 @@ export function createTournament(create: CreateTournament): Promise<void> {
     body: JSON.stringify(create),
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -121,6 +139,9 @@ export interface UpdateTournament {
   name?: string;
   fixturesType?: string;
   finalsType?: string;
+  color?: string;
+  twoCourts?: boolean;
+  hasScorer?: boolean;
 }
 
 export function updateTournament(update: UpdateTournament): Promise<void> {
@@ -133,7 +154,7 @@ export function updateTournament(update: UpdateTournament): Promise<void> {
     body: JSON.stringify(update),
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());

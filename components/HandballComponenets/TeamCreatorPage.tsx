@@ -8,6 +8,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   ColorPicker,
   Container,
   Grid,
@@ -44,6 +45,7 @@ import {
   renameTeamForTournament,
 } from '@/ServerActions/TeamActions';
 import {
+  getFixtureTypes,
   getTournament,
   startTournament,
   updateTournament,
@@ -704,10 +706,15 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
     undefined,
     undefined,
   ]);
+  const [hasScorer, setHasScorer] = useState<boolean>(true);
+  const [twoCourts, setTwoCourts] = useState<boolean>(true);
   const [newTournamentName, setNewTournamentName] = useState<string>();
   const [openTournamentEdit, setOpenTournamentEdit] = useState<boolean>(false);
   const [fixturesType, setFixturesType] = useState<string>();
   const [finalsType, setFinalsType] = useState<string>();
+  const [fixturesTypes, setFixturesTypes] = useState<string[]>([]);
+  const [finalsTypes, setFinalsTypes] = useState<string[]>([]);
+  const [tournamentColor, setTournamentColor] = useState<string>();
   const [teamsInTournament, setTeamsInTournament] = React.useState<TeamStructure[]>([]);
   const [newTeamName, setNewTeamName] = React.useState<string | undefined>();
   const [officialsInTournament, setOfficialsInTournament] = React.useState<OfficialStructure[]>([]);
@@ -724,6 +731,13 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
       setFixturesType(t.fixturesType);
       setFinalsType(t.finalsType);
       setNewTournamentName(t.name);
+      setTournamentColor(t.color);
+      setTwoCourts(t.twoCourts);
+      setHasScorer(t.hasScorer);
+    });
+    getFixtureTypes().then((f) => {
+      setFixturesTypes(f.fixturesTypes);
+      setFinalsTypes(f.finalsTypes);
     });
     getTeams({ tournament }).then((t) => setTeamsInTournament(t.teams));
     getOfficials({ tournament }).then((o) => setOfficialsInTournament(o.officials));
@@ -769,7 +783,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           <Select
             label="Fixtures Type"
             placeholder="Pick value"
-            data={[{ label: 'Round Robin', value: 'RoundRobin' }, 'Pooled', 'Swiss']}
+            data={fixturesTypes}
             value={fixturesType}
             onChange={(v) => setFixturesType(v!)}
             allowDeselect={false}
@@ -777,15 +791,36 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           <Select
             label="Finals Type"
             placeholder="Pick value"
-            data={[
-              { value: 'BasicFinals', label: 'Basic Finals' },
-              { value: 'PooledFinals', label: 'Pooled Finals' },
-              { value: 'TopThreeFinals', label: 'Top Three Finals' },
-            ]}
+            data={finalsTypes}
             value={finalsType}
             onChange={(v) => setFinalsType(v!)}
             allowDeselect={false}
           />
+          <Checkbox
+            label="Has Scorer"
+            checked={hasScorer}
+            onChange={(e) => setHasScorer(e.target.checked)}
+          ></Checkbox>
+          <Checkbox
+            label="Two Courts"
+            checked={twoCourts}
+            onChange={(e) => setTwoCourts(e.target.checked)}
+          ></Checkbox>
+          <Box>
+            <TextInput
+              label="Tournament Color"
+              value={tournamentColor}
+              onChange={(e) => setTournamentColor(e.currentTarget.value)}
+              error={!/^#([0-9A-F]{3}){1,2}$/i.test(tournamentColor!)}
+            ></TextInput>
+            <ColorPicker
+              mt={5}
+              format="hex"
+              onChange={setTournamentColor}
+              value={tournamentColor}
+              fullWidth
+            ></ColorPicker>
+          </Box>
           <Button
             m={5}
             color="green"
@@ -795,6 +830,9 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
                 name: newTournamentName,
                 fixturesType,
                 finalsType,
+                color: tournamentColor,
+                hasScorer,
+                twoCourts,
               }).then(() => setOpenTournamentEdit(false))
             }
           >

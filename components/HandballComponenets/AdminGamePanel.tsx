@@ -75,7 +75,7 @@ export const RESOLVED_STATUSES = [
   undefined,
 ];
 
-export const eventIcon = (e: CardStructure, props = {}) => {
+export const eventIcon = (e: GameEventStructure | CardStructure, props = {}) => {
   switch (e.eventType) {
     case 'Start':
       return <IconFlagCheck {...props} />;
@@ -434,7 +434,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                     <Timeline.Item
                       key={i}
                       title={`${e.eventType} ${e.player ? `for ${e.player.name}` : e.firstTeam !== null ? `for ${e.firstTeam ? game.teamOne.name : game.teamTwo.name}` : ''}`}
-                      bullet={eventIcon(e)}
+                      bullet={eventIcon(e as CardStructure)}
                     >
                       <Text c="dimmed" size="sm">
                         <strong>

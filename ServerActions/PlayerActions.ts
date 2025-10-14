@@ -45,7 +45,7 @@ export function getPlayers({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -87,7 +87,7 @@ export function getAveragePlayerStats({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
@@ -131,7 +131,7 @@ export function getPlayer({
     method: 'GET',
   }).then((response) => {
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         localLogout();
       }
       return Promise.reject(response.text());
