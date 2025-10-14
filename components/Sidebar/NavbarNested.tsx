@@ -85,6 +85,7 @@ export function NavbarNested({
         label: 'Current Tournament',
         icon: IconChartPie,
         links: [
+          { label: 'Home', link: `/${currentTournament.searchableName}` },
           { label: 'Fixtures', link: `/${currentTournament.searchableName}/fixtures` },
           { label: 'Ladder', link: `/${currentTournament.searchableName}/ladder` },
           { label: 'Players', link: `/${currentTournament.searchableName}/players` },
