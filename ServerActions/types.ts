@@ -26,6 +26,15 @@ export interface CardStructure {
   notes: string;
 }
 
+export interface DocumentStructure {
+  name: string;
+  type: 'Rules' | 'Umpire Qualification Program' | 'Tournament Regulations' | 'Other';
+  description: string;
+  tournament: TournamentStructure | null;
+  link: string;
+  imageUrl: string;
+}
+
 export interface PersonStructure {
   name: string;
   searchableName: string;
