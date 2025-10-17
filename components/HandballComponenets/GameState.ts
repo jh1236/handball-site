@@ -9,7 +9,6 @@ import {
   subLocal,
   timeoutLocal,
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
-import { playersOf } from '@/components/HandballComponenets/StatsComponents/IndividualPlayer';
 import { GameEventStructure, GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 import { playersOf } from '@/components/HandballComponenets/StatsComponents/IndividualPlayer';
 
