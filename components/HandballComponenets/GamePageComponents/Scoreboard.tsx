@@ -151,7 +151,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
     }
 
     if (!p) {
-      return <p> error: player not found</p>;
+      return <p> error: {side} player not found</p>;
     }
     if (!gameState) {
       return <p>error</p>;
@@ -346,12 +346,12 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
           </>
         )}
         <Box pos="absolute" left="10%" bottom="10%">
-          {createNamePlate(teamOne!, 'right')}
-          {createNamePlate(teamOne!, 'left')}
+          {!!teamOne?.right.get && createNamePlate(teamOne!, 'right')}
+          {!!teamOne?.left.get && createNamePlate(teamOne!, 'left')}
         </Box>
         <Box pos="absolute" right="10%" bottom="10%" style={{ textAlign: 'right' }}>
-          {createNamePlate(teamTwo!, 'right')}
-          {createNamePlate(teamTwo!, 'left')}
+          {!!teamTwo?.right.get && createNamePlate(teamTwo!, 'right')}
+          {!!teamTwo?.left.get && createNamePlate(teamTwo!, 'left')}
         </Box>
         <Box pos="absolute" bottom={20} w="100%">
           <Text ta="center" fz={20}>

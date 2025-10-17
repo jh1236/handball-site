@@ -1,7 +1,7 @@
 import { GameState } from '@/components/HandballComponenets/GameState';
-import { PersonStructure } from '@/ServerActions/types';
+import { PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
-function nextPoint(game: GameState, swap?: boolean) {
+function nextPoint(game: GameState, firstTeamScored: boolean) {
   for (const i of [
     game.teamOne.left,
     game.teamOne.right,
@@ -17,17 +17,57 @@ function nextPoint(game: GameState, swap?: boolean) {
       i.set(temp);
     }
   }
-  if (swap !== undefined && game.badminton.get) {
-    const team = swap ? game.teamOne : game.teamTwo;
-    if (team.right.get && team.left.get) {
+  const team = firstTeamScored ? game.teamOne : game.teamTwo;
+  const opponent = firstTeamScored ? game.teamTwo : game.teamOne;
+  if (game.badminton.get) {
+    if (firstTeamScored === game.firstTeamServes.get) {
+      // the team who served has scored
       const newRight = team.left?.get;
-      newRight.sideOfCourt = 'Right';
+      if (newRight) {
+        newRight.sideOfCourt = 'Right';
+      }
       const newLeft = team.right?.get;
-      newLeft.sideOfCourt = 'Left';
+      if (newLeft) {
+        newLeft.sideOfCourt = 'Left';
+      }
       team.left.set(newLeft);
       team.right.set(newRight);
+    } else {
+      //the team who did not serve scored
+      // eslint-disable-next-line no-lonely-if
+      if (!team.left.get || !team.right.get) {
+        //we are playing a solo game
+        let newRight: PlayerGameStatsStructure | undefined;
+        let newLeft: PlayerGameStatsStructure | undefined;
+        if (!team.servingFromLeft.get) {
+          //I think this is inverted because it isn't properly updated yet
+          newLeft = team.left.get || team.right.get;
+          newLeft!.sideOfCourt = 'Left';
+        } else {
+          newRight = team.left.get || team.right.get;
+          newRight!.sideOfCourt = 'Right';
+        }
+        team.left.set(newLeft);
+        team.right.set(newRight);
+      }
     }
   }
+
+  if (!opponent.left.get || !opponent.right.get) {
+    let newerRight: PlayerGameStatsStructure | undefined;
+    let newerLeft: PlayerGameStatsStructure | undefined;
+    if (!team.servingFromLeft.get) {
+      //I think this is inverted because it isn't properly updated yet
+      newerLeft = opponent.left.get || opponent.right.get;
+      newerLeft!.sideOfCourt = 'Left';
+    } else {
+      newerRight = opponent.left.get || opponent.right.get;
+      newerRight!.sideOfCourt = 'Right';
+    }
+    opponent.left.set(newerLeft);
+    opponent.right.set(newerRight);
+  }
+
   game.faulted.set(false);
 }
 
@@ -70,9 +110,8 @@ export function scoreLocal(game: GameState, firstTeam: boolean): void {
 
   const team = firstTeam ? game.teamOne : game.teamTwo;
   team.score.set(team.score.get + 1);
-  const needsSwap = firstTeam === game.firstTeamServes.get;
+  nextPoint(game, firstTeam);
   game.firstTeamServes.set(firstTeam);
-  nextPoint(game, needsSwap ? firstTeam : undefined);
 }
 
 export function aceLocal(game: GameState): void {
@@ -110,7 +149,7 @@ export function faultLocal(game: GameState): void {
     team.score.set(team.score.get + 1);
     team.servingFromLeft.set(!team.servingFromLeft.get);
     game.firstTeamServes.set(!game.firstTeamServes.get);
-    nextPoint(game); //faulted is unset here
+    nextPoint(game, !game.firstTeamServes.get); //faulted is unset here
   } else {
     game.faulted.set(true);
   }

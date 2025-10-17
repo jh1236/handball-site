@@ -10,6 +10,7 @@ import {
   timeoutLocal,
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { GameEventStructure, GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import { playersOf } from '@/components/HandballComponenets/StatsComponents/IndividualPlayer';
 
 export function getWinningScore(game: GameState): number {
   return game.blitzGame.get ? 7 : 11;
@@ -405,12 +406,22 @@ function setGameState(gameObj: GameStructure, state: GameState) {
   state.teamOne.servingFromLeft.set(gameObj.teamOne.servingFromLeft!);
   const { teamOne, teamTwo } = gameObj;
   if (gameObj.started) {
-    const sorted = [teamOne.captain, teamOne.nonCaptain, teamOne.substitute].toSorted((a, b) =>
-      (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
-    );
-    state.teamOne.left.set(sorted[0] || undefined);
-    state.teamOne.right.set(sorted[1] || undefined);
-    state.teamOne.sub.set(sorted[2] || undefined);
+    for (const side of ['left', 'right']) {
+      state.teamOne[side].set(undefined);
+    }
+    for (const pgs of playersOf(gameObj.teamOne)) {
+      switch (pgs.sideOfCourt) {
+        case 'Left':
+          state.teamOne.left.set(pgs);
+          break;
+        case 'Right':
+          state.teamOne.right.set(pgs);
+          break;
+        case 'Substitute':
+          state.teamOne.substitute.set(pgs);
+          break;
+      }
+    }
   } else {
     //trick i stole from python, if nonCaptain is null it will be replaced with undefined
     state.teamOne.left.set(teamOne.captain);
@@ -423,12 +434,22 @@ function setGameState(gameObj: GameStructure, state: GameState) {
 
   state.teamTwo.servingFromLeft.set(gameObj.teamTwo.servingFromLeft!);
   if (gameObj.started) {
-    const sorted = [teamTwo.captain, teamTwo.nonCaptain, teamTwo.substitute].toSorted((a, b) =>
-      (a?.sideOfCourt ?? 'z').localeCompare(b?.sideOfCourt ?? 'z')
-    );
-    state.teamTwo.left.set(sorted[0] || undefined);
-    state.teamTwo.right.set(sorted[1] || undefined);
-    state.teamTwo.sub.set(sorted[2] || undefined);
+    for (const side of ['left', 'right']) {
+      state.teamTwo[side].set(undefined);
+    }
+    for (const pgs of playersOf(gameObj.teamTwo)) {
+      switch (pgs.sideOfCourt) {
+        case 'Left':
+          state.teamTwo.left.set(pgs);
+          break;
+        case 'Right':
+          state.teamTwo.right.set(pgs);
+          break;
+        case 'Substitute':
+          state.teamTwo.substitute.set(pgs);
+          break;
+      }
+    }
   } else {
     //trick i stole from python, if nonCaptain is null it will be replaced with undefined
     state.teamTwo.left.set(teamTwo.captain);
