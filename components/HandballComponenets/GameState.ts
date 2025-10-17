@@ -9,8 +9,8 @@ import {
   subLocal,
   timeoutLocal,
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
-import { GameEventStructure, GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 import { playersOf } from '@/components/HandballComponenets/StatsComponents/IndividualPlayer';
+import { GameEventStructure, GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 export function getWinningScore(game: GameState): number {
   return game.blitzGame.get ? 7 : 11;
