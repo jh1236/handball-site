@@ -114,7 +114,7 @@ export function PlayerButton({
         ) : (
           name
         )}{' '}
-        {(!team.left.get || !team.right.get) && (game.servingFromLeft ? ' (Left)' : ' (Right)')}
+        {(!team.left.get || !team.right.get) && `(${player?.sideOfCourt ?? '?'})`}
       </Button>
       <br />
       {player?.cardTimeRemaining !== 0 && player && !game.ended.get && (
