@@ -97,7 +97,7 @@ export function GameSettings({
         <Button
           size="sm"
           color="player-color"
-          disabled={!creating}
+          disabled={creating}
           onClick={() => {
               setCreating(true);
               createGameWithPlayers(
