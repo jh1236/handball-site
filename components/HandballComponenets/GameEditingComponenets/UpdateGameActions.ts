@@ -216,6 +216,8 @@ export function cardLocal(
   const otherPlayer = leftPlayer ? team.right : team.left;
   const outOtherPlayer = otherPlayer.get!;
   const otherTeamWins = Math.max(11, team.score.get + 2);
+  const firstTeamServed = game.firstTeamServes.get;
+  const prevSideServed = game.servingFromLeft;
   if (!player.get || !otherPlayer.get) {
     // Single Player Case
     if (duration === -1) {
@@ -274,6 +276,17 @@ export function cardLocal(
     outPlayer.cardTimeRemaining = outPlayer.cardTime;
   }
   outPlayer.prevCards?.push({
+    //I don't think any of these are ever used but ooh well
+    firstTeamJustServed: firstTeamServed,
+    firstTeamToServe: game.firstTeamServes.get,
+    gameId: game.id,
+    id: -1,
+    sideServed: prevSideServed ? 'Left' : 'Right',
+    sideToServe: game.servingFromLeft ? 'Left' : 'Right',
+    teamOneLeft: game.teamOne.left.get,
+    teamOneRight: game.teamOne.right.get,
+    teamTwoLeft: game.teamTwo.left.get,
+    teamTwoRight: game.teamTwo.right.get,
     details: duration,
     eventType: `${color}${color !== 'Warning' ? ' Card' : ''}`,
     firstTeam,

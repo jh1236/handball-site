@@ -18,14 +18,6 @@ export interface TeamStructure {
   [k: string]: any;
 }
 
-export interface CardStructure {
-  eventType: string;
-  firstTeam: boolean;
-  player?: PersonStructure;
-  details: number;
-  notes: string;
-}
-
 export interface DocumentStructure {
   name: string;
   type: 'Rules' | 'Umpire Qualification Program' | 'Tournament Regulations' | 'Other';
@@ -42,7 +34,7 @@ export interface PersonStructure {
   bigImageUrl: string;
   isAdmin?: boolean;
   team?: TeamStructure;
-  prevCards?: CardStructure[];
+  prevCards?: GameEventStructure[];
   stats?: { [key: string]: number };
 
   [k: string]: any;
@@ -88,7 +80,7 @@ export interface PlayerGameStatsStructure extends PersonStructure {
   startSide: 'Left' | 'Right' | 'Substitute';
   sideOfCourt: 'Left' | 'Right' | 'Substitute';
   rating: number;
-  prevCards?: CardStructure[];
+  prevCards?: GameEventStructure[];
   stats: { [key: string]: any };
 
   [k: string]: any;
@@ -96,6 +88,7 @@ export interface PlayerGameStatsStructure extends PersonStructure {
 
 export interface GameEventStructure {
   id: number;
+  gameId: number;
   eventType: string;
   firstTeam?: boolean;
   player?: PersonStructure;
@@ -105,10 +98,10 @@ export interface GameEventStructure {
   sideServed: string;
   firstTeamToServe: boolean;
   sideToServe: string;
-  teamOneLeft: PersonStructure;
-  teamOneRight: PersonStructure;
-  teamTwoLeft: PersonStructure;
-  teamTwoRight: PersonStructure;
+  teamOneLeft?: PersonStructure;
+  teamOneRight?: PersonStructure;
+  teamTwoLeft?: PersonStructure;
+  teamTwoRight?: PersonStructure;
 
   [k: string]: any;
 }
@@ -167,7 +160,7 @@ export interface GameStructure {
   blitzGame: boolean;
   admin?: {
     notes?: string;
-    cards: CardStructure[];
+    cards: GameEventStructure[];
     markedForReview: boolean;
     requiresAction: boolean;
     noteableStatus: string;

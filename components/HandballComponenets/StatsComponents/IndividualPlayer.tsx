@@ -32,7 +32,7 @@ import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
 import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
 import {
-  CardStructure,
+  GameEventStructure,
   GameStructure,
   GameTeamStructure,
   PersonStructure,
@@ -125,7 +125,7 @@ export function findPlayer(game: GameStructure, playerName: string): PlayerGameS
 
 export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   // const [sort, setSort] = React.useState<number>(-1);
-  const [cards, setCards] = React.useState<{ game: GameStructure; card: CardStructure }[]>([]);
+  const [cards, setCards] = React.useState<{ game: GameStructure; card: GameEventStructure }[]>([]);
 
   const [gamesCount, setGamesCount] = React.useState<number>(20);
   const [games, setGames] = React.useState<GameStructure[]>([]);
@@ -147,7 +147,7 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
   useEffect(() => {
     getGames({ player: [player], tournament, includePlayerStats: true }).then((g) => {
       g.games.reverse();
-      let output: { game: GameStructure; card: CardStructure }[] = [];
+      let output: { game: GameStructure; card: GameEventStructure }[] = [];
       for (const game of g.games) {
         output = output.concat(
           (game.admin?.cards ?? [])

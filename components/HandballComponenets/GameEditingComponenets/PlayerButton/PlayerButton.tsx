@@ -1,5 +1,5 @@
 import React, { ForwardRefExoticComponent, Fragment, useMemo } from 'react';
-import { Button, Modal, Progress, Title } from '@mantine/core';
+import { Button, Modal, Progress, Title, useMatches } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { PlayerActionList } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
@@ -83,9 +83,20 @@ export function PlayerButton({
   const name = player ? (player.isCaptain ? `${player.name} (c)` : player.name) : 'Loading...';
   const servingColor = 'serving-color';
   const defaultColor = 'player-color';
+  const fullscreen = useMatches({ base: true, md: false });
   return (
     <>
-      <Modal opened={opened} centered onClose={close} title="Action">
+      <Modal
+        opened={opened}
+        centered
+        onClose={close}
+        title=""
+        fullScreen={fullscreen}
+        opacity={fullscreen ? 0.95 : 1}
+        // style={{
+        //   backdropFilter: 'blur(10px)',
+        // }}
+      >
         <Title> {player?.name ?? 'Placeholder'}</Title>
         <PlayerActionList
           game={game}
