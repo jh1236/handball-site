@@ -18,14 +18,14 @@ import {
   Box,
   Button,
   Collapse,
+  Flex,
   Modal,
-  Select,
-  Slider,
+  Stack,
   Tabs,
+  Text,
   TextInput,
-  Title,
 } from '@mantine/core';
-import { makeUnique } from '@/components/HandballComponenets/GameCreatingComponents/CreateTeamButton';
+import { VerticalSlider } from '@/components/basic/VerticalSlider';
 import {
   ace,
   demerit,
@@ -49,6 +49,16 @@ function buttonEnabledFor(player: PlayerGameStatsStructure, reason: string, type
   const cards = player.prevCards!;
   const prevCard = cards.find((i) => i.eventType === type && i.notes === reason);
   return prevCard === undefined;
+}
+function getCardBadness(eventType: string): number {
+  return (
+    {
+      Warning: 1,
+      'Green Card': 2,
+      'Yellow Card': 3,
+      'Red Card': 4,
+    }[eventType] || 0
+  );
 }
 
 interface PlayerActionListParams {
@@ -82,48 +92,74 @@ export function PlayerActionList({
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const players = [team.left, team.right, team.sub].filter((a) => typeof a.get !== 'undefined');
   const currentPlayer = players.length > 1 ? players[leftSide ? 0 : 1] : players[0];
+
+  const defaultCategory = useMemo(() => {
+    if (!currentPlayer.get) return 'Warning';
+    const cards = currentPlayer.get!.prevCards!;
+    const prevCard = cards.reduce(
+      (prev, card) => Math.max(prev, getCardBadness(card.eventType)),
+      0
+    );
+    return ['Warning', 'Green Card', 'Yellow Card', 'Red Card'][prevCard] as
+      | 'Warning'
+      | 'Green Card'
+      | 'Yellow Card'
+      | 'Red Card';
+  }, [currentPlayer.get]);
+
+  const disabledCategories = useMemo(() => {
+    const possible = ['Warning', 'Green Card', 'Yellow Card', 'Red Card'];
+
+    return possible.filter((i) => getCardBadness(i) < getCardBadness(defaultCategory));
+  }, [defaultCategory]);
+
   if (!currentPlayer?.get) return <></>;
+
   let out: AccordionSettings[] = [
     {
       Icon: IconHandballCards,
       value: 'Cards',
       content: (
-        <Tabs defaultValue="Warn">
-          <Tabs.List grow style={{ flexWrap: 'nowrap' }}>
+        <Tabs defaultValue={defaultCategory}>
+          {disabledCategories}
+          <Tabs.List style={{ flexWrap: 'nowrap' }}>
             <Tabs.Tab
               size="sm"
               color="grey"
-              value="Warn"
+              value="Warning"
               leftSection={<IconExclamationMark color="grey" size={12} stroke={3} />}
+              disabled={disabledCategories.includes('Warning')}
             >
               Warn
             </Tabs.Tab>
             <Tabs.Tab
               size="sm"
               color="green"
-              value="Green"
+              value="Green Card"
               leftSection={<IconTriangleInvertedFilled color="green" size={12} />}
+              disabled={disabledCategories.includes('Green Card')}
             >
               Green
             </Tabs.Tab>
             <Tabs.Tab
               size="sm"
               color="yellow"
-              value="Yellow"
+              value="Yellow Card"
               leftSection={<IconSquareFilled color="yellow" size={12} />}
+              disabled={disabledCategories.includes('Yellow Card')}
             >
               Yellow
             </Tabs.Tab>
             <Tabs.Tab
               size="sm"
               color="red"
-              value="Red"
+              value="Red Card"
               leftSection={<IconCircleFilled color="red" size={12} />}
             >
               Red
             </Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel value="Warn">
+          <Tabs.Panel value="Warning">
             {GAME_CONFIG.cards.warning.map((reason, i) => (
               <Fragment key={i}>
                 <Button
@@ -178,7 +214,7 @@ export function PlayerActionList({
               </Button>
             </Modal>
           </Tabs.Panel>
-          <Tabs.Panel value="Green">
+          <Tabs.Panel value="Green Card">
             {GAME_CONFIG.cards.green.map((reason, i) => (
               <Fragment key={i}>
                 <Button
@@ -205,7 +241,7 @@ export function PlayerActionList({
               size="sm"
               color="gray"
             >
-              Repeat/Other
+              Other
             </Button>
 
             <Modal
@@ -215,30 +251,8 @@ export function PlayerActionList({
                 setOtherReason('');
               }}
             >
-              <Select
-                label="Select Repeat Reason"
-                allowDeselect={false}
-                defaultValue="Other"
-                data={GAME_CONFIG.cards.warning.concat('Other').map((a) => ({
-                  value: a,
-                  label: a,
-                  disabled:
-                    !game.practice.get &&
-                    !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Green Card'),
-                }))}
-                onChange={(reason) =>
-                  setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
-                }
-              ></Select>
               <TextInput
-                value={
-                  otherReason.startsWith('Repeated ')
-                    ? '-'
-                    : otherReason === 'Other'
-                      ? ''
-                      : otherReason
-                }
-                disabled={otherReason.startsWith('Repeated ')}
+                value={otherReason}
                 onChange={(event) => setOtherReason(event.currentTarget.value)}
                 label="Select Other Reason"
               ></TextInput>
@@ -256,46 +270,52 @@ export function PlayerActionList({
               </Button>
             </Modal>
           </Tabs.Panel>
-          <Tabs.Panel value="Yellow">
-            <Title m={5} order={2}>
-              Rounds:{' '}
-            </Title>
-            <Slider
-              min={game.blitzGame.get ? 3 : 6}
-              max={game.blitzGame.get ? 9 : 12}
-              step={1}
-              value={cardTime}
-              onChange={(value) => setCardTime(value)}
-            />
-            <br />
-            {GAME_CONFIG.cards.yellow.map((reason, i) => (
-              <Fragment key={i}>
+          <Tabs.Panel value="Yellow Card">
+            <Flex flex="space-between">
+              <Box>
+                {GAME_CONFIG.cards.yellow.map((reason, i) => (
+                  <Fragment key={i}>
+                    <Button
+                      style={{ margin: '3px' }}
+                      size="sm"
+                      disabled={
+                        !game.practice.get &&
+                        !buttonEnabledFor(currentPlayer.get!, reason, 'Yellow Card')
+                      }
+                      color="orange"
+                      onClick={() => {
+                        yellowCard(game, firstTeam, leftSide, reason, cardTime);
+                        close();
+                      }}
+                    >
+                      {reason}
+                    </Button>
+                    <br />
+                  </Fragment>
+                ))}
                 <Button
+                  onClick={() => setOpenModal('yellow')}
                   style={{ margin: '3px' }}
                   size="sm"
-                  disabled={
-                    !game.practice.get &&
-                    !buttonEnabledFor(currentPlayer.get!, reason, 'Yellow Card')
-                  }
-                  color="orange"
-                  onClick={() => {
-                    yellowCard(game, firstTeam, leftSide, reason, cardTime);
-                    close();
-                  }}
+                  color="gray"
                 >
-                  {reason}
+                  Other
                 </Button>
-                <br />
-              </Fragment>
-            ))}
-            <Button
-              onClick={() => setOpenModal('yellow')}
-              style={{ margin: '3px' }}
-              size="sm"
-              color="gray"
-            >
-              Repeat/Other
-            </Button>
+              </Box>
+
+              <Stack m="auto">
+                <VerticalSlider
+                  minValue={game.blitzGame.get ? 3 : 6}
+                  maxValue={game.blitzGame.get ? 9 : 12}
+                  value={cardTime}
+                  setValue={setCardTime}
+                />
+
+                <Text ta="center" mt="sm">
+                  <b>Card Time:</b> {cardTime} Rounds
+                </Text>
+              </Stack>
+            </Flex>
             <Modal
               opened={openModal === 'yellow'}
               onClose={() => {
@@ -303,38 +323,14 @@ export function PlayerActionList({
                 setOtherReason('');
               }}
             >
-              <Select
-                label="Select Repeat Reason"
-                allowDeselect={false}
-                defaultValue="Other"
-                data={makeUnique(GAME_CONFIG.cards.warning.concat(GAME_CONFIG.cards.green))
-                  .concat('Other')
-                  .map((a) => ({
-                    value: a,
-                    label: a,
-                    disabled:
-                      !game.practice.get &&
-                      !buttonEnabledFor(currentPlayer.get!, `Repeated ${a}`, 'Yellow Card'),
-                  }))}
-                onChange={(reason) =>
-                  setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
-                }
-              ></Select>
               <TextInput
-                value={
-                  otherReason.startsWith('Repeated ')
-                    ? '-'
-                    : otherReason === 'Other'
-                      ? ''
-                      : otherReason
-                }
-                disabled={otherReason.startsWith('Repeated ')}
+                value={otherReason}
                 onChange={(event) => setOtherReason(event.currentTarget.value)}
                 label="Select Other Reason"
               ></TextInput>
               <Button
                 onClick={() => {
-                  yellowCard(game, firstTeam, leftSide, otherReason);
+                  yellowCard(game, firstTeam, leftSide, otherReason, cardTime);
                   close();
                 }}
                 style={{ margin: '3px' }}
@@ -346,7 +342,7 @@ export function PlayerActionList({
               </Button>
             </Modal>
           </Tabs.Panel>
-          <Tabs.Panel value="Red">
+          <Tabs.Panel value="Red Card">
             {GAME_CONFIG.cards.red.map((reason, i) => (
               <Fragment key={i}>
                 <Button
@@ -369,7 +365,7 @@ export function PlayerActionList({
               size="sm"
               color="gray"
             >
-              Repeat/Other
+              Other
             </Button>
             <Modal
               opened={openModal === 'red'}
@@ -378,28 +374,8 @@ export function PlayerActionList({
                 setOtherReason('');
               }}
             >
-              <Select
-                label="Select Repeat Reason"
-                allowDeselect={false}
-                defaultValue="Other"
-                data={makeUnique(
-                  GAME_CONFIG.cards.warning
-                    .concat(GAME_CONFIG.cards.green)
-                    .concat(GAME_CONFIG.cards.yellow)
-                ).concat('Other')}
-                onChange={(reason) =>
-                  setOtherReason(reason === 'Other' ? 'Other' : `Repeated ${reason}`)
-                }
-              ></Select>
               <TextInput
-                value={
-                  otherReason.startsWith('Repeated ')
-                    ? '-'
-                    : otherReason === 'Other'
-                      ? ''
-                      : otherReason
-                }
-                disabled={otherReason.startsWith('Repeated ')}
+                value={otherReason}
                 onChange={(event) => setOtherReason(event.currentTarget.value)}
                 label="Select Other Reason"
               ></TextInput>

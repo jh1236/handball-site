@@ -49,7 +49,7 @@ import {
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { alertGame, deleteGame, resolveGame } from '@/ServerActions/GameActions';
-import { CardStructure, GameEventStructure, GameStructure } from '@/ServerActions/types';
+import { GameEventStructure, GameStructure } from '@/ServerActions/types';
 
 interface AdminGamePanelProps {
   game: GameStructure;
@@ -75,7 +75,7 @@ export const RESOLVED_STATUSES = [
   undefined,
 ];
 
-export const eventIcon = (e: GameEventStructure | CardStructure, props = {}) => {
+export const eventIcon = (e: GameEventStructure, props = {}) => {
   switch (e.eventType) {
     case 'Start':
       return <IconFlagCheck {...props} />;
@@ -156,8 +156,7 @@ export const eventIcon = (e: GameEventStructure | CardStructure, props = {}) => 
   return null;
 };
 
-const cardColor = (e: GameEventStructure | CardStructure) =>
-  e.eventType.toLowerCase().replace(' Card', '');
+const cardColor = (e: GameEventStructure) => e.eventType.toLowerCase().replace(' Card', '');
 
 export function AdminGamePanel({ game }: AdminGamePanelProps) {
   const teamTwoCards = game.admin?.cards!.filter((a) => !a.firstTeam) ?? [];
@@ -434,7 +433,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
                     <Timeline.Item
                       key={i}
                       title={`${e.eventType} ${e.player ? `for ${e.player.name}` : e.firstTeam !== null ? `for ${e.firstTeam ? game.teamOne.name : game.teamTwo.name}` : ''}`}
-                      bullet={eventIcon(e as CardStructure)}
+                      bullet={eventIcon(e)}
                     >
                       <Text c="dimmed" size="sm">
                         <strong>

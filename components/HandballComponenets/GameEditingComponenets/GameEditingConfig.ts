@@ -19,12 +19,7 @@ export const GAME_CONFIG = {
   ],
 
   cards: {
-    warning: [
-      'Audible Swearing',
-      'Delay of Game',
-      'Missed Post-game Handshake',
-      'Unreasonable Carry',
-    ],
+    warning: cardReasons,
     green: cardReasons,
     yellow: cardReasons,
     red: cardReasons,
