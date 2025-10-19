@@ -47,7 +47,9 @@ import { PlayerGameStatsStructure } from '@/ServerActions/types';
 function buttonEnabledFor(player: PlayerGameStatsStructure, reason: string, type: string): boolean {
   if (!player) return true;
   const cards = player.prevCards!;
-  const prevCard = cards.find((i) => i.eventType === type && i.notes === reason);
+  const prevCard = cards.find(
+    (i) => getCardBadness(i.eventType) >= getCardBadness(type) && i.notes === reason
+  );
   return prevCard === undefined;
 }
 function getCardBadness(eventType: string): number {
@@ -97,7 +99,7 @@ export function PlayerActionList({
 
   const defaultCategory = useMemo(() => {
     if (!currentPlayer.get) return 'Warning';
-    const cards = currentPlayer.get!.prevCards!;
+    const cards = currentPlayer.get!.prevCards!.filter((gE) => gE.gameId === game.id);
     const prevCard = cards.reduce(
       (prev, card) => Math.max(prev, getCardBadness(card.eventType)),
       0
@@ -107,7 +109,7 @@ export function PlayerActionList({
       | 'Green Card'
       | 'Yellow Card'
       | 'Red Card';
-  }, [currentPlayer.get]);
+  }, [currentPlayer.get, game.id]);
 
   const disabledCategories = useMemo(() => {
     const possible = ['Warning', 'Green Card', 'Yellow Card', 'Red Card'];
