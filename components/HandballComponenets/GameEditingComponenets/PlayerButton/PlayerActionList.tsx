@@ -76,20 +76,22 @@ export function PlayerActionList({
   serving,
   close: _close,
 }: PlayerActionListParams): React.ReactElement {
-  const [cardTime, setCardTime] = React.useState<number>(game.blitzGame.get ? 3 : 6);
+  const team = firstTeam ? game.teamOne : game.teamTwo;
+  const [cardTime, setCardTime] = React.useState<number>(
+    Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0))
+  );
   const [otherReason, setOtherReason] = React.useState<string>('');
   const close = useCallback(() => {
     _close();
-    setCardTime(game.blitzGame.get ? 3 : 6);
+    setCardTime(Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0)));
     setOpenModal(undefined);
     setOtherReason('');
-  }, [_close, game.blitzGame.get]);
+  }, [_close, game.blitzGame.get, team.isSolo]);
 
   const subsAllowedScore = useMemo(() => (game.blitzGame.get ? 5 : 9), [game.blitzGame.get]);
   const [openModal, setOpenModal] = useState<
     undefined | 'green' | 'yellow' | 'red' | 'score' | 'warning'
   >(undefined);
-  const team = firstTeam ? game.teamOne : game.teamTwo;
   const players = [team.left, team.right, team.sub].filter((a) => typeof a.get !== 'undefined');
   const currentPlayer = players.length > 1 ? players[leftSide ? 0 : 1] : players[0];
 

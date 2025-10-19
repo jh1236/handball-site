@@ -108,6 +108,7 @@ export type TeamState = {
     get: boolean;
     set: (v: boolean) => void;
   };
+  isSolo: boolean;
   left: {
     get?: PlayerGameStatsStructure;
     set: (v?: PlayerGameStatsStructure) => void;
@@ -192,6 +193,9 @@ export function useGameState(game?: GameStructure) {
     }
   }, [teamOneScore, teamTwoScore, abandoned, blitzGame]);
 
+  // DEAR FUTURE JARED
+  // I am incredibly suspicious at the `isSolo` implementation.
+  // If you are encountering bugs, start there
   const gameState: GameState = useMemo(
     () => ({
       practice: {
@@ -285,6 +289,7 @@ export function useGameState(game?: GameStructure) {
           get: teamOneSub,
           set: setTeamOneSub,
         },
+        isSolo: !teamOneLeft || !teamOneRight,
       },
       teamTwo: {
         name: {
@@ -327,6 +332,7 @@ export function useGameState(game?: GameStructure) {
           get: teamTwoSub,
           set: setTeamTwoSub,
         },
+        isSolo: !teamTwoLeft || !teamTwoRight,
       },
       firstTeamScoredLast: {
         get: firstTeamScoredLast,
