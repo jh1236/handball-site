@@ -47,7 +47,9 @@ import { PlayerGameStatsStructure } from '@/ServerActions/types';
 function buttonEnabledFor(player: PlayerGameStatsStructure, reason: string, type: string): boolean {
   if (!player) return true;
   const cards = player.prevCards!;
-  const prevCard = cards.find((i) => i.eventType === type && i.notes === reason);
+  const prevCard = cards.find(
+    (i) => getCardBadness(i.eventType) >= getCardBadness(type) && i.notes === reason
+  );
   return prevCard === undefined;
 }
 function getCardBadness(eventType: string): number {
