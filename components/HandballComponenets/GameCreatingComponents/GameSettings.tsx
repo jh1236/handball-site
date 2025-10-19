@@ -114,9 +114,9 @@ export function GameSettings({
                   router.push(`/games/${id}/edit`);
                 })
                 // TODO: We don't have proper error handling yet- maybe another one for Digby 🥺👉👈
-                // eslint-disable-next-line no-alert
                 .catch(() => {
                   setCreating(false);
+                  // eslint-disable-next-line no-alert
                   alert('Learn to use a basic ui!');
                 });
             }
