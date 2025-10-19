@@ -97,7 +97,7 @@ export function PlayerActionList({
 
   const defaultCategory = useMemo(() => {
     if (!currentPlayer.get) return 'Warning';
-    const cards = currentPlayer.get!.prevCards!.filter(gE => gE.gameId === game.id);
+    const cards = currentPlayer.get!.prevCards!.filter((gE) => gE.gameId === game.id);
     const prevCard = cards.reduce(
       (prev, card) => Math.max(prev, getCardBadness(card.eventType)),
       0
