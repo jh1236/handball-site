@@ -97,29 +97,28 @@ export function GameSettings({
         <Button
           size="sm"
           color="player-color"
+          disabled={creating}
           onClick={() => {
-            if (!creating) {
-              setCreating(true);
-              createGameWithPlayers(
-                'suss_practice',
-                playersOne,
-                playersTwo,
-                blitzGame,
-                official?.searchableName,
-                scorer?.searchableName,
-                teamNameOne,
-                teamNameTwo
-              )
-                .then((id) => {
-                  router.push(`/games/${id}/edit`);
-                })
-                // TODO: We don't have proper error handling yet- maybe another one for Digby 🥺👉👈
-                .catch(() => {
-                  setCreating(false);
-                  // eslint-disable-next-line no-alert
-                  alert('Learn to use a basic ui!');
-                });
-            }
+            setCreating(true);
+            createGameWithPlayers(
+              'suss_practice',
+              playersOne,
+              playersTwo,
+              blitzGame,
+              official?.searchableName,
+              scorer?.searchableName,
+              teamNameOne,
+              teamNameTwo
+            )
+              .then((id) => {
+                router.push(`/games/${id}/edit`);
+              })
+              // TODO: We don't have proper error handling yet- maybe another one for Digby 🥺👉👈
+              .catch(() => {
+                setCreating(false);
+                // eslint-disable-next-line no-alert
+                alert('Learn to use a basic ui!');
+              });
           }}
         >
           Create
