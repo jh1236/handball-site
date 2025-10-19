@@ -168,7 +168,16 @@ export function greenCard(
   leftPlayer: boolean,
   reason: string
 ): void {
-  card(game, 'Green', firstTeam, leftPlayer, reason, game.blitzGame.get ? 1 : 2);
+  let cardTime = 2;
+  if (game.blitzGame.get) {
+    cardTime -= 1;
+  }
+  const team = firstTeam ? game.teamOne : game.teamTwo;
+  if (team.isSolo) {
+    cardTime -= 1;
+  }
+
+  card(game, 'Green', firstTeam, leftPlayer, reason, cardTime);
 }
 
 export function yellowCard(

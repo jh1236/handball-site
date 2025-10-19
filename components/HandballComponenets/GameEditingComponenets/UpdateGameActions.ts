@@ -1,5 +1,18 @@
-import { GameState } from '@/components/HandballComponenets/GameState';
+import { GameState, TeamState } from '@/components/HandballComponenets/GameState';
 import { PersonStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+
+function swapSides(team: TeamState) {
+  const newRight = team.left?.get;
+  if (newRight) {
+    newRight.sideOfCourt = 'Right';
+  }
+  const newLeft = team.right?.get;
+  if (newLeft) {
+    newLeft.sideOfCourt = 'Left';
+  }
+  team.left.set(newLeft);
+  team.right.set(newRight);
+}
 
 function nextPoint(game: GameState, firstTeamScored: boolean) {
   for (const i of [
@@ -22,16 +35,7 @@ function nextPoint(game: GameState, firstTeamScored: boolean) {
   if (game.badminton.get) {
     if (firstTeamScored === game.firstTeamServes.get) {
       // the team who served has scored
-      const newRight = team.left?.get;
-      if (newRight) {
-        newRight.sideOfCourt = 'Right';
-      }
-      const newLeft = team.right?.get;
-      if (newLeft) {
-        newLeft.sideOfCourt = 'Left';
-      }
-      team.left.set(newLeft);
-      team.right.set(newRight);
+      swapSides(team);
     } else {
       //the team who did not serve scored
       // eslint-disable-next-line no-lonely-if
@@ -216,6 +220,7 @@ export function cardLocal(
   const otherPlayer = leftPlayer ? team.right : team.left;
   const outOtherPlayer = otherPlayer.get!;
   const otherTeamWins = Math.max(11, team.score.get + 2);
+  let needsSwap = false;
   if (!player.get || !otherPlayer.get) {
     // Single Player Case
     if (duration === -1) {
@@ -223,23 +228,26 @@ export function cardLocal(
     } else {
       otherTeam.score.set(Math.min(otherTeamWins, otherTeam.score.get + duration));
     }
+    if (duration % 2 !== 0) {
+      otherTeam.servingFromLeft.set(!otherTeam.servingFromLeft.get);
+    }
+    needsSwap = true;
     game.firstTeamServes.set(!firstTeam);
   } else if (player.get && otherPlayer.get?.cardTimeRemaining) {
     // both players are carded
+    let pointsToAdd: number;
     if (otherPlayer.get.cardTimeRemaining === -1) {
       // team mate has a red card
       if (duration === -1) {
         // both players are red carded; the game is over
-        otherTeam.score.set(otherTeamWins);
+        pointsToAdd = otherTeamWins - otherTeam.score.get;
       } else {
         // instead of being sent off, the other team needs the score to be set
-        otherTeam.score.set(Math.min(otherTeamWins, otherTeam.score.get + duration));
+        pointsToAdd = duration;
       }
     } else if (duration === -1) {
       //only i have a red card
-      otherTeam.score.set(
-        Math.min(otherTeamWins, otherTeam.score.get + otherPlayer.get.cardTimeRemaining)
-      );
+      pointsToAdd = otherPlayer.get.cardTimeRemaining;
       const temp = otherPlayer.get;
       temp.cardTimeRemaining = 0;
       otherPlayer.set(temp);
@@ -255,18 +263,27 @@ export function cardLocal(
         otherPlayer.get.cardTimeRemaining <= player.get.cardTimeRemaining
           ? outOtherPlayer
           : outPlayer;
-      otherTeam.score.set(
-        Math.min(otherTeamWins, otherTeam.score.get + notCardedPlayer.cardTimeRemaining)
-      );
+
+      pointsToAdd = notCardedPlayer.cardTimeRemaining;
+
       stillCardedPlayer.cardTimeRemaining -= notCardedPlayer.cardTimeRemaining;
       notCardedPlayer.cardTimeRemaining = 0;
     }
+    otherTeam.score.set(Math.min(otherTeamWins, otherTeam.score.get + pointsToAdd));
     // set the other team to serve
     game.firstTeamServes.set(!firstTeam);
-    if (game.firstTeamServes.get === firstTeam) {
-      const temp = otherTeam.left?.get;
-      otherTeam.left?.set(otherTeam.right?.get);
-      otherTeam.right?.set(temp);
+    const even = pointsToAdd % 2 === 0;
+    const cardedTeamServed = firstTeam === game.firstTeamServes.get;
+    if (even === cardedTeamServed) {
+      // what I thought should happen is this is true when:
+      //   both are false (an odd number of points when the team serving gets the points)
+      //   both are true  (an even number of points but the team not serving gets the points)
+      //   if you were already serving, an odd number of points swaps you
+      //   but if you get the service, you don't swap on the first one, so an even number does
+      needsSwap = true;
+    }
+    if (!even) {
+      otherTeam.servingFromLeft.set(!otherTeam.servingFromLeft.get);
     }
   } else if (outPlayer.cardTimeRemaining !== -1) {
     //I dont already have a red card
@@ -282,5 +299,8 @@ export function cardLocal(
   player.set(outPlayer);
   if (outOtherPlayer !== otherPlayer.get!) {
     otherPlayer.set(outOtherPlayer);
+  }
+  if (needsSwap) {
+    swapSides(otherTeam);
   }
 }
