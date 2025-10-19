@@ -33,7 +33,7 @@ import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComp
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGames } from '@/ServerActions/GameActions';
 import { getTeam } from '@/ServerActions/TeamActions';
-import { CardStructure, GameStructure, TeamStructure } from '@/ServerActions/types';
+import { GameEventStructure, GameStructure, TeamStructure } from '@/ServerActions/types';
 import PlayerStatsTable from './PlayerStatsTable';
 
 interface TeamsProps {
@@ -64,7 +64,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
   // const [sort, setSort] = React.useState<number>(-1);
 
   const [games, setGames] = React.useState<GameStructure[]>([]);
-  const [cards, setCards] = React.useState<{ game: GameStructure; card: CardStructure }[]>([]);
+  const [cards, setCards] = React.useState<{ game: GameStructure; card: GameEventStructure }[]>([]);
   const [teamObj, setteamObj] = React.useState<TeamStructure | undefined>(undefined);
   const [gamesCount, setGamesCount] = React.useState<number>(20);
   const { isUmpireManager } = useUserData();
@@ -84,7 +84,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
       tournament,
       includePlayerStats: true,
     }).then((g) => {
-      let output: { game: GameStructure; card: CardStructure }[] = [];
+      let output: { game: GameStructure; card: GameEventStructure }[] = [];
       for (const game of g.games) {
         output = output.concat(
           (game.admin?.cards ?? [])
