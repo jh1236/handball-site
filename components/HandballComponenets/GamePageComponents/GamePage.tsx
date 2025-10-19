@@ -23,7 +23,7 @@ export function GamePage({ gameID }: GamePageProps) {
   const [activeTab, setActiveTab] = useState<string | null>('stats');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isUmpireManager } = useUserData();
+  const { isUmpireManager, isOfficial } = useUserData();
 
   useEffect(() => {
     getGame({
@@ -99,7 +99,7 @@ export function GamePage({ gameID }: GamePageProps) {
                 </Tabs.Panel>
               </Tabs>
             </Tabs.Panel>
-            {game.admin && (
+            {isOfficial(game.tournament.searchableName) && (
               <Tabs.Panel value="admin">
                 <AdminGamePanel game={game}></AdminGamePanel>
               </Tabs.Panel>
