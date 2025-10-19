@@ -97,8 +97,8 @@ export function GameSettings({
         <Button
           size="sm"
           color="player-color"
+          disabled={!creating}
           onClick={() => {
-            if (!creating) {
               setCreating(true);
               createGameWithPlayers(
                 'suss_practice',
@@ -120,7 +120,7 @@ export function GameSettings({
                   alert('Learn to use a basic ui!');
                 });
             }
-          }}
+          }
         >
           Create
         </Button>
