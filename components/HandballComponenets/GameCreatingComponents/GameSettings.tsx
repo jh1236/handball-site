@@ -28,6 +28,7 @@ export function GameSettings({
   const [tournament, setTournament] = useState<TournamentStructure>();
   const [tournaments, setTournaments] = useState<TournamentStructure[]>([]);
   const [scorer, setScorer] = useState<OfficialStructure>();
+  const [creating, setCreating] = useState<boolean>(false);
   const [official, setOfficial] = useState<OfficialStructure>();
   const { username } = useUserData();
   const router = useRouter();
@@ -97,22 +98,28 @@ export function GameSettings({
           size="sm"
           color="player-color"
           onClick={() => {
-            createGameWithPlayers(
-              'suss_practice',
-              playersOne,
-              playersTwo,
-              blitzGame,
-              official?.searchableName,
-              scorer?.searchableName,
-              teamNameOne,
-              teamNameTwo
-            )
-              .then((id) => {
-                router.push(`/games/${id}/edit`);
-              })
-              // TODO: We don't have proper error handling yet- maybe another one for Digby 🥺👉👈
-              // eslint-disable-next-line no-alert
-              .catch(() => alert('Learn to use a basic ui!'));
+            if (!creating) {
+              setCreating(true);
+              createGameWithPlayers(
+                'suss_practice',
+                playersOne,
+                playersTwo,
+                blitzGame,
+                official?.searchableName,
+                scorer?.searchableName,
+                teamNameOne,
+                teamNameTwo
+              )
+                .then((id) => {
+                  router.push(`/games/${id}/edit`);
+                })
+                // TODO: We don't have proper error handling yet- maybe another one for Digby 🥺👉👈
+                .catch(() => {
+                  setCreating(false);
+                  // eslint-disable-next-line no-alert
+                  alert('Learn to use a basic ui!');
+                });
+            }
           }}
         >
           Create
