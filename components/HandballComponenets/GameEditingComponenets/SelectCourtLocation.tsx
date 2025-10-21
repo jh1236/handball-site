@@ -5,11 +5,17 @@ import classes from './SelectCourtLocation.module.css';
 
 interface SelectCourtLocationParams {
   location: string[];
-  setLocation: React.SetStateAction<string[]>;
-  isAce: boolean;
+  setLocation: React.Dispatch<React.SetStateAction<string[]>>;
+  isAce?: boolean;
+  leftSide: boolean;
 }
 
-export function SelectCourtLocation({ location, setLocation, isAce }: SelectCourtLocationParams) {
+export function SelectCourtLocation({
+  location,
+  setLocation,
+  isAce = false,
+  leftSide,
+}: SelectCourtLocationParams) {
   const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
   const [controlsRefs, setControlsRefs] = useState<Record<string, HTMLButtonElement | null>>({});
 
@@ -19,8 +25,10 @@ export function SelectCourtLocation({ location, setLocation, isAce }: SelectCour
   };
   const W = 50;
   const H = 50;
-  const Thick = 3;
-  const stringLocation = useMemo(() => controlsRefs[location.join('-')], [controlsRefs, location]);
+  const lineThickness = 3;
+  const edgeFactor = 2;
+  const stringLocation = useMemo(() => location.join('-'), [location]);
+  const active = useMemo(() => controlsRefs[stringLocation], [controlsRefs, stringLocation]);
   return (
     <>
       <div className={classes.root} dir="ltr" ref={setRootRef}>
@@ -28,7 +36,7 @@ export function SelectCourtLocation({ location, setLocation, isAce }: SelectCour
           <i>Back Court</i>
         </Center>
         <FloatingIndicator
-          target={stringLocation}
+          target={active}
           style={{
             opacity: 0.5,
             backgroundColor: '#6666ff',
@@ -37,47 +45,163 @@ export function SelectCourtLocation({ location, setLocation, isAce }: SelectCour
           className={classes.indicator}
         />
 
-        <Box w={4 * W + 3 * Thick} bg="purple" h={Thick}></Box>
+        <Flex>
+          <UnstyledButton
+            disabled={isAce && leftSide}
+            className={isAce && leftSide ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W / edgeFactor}
+            onClick={() => setLocation(['deep', 'wide-left'])}
+            ref={setControlRef('deep-wide-left')}
+            mod={{ active: stringLocation === 'deep-wide-left' }}
+          >
+            {isAce && leftSide && <IconX />}
+          </UnstyledButton>
+          <Box w={lineThickness} h={H} />
+          <UnstyledButton
+            disabled={isAce && leftSide}
+            className={isAce && leftSide ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W}
+            onClick={() => setLocation(['deep', 'left'])}
+            ref={setControlRef('deep-left')}
+            mod={{ active: stringLocation === 'deep-left' }}
+          >
+            {isAce && leftSide && <IconX />}
+          </UnstyledButton>
+          <UnstyledButton
+            disabled={isAce && leftSide}
+            className={isAce && leftSide ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W}
+            onClick={() => setLocation(['deep', 'center-left'])}
+            ref={setControlRef('deep-center-left')}
+            mod={{ active: stringLocation === 'deep-center-left' }}
+          >
+            {isAce && leftSide && <IconX />}
+          </UnstyledButton>
+          <Box pos="relative" w={lineThickness} bg="green" h={H / edgeFactor} top={(2 * H) / edgeFactor} />
+          <UnstyledButton
+            disabled={isAce && !leftSide}
+            className={isAce && !leftSide ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W}
+            onClick={() => setLocation(['deep', 'center-right'])}
+            ref={setControlRef('deep-center-right')}
+            mod={{ active: stringLocation === 'deep-center-right' }}
+          >
+            {isAce && !leftSide && <IconX />}
+          </UnstyledButton>
+          <UnstyledButton
+            disabled={isAce && !leftSide}
+            className={isAce && !leftSide ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W}
+            onClick={() => setLocation(['deep', 'right'])}
+            ref={setControlRef('deep-right')}
+            mod={{ active: stringLocation === 'deep-right' }}
+          >
+            {isAce && !leftSide && <IconX />}
+          </UnstyledButton>
+          <UnstyledButton
+            disabled={isAce && !leftSide}
+            className={isAce && !leftSide ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W / edgeFactor}
+            onClick={() => setLocation(['deep', 'wide-right'])}
+            ref={setControlRef('deep-wide-right')}
+            mod={{ active: stringLocation === 'deep-wide-right' }}
+          >
+            {isAce && !leftSide && <IconX />}
+          </UnstyledButton>
+        </Flex>
+
+        <Box pos="relative" left={W / edgeFactor} w={4 * W + 3 * lineThickness} bg="purple" h={lineThickness} />
 
         <Flex>
-          <Box w={Thick} bg="pink" h={H}></Box>
           <UnstyledButton
-            className={classes.control}
+            disabled={isAce}
+            className={isAce ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W / edgeFactor}
+            onClick={() => setLocation(['back', 'wide-left'])}
+            ref={setControlRef('back-wide-left')}
+            mod={{ active: stringLocation === 'back-wide-left' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
+          <Box w={lineThickness} bg="pink" h={H} />
+          <UnstyledButton
+            disabled={isAce}
+            className={isAce ? classes.evilcontrol : classes.control}
             h={H}
             w={W}
-            onClick={() => setLocation(['top', 'left'])}
-            ref={setControlRef('top-left')}
-            mod={{ active: stringLocation === 'top-left' }}
-          ></UnstyledButton>
+            onClick={() => setLocation(['back', 'left'])}
+            ref={setControlRef('back-left')}
+            mod={{ active: stringLocation === 'back-left' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
           <UnstyledButton
-            className={classes.control}
+            disabled={isAce}
+            className={isAce ? classes.evilcontrol : classes.control}
             h={H}
             w={W}
-            onClick={() => setLocation(['top', 'center-left'])}
-            ref={setControlRef('top-center-left')}
-            mod={{ active: stringLocation === 'top-center-left' }}
-          ></UnstyledButton>
-          <Box w={Thick} bg="green" h={H}></Box>
+            onClick={() => setLocation(['back', 'center-left'])}
+            ref={setControlRef('back-center-left')}
+            mod={{ active: stringLocation === 'back-center-left' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
+          <Box w={lineThickness} bg="green" h={H} />
           <UnstyledButton
-            className={classes.control}
+            disabled={isAce}
+            className={isAce ? classes.evilcontrol : classes.control}
             h={H}
             w={W}
-            onClick={() => setLocation(['top', 'center-right'])}
-            ref={setControlRef('top-center-right')}
-            mod={{ active: stringLocation === 'top-center-right' }}
-          ></UnstyledButton>
+            onClick={() => setLocation(['back', 'center-right'])}
+            ref={setControlRef('back-center-right')}
+            mod={{ active: stringLocation === 'back-center-right' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
           <UnstyledButton
-            className={classes.control}
+            disabled={isAce}
+            className={isAce ? classes.evilcontrol : classes.control}
             h={H}
             w={W}
-            onClick={() => setLocation(['top', 'right'])}
-            ref={setControlRef('top-right')}
-            mod={{ active: stringLocation === 'top-center-right' }}
-          ></UnstyledButton>
-          <Box w={Thick} bg="pink" h={H}></Box>
+            onClick={() => setLocation(['back', 'right'])}
+            ref={setControlRef('back-right')}
+            mod={{ active: stringLocation === 'back-right' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
+          <Box w={lineThickness} bg="pink" h={H} />
+          <UnstyledButton
+            disabled={isAce}
+            className={isAce ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W / edgeFactor}
+            onClick={() => setLocation(['back', 'wide-right'])}
+            ref={setControlRef('back-wide-right')}
+            mod={{ active: stringLocation === 'back-wide-right' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
         </Flex>
         <Flex>
-          <Box w={Thick} bg="pink" h={H}></Box>
+          <UnstyledButton
+            disabled={isAce}
+            className={isAce ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W / edgeFactor}
+            onClick={() => setLocation(['mid', 'wide-left'])}
+            ref={setControlRef('mid-wide-left')}
+            mod={{ active: stringLocation === 'mid-wide-left' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
+          <Box w={lineThickness} bg="pink" h={H} />
           <UnstyledButton
             disabled={isAce}
             className={isAce ? classes.evilcontrol : classes.control}
@@ -87,7 +211,7 @@ export function SelectCourtLocation({ location, setLocation, isAce }: SelectCour
             ref={setControlRef('mid-left')}
             mod={{ active: stringLocation === 'mid-left' }}
           >
-            {isAce && <IconX></IconX>}
+            {isAce && <IconX />}
           </UnstyledButton>
           <UnstyledButton
             disabled={isAce}
@@ -98,9 +222,9 @@ export function SelectCourtLocation({ location, setLocation, isAce }: SelectCour
             ref={setControlRef('mid-center-left')}
             mod={{ active: stringLocation === 'mid-center-left' }}
           >
-            {isAce && <IconX></IconX>}
+            {isAce && <IconX />}
           </UnstyledButton>
-          <Box w={Thick} bg="green" h={H}></Box>
+          <Box w={lineThickness} bg="green" h={H} />
           <UnstyledButton
             disabled={isAce}
             className={isAce ? classes.evilcontrol : classes.control}
@@ -108,9 +232,9 @@ export function SelectCourtLocation({ location, setLocation, isAce }: SelectCour
             w={W}
             onClick={() => setLocation(['mid', 'center-right'])}
             ref={setControlRef('mid-center-right')}
-            mod={{ active: location === 'mid-center-right' }}
+            mod={{ active: stringLocation === 'mid-center-right' }}
           >
-            {isAce && <IconX></IconX>}
+            {isAce && <IconX />}
           </UnstyledButton>
           <UnstyledButton
             disabled={isAce}
@@ -119,63 +243,100 @@ export function SelectCourtLocation({ location, setLocation, isAce }: SelectCour
             w={W}
             onClick={() => setLocation(['mid', 'right'])}
             ref={setControlRef('mid-right')}
-            mod={{ active: location === 'mid-right' }}
+            mod={{ active: stringLocation === 'mid-right' }}
           >
-            {isAce && <IconX></IconX>}
+            {isAce && <IconX />}
           </UnstyledButton>
-          <Box w={Thick} bg="pink" h={H}></Box>
+          <Box w={lineThickness} bg="pink" h={H} />
+          <UnstyledButton
+            disabled={isAce}
+            className={isAce ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W / edgeFactor}
+            onClick={() => setLocation(['mid', 'wide-right'])}
+            ref={setControlRef('mid-wide-right')}
+            mod={{ active: stringLocation === 'mid-wide-right' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
         </Flex>
-        <Box w={4 * W + 3 * Thick} bg="red" h={Thick}></Box>
+
+        <Box pos="relative" left={W / edgeFactor} w={4 * W + 3 * lineThickness} bg="red" h={lineThickness} />
+
         <Flex>
-          <Box w={Thick} bg="pink" h={H}></Box>
+          <UnstyledButton
+            disabled={isAce}
+            className={isAce ? classes.evilcontrol : classes.control}
+            h={H}
+            w={W / edgeFactor}
+            onClick={() => setLocation(['front', 'wide-left'])}
+            ref={setControlRef('front-wide-left')}
+            mod={{ active: stringLocation === 'front-wide-left' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
+          <Box w={lineThickness} bg="pink" h={H} />
           <UnstyledButton
             className={isAce ? classes.evilcontrol : classes.control}
             disabled={isAce}
             h={H}
             w={W}
-            onClick={() => setLocation(['bra', 'left'])}
-            ref={setControlRef('bra-left')}
-            mod={{ active: stringLocation === 'bra-left' }}
+            onClick={() => setLocation(['front', 'left'])}
+            ref={setControlRef('front-left')}
+            mod={{ active: stringLocation === 'front-left' }}
           >
-            {isAce && <IconX></IconX>}
+            {isAce && <IconX />}
           </UnstyledButton>
           <UnstyledButton
             className={isAce ? classes.evilcontrol : classes.control}
             disabled={isAce}
             h={H}
             w={W}
-            onClick={() => setLocation(['bra', 'center-left'])}
-            ref={setControlRef('bra-center-left')}
-            mod={{ active: stringLocation === 'bra-center-left' }}
+            onClick={() => setLocation(['front', 'center-left'])}
+            ref={setControlRef('front-center-left')}
+            mod={{ active: stringLocation === 'front-center-left' }}
           >
-            {isAce && <IconX></IconX>}
+            {isAce && <IconX />}
           </UnstyledButton>
-          <Box w={Thick} bg="green" h={H}></Box>
+          <Box w={lineThickness} bg="green" h={H} />
           <UnstyledButton
             className={isAce ? classes.evilcontrol : classes.control}
             disabled={isAce}
             h={H}
             w={W}
-            onClick={() => setLocation(['bra', 'center-right'])}
-            ref={setControlRef('bra-center-right')}
-            mod={{ active: stringLocation === 'bra-center-right' }}
+            onClick={() => setLocation(['front', 'center-right'])}
+            ref={setControlRef('front-center-right')}
+            mod={{ active: stringLocation === 'front-center-right' }}
           >
-            {isAce && <IconX></IconX>}
+            {isAce && <IconX />}
           </UnstyledButton>
           <UnstyledButton
             className={isAce ? classes.evilcontrol : classes.control}
             disabled={isAce}
             h={H}
             w={W}
-            onClick={() => setLocation(['bra', 'right'])}
-            ref={setControlRef('bra-right')}
-            mod={{ active: stringLocation === 'bra-right' }}
+            onClick={() => setLocation(['front', 'right'])}
+            ref={setControlRef('front-right')}
+            mod={{ active: stringLocation === 'front-right' }}
           >
-            {isAce && <IconX></IconX>}
+            {isAce && <IconX />}
           </UnstyledButton>
-          <Box w={Thick} bg="pink" h={H}></Box>
+          <Box w={lineThickness} bg="pink" h={H} />
+          <UnstyledButton
+            className={isAce ? classes.evilcontrol : classes.control}
+            disabled={isAce}
+            h={H}
+            w={W / edgeFactor}
+            onClick={() => setLocation(['front', 'wide-right'])}
+            ref={setControlRef('front-wide-right')}
+            mod={{ active: stringLocation === 'front-wide-right' }}
+          >
+            {isAce && <IconX />}
+          </UnstyledButton>
         </Flex>
-        <Box w={4 * W + 3 * Thick} bg="white" h={Thick}></Box>
+
+        <Box pos="relative" left={W / edgeFactor} w={4 * W + 3 * lineThickness} bg="white" h={lineThickness} />
+
         <Center>
           <i>Center Line</i>
         </Center>

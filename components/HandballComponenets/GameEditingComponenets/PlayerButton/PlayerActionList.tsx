@@ -87,7 +87,7 @@ export function PlayerActionList({
   );
   const [moreShown, setMoreShown] = useState<boolean>(false);
 
-  const [location, setLocation] = React.useState<string[]>([undefined, undefined]);
+  const [location, setLocation] = React.useState<string[]>([]);
   const [otherReason, setOtherReason] = React.useState<string>('');
   const close = useCallback(() => {
     _close();
@@ -521,6 +521,7 @@ export function PlayerActionList({
             title="Location Picker"
             onClose={() => {
               setOtherReason('');
+              setLocation([]);
               setOpenModal(undefined);
             }}
           >
@@ -530,6 +531,7 @@ export function PlayerActionList({
                 <SelectCourtLocation
                   location={location}
                   setLocation={setLocation}
+                  leftSide={leftSide}
                 ></SelectCourtLocation>
               </Center>
               <br />
@@ -537,9 +539,9 @@ export function PlayerActionList({
                 onClick={() => {
                   score(game, firstTeam, leftSide, otherReason, location);
                   setOpenModal(undefined);
-                  setLocation([undefined, undefined]);
+                  setLocation([]);
                 }}
-                disabled={!location[0]}
+                disabled={!location.length}
               >
                 Submit
               </Button>
@@ -619,7 +621,7 @@ export function PlayerActionList({
               opened={openModal === 'ace'}
               title="Location Picker"
               onClose={() => {
-                setOtherReason('');
+                setLocation([]);
                 setOpenModal(undefined);
               }}
             >
@@ -630,6 +632,7 @@ export function PlayerActionList({
                     isAce
                     location={location}
                     setLocation={setLocation}
+                    leftSide={leftSide}
                   ></SelectCourtLocation>
                 </Center>
                 <br />
@@ -637,7 +640,7 @@ export function PlayerActionList({
                   onClick={() => {
                     ace(game, location);
                     setOpenModal(undefined);
-                    setLocation([undefined, undefined]);
+                    setLocation([]);
                   }}
                   disabled={!location[0]}
                 >
