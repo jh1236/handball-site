@@ -80,7 +80,13 @@ export function SelectCourtLocation({
           >
             {isAce && leftSide && <IconX />}
           </UnstyledButton>
-          <Box pos="relative" w={lineThickness} bg="green" h={H / edgeFactor} top={(2 * H) / edgeFactor} />
+          <Box
+            pos="relative"
+            w={lineThickness}
+            bg="green"
+            h={H / edgeFactor}
+            top={(2 * H) / edgeFactor}
+          />
           <UnstyledButton
             disabled={isAce && !leftSide}
             className={isAce && !leftSide ? classes.evilcontrol : classes.control}
@@ -116,7 +122,13 @@ export function SelectCourtLocation({
           </UnstyledButton>
         </Flex>
 
-        <Box pos="relative" left={W / edgeFactor} w={4 * W + 3 * lineThickness} bg="purple" h={lineThickness} />
+        <Box
+          pos="relative"
+          left={W / edgeFactor}
+          w={4 * W + 3 * lineThickness}
+          bg="purple"
+          h={lineThickness}
+        />
 
         <Flex>
           <UnstyledButton
@@ -261,7 +273,13 @@ export function SelectCourtLocation({
           </UnstyledButton>
         </Flex>
 
-        <Box pos="relative" left={W / edgeFactor} w={4 * W + 3 * lineThickness} bg="red" h={lineThickness} />
+        <Box
+          pos="relative"
+          left={W / edgeFactor}
+          w={4 * W + 3 * lineThickness}
+          bg="red"
+          h={lineThickness}
+        />
 
         <Flex>
           <UnstyledButton
@@ -335,7 +353,13 @@ export function SelectCourtLocation({
           </UnstyledButton>
         </Flex>
 
-        <Box pos="relative" left={W / edgeFactor} w={4 * W + 3 * lineThickness} bg="white" h={lineThickness} />
+        <Box
+          pos="relative"
+          left={W / edgeFactor}
+          w={4 * W + 3 * lineThickness}
+          bg="white"
+          h={lineThickness}
+        />
 
         <Center>
           <i>Center Line</i>
