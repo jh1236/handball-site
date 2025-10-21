@@ -334,7 +334,8 @@ export function scoreForGame(
   firstTeam: boolean,
   playerSearchable: SearchableName,
   leftPlayer?: boolean,
-  method?: string
+  method?: string,
+  location?: string[]
 ): Promise<void> {
   const body: any = {
     id: gameId,
@@ -343,6 +344,9 @@ export function scoreForGame(
   };
   if (method) {
     body.method = method;
+  }
+  if (location) {
+    body.location = location;
   }
   if (leftPlayer !== undefined) {
     body.leftPlayer = leftPlayer;
@@ -365,10 +369,14 @@ export function scoreForGame(
   });
 }
 
-export function aceForGame(gameId: number): Promise<void> {
+export function aceForGame(gameId: number, location?: string[]): Promise<void> {
   const body: any = {
     id: gameId,
   };
+
+  if (location) {
+    body.location = location;
+  }
 
   return tokenFetch('/api/games/update/ace', {
     method: 'POST',

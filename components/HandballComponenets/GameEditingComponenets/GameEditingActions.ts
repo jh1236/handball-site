@@ -82,19 +82,20 @@ export function score(
   game: GameState,
   firstTeam: boolean,
   leftPlayer: boolean,
-  method?: string
+  method?: string,
+  location?: string[]
 ): void {
   scoreLocal(game, firstTeam);
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const player = leftPlayer ? team.left : team.right;
-  scoreForGame(game.id, firstTeam, player.get?.searchableName!, leftPlayer, method).catch(() =>
-    sync(game)
+  scoreForGame(game.id, firstTeam, player.get?.searchableName!, leftPlayer, method, location).catch(
+    () => sync(game)
   );
 }
 
-export function ace(game: GameState): void {
+export function ace(game: GameState, location?: string[]): void {
   aceLocal(game);
-  aceForGame(game.id).catch(() => sync(game));
+  aceForGame(game.id, location).catch(() => sync(game));
 }
 
 export function timeout(game: GameState, firstTeam: boolean): void {
