@@ -141,7 +141,7 @@ export function TournamentLanding({ tournament }: TournamentLandingProps) {
               </>
             ) : (
               <Box visibleFrom="md">
-                <Link className="hideLink" href={`/${tournament}/fixtures`}>
+                <Link className="hideLink" href={`/${tournament}/officials`}>
                   <Title order={2}>Officials</Title>
                 </Link>
                 <Box mah={350} style={{ overflow: 'scroll' }}>

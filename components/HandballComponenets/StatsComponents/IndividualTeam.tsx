@@ -174,7 +174,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                     href={`/games/${game.id}`}
                     className="hideLink"
                   >
-                    <Card.Section>
+                    <Card.Section h={160}>
                       <Image
                         src={
                           game.teamOne.searchableName !== team
@@ -182,15 +182,16 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                             : game.teamTwo.imageUrl
                         }
                         h={160}
+                        w={160}
                         alt="logo for the other team"
                       />
                     </Card.Section>
-
-                    <Text fw={500} size="lg" mt="md">
-                      {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
-                      {game.teamTwoScore})
-                    </Text>
-
+                    <Card.Section h={2000}>
+                      <Text fw={500} size="lg" mt="md">
+                        {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
+                        {game.teamTwoScore})
+                      </Text>
+                    </Card.Section>
                     {isUmpireManager(tournament) && (
                       <>
                         <Text>

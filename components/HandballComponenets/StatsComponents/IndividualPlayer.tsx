@@ -77,6 +77,12 @@ const CATEGORIES = {
     'Games Won',
     'Games Lost',
     'Percentage',
+    'Games Started Left',
+    'Games Started Right',
+    'Games Started Substitute',
+    'Caps',
+    'Tournaments',
+    'Rounds per Game',
   ],
   'Card and Penalty Metrics': [
     'Cards',
@@ -88,6 +94,7 @@ const CATEGORIES = {
     'Cards per Game',
     'Penalty Points',
     'Points per Card',
+    'Percentage of Rounds Carded',
   ],
   'Rating and Voting Metrics': [
     'Elo',
@@ -96,9 +103,13 @@ const CATEGORIES = {
     'Average Rating',
     'B&F Votes',
     'Votes per 100 Games',
+    'Votes per Tournament',
+    'Merits',
+    'Merits per Tournament',
+    'Nefarious Votes',
+    'Nefarious Rate',
   ],
 };
-
 function playersOfSearchable(team?: GameTeamStructure): string[] {
   return playersOf(team).map((a) => a?.searchableName);
 }
