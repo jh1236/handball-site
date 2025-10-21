@@ -111,7 +111,11 @@ export function ScoreGraphic({ game }: ScoreGraphicParams): any {
       </Box>
       <Box className={`${classes.gameOfficial}`}>
         <Link
-          href={game.official ? `/${game.tournament.searchableName}/officials/${game.official.searchableName}` : '#'}
+          href={
+            game.official
+              ? `/${game.tournament.searchableName}/officials/${game.official.searchableName}`
+              : '#'
+          }
           className="hideLink"
         >
           <p>Officiated by {game.official?.name ?? 'No Official'}</p>
