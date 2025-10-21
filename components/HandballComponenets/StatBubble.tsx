@@ -32,6 +32,7 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
       </Container>
     );
   }
+  const tournamentLink = tournament ? `${tournament}/` : '';
   const sortMultiplier = stat.order === 'asc' ? 1 : -1;
   if (stat.type === 'team') {
     if (teams.length === 0 || !teams.some((a) => a.stats!['Games Played'] >= 1)) {
@@ -68,7 +69,7 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
     return (
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
         <Link
-          href={`/${tournament ? `${tournament}/` : ''}players/${team.searchableName}`}
+          href={`/${tournamentLink}teams/${team.searchableName}`}
           className="hideLink"
         >
           <Text size="auto" fw={700} ta="center">
@@ -76,13 +77,13 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
           </Text>
         </Link>
         <Link
-          href={`/${tournament ? `${tournament}/` : ''}/players/${team.searchableName}`}
+          href={`/${tournamentLink}teams/${team.searchableName}`}
           className="hideLink"
         >
           <Image alt={team.name} src={team.bigImageUrl} h="200" w="auto" m="auto"></Image>
         </Link>
         <Link
-          href={`/${tournament ? `${tournament}/` : ''}/players/${team.searchableName}`}
+          href={`/${tournamentLink}teams/${team.searchableName}`}
           className="hideLink"
         >
           <Text ta="center">
@@ -126,7 +127,7 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
   return (
     <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
       <Link
-        href={`/${tournament ? `${tournament}/` : ''}players/${player.searchableName}`}
+        href={`/${tournamentLink}players/${player.searchableName}`}
         className="hideLink"
       >
         <Text size="auto" fw={700} ta="center">
@@ -134,13 +135,13 @@ export function StatBubble({ players, teams, stat, tournament }: StatBubbleParam
         </Text>
       </Link>
       <Link
-        href={`/${tournament ? `${tournament}/` : ''}players/${player.searchableName}`}
+        href={`/${tournamentLink}players/${player.searchableName}`}
         className="hideLink"
       >
         <Image alt={player.name} src={player.bigImageUrl} h="200" w="auto" m="auto"></Image>
       </Link>
       <Link
-        href={`/${tournament ? `${tournament}/` : ''}players/${player.searchableName}`}
+        href={`/${tournamentLink}players/${player.searchableName}`}
         className="hideLink"
       >
         <Text ta="center">
