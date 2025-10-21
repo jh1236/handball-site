@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { generateColors } from '@mantine/colors-generator';
 import { Box, Flex, HoverCard, Table, Text, useMantineTheme } from '@mantine/core';
 import { playersOf } from '@/components/HandballComponenets/StatsComponents/IndividualPlayer';
@@ -116,13 +117,23 @@ export function PlayerStats({ game }: PlayerStatsStructure) {
       <Table withColumnBorders>
         <Table.Tr>
           <Table.Th style={{ textAlign: 'right' }} w="37.5%">
-            {game.teamOne.name}
+            <Link
+              href={`/${game.tournament.searchableName}/teams/${game.teamOne.searchableName}`}
+              className="hideLink"
+            >
+              {game.teamOne.name}
+            </Link>
           </Table.Th>
           <Table.Th style={{ textAlign: 'center' }} w="25%">
             Stat
           </Table.Th>
           <Table.Th style={{ textAlign: 'left' }} w="37.5%">
-            {game.teamTwo.name}
+            <Link
+              href={`/${game.tournament.searchableName}/teams/${game.teamTwo.searchableName}`}
+              className="hideLink"
+            >
+              {game.teamTwo.name}
+            </Link>
           </Table.Th>
         </Table.Tr>
         {statRows}

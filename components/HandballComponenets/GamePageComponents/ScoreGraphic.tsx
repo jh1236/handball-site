@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Box, Image } from '@mantine/core';
 import classes from '@/components/HandballComponenets/GamePageComponents/gamesStyles.module.css';
 import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
@@ -9,9 +10,10 @@ interface ScoreGraphicParams {
 
 interface PlayerNameParams {
   player: PlayerGameStatsStructure;
+  game: GameStructure;
 }
 
-function PlayerName({ player }: PlayerNameParams) {
+function PlayerName({ player, game }: PlayerNameParams) {
   if (player === undefined) {
     return <p>ERROR!</p>;
   }
@@ -32,14 +34,19 @@ function PlayerName({ player }: PlayerNameParams) {
     prefix = '±';
   }
   return (
-    <p>
-      {player.name}
-      {'  '}
-      <span style={{ color }}>
-        {prefix}
-        {eloDelta.toFixed(2)}
-      </span>
-    </p>
+    <Link
+      href={`/${game.tournament.searchableName}/players/${player.searchableName}`}
+      className="hideLink"
+    >
+      <p>
+        {player.name}
+        {'  '}
+        <span style={{ color }}>
+          {prefix}
+          {eloDelta.toFixed(2)}
+        </span>
+      </p>
+    </Link>
   );
 }
 
@@ -56,33 +63,60 @@ export function ScoreGraphic({ game }: ScoreGraphicParams): any {
         left: 0,
       }}
     >
-      <div className={`${classes.teamNames} ${classes.team1Name}`}>
-        <p>{game.teamOne.name}</p>
-      </div>
-      <div className={`${classes.dash} ${classes.verse}`}>VS</div>
-      <div className={`${classes.teamNames} ${classes.team2Name}`}>{game.teamTwo.name}</div>
-      <div className={`${classes.teamLogos} ${classes.logo1}`} style={{ justifyItems: 'flex-end' }}>
-        <Image src={game.teamOne.imageUrl} />
-      </div>
-      <div className={`${classes.teamInfo} ${classes.info1}`}>
-        {game.teamOne.captain ? <PlayerName player={game.teamOne.captain} /> : ''}
-        {game.teamOne.nonCaptain ? <PlayerName player={game.teamOne.nonCaptain} /> : ''}
-        {game.teamOne.substitute ? <PlayerName player={game.teamOne.substitute} /> : ''}
-      </div>
-      <div className={`${classes.teamScores} ${classes.score1}`}>{game.teamOneScore}</div>
-      <div className={`${classes.dash}`}>-</div>
-      <div className={`${classes.teamScores} ${classes.score2}`}>{game.teamTwoScore}</div>
-      <div className={`${classes.teamInfo} ${classes.info2}`}>
-        {game.teamTwo.captain ? <PlayerName player={game.teamTwo.captain} /> : ''}
-        {game.teamTwo.nonCaptain ? <PlayerName player={game.teamTwo.nonCaptain} /> : ''}
-        {game.teamTwo.substitute ? <PlayerName player={game.teamTwo.substitute} /> : ''}
-      </div>
-      <div className={`${classes.teamLogos} ${classes.logo2}`}>
-        <Image src={game.teamTwo.imageUrl} />
-      </div>
-      <div className={`${classes.gameOfficial}`}>
-        <p>Officiated by {game.official?.name ?? 'No Official'}</p>
-      </div>
+      <Box className={`${classes.teamNames} ${classes.team1Name}`}>
+        <Link
+          href={`/${game.tournament.searchableName}/teams/${game.teamOne.searchableName}`}
+          className="hideLink"
+        >
+          <p>{game.teamOne.name}</p>
+        </Link>
+      </Box>
+      <Box className={`${classes.dash} ${classes.verse}`}>VS</Box>
+      <Box className={`${classes.teamNames} ${classes.team2Name}`}>
+        <Link
+          href={`/${game.tournament.searchableName}/teams/${game.teamTwo.searchableName}`}
+          className="hideLink"
+        >
+          {game.teamTwo.name}
+        </Link>
+      </Box>
+      <Box className={`${classes.teamLogos} ${classes.logo1}`} style={{ justifyItems: 'flex-end' }}>
+        <Link
+          href={`/${game.tournament.searchableName}/teams/${game.teamOne.searchableName}`}
+          className="hideLink"
+        >
+          <Image src={game.teamOne.imageUrl} />
+        </Link>
+      </Box>
+      <Box className={`${classes.teamInfo} ${classes.info1}`}>
+        {game.teamOne.captain ? <PlayerName game={game} player={game.teamOne.captain} /> : ''}
+        {game.teamOne.nonCaptain ? <PlayerName game={game} player={game.teamOne.nonCaptain} /> : ''}
+        {game.teamOne.substitute ? <PlayerName game={game} player={game.teamOne.substitute} /> : ''}
+      </Box>
+      <Box className={`${classes.teamScores} ${classes.score1}`}>{game.teamOneScore}</Box>
+      <Box className={`${classes.dash}`}>-</Box>
+      <Box className={`${classes.teamScores} ${classes.score2}`}>{game.teamTwoScore}</Box>
+      <Box className={`${classes.teamInfo} ${classes.info2}`}>
+        {game.teamTwo.captain ? <PlayerName game={game} player={game.teamTwo.captain} /> : ''}
+        {game.teamTwo.nonCaptain ? <PlayerName game={game} player={game.teamTwo.nonCaptain} /> : ''}
+        {game.teamTwo.substitute ? <PlayerName game={game} player={game.teamTwo.substitute} /> : ''}
+      </Box>
+      <Box className={`${classes.teamLogos} ${classes.logo2}`}>
+        <Link
+          href={`/${game.tournament.searchableName}/teams/${game.teamTwo.searchableName}`}
+          className="hideLink"
+        >
+          <Image src={game.teamTwo.imageUrl} />
+        </Link>
+      </Box>
+      <Box className={`${classes.gameOfficial}`}>
+        <Link
+          href={game.official ? `/${game.tournament.searchableName}/officials/${game.official.searchableName}` : '#'}
+          className="hideLink"
+        >
+          <p>Officiated by {game.official?.name ?? 'No Official'}</p>
+        </Link>
+      </Box>
     </Box>
   );
 }

@@ -2,7 +2,18 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Box, Center, Grid, Image, luminance, Paper, Skeleton, Space, Text } from '@mantine/core';
+import {
+  Box,
+  Center,
+  Grid,
+  Image,
+  luminance,
+  Paper,
+  Skeleton,
+  Space,
+  Text,
+  useComputedColorScheme,
+} from '@mantine/core';
 import { getTeams, getWinningTeams } from '@/ServerActions/TeamActions';
 import { TeamStructure } from '@/ServerActions/types';
 
@@ -15,6 +26,7 @@ interface TeamBubbleParams {
 }
 
 function TeamBubble({ team, tournament, ...props }: TeamBubbleParams) {
+  const computedColorScheme = useComputedColorScheme('light');
   return (
     <Paper
       bg={team.teamColor ? team.teamColor : undefined}
@@ -23,7 +35,6 @@ function TeamBubble({ team, tournament, ...props }: TeamBubbleParams) {
       p={20}
       m={10}
       shadow="xl"
-      // bd="1 solid black"
       withBorder={!team.teamColor}
       pos="relative"
       style={{ overflow: 'hidden' }}
@@ -33,7 +44,15 @@ function TeamBubble({ team, tournament, ...props }: TeamBubbleParams) {
         size="auto"
         fw={700}
         ta="center"
-        c={team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black'}
+        c={
+          team.teamColor
+            ? luminance(team.teamColor) < 0.5
+              ? 'white'
+              : 'black'
+            : computedColorScheme === 'dark'
+              ? 'white'
+              : 'black'
+        }
         lineClamp={2}
       >
         {team.name}
@@ -46,11 +65,30 @@ function TeamBubble({ team, tournament, ...props }: TeamBubbleParams) {
       <Text
         fw={700}
         ta="center"
-        c={team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black'}
+        c={
+          team.teamColor
+            ? luminance(team.teamColor) < 0.5
+              ? 'white'
+              : 'black'
+            : computedColorScheme === 'dark'
+              ? 'white'
+              : 'black'
+        }
       >
         {team.captain.name}
       </Text>
-      <Text ta="center" c={team.teamColor && luminance(team.teamColor) < 0.5 ? 'white' : 'black'}>
+      <Text
+        ta="center"
+        c={
+          team.teamColor
+            ? luminance(team.teamColor) < 0.5
+              ? 'white'
+              : 'black'
+            : computedColorScheme === 'dark'
+              ? 'white'
+              : 'black'
+        }
+      >
         {team.nonCaptain?.name} {team.substitute && `& ${team.substitute.name}`}
       </Text>
     </Paper>
