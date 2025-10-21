@@ -538,8 +538,7 @@ export function PlayerActionList({
               <Button
                 onClick={() => {
                   score(game, firstTeam, leftSide, otherReason, location);
-                  setOpenModal(undefined);
-                  setLocation([]);
+                  close();
                 }}
                 disabled={!location.length}
               >
@@ -639,8 +638,7 @@ export function PlayerActionList({
                 <Button
                   onClick={() => {
                     ace(game, location);
-                    setOpenModal(undefined);
-                    setLocation([]);
+                    close();
                   }}
                   disabled={!location[0]}
                 >
