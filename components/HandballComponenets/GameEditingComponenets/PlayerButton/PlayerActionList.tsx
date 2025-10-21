@@ -17,6 +17,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  Center,
   Collapse,
   Flex,
   Modal,
@@ -24,6 +25,7 @@ import {
   Tabs,
   Text,
   TextInput,
+  Title,
 } from '@mantine/core';
 import { VerticalSlider } from '@/components/basic/VerticalSlider';
 import {
@@ -40,6 +42,7 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GAME_CONFIG } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingConfig';
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
+import { SelectCourtLocation } from '@/components/HandballComponenets/GameEditingComponenets/SelectCourtLocation';
 import { GameState } from '@/components/HandballComponenets/GameState';
 import { IconHandballCards } from '@/components/icons/IconCards';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
@@ -82,17 +85,21 @@ export function PlayerActionList({
   const [cardTime, setCardTime] = React.useState<number>(
     Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0))
   );
+  const [moreShown, setMoreShown] = useState<boolean>(false);
+
+  const [location, setLocation] = React.useState<string[]>([undefined, undefined]);
   const [otherReason, setOtherReason] = React.useState<string>('');
   const close = useCallback(() => {
     _close();
     setCardTime(Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0)));
     setOpenModal(undefined);
     setOtherReason('');
+    setMoreShown(false);
   }, [_close, game.blitzGame.get, team.isSolo]);
 
   const subsAllowedScore = useMemo(() => (game.blitzGame.get ? 5 : 9), [game.blitzGame.get]);
   const [openModal, setOpenModal] = useState<
-    undefined | 'green' | 'yellow' | 'red' | 'score' | 'warning'
+    undefined | 'green' | 'yellow' | 'red' | 'score' | 'warning' | 'ace'
   >(undefined);
   const players = [team.left, team.right, team.sub].filter((a) => typeof a.get !== 'undefined');
   const currentPlayer = players.length > 1 ? players[leftSide ? 0 : 1] : players[0];
@@ -509,6 +516,35 @@ export function PlayerActionList({
       color: undefined,
       content: (
         <>
+          <Modal
+            opened={openModal === 'score'}
+            title="Location Picker"
+            onClose={() => {
+              setOtherReason('');
+              setOpenModal(undefined);
+            }}
+          >
+            <Stack>
+              <Title order={3}>Pick the location where the player scored.</Title>
+              <Center>
+                <SelectCourtLocation
+                  location={location}
+                  setLocation={setLocation}
+                ></SelectCourtLocation>
+              </Center>
+              <br />
+              <Button
+                onClick={() => {
+                  score(game, firstTeam, leftSide, otherReason, location);
+                  setOpenModal(undefined);
+                  setLocation([undefined, undefined]);
+                }}
+                disabled={!location[0]}
+              >
+                Submit
+              </Button>
+            </Stack>
+          </Modal>
           {GAME_CONFIG.scoreMethods.slice(0, 3).map((method, i) => (
             <Fragment key={i}>
               <Button
@@ -516,8 +552,8 @@ export function PlayerActionList({
                 style={{ margin: '3px' }}
                 size="sm"
                 onClick={() => {
-                  score(game, firstTeam, leftSide, method);
-                  close();
+                  setOtherReason(method);
+                  setOpenModal('score');
                 }}
               >
                 {method}
@@ -526,15 +562,11 @@ export function PlayerActionList({
             </Fragment>
           ))}
           <Box>
-            <Button
-              style={{ margin: '3px' }}
-              color="gray"
-              onClick={() => setOpenModal(openModal ? undefined : 'score')}
-            >
-              Show {openModal ? 'Less' : 'More'}
+            <Button style={{ margin: '3px' }} color="gray" onClick={() => setMoreShown(!moreShown)}>
+              Show {moreShown ? 'Less' : 'More'}
             </Button>
 
-            <Collapse in={openModal === 'score'}>
+            <Collapse in={moreShown}>
               {GAME_CONFIG.scoreMethods.slice(3).map((method, i) => (
                 <Fragment key={i}>
                   <Button
@@ -542,8 +574,8 @@ export function PlayerActionList({
                     size="sm"
                     color="player-color"
                     onClick={() => {
-                      score(game, firstTeam, leftSide, method);
-                      close();
+                      setOtherReason(method);
+                      setOpenModal('score');
                     }}
                   >
                     {method}
@@ -583,13 +615,42 @@ export function PlayerActionList({
         color: undefined,
         content: (
           <>
+            <Modal
+              opened={openModal === 'ace'}
+              title="Location Picker"
+              onClose={() => {
+                setOtherReason('');
+                setOpenModal(undefined);
+              }}
+            >
+              <Stack>
+                <Title order={3}>Pick the location where the player scored.</Title>
+                <Center>
+                  <SelectCourtLocation
+                    isAce
+                    location={location}
+                    setLocation={setLocation}
+                  ></SelectCourtLocation>
+                </Center>
+                <br />
+                <Button
+                  onClick={() => {
+                    ace(game, location);
+                    setOpenModal(undefined);
+                    setLocation([undefined, undefined]);
+                  }}
+                  disabled={!location[0]}
+                >
+                  Submit
+                </Button>
+              </Stack>
+            </Modal>
             <Button
               color="player-color"
               style={{ margin: '3px' }}
               size="sm"
               onClick={() => {
-                ace(game);
-                close();
+                setOpenModal('ace');
               }}
             >
               Ace
@@ -612,7 +673,7 @@ export function PlayerActionList({
     }
   }
   return (
-    <Accordion defaultValue="Score" onChange={() => setOpenModal(undefined)}>
+    <Accordion defaultValue="Score" onChange={() => setMoreShown(false)}>
       {out.map((item, i) => (
         <Accordion.Item key={i} value={item.value}>
           <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
