@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Box, Divider, Paper, Tabs } from '@mantine/core';
+import { Box, Center, Divider, Paper, Tabs } from '@mantine/core';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
+import { DisplayCourtLocation } from '@/components/HandballComponenets/GamePageComponents/DisplayCourtLocation';
 import { GamePlayerPointsGraph } from '@/components/HandballComponenets/GamePageComponents/GamePlayerPointsGraph';
 import { GamePointsMethodGraph } from '@/components/HandballComponenets/GamePageComponents/GamePointsMethodGraph';
 import { GameTimelineLineGraph } from '@/components/HandballComponenets/GamePageComponents/GameTimelineLineGraph';
@@ -80,6 +81,7 @@ export function GamePage({ gameID }: GamePageProps) {
                   <Tabs.Tab value="worm">Worm</Tabs.Tab>
                   <Tabs.Tab value="playerPoints">Points by Player</Tabs.Tab>
                   <Tabs.Tab value="methodPoints">Points by Score Method</Tabs.Tab>
+                  <Tabs.Tab value="heatmap">Heatmap</Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="worm">
@@ -96,6 +98,11 @@ export function GamePage({ gameID }: GamePageProps) {
                   <Box style={{ marginTop: '30px' }} w="100%" h={{ base: 300, md: 600 }}>
                     <GamePointsMethodGraph game={game} />
                   </Box>
+                </Tabs.Panel>
+                <Tabs.Panel value="heatmap">
+                  <Center style={{ marginTop: '30px' }} w="100%" h={{ base: 300, md: 600 }}>
+                    <DisplayCourtLocation game={game} />
+                  </Center>
                 </Tabs.Panel>
               </Tabs>
             </Tabs.Panel>
