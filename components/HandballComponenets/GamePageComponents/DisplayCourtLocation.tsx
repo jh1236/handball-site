@@ -1,4 +1,4 @@
-import { Box, Center, Flex, MantineStyleProp } from '@mantine/core';
+import { Box, Center, Flex, HoverCard, MantineStyleProp, Text, useMatches } from '@mantine/core';
 import { GameStructure } from '@/ServerActions/types';
 import classes from './DisplayCourtLocation.module.css';
 
@@ -8,6 +8,7 @@ interface SelectCourtLocationParams {
 
 function HeatmapBox({
   scores,
+  game,
   location,
   w,
   h,
@@ -16,11 +17,15 @@ function HeatmapBox({
   scores: { [_: number]: number };
   location: number;
   w: number;
+  game: GameStructure;
   h: number;
   style?: MantineStyleProp;
 }) {
   const maxScore = Math.max(...Object.values(scores));
-  const myScores = scores[location];
+  const myScores = scores[location] ?? 0.1;
+  const teamOneScores =
+    game.events?.filter((gE) => gE.eventType === 'Score' && gE.firstTeam && gE.details === location)
+      .length ?? 0;
   const COLORS = [
     '#ff0000',
     '#f00d20',
@@ -34,21 +39,33 @@ function HeatmapBox({
     '#474747',
   ];
   return (
-    <Center
-      style={style}
-      h={h}
-      w={w}
-      bg={COLORS[10 - Math.round((10 * myScores) / maxScore)]}
-      c="white"
-    >
-      <i>{myScores}</i>
-    </Center>
+    <HoverCard>
+      <HoverCard.Target>
+        <Center
+          style={style}
+          h={h}
+          w={w}
+          bg={COLORS[10 - Math.round((10 * myScores) / maxScore)]}
+          c="white"
+        >
+          {myScores >= 1 && <i>{myScores}</i>}
+        </Center>
+      </HoverCard.Target>
+      <HoverCard.Dropdown>
+        <Text>
+          {game.teamOne.name}: {Math.round((100 * teamOneScores) / myScores)}% of points
+        </Text>
+        <Text>
+          {game.teamTwo.name}: {Math.round(100 - (100 * teamOneScores) / myScores)}% of points
+        </Text>
+      </HoverCard.Dropdown>
+    </HoverCard>
   );
 }
 
 export function DisplayCourtLocation({ game }: SelectCourtLocationParams) {
-  const W = 100;
-  const H = 100;
+  const W = useMatches({ base: 50, md: 100 });
+  const H = useMatches({ base: 50, md: 100 });
   const lineThickness = 3;
   const edgeFactor = 2;
   const counts = game.events
@@ -70,18 +87,44 @@ export function DisplayCourtLocation({ game }: SelectCourtLocationParams) {
 
         <Flex>
           <HeatmapBox
+            game={game}
             scores={counts}
             h={H / edgeFactor}
             w={W / edgeFactor}
             location={11}
           ></HeatmapBox>
           <Box w={lineThickness} h={H / edgeFactor} />
-          <HeatmapBox scores={counts} h={H / edgeFactor} w={W} location={12}></HeatmapBox>
-          <HeatmapBox scores={counts} h={H / edgeFactor} w={W} location={13}></HeatmapBox>
-          <Box w={lineThickness} bg="green" h={H / edgeFactor} />
-          <HeatmapBox scores={counts} h={H / edgeFactor} w={W} location={14}></HeatmapBox>
-          <HeatmapBox scores={counts} h={H / edgeFactor} w={W} location={15}></HeatmapBox>
           <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H / edgeFactor}
+            w={W}
+            location={12}
+          ></HeatmapBox>
+          <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H / edgeFactor}
+            w={W}
+            location={13}
+          ></HeatmapBox>
+          <Box w={lineThickness} bg="green" h={H / edgeFactor} />
+          <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H / edgeFactor}
+            w={W}
+            location={14}
+          ></HeatmapBox>
+          <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H / edgeFactor}
+            w={W}
+            location={15}
+          ></HeatmapBox>
+          <HeatmapBox
+            game={game}
             scores={counts}
             h={H / edgeFactor}
             w={W / edgeFactor}
@@ -98,26 +141,50 @@ export function DisplayCourtLocation({ game }: SelectCourtLocationParams) {
         />
 
         <Flex>
-          <HeatmapBox scores={counts} h={H} w={W / edgeFactor} location={21}></HeatmapBox>
+          <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H}
+            w={W / edgeFactor}
+            location={21}
+          ></HeatmapBox>
           <Box w={lineThickness} bg="pink" h={H} />
-          <HeatmapBox scores={counts} h={H} w={W} location={22}></HeatmapBox>
-          <HeatmapBox scores={counts} h={H} w={W} location={23}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={22}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={23}></HeatmapBox>
           <Box w={lineThickness} bg="green" h={H} />
-          <HeatmapBox scores={counts} h={H} w={W} location={24}></HeatmapBox>
-          <HeatmapBox scores={counts} h={H} w={W} location={25}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={24}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={25}></HeatmapBox>
           <Box w={lineThickness} bg="pink" h={H} />
-          <HeatmapBox scores={counts} h={H} w={W / edgeFactor} location={26}></HeatmapBox>
+          <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H}
+            w={W / edgeFactor}
+            location={26}
+          ></HeatmapBox>
         </Flex>
         <Flex>
-          <HeatmapBox scores={counts} h={H} w={W / edgeFactor} location={31}></HeatmapBox>
+          <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H}
+            w={W / edgeFactor}
+            location={31}
+          ></HeatmapBox>
           <Box w={lineThickness} bg="pink" h={H}></Box>
-          <HeatmapBox scores={counts} h={H} w={W} location={32}></HeatmapBox>
-          <HeatmapBox scores={counts} h={H} w={W} location={33}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={32}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={33}></HeatmapBox>
           <Box w={lineThickness} bg="green" h={H} />
-          <HeatmapBox scores={counts} h={H} w={W} location={34}></HeatmapBox>
-          <HeatmapBox scores={counts} h={H} w={W} location={35}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={34}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={35}></HeatmapBox>
           <Box w={lineThickness} bg="pink" h={H} />
-          <HeatmapBox scores={counts} h={H} w={W / edgeFactor} location={36}></HeatmapBox>
+          <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H}
+            w={W / edgeFactor}
+            location={36}
+          ></HeatmapBox>
         </Flex>
 
         <Box
@@ -129,15 +196,27 @@ export function DisplayCourtLocation({ game }: SelectCourtLocationParams) {
         />
 
         <Flex>
-          <HeatmapBox scores={counts} h={H} w={W / edgeFactor} location={41}></HeatmapBox>
+          <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H}
+            w={W / edgeFactor}
+            location={41}
+          ></HeatmapBox>
           <Box w={lineThickness} bg="pink" h={H} />
-          <HeatmapBox scores={counts} h={H} w={W} location={42}></HeatmapBox>
-          <HeatmapBox scores={counts} h={H} w={W} location={43}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={42}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={43}></HeatmapBox>
           <Box w={lineThickness} bg="green" h={H} />
-          <HeatmapBox scores={counts} h={H} w={W} location={44}></HeatmapBox>
-          <HeatmapBox scores={counts} h={H} w={W} location={45}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={44}></HeatmapBox>
+          <HeatmapBox game={game} scores={counts} h={H} w={W} location={45}></HeatmapBox>
           <Box w={lineThickness} bg="pink" h={H} />
-          <HeatmapBox scores={counts} h={H} w={W / edgeFactor} location={46}></HeatmapBox>
+          <HeatmapBox
+            game={game}
+            scores={counts}
+            h={H}
+            w={W / edgeFactor}
+            location={46}
+          ></HeatmapBox>
         </Flex>
 
         <Box
