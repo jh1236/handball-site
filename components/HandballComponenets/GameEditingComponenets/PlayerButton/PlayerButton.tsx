@@ -3,7 +3,6 @@ import { Button, Modal, Progress, Title, useMatches } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { PlayerActionList } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
-import useScreenOrientation from 'react-hook-screen-orientation';
 
 interface PlayerButtonProps {
   game: GameState;
@@ -24,7 +23,6 @@ export function PlayerButton({
   firstTeam: trueFirstTeam,
   leftSide: trueLeftSide,
 }: PlayerButtonProps) {
-  const screenOrientation = useScreenOrientation();
   const firstTeam = useMemo(
     () => trueFirstTeam === game.teamOneIGA.get,
     [game.teamOneIGA.get, trueFirstTeam]
