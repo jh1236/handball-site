@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { IconX } from '@tabler/icons-react';
 import { Box, Center, Flex, FloatingIndicator, UnstyledButton } from '@mantine/core';
 import classes from './SelectCourtLocation.module.css';
+import useScreenOrientation from 'react-hook-screen-orientation';
 
 interface SelectCourtLocationParams {
   location: string[];
@@ -28,6 +29,7 @@ export default function SelectCourtLocation({
 }: SelectCourtLocationParams) {
   const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
   const [controlsRefs, setControlsRefs] = useState<Record<string, HTMLButtonElement | null>>({});
+  const screenOrientation = useScreenOrientation();
 
   const setControlRef = (name: string) => (node: HTMLButtonElement) => {
     controlsRefs[name] = node;

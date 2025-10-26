@@ -21,8 +21,7 @@
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
-
-   "@mantine/colors-generator": "^8.3.3",
+    "@mantine/colors-generator": "^8.3.3",
     "@mantine/core": "7.13.0",
     "@mantine/hooks": "7.13.0",
     "@next/bundle-analyzer": "^14.2.4",
@@ -35,6 +34,7 @@
     "react-dom": "18.3.1",
     "react-fitty": "^1.0.1",
     "react-google-recaptcha": "^3.1.0",
+    "react-hook-screen-orientation": "^1.0.4",
     "react-icons": "^5.4.0",
     "react-signature-canvas": "^1.1.0-alpha.1",
     "react-use-websocket": "^4.13.0",

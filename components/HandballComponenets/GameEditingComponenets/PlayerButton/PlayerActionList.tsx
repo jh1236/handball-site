@@ -11,6 +11,7 @@ import {
   IconStarFilled,
   IconTriangleInvertedFilled,
 } from '@tabler/icons-react';
+import useScreenOrientation from 'react-hook-screen-orientation';
 import { ImEvil } from 'react-icons/im';
 import {
   Accordion,
@@ -42,10 +43,10 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GAME_CONFIG } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingConfig';
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
+import SelectCourtLocation from '@/components/HandballComponenets/GameEditingComponenets/SelectCourtLocation';
 import { GameState } from '@/components/HandballComponenets/GameState';
 import { IconHandballCards } from '@/components/icons/IconCards';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
-import SelectCourtLocation from '@/components/HandballComponenets/GameEditingComponenets/SelectCourtLocation';
 
 function buttonEnabledFor(player: PlayerGameStatsStructure, reason: string, type: string): boolean {
   if (!player) return true;
@@ -81,6 +82,8 @@ export function PlayerActionList({
   serving,
   close: _close,
 }: PlayerActionListParams): React.ReactElement {
+  const screenOrientation = useScreenOrientation();
+
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const [cardTime, setCardTime] = React.useState<number>(
     Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0))
@@ -131,11 +134,14 @@ export function PlayerActionList({
       Icon: IconHandballCards,
       value: 'Cards',
       content: (
-        <Tabs defaultValue={defaultCategory}>
-          {disabledCategories}
+        <Tabs
+          w="100%"
+          defaultValue={defaultCategory}
+          orientation={screenOrientation === 'portrait-primary' ? undefined : 'vertical'}
+        >
           <Tabs.List style={{ flexWrap: 'nowrap' }}>
             <Tabs.Tab
-              size="sm"
+              size="xs"
               color="grey"
               value="Warning"
               leftSection={<IconExclamationMark color="grey" size={12} stroke={3} />}
@@ -144,7 +150,7 @@ export function PlayerActionList({
               Warn
             </Tabs.Tab>
             <Tabs.Tab
-              size="sm"
+              size="xs"
               color="green"
               value="Green Card"
               leftSection={<IconTriangleInvertedFilled color="green" size={12} />}
@@ -153,7 +159,7 @@ export function PlayerActionList({
               Green
             </Tabs.Tab>
             <Tabs.Tab
-              size="sm"
+              size="xs"
               color="yellow"
               value="Yellow Card"
               leftSection={<IconSquareFilled color="yellow" size={12} />}
@@ -162,7 +168,7 @@ export function PlayerActionList({
               Yellow
             </Tabs.Tab>
             <Tabs.Tab
-              size="sm"
+              size="xs"
               color="red"
               value="Red Card"
               leftSection={<IconCircleFilled color="red" size={12} />}
@@ -175,7 +181,7 @@ export function PlayerActionList({
               <Fragment key={i}>
                 <Button
                   style={{ margin: '3px' }}
-                  size="sm"
+                  size="xs"
                   color="gray.6"
                   disabled={
                     !game.practice.get && !buttonEnabledFor(currentPlayer.get!, reason, 'Warning')
@@ -193,7 +199,7 @@ export function PlayerActionList({
             <Button
               onClick={() => setOpenModal('warning')}
               style={{ margin: '3px' }}
-              size="sm"
+              size="xs"
               color="gray"
             >
               Other
@@ -217,7 +223,7 @@ export function PlayerActionList({
                   close();
                 }}
                 style={{ margin: '3px' }}
-                size="sm"
+                size="xs"
                 disabled={!otherReason}
                 color="player-color"
               >
@@ -230,7 +236,7 @@ export function PlayerActionList({
               <Fragment key={i}>
                 <Button
                   style={{ margin: '3px' }}
-                  size="sm"
+                  size="xs"
                   disabled={
                     !game.practice.get &&
                     !buttonEnabledFor(currentPlayer.get!, reason, 'Green Card')
@@ -249,7 +255,7 @@ export function PlayerActionList({
             <Button
               onClick={() => setOpenModal('green')}
               style={{ margin: '3px' }}
-              size="sm"
+              size="xs"
               color="gray"
             >
               Other
@@ -273,7 +279,7 @@ export function PlayerActionList({
                   close();
                 }}
                 style={{ margin: '3px' }}
-                size="sm"
+                size="xs"
                 disabled={!otherReason}
                 color="green"
               >
@@ -288,7 +294,7 @@ export function PlayerActionList({
                   <Fragment key={i}>
                     <Button
                       style={{ margin: '3px' }}
-                      size="sm"
+                      size="xs"
                       disabled={
                         !game.practice.get &&
                         !buttonEnabledFor(currentPlayer.get!, reason, 'Yellow Card')
@@ -307,7 +313,7 @@ export function PlayerActionList({
                 <Button
                   onClick={() => setOpenModal('yellow')}
                   style={{ margin: '3px' }}
-                  size="sm"
+                  size="xs"
                   color="gray"
                 >
                   Other
@@ -322,7 +328,7 @@ export function PlayerActionList({
                   setValue={setCardTime}
                 />
 
-                <Text ta="center" mt="sm">
+                <Text ta="center" mt="xs">
                   <b>Card Time:</b> {cardTime} Rounds
                 </Text>
               </Stack>
@@ -345,7 +351,7 @@ export function PlayerActionList({
                   close();
                 }}
                 style={{ margin: '3px' }}
-                size="sm"
+                size="xs"
                 disabled={!otherReason}
                 color="orange"
               >
@@ -358,7 +364,7 @@ export function PlayerActionList({
               <Fragment key={i}>
                 <Button
                   style={{ margin: '3px' }}
-                  size="sm"
+                  size="xs"
                   color="red"
                   onClick={() => {
                     redCard(game, firstTeam, leftSide, reason);
@@ -373,7 +379,7 @@ export function PlayerActionList({
             <Button
               onClick={() => setOpenModal('red')}
               style={{ margin: '3px' }}
-              size="sm"
+              size="xs"
               color="gray"
             >
               Other
@@ -396,7 +402,7 @@ export function PlayerActionList({
                   close();
                 }}
                 style={{ margin: '3px' }}
-                size="sm"
+                size="xs"
                 disabled={!otherReason}
                 color="red"
               >
@@ -413,7 +419,11 @@ export function PlayerActionList({
       value: 'Other',
       color: 'white',
       content: (
-        <Tabs defaultValue="Merit">
+        <Tabs
+          w="100%"
+          defaultValue="Merit"
+          orientation={screenOrientation === 'portrait-primary' ? undefined : 'vertical'}
+        >
           <Tabs.List grow>
             <Tabs.Tab
               size="sm"
@@ -432,7 +442,7 @@ export function PlayerActionList({
               Demerit
             </Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel value="Merit">
+          <Tabs.Panel value="Merit" m={10}>
             <Autocomplete
               label="Select Reason"
               placeholder="Write something or pick from the list"
@@ -457,7 +467,7 @@ export function PlayerActionList({
               Submit
             </Button>
           </Tabs.Panel>
-          <Tabs.Panel value="Demerit">
+          <Tabs.Panel value="Demerit" m={10}>
             <Autocomplete
               label="Select Reason"
               placeholder="Write something or pick from the list"
@@ -547,34 +557,14 @@ export function PlayerActionList({
               </Button>
             </Stack>
           </Modal>
-          {GAME_CONFIG.scoreMethods.slice(0, 3).map((method, i) => (
-            <Fragment key={i}>
-              <Button
-                color="player-color"
-                style={{ margin: '3px' }}
-                size="sm"
-                onClick={() => {
-                  setOtherReason(method);
-                  setOpenModal('score');
-                }}
-              >
-                {method}
-              </Button>
-              <br />
-            </Fragment>
-          ))}
-          <Box>
-            <Button style={{ margin: '3px' }} color="gray" onClick={() => setMoreShown(!moreShown)}>
-              Show {moreShown ? 'Less' : 'More'}
-            </Button>
-
-            <Collapse in={moreShown}>
-              {GAME_CONFIG.scoreMethods.slice(3).map((method, i) => (
+          <Flex direction={screenOrientation === 'portrait-primary' ? 'column' : 'row'}>
+            <Box>
+              {GAME_CONFIG.scoreMethods.slice(0, 4).map((method, i) => (
                 <Fragment key={i}>
                   <Button
+                    color="player-color"
                     style={{ margin: '3px' }}
                     size="sm"
-                    color="player-color"
                     onClick={() => {
                       setOtherReason(method);
                       setOpenModal('score');
@@ -585,8 +575,36 @@ export function PlayerActionList({
                   <br />
                 </Fragment>
               ))}
-            </Collapse>
-          </Box>
+            </Box>
+            <Box>
+              <Button
+                style={{ margin: '3px' }}
+                color="gray"
+                onClick={() => setMoreShown(!moreShown)}
+                miw={150}
+              >
+                Show {moreShown ? 'Less' : 'More'}
+              </Button>
+              <Collapse in={moreShown}>
+                {GAME_CONFIG.scoreMethods.slice(4).map((method, i) => (
+                  <Fragment key={i}>
+                    <Button
+                      style={{ margin: '3px' }}
+                      size="sm"
+                      color="player-color"
+                      onClick={() => {
+                        setOtherReason(method);
+                        setOpenModal('score');
+                      }}
+                    >
+                      {method}
+                    </Button>
+                    <br />
+                  </Fragment>
+                ))}
+              </Collapse>
+            </Box>
+          </Flex>
         </>
       ),
     });
@@ -648,43 +666,67 @@ export function PlayerActionList({
                 </Button>
               </Stack>
             </Modal>
-            <Button
-              color="player-color"
-              style={{ margin: '3px' }}
-              size="sm"
-              onClick={() => {
-                setOpenModal('ace');
-              }}
-            >
-              Ace
-            </Button>
-            <br />
-            <Button
-              color="player-color"
-              style={{ margin: '3px' }}
-              size="sm"
-              onClick={() => {
-                fault(game);
-                close();
-              }}
-            >
-              Fault
-            </Button>
+            <Flex direction="column">
+              <Button
+                color="player-color"
+                style={{ margin: '3px' }}
+                size="sm"
+                maw={150}
+                onClick={() => {
+                  setOpenModal('ace');
+                }}
+              >
+                Ace
+              </Button>
+              <Button
+                color="player-color"
+                style={{ margin: '3px' }}
+                size="sm"
+                maw={150}
+                onClick={() => {
+                  fault(game);
+                  close();
+                }}
+              >
+                Fault
+              </Button>
+            </Flex>
           </>
         ),
       });
     }
   }
+  if (screenOrientation === 'portrait-primary') {
+    return (
+      <Accordion defaultValue={out[0].value} onChange={() => setMoreShown(false)}>
+        {out.map((item, i) => (
+          <Accordion.Item key={i} value={item.value}>
+            <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
+              {item.value}
+            </Accordion.Control>
+            <Accordion.Panel>{item.content}</Accordion.Panel>
+          </Accordion.Item>
+        ))}
+      </Accordion>
+    );
+  }
+
   return (
-    <Accordion defaultValue="Score" onChange={() => setMoreShown(false)}>
+    <Tabs orientation="vertical" defaultValue={out[0].value}>
+      <Tabs.List>
+        {out.map((item, i) => (
+          <Tabs.Tab
+            leftSection={<item.Icon color={item.color} />}
+            key={i}
+            value={item.value}
+          ></Tabs.Tab>
+        ))}
+      </Tabs.List>
       {out.map((item, i) => (
-        <Accordion.Item key={i} value={item.value}>
-          <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
-            {item.value}
-          </Accordion.Control>
-          <Accordion.Panel>{item.content}</Accordion.Panel>
-        </Accordion.Item>
+        <Tabs.Panel key={i} value={item.value}>
+          <Center>{item.content}</Center>
+        </Tabs.Panel>
       ))}
-    </Accordion>
+    </Tabs>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { IconQuestionMark, IconTrophy } from '@tabler/icons-react';
-import { Button, Modal, Text, Title } from '@mantine/core';
+import useScreenOrientation from 'react-hook-screen-orientation';
+import { Button, Center, Modal, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { TeamActionList } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamActionList';
 import {
@@ -37,10 +38,42 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
   const [opened, { open, close }] = useDisclosure(false);
 
   const name = team ? team.name.get : 'Loading...';
+  const screenOrientation = useScreenOrientation();
+  if (screenOrientation === 'portrait-primary') {
+    return (
+      <>
+        <Modal opened={opened} centered onClose={close} title={<Title> {name}</Title>}>
+          <Title> {name}</Title>
+          <TeamActionList
+            game={game}
+            firstTeam={firstTeam}
+            serving={serving}
+            close={close}
+          ></TeamActionList>
+        </Modal>
+        <Button
+          radius={0}
+          size="lg"
+          color={`${didWinGame(game, firstTeam) ? 'orange.5' : decidedOnCoinToss(game) ? 'green.9' : serving ? 'serving-color.5' : 'player-color.5'}`}
+          style={{
+            width: '100%',
+            height: '100%',
+            fontWeight: serving ? 'bold' : 'normal',
+          }}
+          onClick={open}
+        >
+          <b>
+            {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'}){' '}
+            {didWinGame(game, firstTeam) && <IconTrophy></IconTrophy>}
+            {decidedOnCoinToss(game) && <IconQuestionMark></IconQuestionMark>}
+          </b>
+        </Button>
+      </>
+    );
+  }
   return (
     <>
-      <Modal opened={opened} centered onClose={close} title="Action">
-        <Title> {name}</Title>
+      <Modal opened={opened} centered onClose={close} title={<Title> {name}</Title>}>
         <TeamActionList
           game={game}
           firstTeam={firstTeam}
@@ -51,19 +84,44 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
       <Button
         radius={0}
         size="lg"
-        color={`${didWinGame(game, firstTeam) ? 'orange.5' : decidedOnCoinToss(game) ? 'green.9' : serving ? 'serving-color.5' : 'player-color.5'}`}
+        color={
+          didWinGame(game, firstTeam)
+            ? 'orange.5'
+            : decidedOnCoinToss(game)
+              ? 'green.9'
+              : serving
+                ? 'serving-color.5'
+                : 'player-color.5'
+        }
         style={{
           width: '100%',
           height: '100%',
-          fontWeight: serving ? 'bold' : 'normal',
+          position: 'relative',
+          overflow: 'visible',
         }}
         onClick={open}
       >
-        <b>
-          {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'}){' '}
-          {didWinGame(game, firstTeam) && <IconTrophy></IconTrophy>}
-          {decidedOnCoinToss(game) && <IconQuestionMark></IconQuestionMark>}
-        </b>
+        <span
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: firstTeam
+              ? 'translate(-50%, -50%) rotate(90deg)'
+              : 'translate(-50%, -50%) rotate(-90deg)',
+            transformOrigin: 'center center',
+            whiteSpace: 'nowrap',
+            fontWeight: serving ? 'bold' : 'normal',
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <b>
+            {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'}){' '}
+            {didWinGame(game, firstTeam) && <IconTrophy />}
+            {decidedOnCoinToss(game) && <IconQuestionMark />}
+          </b>
+        </span>
       </Button>
     </>
   );
