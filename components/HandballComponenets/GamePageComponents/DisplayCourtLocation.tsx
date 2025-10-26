@@ -104,7 +104,7 @@ export function DisplayCourtLocation({ game }: SelectCourtLocationParams) {
   return (
     <>
       <div className={classes.root} dir="ltr">
-        <Center>
+        <Center mb={10}>
           <i>{game.teamOne.name}</i>
         </Center>
 
@@ -572,7 +572,7 @@ export function DisplayCourtLocation({ game }: SelectCourtLocationParams) {
             location={11}
           ></HeatmapBox>
         </Flex>
-        <Center>
+        <Center mt={10}>
           <i>{game.teamTwo.name}</i>
         </Center>
       </div>
