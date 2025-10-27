@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { IconQuestionMark, IconTrophy } from '@tabler/icons-react';
-import useScreenOrientation from 'react-hook-screen-orientation';
-import { Button, Center, Modal, Text, Title } from '@mantine/core';
+import { Button, Modal, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { TeamActionList } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamActionList';
 import {
@@ -9,6 +8,7 @@ import {
   didWinGame,
 } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 
 interface TeamButtonProps {
   game: GameState;
@@ -38,8 +38,8 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
   const [opened, { open, close }] = useDisclosure(false);
 
   const name = team ? team.name.get : 'Loading...';
-  const screenOrientation = useScreenOrientation();
-  if (screenOrientation === 'portrait-primary') {
+  const isVertical = useScreenVertical();
+  if (isVertical) {
     return (
       <>
         <Modal opened={opened} centered onClose={close} title={<Title> {name}</Title>}>

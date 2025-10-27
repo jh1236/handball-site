@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import useScreenOrientation from 'react-hook-screen-orientation';
 import {
   Box,
   Button,
@@ -30,6 +29,7 @@ import { PlayerButton } from '@/components/HandballComponenets/GameEditingCompon
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useGameState } from '@/components/HandballComponenets/GameState';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 import { getGame } from '@/ServerActions/GameActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { GameStructure, OfficialStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
@@ -61,7 +61,6 @@ export function EditGame({ game }: { game: number }) {
   const [officials, setOfficials] = useState<OfficialStructure[]>([]);
   const [scorer, setScorer] = useState<OfficialStructure>();
   const [official, setOfficial] = useState<OfficialStructure>();
-  const screenOrientation = useScreenOrientation();
 
   const [gameObj, setGameObj] = React.useState<GameStructure | null>(null);
   setGameFn = setGameObj;
@@ -69,7 +68,7 @@ export function EditGame({ game }: { game: number }) {
   const [editOfficialGame, { close: iKnowWhatImDoing }] = useDisclosure(true);
   startLoading = openLoading;
   const [visibleTimeout, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-
+  const isVertical = useScreenVertical();
   const [currentTime, setCurrentTime] = React.useState<number>(300);
 
   const { gameState, setGameForState } = useGameState(gameObj || undefined);
@@ -199,7 +198,7 @@ export function EditGame({ game }: { game: number }) {
                 : loginProps,
           }}
         />
-        {screenOrientation === 'portrait-primary' ? (
+        {isVertical ? (
           <>
             <Box style={{ width: '100%', height: '40%' }}>
               {(

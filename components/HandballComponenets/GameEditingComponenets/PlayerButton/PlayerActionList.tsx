@@ -11,7 +11,6 @@ import {
   IconStarFilled,
   IconTriangleInvertedFilled,
 } from '@tabler/icons-react';
-import useScreenOrientation from 'react-hook-screen-orientation';
 import { ImEvil } from 'react-icons/im';
 import {
   Accordion,
@@ -27,6 +26,7 @@ import {
   Text,
   TextInput,
   Title,
+  useMatches,
 } from '@mantine/core';
 import { VerticalSlider } from '@/components/basic/VerticalSlider';
 import {
@@ -45,6 +45,7 @@ import { GAME_CONFIG } from '@/components/HandballComponenets/GameEditingCompone
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
 import SelectCourtLocation from '@/components/HandballComponenets/GameEditingComponenets/SelectCourtLocation';
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 import { IconHandballCards } from '@/components/icons/IconCards';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
@@ -82,7 +83,7 @@ export function PlayerActionList({
   serving,
   close: _close,
 }: PlayerActionListParams): React.ReactElement {
-  const screenOrientation = useScreenOrientation();
+  const isVertical = useScreenVertical();
 
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const [cardTime, setCardTime] = React.useState<number>(
@@ -91,6 +92,7 @@ export function PlayerActionList({
   const [moreShown, setMoreShown] = useState<boolean>(false);
 
   const [location, setLocation] = React.useState<string[]>([]);
+  const fullscreenScoreSelector = useMatches({ base: !isVertical, md: false });
   const [otherReason, setOtherReason] = React.useState<string>('');
   const close = useCallback(() => {
     _close();
@@ -137,7 +139,7 @@ export function PlayerActionList({
         <Tabs
           w="100%"
           defaultValue={defaultCategory}
-          orientation={screenOrientation === 'portrait-primary' ? undefined : 'vertical'}
+          orientation={isVertical ? undefined : 'vertical'}
         >
           <Tabs.List style={{ flexWrap: 'nowrap' }}>
             <Tabs.Tab
@@ -419,11 +421,7 @@ export function PlayerActionList({
       value: 'Other',
       color: 'white',
       content: (
-        <Tabs
-          w="100%"
-          defaultValue="Merit"
-          orientation={screenOrientation === 'portrait-primary' ? undefined : 'vertical'}
-        >
+        <Tabs w="100%" defaultValue="Merit" orientation={isVertical ? undefined : 'vertical'}>
           <Tabs.List grow>
             <Tabs.Tab
               size="sm"
@@ -528,7 +526,9 @@ export function PlayerActionList({
         <>
           <Modal
             opened={openModal === 'score'}
-            title="Location Picker"
+            fullScreen={fullscreenScoreSelector}
+            withCloseButton={!fullscreenScoreSelector}
+            title={!fullscreenScoreSelector ? <Title order={3}>Score Location</Title> : undefined}
             onClose={() => {
               setOtherReason('');
               setLocation([]);
@@ -536,7 +536,6 @@ export function PlayerActionList({
             }}
           >
             <Stack>
-              <Title order={3}>Pick the location where the player scored.</Title>
               <Center>
                 <SelectCourtLocation
                   location={location}
@@ -557,7 +556,7 @@ export function PlayerActionList({
               </Button>
             </Stack>
           </Modal>
-          <Flex direction={screenOrientation === 'portrait-primary' ? 'column' : 'row'}>
+          <Flex direction={isVertical ? 'column' : 'row'}>
             <Box>
               {GAME_CONFIG.scoreMethods.slice(0, 4).map((method, i) => (
                 <Fragment key={i}>
@@ -637,34 +636,69 @@ export function PlayerActionList({
           <>
             <Modal
               opened={openModal === 'ace'}
-              title="Location Picker"
+              fullScreen={fullscreenScoreSelector}
+              withCloseButton={!fullscreenScoreSelector}
+              title={!fullscreenScoreSelector ? <Title order={3}>Score Location</Title> : undefined}
               onClose={() => {
                 setLocation([]);
                 setOpenModal(undefined);
               }}
             >
-              <Stack>
-                <Title order={3}>Pick the location where the player scored.</Title>
-                <Center>
-                  <SelectCourtLocation
-                    isAce
-                    location={location}
-                    setLocation={setLocation}
-                    leftSide={leftSide}
-                    reverse={game.teamOneIGA.get !== firstTeam}
-                  ></SelectCourtLocation>
+              {!fullscreenScoreSelector ? (
+                <Stack>
+                  <Center>
+                    <SelectCourtLocation
+                      isAce
+                      location={location}
+                      setLocation={setLocation}
+                      leftSide={leftSide}
+                      reverse={game.teamOneIGA.get !== firstTeam}
+                    ></SelectCourtLocation>
+                  </Center>
+                  <br />
+                  <Button
+                    onClick={() => {
+                      ace(game, location);
+                      close();
+                    }}
+                    disabled={!location[0]}
+                  >
+                    Submit
+                  </Button>
+                </Stack>
+              ) : (
+                <Center h="100%">
+                  <Flex direction="row" justify="space-around">
+                    <SelectCourtLocation
+                      isAce
+                      location={location}
+                      setLocation={setLocation}
+                      leftSide={leftSide}
+                      reverse={game.teamOneIGA.get !== firstTeam}
+                    ></SelectCourtLocation>
+                    <Flex direction="column">
+                      <Button
+                        onClick={() => {
+                          setOpenModal(undefined);
+                        }}
+                        c="gray"
+                      >
+                        Back
+                      </Button>
+                      <br />
+                      <Button
+                        onClick={() => {
+                          ace(game, location);
+                          close();
+                        }}
+                        disabled={!location[0]}
+                      >
+                        Submit
+                      </Button>
+                    </Flex>
+                  </Flex>
                 </Center>
-                <br />
-                <Button
-                  onClick={() => {
-                    ace(game, location);
-                    close();
-                  }}
-                  disabled={!location[0]}
-                >
-                  Submit
-                </Button>
-              </Stack>
+              )}
             </Modal>
             <Flex direction="column">
               <Button
@@ -696,7 +730,7 @@ export function PlayerActionList({
       });
     }
   }
-  if (screenOrientation === 'portrait-primary') {
+  if (isVertical) {
     return (
       <Accordion defaultValue={out[0].value} onChange={() => setMoreShown(false)}>
         {out.map((item, i) => (

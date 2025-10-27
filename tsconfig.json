@@ -5,10 +5,6 @@
       "jest",
       "@testing-library/jest-dom"
     ],
-    "typeRoots": [
-      "typings",
-      "node_modules/@types"
-    ],
     "target": "es5",
     "lib": [
       "dom",
