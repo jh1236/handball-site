@@ -428,7 +428,7 @@ export function AdminGamePanel({ game }: AdminGamePanelProps) {
               )}
               <Timeline bulletSize={24}>
                 {game.events
-                  ?.filter((a) => a.notes !== 'Penalty' && (a.notes || a.eventType !== 'Notes'))
+                  ?.filter((a) => (a.eventType !== 'Score' || !!a.player) && (a.notes || a.eventType !== 'Notes'))
                   .map((e, i) => (
                     <Timeline.Item
                       key={i}

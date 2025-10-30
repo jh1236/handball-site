@@ -42,14 +42,14 @@ export function GamePlayerPointsGraph({ game }: { game: GameStructure }): React.
         new Set(game.events?.filter((gE) => gE.eventType === 'Score').map((e) => e.player?.name))
       )
         .map((a) => ({
-          name: a ?? 'Penalty',
+          name: a ?? 'Not Provided',
           value: game.events
             ?.filter((gE) => gE.eventType === 'Score')
             .map((e) => e.player?.name)
             .filter((f) => f === a).length,
           teamOne: playersOf(game.teamOne)
             .map((pgs) => pgs.name)
-            .includes(a ?? 'Penalty'),
+            .includes(a ?? 'Not Provided'),
           index: Math.max(
             playersOf(game.teamOne).findIndex((pgs) => pgs.name === a),
             playersOf(game.teamTwo).findIndex((pgs) => pgs.name === a)

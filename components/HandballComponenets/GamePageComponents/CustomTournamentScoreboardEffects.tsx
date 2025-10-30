@@ -11,7 +11,7 @@ function fakeRandom(seed: number) {
 
 export function customTournamentScoreboardEffects(game?: GameStructure) {
   if (!game) return null;
-  const events = (game?.events ?? []).filter((a) => a.notes !== 'Penalty');
+  const events = (game?.events ?? []).filter((a) => a.player !== undefined);
   if (!events.length) {
     return null;
   }
@@ -20,7 +20,7 @@ export function customTournamentScoreboardEffects(game?: GameStructure) {
 }
 
 function eighthTournamentScoreboard(game: GameStructure) {
-  const events = (game.events ?? []).filter((a) => a.notes !== 'Penalty');
+  const events = (game.events ?? []).filter((a) => a.player !== undefined);
   const event = events.at(-1);
   if (!event) return null;
   switch (event.eventType) {
