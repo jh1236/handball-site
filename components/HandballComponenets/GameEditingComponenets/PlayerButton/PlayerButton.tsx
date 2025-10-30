@@ -1,8 +1,19 @@
 import React, { ForwardRefExoticComponent, Fragment, useMemo } from 'react';
-import { Button, Modal, Progress, Title, useMatches } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Modal,
+  Overlay,
+  Paper,
+  Portal,
+  Progress,
+  Title,
+  useMatches,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { PlayerActionList } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 
 interface PlayerButtonProps {
   game: GameState;
@@ -79,7 +90,7 @@ export function PlayerButton({
     [game.ended.get, player?.sideOfCourt, trueLeftSide]
   );
   const [opened, { open, close }] = useDisclosure(false);
-
+  const isVertical = useScreenVertical();
   const name = player ? (player.isCaptain ? `${player.name} (c)` : player.name) : 'Loading...';
   const servingColor = 'serving-color';
   const defaultColor = 'player-color';
@@ -87,20 +98,22 @@ export function PlayerButton({
   return (
     <>
       <Modal
-        opened={opened}
+        opened={(isVertical || !fullscreen) && opened}
+        fullScreen={fullscreen}
         centered
         onClose={close}
         title={<Title>{player?.name ?? 'Loading...'}</Title>}
-        fullScreen={fullscreen}
-        opacity={fullscreen ? 0.95 : 1}
       >
-        <PlayerActionList
-          game={game}
-          firstTeam={firstTeam}
-          leftSide={leftSide}
-          serving={serving}
-          close={close}
-        ></PlayerActionList>
+        <Box h={300}>
+          <PlayerActionList
+            game={game}
+            fullscreen={fullscreen}
+            firstTeam={firstTeam}
+            leftSide={leftSide}
+            serving={serving}
+            close={close}
+          ></PlayerActionList>
+        </Box>
       </Modal>
       <Button
         size="lg"
@@ -134,6 +147,35 @@ export function PlayerButton({
             (player!.cardTimeRemaining >= 0 ? player!.cardTimeRemaining / player!.cardTime : 1)
           }
         ></Progress>
+      )}
+      {fullscreen && opened && !isVertical && (
+        <Portal>
+          <Overlay
+            pos="absolute"
+            w="100lvw"
+            h="100lvh"
+            top={0}
+            backgroundOpacity={0.85}
+            blur={15}
+            left={0}
+            center={true}
+            onClick={close}
+          >
+            <Paper p={20} w="70%" h="90%" m="auto" onClick={(e) => e.stopPropagation()}>
+              <Title order={3} mb={15}>
+                {player?.name ?? 'Loading...'}
+              </Title>
+              <PlayerActionList
+                game={game}
+                fullscreen
+                firstTeam={firstTeam}
+                leftSide={leftSide}
+                serving={serving}
+                close={close}
+              ></PlayerActionList>
+            </Paper>
+          </Overlay>
+        </Portal>
       )}
     </>
   );

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { IconQuestionMark, IconTrophy } from '@tabler/icons-react';
-import { Button, Modal, Text, Title } from '@mantine/core';
+import { Button, Modal, Overlay, Paper, Portal, Text, Title, useMatches } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { TeamActionList } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamActionList';
 import {
@@ -36,14 +36,20 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
     [firstTeam, game.ended.get, game.firstTeamServes.get]
   );
   const [opened, { open, close }] = useDisclosure(false);
+  const fullscreen = useMatches({ base: true, md: false });
 
   const name = team ? team.name.get : 'Loading...';
   const isVertical = useScreenVertical();
   if (isVertical) {
     return (
       <>
-        <Modal opened={opened} centered onClose={close} title={<Title> {name}</Title>}>
-          <Title> {name}</Title>
+        <Modal
+          opened={opened}
+          fullScreen={fullscreen}
+          centered
+          onClose={close}
+          title={<Title> {name}</Title>}
+        >
           <TeamActionList
             game={game}
             firstTeam={firstTeam}
@@ -73,7 +79,7 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
   }
   return (
     <>
-      <Modal opened={opened} centered onClose={close} title={<Title> {name}</Title>}>
+      <Modal opened={!fullscreen && opened} centered onClose={close} title={<Title> {name}</Title>}>
         <TeamActionList
           game={game}
           firstTeam={firstTeam}
@@ -123,6 +129,33 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
           </b>
         </span>
       </Button>
+      {fullscreen && opened && (
+        <Portal>
+          <Overlay
+            pos="absolute"
+            w="100lvw"
+            h="100lvh"
+            top={0}
+            backgroundOpacity={0.85}
+            blur={15}
+            left={0}
+            center={true}
+            onClick={close}
+          >
+            <Paper p={20} w="70%" h="90%" m="auto" onClick={(e) => e.stopPropagation()}>
+              <Title order={3} mb={15}>
+                {name}
+              </Title>
+              <TeamActionList
+                game={game}
+                firstTeam={firstTeam}
+                serving={serving}
+                close={close}
+              ></TeamActionList>
+            </Paper>
+          </Overlay>
+        </Portal>
+      )}
     </>
   );
 }

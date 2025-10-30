@@ -30,7 +30,7 @@ export default function SelectCourtLocation({
   const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
   const [controlsRefs, setControlsRefs] = useState<Record<string, HTMLButtonElement | null>>({});
 
-  const isVertical = useScreenVertical();
+  const isVertical = useScreenVertical() || gameState.ended.get;
 
   const setControlRef = (name: string) => (node: HTMLButtonElement) => {
     controlsRefs[name] = node;
@@ -62,8 +62,8 @@ export default function SelectCourtLocation({
 
     const leftCols = ['wide-left', 'left', 'center-left'];
     const rightCols = ['center-right', 'right', 'wide-right'];
-    if (leftCols.includes(col)) return isAce && leftSide;
-    if (rightCols.includes(col)) return isAce && !leftSide;
+    if (leftCols.includes(col)) return isAce && !leftSide;
+    if (rightCols.includes(col)) return isAce && leftSide;
 
     return isAce;
   };

@@ -68,10 +68,10 @@ export function EditGame({ game }: { game: number }) {
   const [editOfficialGame, { close: iKnowWhatImDoing }] = useDisclosure(true);
   startLoading = openLoading;
   const [visibleTimeout, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-  const isVertical = useScreenVertical();
   const [currentTime, setCurrentTime] = React.useState<number>(300);
-
   const { gameState, setGameForState } = useGameState(gameObj || undefined);
+
+  const isVertical = useScreenVertical();
 
   //team one state
 
@@ -207,20 +207,20 @@ export function EditGame({ game }: { game: number }) {
                   : gameState.teamTwo.right.get && gameState.teamTwo.left.get
               ) ? (
                 <>
-                  <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+                  <Box style={{ width: '50%', height: '80%', float: 'left' }}>
                     <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
                   </Box>
-                  <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+                  <Box style={{ width: '50%', height: '80%', float: 'right' }}>
                     <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
                   </Box>
                 </>
               ) : (
-                <Box style={{ width: '100%', height: '90%', float: 'left' }}>
+                <Box style={{ width: '100%', height: '80%', float: 'left' }}>
                   <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
                 </Box>
               )}
 
-              <Box style={{ width: '100%', height: '10%', float: 'right' }}>
+              <Box style={{ width: '100%', height: '20%', float: 'right' }}>
                 <TeamButton firstTeam={true} game={gameState}></TeamButton>
               </Box>
             </Box>
@@ -318,7 +318,7 @@ export function EditGame({ game }: { game: number }) {
               </Group>
             </Box>
             <Box style={{ width: '100%', height: '40%' }}>
-              <Box style={{ width: '100%', height: '10%', float: 'right' }}>
+              <Box style={{ width: '100%', height: '20%', float: 'right' }}>
                 <TeamButton firstTeam={false} game={gameState}></TeamButton>
               </Box>
               {(
@@ -327,10 +327,10 @@ export function EditGame({ game }: { game: number }) {
                   : gameState.teamOne.right.get && gameState.teamOne.left.get
               ) ? (
                 <>
-                  <Box style={{ width: '50%', height: '90%', float: 'left' }}>
+                  <Box style={{ width: '50%', height: '80%', float: 'left' }}>
                     <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
                   </Box>
-                  <Box style={{ width: '50%', height: '90%', float: 'right' }}>
+                  <Box style={{ width: '50%', height: '80%', float: 'right' }}>
                     <PlayerButton
                       game={gameState}
                       firstTeam={false}

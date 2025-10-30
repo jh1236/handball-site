@@ -18,9 +18,11 @@ import {
   Box,
   Button,
   Center,
-  Collapse,
   Flex,
   Modal,
+  Overlay,
+  Paper,
+  Portal,
   Stack,
   Tabs,
   Text,
@@ -71,6 +73,7 @@ function getCardBadness(eventType: string): number {
 interface PlayerActionListParams {
   game: GameState;
   firstTeam: boolean;
+  fullscreen: boolean;
   leftSide: boolean;
   serving: boolean;
   close: () => void;
@@ -79,6 +82,7 @@ interface PlayerActionListParams {
 export function PlayerActionList({
   game,
   firstTeam,
+  fullscreen,
   leftSide,
   serving,
   close: _close,
@@ -89,7 +93,6 @@ export function PlayerActionList({
   const [cardTime, setCardTime] = React.useState<number>(
     Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0))
   );
-  const [moreShown, setMoreShown] = useState<boolean>(false);
 
   const [location, setLocation] = React.useState<string[]>([]);
   const fullscreenScoreSelector = useMatches({ base: !isVertical, md: false });
@@ -99,7 +102,6 @@ export function PlayerActionList({
     setCardTime(Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0)));
     setOpenModal(undefined);
     setOtherReason('');
-    setMoreShown(false);
   }, [_close, game.blitzGame.get, team.isSolo]);
 
   const subsAllowedScore = useMemo(() => (game.blitzGame.get ? 5 : 9), [game.blitzGame.get]);
@@ -141,7 +143,12 @@ export function PlayerActionList({
           defaultValue={defaultCategory}
           orientation={isVertical ? undefined : 'vertical'}
         >
-          <Tabs.List style={{ flexWrap: 'nowrap' }}>
+          <Tabs.List
+            style={{ flexWrap: 'nowrap' }}
+            mr={!isVertical ? 10 : undefined}
+            mb={isVertical ? 10 : undefined}
+            grow
+          >
             <Tabs.Tab
               size="xs"
               color="grey"
@@ -182,8 +189,9 @@ export function PlayerActionList({
             {GAME_CONFIG.cards.warning.map((reason, i) => (
               <Fragment key={i}>
                 <Button
-                  style={{ margin: '3px' }}
                   size="xs"
+                  m={3}
+                  miw={160}
                   color="gray.6"
                   disabled={
                     !game.practice.get && !buttonEnabledFor(currentPlayer.get!, reason, 'Warning')
@@ -237,8 +245,9 @@ export function PlayerActionList({
             {GAME_CONFIG.cards.green.map((reason, i) => (
               <Fragment key={i}>
                 <Button
-                  style={{ margin: '3px' }}
                   size="xs"
+                  m={3}
+                  miw={160}
                   disabled={
                     !game.practice.get &&
                     !buttonEnabledFor(currentPlayer.get!, reason, 'Green Card')
@@ -295,7 +304,8 @@ export function PlayerActionList({
                 {GAME_CONFIG.cards.yellow.map((reason, i) => (
                   <Fragment key={i}>
                     <Button
-                      style={{ margin: '3px' }}
+                      m={3}
+                      miw={160}
                       size="xs"
                       disabled={
                         !game.practice.get &&
@@ -365,7 +375,8 @@ export function PlayerActionList({
             {GAME_CONFIG.cards.red.map((reason, i) => (
               <Fragment key={i}>
                 <Button
-                  style={{ margin: '3px' }}
+                  m={3}
+                  miw={160}
                   size="xs"
                   color="red"
                   onClick={() => {
@@ -421,7 +432,7 @@ export function PlayerActionList({
       value: 'Other',
       color: 'white',
       content: (
-        <Tabs w="100%" defaultValue="Merit" orientation={isVertical ? undefined : 'vertical'}>
+        <Tabs w="100%" defaultValue="Merit">
           <Tabs.List grow>
             <Tabs.Tab
               size="sm"
@@ -524,8 +535,44 @@ export function PlayerActionList({
       color: undefined,
       content: (
         <>
+          {fullscreen && openModal === 'score' && !isVertical && (
+            <Portal>
+              <Overlay
+                pos="absolute"
+                w="100lvw"
+                h="100lvh"
+                backgroundOpacity={0.35}
+                top={0}
+                left={0}
+                center={true}
+                onClick={() => setOpenModal(undefined)}
+              >
+                <Paper shadow="xl" m="auto" onClick={(e) => e.stopPropagation()} p={30}>
+                  <Center>
+                    <SelectCourtLocation
+                      location={location}
+                      setLocation={setLocation}
+                      leftSide={leftSide}
+                      reverse={game.teamOneIGA.get !== firstTeam}
+                    ></SelectCourtLocation>
+                    <br />
+                    <Button
+                      ml={15}
+                      onClick={() => {
+                        score(game, firstTeam, leftSide, otherReason, location);
+                        close();
+                      }}
+                      disabled={!location.length}
+                    >
+                      Submit
+                    </Button>
+                  </Center>
+                </Paper>
+              </Overlay>
+            </Portal>
+          )}
           <Modal
-            opened={openModal === 'score'}
+            opened={openModal === 'score' && (isVertical || !fullscreen)}
             fullScreen={fullscreenScoreSelector}
             withCloseButton={!fullscreenScoreSelector}
             title={!fullscreenScoreSelector ? <Title order={3}>Score Location</Title> : undefined}
@@ -556,11 +603,16 @@ export function PlayerActionList({
               </Button>
             </Stack>
           </Modal>
-          <Flex direction={isVertical ? 'column' : 'row'}>
-            <Box>
-              {GAME_CONFIG.scoreMethods.slice(0, 4).map((method, i) => (
+          <Flex direction="row" justify="space-around" w="100%">
+            <Flex direction="column">
+              <Text m={5} fw={600} ta="center">
+                Common Methods
+              </Text>
+              {GAME_CONFIG.scoreMethods.slice(0, 3).map((method, i) => (
                 <Fragment key={i}>
                   <Button
+                    miw={160}
+                    mb={isVertical ? undefined : 10}
                     color="player-color"
                     style={{ margin: '3px' }}
                     size="sm"
@@ -574,35 +626,29 @@ export function PlayerActionList({
                   <br />
                 </Fragment>
               ))}
-            </Box>
-            <Box>
-              <Button
-                style={{ margin: '3px' }}
-                color="gray"
-                onClick={() => setMoreShown(!moreShown)}
-                miw={150}
-              >
-                Show {moreShown ? 'Less' : 'More'}
-              </Button>
-              <Collapse in={moreShown}>
-                {GAME_CONFIG.scoreMethods.slice(4).map((method, i) => (
-                  <Fragment key={i}>
-                    <Button
-                      style={{ margin: '3px' }}
-                      size="sm"
-                      color="player-color"
-                      onClick={() => {
-                        setOtherReason(method);
-                        setOpenModal('score');
-                      }}
-                    >
-                      {method}
-                    </Button>
-                    <br />
-                  </Fragment>
-                ))}
-              </Collapse>
-            </Box>
+            </Flex>
+            <Flex direction="column">
+              <Text m={5} fw={600} ta="center">
+                Alternative Methods
+              </Text>
+              {GAME_CONFIG.scoreMethods.slice(3).map((method, i) => (
+                <Fragment key={i}>
+                  <Button
+                    miw={160}
+                    style={{ margin: '3px' }}
+                    mb={isVertical ? undefined : 10}
+                    size="sm"
+                    color="player-color"
+                    onClick={() => {
+                      setOtherReason(method);
+                      setOpenModal('score');
+                    }}
+                  >
+                    {method}
+                  </Button>
+                </Fragment>
+              ))}
+            </Flex>
           </Flex>
         </>
       ),
@@ -614,6 +660,7 @@ export function PlayerActionList({
         color: undefined,
         content: (
           <Button
+            miw={160}
             color="player-color"
             size="sm"
             style={{ margin: '3px' }}
@@ -634,78 +681,83 @@ export function PlayerActionList({
         color: undefined,
         content: (
           <>
-            <Modal
-              opened={openModal === 'ace'}
-              fullScreen={fullscreenScoreSelector}
-              withCloseButton={!fullscreenScoreSelector}
-              title={!fullscreenScoreSelector ? <Title order={3}>Score Location</Title> : undefined}
-              onClose={() => {
-                setLocation([]);
-                setOpenModal(undefined);
-              }}
-            >
-              {!fullscreenScoreSelector ? (
-                <Stack>
-                  <Center>
-                    <SelectCourtLocation
-                      isAce
-                      location={location}
-                      setLocation={setLocation}
-                      leftSide={leftSide}
-                      reverse={game.teamOneIGA.get !== firstTeam}
-                    ></SelectCourtLocation>
-                  </Center>
-                  <br />
-                  <Button
-                    onClick={() => {
-                      ace(game, location);
-                      close();
-                    }}
-                    disabled={!location[0]}
-                  >
-                    Submit
-                  </Button>
-                </Stack>
-              ) : (
-                <Center h="100%">
-                  <Flex direction="row" justify="space-around">
-                    <SelectCourtLocation
-                      isAce
-                      location={location}
-                      setLocation={setLocation}
-                      leftSide={leftSide}
-                      reverse={game.teamOneIGA.get !== firstTeam}
-                    ></SelectCourtLocation>
-                    <Flex direction="column">
-                      <Button
-                        onClick={() => {
-                          setOpenModal(undefined);
-                        }}
-                        c="gray"
-                      >
-                        Back
-                      </Button>
+            {fullscreen && openModal === 'ace' && !isVertical && (
+              <Portal>
+                <Overlay
+                  pos="absolute"
+                  w="100lvw"
+                  h="100lvh"
+                  backgroundOpacity={0.35}
+                  top={0}
+                  left={0}
+                  center={true}
+                  onClick={() => setOpenModal(undefined)}
+                >
+                  <Paper shadow="xl" m="auto" onClick={(e) => e.stopPropagation()} p={30}>
+                    <Center>
+                      <SelectCourtLocation
+                        location={location}
+                        isAce
+                        setLocation={setLocation}
+                        leftSide={leftSide}
+                        reverse={game.teamOneIGA.get !== firstTeam}
+                      ></SelectCourtLocation>
                       <br />
                       <Button
+                        ml={15}
                         onClick={() => {
                           ace(game, location);
                           close();
                         }}
-                        disabled={!location[0]}
+                        disabled={!location.length}
                       >
                         Submit
                       </Button>
-                    </Flex>
-                  </Flex>
+                    </Center>
+                  </Paper>
+                </Overlay>
+              </Portal>
+            )}
+            <Modal
+              opened={openModal === 'ace' && (isVertical || !fullscreen)}
+              fullScreen={fullscreenScoreSelector}
+              withCloseButton={!fullscreenScoreSelector}
+              title={!fullscreenScoreSelector ? <Title order={3}>Score Location</Title> : undefined}
+              onClose={() => {
+                setOtherReason('');
+                setLocation([]);
+                setOpenModal(undefined);
+              }}
+            >
+              <Stack>
+                <Center>
+                  <SelectCourtLocation
+                    location={location}
+                    isAce
+                    setLocation={setLocation}
+                    leftSide={leftSide}
+                    reverse={game.teamOneIGA.get !== firstTeam}
+                  ></SelectCourtLocation>
                 </Center>
-              )}
+                <br />
+                <Button
+                  onClick={() => {
+                    ace(game, location);
+                    close();
+                  }}
+                  disabled={!location.length}
+                >
+                  Submit
+                </Button>
+              </Stack>
             </Modal>
             <Flex direction="column">
               <Button
                 color="player-color"
                 style={{ margin: '3px' }}
                 size="sm"
-                maw={150}
+                w={160}
+                mb={isVertical ? undefined : 10}
                 onClick={() => {
                   setOpenModal('ace');
                 }}
@@ -716,7 +768,8 @@ export function PlayerActionList({
                 color="player-color"
                 style={{ margin: '3px' }}
                 size="sm"
-                maw={150}
+                mb={isVertical ? undefined : 10}
+                w={160}
                 onClick={() => {
                   fault(game);
                   close();
@@ -732,7 +785,7 @@ export function PlayerActionList({
   }
   if (isVertical) {
     return (
-      <Accordion defaultValue={out[0].value} onChange={() => setMoreShown(false)}>
+      <Accordion defaultValue={out[0].value}>
         {out.map((item, i) => (
           <Accordion.Item key={i} value={item.value}>
             <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
@@ -746,8 +799,8 @@ export function PlayerActionList({
   }
 
   return (
-    <Tabs orientation="vertical" defaultValue={out[0].value}>
-      <Tabs.List>
+    <Tabs orientation="vertical" w="100%" h="90%" defaultValue={out[0].value}>
+      <Tabs.List mr={10}>
         {out.map((item, i) => (
           <Tabs.Tab
             leftSection={<item.Icon color={item.color} />}
