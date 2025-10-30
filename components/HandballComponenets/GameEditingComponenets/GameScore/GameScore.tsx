@@ -186,7 +186,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
           >
             <Paper p={20} maw="40%" m="auto" onClick={(e) => e.stopPropagation()}>
               <Title order={3} mb={15} ta="center">
-                <IconRotate3d style={{marginRight: 5}}/>
+                <IconRotate3d style={{ marginRight: 5 }} />
                 Rotate your device
               </Title>
               <Text>
