@@ -920,9 +920,9 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           <Title ta="center" order={2}>
             Teams
           </Title>
-          {teamsInTournament.map((t, index) => (
+          {teamsInTournament.map((t) => (
             <TeamCard
-              key={index}
+              key={t.searchableName}
               tournament={tournament}
               team={t}
               setTeamsInTournament={setTeamsInTournament}
@@ -947,8 +947,8 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
             Officials
           </Title>
           <Grid>
-            {officialsInTournament.map((t, index) => (
-              <Grid.Col key={index} span={6}>
+            {officialsInTournament.map((t) => (
+              <Grid.Col key={t.searchableName} span={6}>
                 <OfficialCard
                   tournament={tournament}
                   official={t}

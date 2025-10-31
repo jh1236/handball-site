@@ -79,8 +79,8 @@ export function InternalDynamicTable<T extends InputType>({
   }, [sortIndexIn]);
 
   const sortedData = useMemo(() => {
-    if (sortIndex === 0) return data;
     const idx = Math.abs(sortIndex);
+    if (idx === 0 || idx - 1 > columns.length) return data;
     const factor = Math.sign(sortIndex);
     return data?.toSorted((a, b) => {
       const valueA = stringToNumber(getHeader(a, ['searchableName'].concat(columns)[idx - 1]));
