@@ -50,83 +50,73 @@ export default function SelectCourtLocation({
     { key: 'wide-right', width: W / edgeFactor },
   ];
 
-  // produce the `stringLocation` used to match active button
   const stringLocation = useMemo(() => location.join('-'), [location]);
 
-  // active DOM node for the FloatingIndicator
   const active = useMemo(
     () => controlsRefs[stringLocation] ?? null,
     [controlsRefs, stringLocation]
   );
 
-  // convenience: should this cell be disabled (mirrors original logic)
   const isDisabled = (row: string, col: string) => {
-    // deep row had special logic for left/right wide depending on ace & leftSide
-    if (row === 'deep') {
-      if (
-        col.startsWith('wide-') ||
-        col === 'left' ||
-        col === 'right' ||
-        col.startsWith('center-')
-      ) {
-        // original: deep-wide-left / deep-left / deep-center-left disabled when isAce && leftSide
-        // and deep-center-right/deep-right/deep-wide-right disabled when isAce && !leftSide
-        const leftCols = ['wide-left', 'left', 'center-left'];
-        const rightCols = ['center-right', 'right', 'wide-right'];
-        if (leftCols.includes(col)) return isAce && leftSide;
-        if (rightCols.includes(col)) return isAce && !leftSide;
-      }
-    }
+    if (row !== 'deep') return isAce;
 
-    // other rows were all disabled when isAce in original
+    const leftCols = ['wide-left', 'left', 'center-left'];
+    const rightCols = ['center-right', 'right', 'wide-right'];
+    if (leftCols.includes(col)) return isAce && leftSide;
+    if (rightCols.includes(col)) return isAce && !leftSide;
+    if (leftCols.includes(col)) return isAce && !leftSide;
+    if (rightCols.includes(col)) return isAce && leftSide;
+
     return isAce;
   };
 
-  // separator color function — this reproduces the different colors used in each row
   const separatorColor = (rowIndex: number, afterColIndex: number) => {
-    // original had pink separators at many spots and a green separator in the middle of each row
-    // We'll make the "middle" separator (between the 3rd and 4th logical columns) green,
-    // and the others pink. The top-most short row (deep) used no pink in some places but this
-    // mirrors the general pattern.
     if (afterColIndex === 2) return 'green';
     if ([0, 4].includes(afterColIndex)) return 'pink';
     return undefined;
   };
 
-  // when rendering we want to insert a thin Box between columns
   const renderRow = (row: string, rowIndex: number) => (
-    <Flex key={row}>
+    <Flex
+      key={row}
+      direction={`${isVertical ? 'row' : 'column'}${isVertical === reverse ? '-reverse' : ''}`}
+    >
       {columns.map((col, colIndex) => {
         const id = `${row}-${col.key}`;
         const disabled = isDisabled(row, col.key);
         const className = disabled ? classes.evilcontrol : classes.control;
-        const activeProp = { mod: { active: stringLocation === id } } as any; // keep same `mod` prop used previously
-
+        const activeProp = { mod: { active: stringLocation === id } } as any;
+        let lw = lineThickness;
+        let lh = row === 'deep' ? H / edgeFactor : H;
+        let h = row === 'deep' ? H / edgeFactor : H;
+        let w = col.width;
+        if (!isVertical) {
+          [lw, lh] = [lh, lw]; //oneliner to swap variables
+          [h, w] = [w, h];
+        }
         const c = separatorColor(rowIndex, colIndex);
         return (
           <React.Fragment key={id}>
             <UnstyledButton
               disabled={!!disabled}
               className={className}
-              h={row === 'deep' ? H / edgeFactor : H}
-              w={col.width}
+              h={h}
+              w={w}
               onClick={() => setLocation([row, col.key])}
               ref={setControlRef(id)}
               {...activeProp}
             >
-              {isAce &&
-                // original logic: show IconX on certain buttons depending on row/leftSide
-                // simplify: show IconX when the button is disabled because of ace
-                (disabled ? <IconX /> : null)}
+              {isAce && (disabled ? <IconX /> : null)}
+              {/*{row[0]}:{col.key[0]}*/}
+              {/*{col.key.split('-')[1]?.[0]}*/}
             </UnstyledButton>
 
-            {/* separator after the column unless it's the last column */}
             {colIndex < columns.length - 1 && [0, 2, 4].includes(colIndex) && (
               <Box
                 key={`${id}-sep`}
-                w={lineThickness}
+                w={lw}
                 bg={colIndex === 2 || rowIndex !== 0 ? c : undefined}
-                h={row === 'deep' ? H / edgeFactor : H}
+                h={lh}
               />
             )}
           </React.Fragment>
@@ -134,9 +124,27 @@ export default function SelectCourtLocation({
       })}
     </Flex>
   );
-  if (reverse) {
-    return (
-      <div className={classes.root} dir="ltr" ref={setRootRef}>
+  let left = W / edgeFactor;
+  let top = 0;
+  let lh = lineThickness;
+  let lw = 4 * W + 3 * lh;
+  if (!isVertical) {
+    [lw, lh] = [lh, lw];
+    [left, top] = [top, left];
+  }
+  return (
+    <Flex className={classes.root} dir="ltr" ref={setRootRef}>
+      <FloatingIndicator
+        target={active}
+        style={{ opacity: 0.5, backgroundColor: '#6666ff' }}
+        parent={rootRef}
+        className={classes.indicator}
+      />
+      <Flex direction={`${isVertical ? 'column' : 'row'}${reverse ? '-reverse' : ''}`}>
+        <Center m={15}>
+          <i>Back Court</i>
+        </Center>
+
         <FloatingIndicator
           target={active}
           style={{ opacity: 0.5, backgroundColor: '#6666ff' }}
@@ -144,92 +152,23 @@ export default function SelectCourtLocation({
           className={classes.indicator}
         />
 
-        <Center>
-          <i>Center Line</i>
-        </Center>
+        {renderRow('deep', 0)}
 
-        <Box
-          pos="relative"
-          left={W / edgeFactor}
-          w={4 * W + 3 * lineThickness}
-          bg="white"
-          h={lineThickness}
-        />
-        {renderRow('front', 3)}
-
-        <Box
-          pos="relative"
-          left={W / edgeFactor}
-          w={4 * W + 3 * lineThickness}
-          bg="red"
-          h={lineThickness}
-        />
-        {renderRow('mid', 2)}
+        <Box pos="relative" left={left} top={top} w={lw} bg="purple" h={lh} />
 
         {renderRow('back', 1)}
+        {renderRow('mid', 2)}
 
-        <Box
-          pos="relative"
-          left={W / edgeFactor}
-          w={4 * W + 3 * lineThickness}
-          bg="purple"
-          h={lineThickness}
-        />
+        <Box pos="relative" left={left} top={top} w={lw} bg="red" h={lh} />
 
-        {renderRow('deep', 0)}
-        <Center>
-          <i>Back Court</i>
+        {renderRow('front', 3)}
+
+        <Box pos="relative" left={left} top={top} w={lw} bg="white" h={lh} />
+
+        <Center m={15}>
+          <i>Center Line</i>
         </Center>
-      </div>
-    );
-  }
-  return (
-    <div className={classes.root} dir="ltr" ref={setRootRef}>
-      <Center>
-        <i>Back Court</i>
-      </Center>
-
-      <FloatingIndicator
-        target={active}
-        style={{ opacity: 0.5, backgroundColor: '#6666ff' }}
-        parent={rootRef}
-        className={classes.indicator}
-      />
-
-      {renderRow('deep', 0)}
-
-      <Box
-        pos="relative"
-        left={W / edgeFactor}
-        w={4 * W + 3 * lineThickness}
-        bg="purple"
-        h={lineThickness}
-      />
-
-      {renderRow('back', 1)}
-      {renderRow('mid', 2)}
-
-      <Box
-        pos="relative"
-        left={W / edgeFactor}
-        w={4 * W + 3 * lineThickness}
-        bg="red"
-        h={lineThickness}
-      />
-
-      {renderRow('front', 3)}
-
-      <Box
-        pos="relative"
-        left={W / edgeFactor}
-        w={4 * W + 3 * lineThickness}
-        bg="white"
-        h={lineThickness}
-      />
-
-      <Center>
-        <i>Center Line</i>
-      </Center>
-    </div>
+      </Flex>
+    </Flex>
   );
 }
