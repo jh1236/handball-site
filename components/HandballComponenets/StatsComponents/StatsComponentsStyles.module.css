@@ -1,0 +1,75 @@
+.glows{
+    overflow: visible !important;
+    animation: grow-shrink-shadow 10s infinite forwards !important;
+}
+
+.glows::after,
+.glows::before {
+    --size: 150%;
+
+    --color-a: rgba(204, 202, 50, 0.1);
+    --color-b: rgba(204, 202, 50, 0.5);
+    --color-c: rgba(204, 202, 50, 0.5);
+    --color-d: rgba(204, 202, 50, 0.68);
+
+
+    content: "";
+    z-index: -1;
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    left: calc((100% - var(--size)) / 2);
+    top: calc((100% - var(--size)) / 2);
+    border-radius: 0;
+    mask: radial-gradient(#ffff 0%, #fff0 70%);
+}
+
+.glows::before {
+    background: conic-gradient(
+        var(--color-a),
+        var(--color-b),
+        var(--color-c),
+        var(--color-d),
+        var(--color-a),
+        var(--color-d),
+        var(--color-a),
+        var(--color-d),
+        var(--color-b),
+        var(--color-c),
+        var(--color-a),
+        var(--color-b),
+        var(--color-a)
+    );
+    animation: rotate-grow-shrink 7s infinite linear;
+}
+
+.glows::after{
+    background: conic-gradient(
+        transparent,
+        var(--color-a),
+        var(--color-b),
+        transparent,
+        var(--color-c),
+        var(--color-d),
+        transparent,
+        var(--color-a),
+        var(--color-b),
+        transparent,
+        var(--color-c),
+        var(--color-d),
+        transparent
+    );
+    animation: rotate-grow-shrink 8s 6s infinite reverse;
+}
+
+@keyframes rotate-grow-shrink {
+    0%   { transform: rotate(0deg) scale(0.9); }
+    50%  { transform: rotate(180deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(0.9); }
+}
+
+@keyframes grow-shrink-shadow {
+    0% { box-shadow: 0 0 10px 10px rgba(255, 252, 0, 0.3); }
+    50% { box-shadow: 0 0 15px 15px rgba(255, 252, 0, 0.3); }
+    100% { box-shadow: 0 0 10px 10px rgba(255, 252, 0, 0.3); }
+}
