@@ -50,8 +50,6 @@ export default function SelectCourtLocation({
     { key: 'wide-right', width: W / edgeFactor },
   ];
 
-  const stringLocation = useMemo(() => location.join('-'), [location]);
-
   // produce the `stringLocation` used to match active button
   const stringLocation = useMemo(() => location.join('-'), [location]);
 
