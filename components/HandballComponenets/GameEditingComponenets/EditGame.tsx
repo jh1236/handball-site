@@ -8,6 +8,7 @@ import {
   Center,
   createTheme,
   DEFAULT_THEME,
+  Flex,
   Group,
   LoadingOverlay,
   MantineProvider,
@@ -28,6 +29,7 @@ import { PlayerButton } from '@/components/HandballComponenets/GameEditingCompon
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useGameState } from '@/components/HandballComponenets/GameState';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 import { getGame } from '@/ServerActions/GameActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { GameStructure, OfficialStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
@@ -66,10 +68,10 @@ export function EditGame({ game }: { game: number }) {
   const [editOfficialGame, { close: iKnowWhatImDoing }] = useDisclosure(true);
   startLoading = openLoading;
   const [visibleTimeout, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
-
   const [currentTime, setCurrentTime] = React.useState<number>(300);
-
   const { gameState, setGameForState } = useGameState(gameObj || undefined);
+
+  const isVertical = useScreenVertical();
 
   //team one state
 
@@ -196,140 +198,300 @@ export function EditGame({ game }: { game: number }) {
                 : loginProps,
           }}
         />
-        <Box style={{ width: '100%', height: '40%' }}>
-          {(
-            gameState.teamOneIGA.get
-              ? gameState.teamOne.right.get && gameState.teamOne.left.get
-              : gameState.teamTwo.right.get && gameState.teamTwo.left.get
-          ) ? (
-            <>
-              <Box style={{ width: '50%', height: '90%', float: 'left' }}>
-                <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
-              </Box>
-              <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-                <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
-              </Box>
-            </>
-          ) : (
-            <Box style={{ width: '100%', height: '90%', float: 'left' }}>
-              <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
-            </Box>
-          )}
-
-          <Box style={{ width: '100%', height: '10%', float: 'right' }}>
-            <TeamButton firstTeam={true} game={gameState}></TeamButton>
-          </Box>
-        </Box>
-        <Box
-          style={{
-            width: '100%',
-            height: '20%',
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Group w="100%">
-            <Center w="33%">
-              {gameState.started.get ? (
-                <Button color="player-color" size="lg" onClick={() => sync(gameState)}>
-                  Sync
-                </Button>
+        {isVertical ? (
+          <>
+            <Box style={{ width: '100%', height: '40%' }}>
+              {(
+                gameState.teamOneIGA.get
+                  ? gameState.teamOne.right.get && gameState.teamOne.left.get
+                  : gameState.teamTwo.right.get && gameState.teamTwo.left.get
+              ) ? (
+                <>
+                  <Box style={{ width: '50%', height: '80%', float: 'left' }}>
+                    <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
+                  </Box>
+                  <Box style={{ width: '50%', height: '80%', float: 'right' }}>
+                    <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
+                  </Box>
+                </>
               ) : (
-                <Popover width={300} position="bottom" withArrow shadow="md">
-                  <Popover.Target>
-                    <Button size="lg" color="player-color">
-                      Officials
-                    </Button>
-                  </Popover.Target>
-                  <Popover.Dropdown>
-                    <Center>
-                      <Stack>
-                        <Select
-                          label="Official"
-                          searchable
-                          allowDeselect={false}
-                          placeholder="Pick value"
-                          data={officials.map((a) => ({ value: a.searchableName, label: a.name }))}
-                          value={official?.searchableName}
-                          onChange={(v) => {
-                            setOfficial(officials.find((a) => a.searchableName === v)!);
-                          }}
-                          comboboxProps={{ withinPortal: false }}
-                        />
-
-                        <Select
-                          label="Scorer"
-                          allowDeselect={false}
-                          placeholder="Pick value"
-                          data={officials.map((a) => ({ value: a.searchableName, label: a.name }))}
-                          value={scorer?.searchableName}
-                          onChange={(v) => {
-                            setScorer(officials.find((a) => a.searchableName === v)!);
-                          }}
-                          comboboxProps={{ withinPortal: false }}
-                        />
-                      </Stack>
-                    </Center>
-                  </Popover.Dropdown>
-                </Popover>
+                <Box style={{ width: '100%', height: '80%', float: 'left' }}>
+                  <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
+                </Box>
               )}
-            </Center>
+
+              <Box style={{ width: '100%', height: '20%', float: 'right' }}>
+                <TeamButton firstTeam={true} game={gameState}></TeamButton>
+              </Box>
+            </Box>
             <Box
               style={{
-                margin: '0px auto',
-                textAlign: 'center',
+                width: '100%',
+                height: '20%',
                 display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-evenly',
+                flexDirection: 'row',
+                justifyContent: 'center',
                 alignItems: 'center',
-                flex: '5',
               }}
             >
-              <GameScore game={gameState} official={official} scorer={scorer}></GameScore>
-            </Box>
+              <Group w="100%">
+                <Center w="33%">
+                  {gameState.started.get ? (
+                    <Button color="player-color" size="lg" onClick={() => sync(gameState)}>
+                      Sync
+                    </Button>
+                  ) : (
+                    <Popover width={300} position="bottom" withArrow shadow="md">
+                      <Popover.Target>
+                        <Button size="lg" color="player-color">
+                          Officials
+                        </Button>
+                      </Popover.Target>
+                      <Popover.Dropdown>
+                        <Center>
+                          <Stack>
+                            <Select
+                              label="Official"
+                              searchable
+                              allowDeselect={false}
+                              placeholder="Pick value"
+                              data={officials.map((a) => ({
+                                value: a.searchableName,
+                                label: a.name,
+                              }))}
+                              value={official?.searchableName}
+                              onChange={(v) => {
+                                setOfficial(officials.find((a) => a.searchableName === v)!);
+                              }}
+                              comboboxProps={{ withinPortal: false }}
+                            />
 
-            <Center w="33%">
-              <Button
-                size="lg"
-                color={gameState.started.get ? 'player-color' : 'red'}
-                onClick={() => {
-                  if (gameState.started.get) {
-                    undo(gameState);
-                  } else {
-                    del(gameState);
-                  }
-                }}
-              >
-                {gameState.started.get ? 'Undo' : 'Delete'}
-              </Button>
-            </Center>
-          </Group>
-        </Box>
-        <Box style={{ width: '100%', height: '40%' }}>
-          <Box style={{ width: '100%', height: '10%', float: 'right' }}>
-            <TeamButton firstTeam={false} game={gameState}></TeamButton>
-          </Box>
-          {(
-            gameState.teamOneIGA.get
-              ? gameState.teamTwo.right.get && gameState.teamTwo.left.get
-              : gameState.teamOne.right.get && gameState.teamOne.left.get
-          ) ? (
-            <>
-              <Box style={{ width: '50%', height: '90%', float: 'left' }}>
-                <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
-              </Box>
-              <Box style={{ width: '50%', height: '90%', float: 'right' }}>
-                <PlayerButton game={gameState} firstTeam={false} leftSide={false}></PlayerButton>
-              </Box>
-            </>
-          ) : (
-            <Box style={{ width: '100%', height: '90%', float: 'left' }}>
-              <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
+                            <Select
+                              label="Scorer"
+                              allowDeselect={false}
+                              placeholder="Pick value"
+                              data={officials.map((a) => ({
+                                value: a.searchableName,
+                                label: a.name,
+                              }))}
+                              value={scorer?.searchableName}
+                              onChange={(v) => {
+                                setScorer(officials.find((a) => a.searchableName === v)!);
+                              }}
+                              comboboxProps={{ withinPortal: false }}
+                            />
+                          </Stack>
+                        </Center>
+                      </Popover.Dropdown>
+                    </Popover>
+                  )}
+                </Center>
+                <Box
+                  style={{
+                    margin: '0px auto',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-evenly',
+                    alignItems: 'center',
+                    flex: '5',
+                  }}
+                >
+                  <GameScore game={gameState} official={official} scorer={scorer}></GameScore>
+                </Box>
+
+                <Center w="33%">
+                  <Button
+                    size="lg"
+                    color={gameState.started.get ? 'player-color' : 'red'}
+                    onClick={() => {
+                      if (gameState.started.get) {
+                        undo(gameState);
+                      } else {
+                        del(gameState);
+                      }
+                    }}
+                  >
+                    {gameState.started.get ? 'Undo' : 'Delete'}
+                  </Button>
+                </Center>
+              </Group>
             </Box>
-          )}
-        </Box>
+            <Box style={{ width: '100%', height: '40%' }}>
+              <Box style={{ width: '100%', height: '20%', float: 'right' }}>
+                <TeamButton firstTeam={false} game={gameState}></TeamButton>
+              </Box>
+              {(
+                gameState.teamOneIGA.get
+                  ? gameState.teamTwo.right.get && gameState.teamTwo.left.get
+                  : gameState.teamOne.right.get && gameState.teamOne.left.get
+              ) ? (
+                <>
+                  <Box style={{ width: '50%', height: '80%', float: 'left' }}>
+                    <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
+                  </Box>
+                  <Box style={{ width: '50%', height: '80%', float: 'right' }}>
+                    <PlayerButton
+                      game={gameState}
+                      firstTeam={false}
+                      leftSide={false}
+                    ></PlayerButton>
+                  </Box>
+                </>
+              ) : (
+                <Box style={{ width: '100%', height: '90%', float: 'left' }}>
+                  <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
+                </Box>
+              )}
+            </Box>
+          </>
+        ) : (
+          <Flex direction="row" h="100vh" mih={0}>
+            <Flex direction="column" style={{ width: '40%', height: '100%' }}>
+              {(
+                gameState.teamOneIGA.get
+                  ? gameState.teamOne.right.get && gameState.teamOne.left.get
+                  : gameState.teamTwo.right.get && gameState.teamTwo.left.get
+              ) ? (
+                <>
+                  <Box style={{ height: '100%', float: 'left' }}>
+                    <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
+                  </Box>
+                  <Box style={{ height: '100%', float: 'right' }}>
+                    <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
+                  </Box>
+                </>
+              ) : (
+                <Box style={{ width: '100%', height: '100%', float: 'left' }}>
+                  <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
+                </Box>
+              )}
+            </Flex>
+            <Box style={{ width: '10%', height: '100%', float: 'right' }}>
+              <TeamButton firstTeam={true} game={gameState}></TeamButton>
+            </Box>
+            <Box
+              style={{
+                width: '20%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: 0,
+              }}
+            >
+              <Stack w="100%" h="100vh">
+                <Center mih={0} flex={30}>
+                  {gameState.started.get ? (
+                    <Button color="player-color" size="lg" onClick={() => sync(gameState)}>
+                      Sync
+                    </Button>
+                  ) : (
+                    <Popover width={300} position="bottom" withArrow shadow="md">
+                      <Popover.Target>
+                        <Button size="lg" color="player-color">
+                          Officials
+                        </Button>
+                      </Popover.Target>
+                      <Popover.Dropdown>
+                        <Center>
+                          <Stack>
+                            <Select
+                              label="Official"
+                              searchable
+                              allowDeselect={false}
+                              placeholder="Pick value"
+                              data={officials.map((a) => ({
+                                value: a.searchableName,
+                                label: a.name,
+                              }))}
+                              value={official?.searchableName}
+                              onChange={(v) => {
+                                setOfficial(officials.find((a) => a.searchableName === v)!);
+                              }}
+                              comboboxProps={{ withinPortal: false }}
+                            />
+
+                            <Select
+                              label="Scorer"
+                              allowDeselect={false}
+                              placeholder="Pick value"
+                              data={officials.map((a) => ({
+                                value: a.searchableName,
+                                label: a.name,
+                              }))}
+                              value={scorer?.searchableName}
+                              onChange={(v) => {
+                                setScorer(officials.find((a) => a.searchableName === v)!);
+                              }}
+                              comboboxProps={{ withinPortal: false }}
+                            />
+                          </Stack>
+                        </Center>
+                      </Popover.Dropdown>
+                    </Popover>
+                  )}
+                </Center>
+                <Box
+                  flex={30}
+                  style={{
+                    margin: '0px auto',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-evenly',
+                    alignItems: 'center',
+                    flex: '5',
+                  }}
+                >
+                  <GameScore game={gameState} official={official} scorer={scorer}></GameScore>
+                </Box>
+
+                <Center flex={30}>
+                  <Button
+                    size="lg"
+                    color={gameState.started.get ? 'player-color' : 'red'}
+                    onClick={() => {
+                      if (gameState.started.get) {
+                        undo(gameState);
+                      } else {
+                        del(gameState);
+                      }
+                    }}
+                  >
+                    {gameState.started.get ? 'Undo' : 'Delete'}
+                  </Button>
+                </Center>
+              </Stack>
+            </Box>
+            <Box style={{ width: '10%', height: '100%', float: 'right' }}>
+              <TeamButton firstTeam={false} game={gameState}></TeamButton>
+            </Box>
+            <Flex direction="column" style={{ width: '40%', height: '100%' }}>
+              {(
+                gameState.teamOneIGA.get
+                  ? gameState.teamTwo.right.get && gameState.teamTwo.left.get
+                  : gameState.teamOne.right.get && gameState.teamOne.left.get
+              ) ? (
+                <>
+                  <Box style={{ height: '100%', float: 'left' }}>
+                    <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
+                  </Box>
+                  <Box style={{ height: '100%', float: 'right' }}>
+                    <PlayerButton
+                      game={gameState}
+                      firstTeam={false}
+                      leftSide={false}
+                    ></PlayerButton>
+                  </Box>
+                </>
+              ) : (
+                <Box style={{ height: '100%', float: 'left' }}>
+                  <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
+                </Box>
+              )}
+            </Flex>
+          </Flex>
+        )}
       </Box>
     </MantineProvider>
   );

@@ -2,7 +2,6 @@
     position: relative;
     background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8));
     width: fit-content;
-    padding: var(--mantine-spacing-sm);
     border-radius: var(--mantine-radius-md);
 }
 

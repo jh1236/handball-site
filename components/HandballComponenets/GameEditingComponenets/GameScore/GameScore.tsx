@@ -1,5 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Button, Center, Modal, Popover, Stack, Text, Title } from '@mantine/core';
+import { IconRotate3d } from '@tabler/icons-react';
+import {
+  Box,
+  Button,
+  Center,
+  Modal,
+  Overlay,
+  Paper,
+  Popover,
+  Portal,
+  Stack,
+  Text,
+  Title,
+  useMatches,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   abandon,
@@ -7,6 +21,7 @@ import {
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GameActionList } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 import { replayForGame } from '@/ServerActions/GameActions';
 import { OfficialStructure } from '@/ServerActions/types';
 
@@ -19,6 +34,9 @@ interface GameScoreArgs {
 export const QUICK_GAME_END = false;
 
 export function GameScore({ game, official, scorer }: GameScoreArgs) {
+  const isVertical = useScreenVertical();
+  const fullscreen = useMatches({ base: true, md: false });
+
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
   const [openPopover, setOpenPopover] = useState(false);
   useEffect(() => {
@@ -45,8 +63,12 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
   );
   return (
     <>
-      <Modal opened={endGameOpen} centered onClose={closeEndGame} title="Action">
-        <Title> End Game</Title>
+      <Modal
+        opened={(isVertical || !fullscreen) && endGameOpen}
+        centered
+        onClose={closeEndGame}
+        title={<Title> End Game</Title>}
+      >
         <GameActionList game={game} close={closeEndGame}></GameActionList>
       </Modal>
       {game.started.get ? (
@@ -58,7 +80,12 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
           </>
         ) : (
           <>
-            <Popover opened={openPopover} onChange={setOpenPopover}>
+            <Popover
+              opened={openPopover}
+              onChange={setOpenPopover}
+              position={isVertical ? undefined : 'right'}
+              offset={isVertical ? undefined : 40}
+            >
               <Popover.Target>
                 <Box
                   onClick={() => {
@@ -143,6 +170,32 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
         <Button color="player-color" size="lg" onClick={() => begin(game, official, scorer)}>
           Start
         </Button>
+      )}
+      {!isVertical && fullscreen && endGameOpen && (
+        <Portal>
+          <Overlay
+            pos="absolute"
+            w="100lvw"
+            h="100lvh"
+            top={0}
+            backgroundOpacity={0.85}
+            blur={15}
+            left={0}
+            center={true}
+            onClick={closeEndGame}
+          >
+            <Paper p={20} maw="40%" m="auto" onClick={(e) => e.stopPropagation()}>
+              <Title order={3} mb={15} ta="center">
+                <IconRotate3d style={{ marginRight: 5 }} />
+                Rotate your device
+              </Title>
+              <Text>
+                This menu is not suitable for a horizontal mobile device. Please rotate your device
+                to fill out the data required.
+              </Text>
+            </Paper>
+          </Overlay>
+        </Portal>
       )}
     </>
   );

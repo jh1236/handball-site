@@ -18,14 +18,17 @@ import {
   Box,
   Button,
   Center,
-  Collapse,
   Flex,
   Modal,
+  Overlay,
+  Paper,
+  Portal,
   Stack,
   Tabs,
   Text,
   TextInput,
   Title,
+  useMatches,
 } from '@mantine/core';
 import { VerticalSlider } from '@/components/basic/VerticalSlider';
 import {
@@ -44,6 +47,7 @@ import { GAME_CONFIG } from '@/components/HandballComponenets/GameEditingCompone
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
 import SelectCourtLocation from '@/components/HandballComponenets/GameEditingComponenets/SelectCourtLocation';
 import { GameState } from '@/components/HandballComponenets/GameState';
+import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 import { IconHandballCards } from '@/components/icons/IconCards';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
@@ -69,6 +73,7 @@ function getCardBadness(eventType: string): number {
 interface PlayerActionListParams {
   game: GameState;
   firstTeam: boolean;
+  fullscreen: boolean;
   leftSide: boolean;
   serving: boolean;
   close: () => void;
@@ -77,24 +82,26 @@ interface PlayerActionListParams {
 export function PlayerActionList({
   game,
   firstTeam,
+  fullscreen,
   leftSide,
   serving,
   close: _close,
 }: PlayerActionListParams): React.ReactElement {
+  const isVertical = useScreenVertical();
+
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const [cardTime, setCardTime] = React.useState<number>(
     Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0))
   );
-  const [moreShown, setMoreShown] = useState<boolean>(false);
 
   const [location, setLocation] = React.useState<string[]>([]);
+  const fullscreenScoreSelector = useMatches({ base: !isVertical, md: false });
   const [otherReason, setOtherReason] = React.useState<string>('');
   const close = useCallback(() => {
     _close();
     setCardTime(Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0)));
     setOpenModal(undefined);
     setOtherReason('');
-    setMoreShown(false);
   }, [_close, game.blitzGame.get, team.isSolo]);
 
   const subsAllowedScore = useMemo(() => (game.blitzGame.get ? 5 : 9), [game.blitzGame.get]);
@@ -131,11 +138,19 @@ export function PlayerActionList({
       Icon: IconHandballCards,
       value: 'Cards',
       content: (
-        <Tabs defaultValue={defaultCategory}>
-          {disabledCategories}
-          <Tabs.List style={{ flexWrap: 'nowrap' }}>
+        <Tabs
+          w="100%"
+          defaultValue={defaultCategory}
+          orientation={isVertical ? undefined : 'vertical'}
+        >
+          <Tabs.List
+            style={{ flexWrap: 'nowrap' }}
+            mr={!isVertical ? 10 : undefined}
+            mb={isVertical ? 10 : undefined}
+            grow
+          >
             <Tabs.Tab
-              size="sm"
+              size="xs"
               color="grey"
               value="Warning"
               leftSection={<IconExclamationMark color="grey" size={12} stroke={3} />}
@@ -144,7 +159,7 @@ export function PlayerActionList({
               Warn
             </Tabs.Tab>
             <Tabs.Tab
-              size="sm"
+              size="xs"
               color="green"
               value="Green Card"
               leftSection={<IconTriangleInvertedFilled color="green" size={12} />}
@@ -153,7 +168,7 @@ export function PlayerActionList({
               Green
             </Tabs.Tab>
             <Tabs.Tab
-              size="sm"
+              size="xs"
               color="yellow"
               value="Yellow Card"
               leftSection={<IconSquareFilled color="yellow" size={12} />}
@@ -162,7 +177,7 @@ export function PlayerActionList({
               Yellow
             </Tabs.Tab>
             <Tabs.Tab
-              size="sm"
+              size="xs"
               color="red"
               value="Red Card"
               leftSection={<IconCircleFilled color="red" size={12} />}
@@ -174,8 +189,9 @@ export function PlayerActionList({
             {GAME_CONFIG.cards.warning.map((reason, i) => (
               <Fragment key={i}>
                 <Button
-                  style={{ margin: '3px' }}
-                  size="sm"
+                  size="xs"
+                  m={3}
+                  miw={160}
                   color="gray.6"
                   disabled={
                     !game.practice.get && !buttonEnabledFor(currentPlayer.get!, reason, 'Warning')
@@ -193,7 +209,7 @@ export function PlayerActionList({
             <Button
               onClick={() => setOpenModal('warning')}
               style={{ margin: '3px' }}
-              size="sm"
+              size="xs"
               color="gray"
             >
               Other
@@ -217,7 +233,7 @@ export function PlayerActionList({
                   close();
                 }}
                 style={{ margin: '3px' }}
-                size="sm"
+                size="xs"
                 disabled={!otherReason}
                 color="player-color"
               >
@@ -229,8 +245,9 @@ export function PlayerActionList({
             {GAME_CONFIG.cards.green.map((reason, i) => (
               <Fragment key={i}>
                 <Button
-                  style={{ margin: '3px' }}
-                  size="sm"
+                  size="xs"
+                  m={3}
+                  miw={160}
                   disabled={
                     !game.practice.get &&
                     !buttonEnabledFor(currentPlayer.get!, reason, 'Green Card')
@@ -249,7 +266,7 @@ export function PlayerActionList({
             <Button
               onClick={() => setOpenModal('green')}
               style={{ margin: '3px' }}
-              size="sm"
+              size="xs"
               color="gray"
             >
               Other
@@ -273,7 +290,7 @@ export function PlayerActionList({
                   close();
                 }}
                 style={{ margin: '3px' }}
-                size="sm"
+                size="xs"
                 disabled={!otherReason}
                 color="green"
               >
@@ -287,8 +304,9 @@ export function PlayerActionList({
                 {GAME_CONFIG.cards.yellow.map((reason, i) => (
                   <Fragment key={i}>
                     <Button
-                      style={{ margin: '3px' }}
-                      size="sm"
+                      m={3}
+                      miw={160}
+                      size="xs"
                       disabled={
                         !game.practice.get &&
                         !buttonEnabledFor(currentPlayer.get!, reason, 'Yellow Card')
@@ -307,7 +325,7 @@ export function PlayerActionList({
                 <Button
                   onClick={() => setOpenModal('yellow')}
                   style={{ margin: '3px' }}
-                  size="sm"
+                  size="xs"
                   color="gray"
                 >
                   Other
@@ -322,7 +340,7 @@ export function PlayerActionList({
                   setValue={setCardTime}
                 />
 
-                <Text ta="center" mt="sm">
+                <Text ta="center" mt="xs">
                   <b>Card Time:</b> {cardTime} Rounds
                 </Text>
               </Stack>
@@ -345,7 +363,7 @@ export function PlayerActionList({
                   close();
                 }}
                 style={{ margin: '3px' }}
-                size="sm"
+                size="xs"
                 disabled={!otherReason}
                 color="orange"
               >
@@ -357,8 +375,9 @@ export function PlayerActionList({
             {GAME_CONFIG.cards.red.map((reason, i) => (
               <Fragment key={i}>
                 <Button
-                  style={{ margin: '3px' }}
-                  size="sm"
+                  m={3}
+                  miw={160}
+                  size="xs"
                   color="red"
                   onClick={() => {
                     redCard(game, firstTeam, leftSide, reason);
@@ -373,7 +392,7 @@ export function PlayerActionList({
             <Button
               onClick={() => setOpenModal('red')}
               style={{ margin: '3px' }}
-              size="sm"
+              size="xs"
               color="gray"
             >
               Other
@@ -396,7 +415,7 @@ export function PlayerActionList({
                   close();
                 }}
                 style={{ margin: '3px' }}
-                size="sm"
+                size="xs"
                 disabled={!otherReason}
                 color="red"
               >
@@ -413,7 +432,7 @@ export function PlayerActionList({
       value: 'Other',
       color: 'white',
       content: (
-        <Tabs defaultValue="Merit">
+        <Tabs w="100%" defaultValue="Merit">
           <Tabs.List grow>
             <Tabs.Tab
               size="sm"
@@ -432,7 +451,7 @@ export function PlayerActionList({
               Demerit
             </Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel value="Merit">
+          <Tabs.Panel value="Merit" m={10}>
             <Autocomplete
               label="Select Reason"
               placeholder="Write something or pick from the list"
@@ -457,7 +476,7 @@ export function PlayerActionList({
               Submit
             </Button>
           </Tabs.Panel>
-          <Tabs.Panel value="Demerit">
+          <Tabs.Panel value="Demerit" m={10}>
             <Autocomplete
               label="Select Reason"
               placeholder="Write something or pick from the list"
@@ -516,9 +535,47 @@ export function PlayerActionList({
       color: undefined,
       content: (
         <>
+          {fullscreen && openModal === 'score' && !isVertical && (
+            <Portal>
+              <Overlay
+                pos="absolute"
+                w="100lvw"
+                h="100lvh"
+                backgroundOpacity={0.35}
+                top={0}
+                left={0}
+                center={true}
+                onClick={() => setOpenModal(undefined)}
+              >
+                <Paper shadow="xl" m="auto" onClick={(e) => e.stopPropagation()} p={30}>
+                  <Center>
+                    <SelectCourtLocation
+                      location={location}
+                      setLocation={setLocation}
+                      leftSide={leftSide}
+                      reverse={game.teamOneIGA.get !== firstTeam}
+                    ></SelectCourtLocation>
+                    <br />
+                    <Button
+                      ml={15}
+                      onClick={() => {
+                        score(game, firstTeam, leftSide, otherReason, location);
+                        close();
+                      }}
+                      disabled={!location.length}
+                    >
+                      Submit
+                    </Button>
+                  </Center>
+                </Paper>
+              </Overlay>
+            </Portal>
+          )}
           <Modal
-            opened={openModal === 'score'}
-            title="Location Picker"
+            opened={openModal === 'score' && (isVertical || !fullscreen)}
+            fullScreen={fullscreenScoreSelector}
+            withCloseButton={!fullscreenScoreSelector}
+            title={!fullscreenScoreSelector ? <Title order={3}>Score Location</Title> : undefined}
             onClose={() => {
               setOtherReason('');
               setLocation([]);
@@ -526,7 +583,6 @@ export function PlayerActionList({
             }}
           >
             <Stack>
-              <Title order={3}>Pick the location where the player scored.</Title>
               <Center>
                 <SelectCourtLocation
                   location={location}
@@ -547,34 +603,19 @@ export function PlayerActionList({
               </Button>
             </Stack>
           </Modal>
-          {GAME_CONFIG.scoreMethods.slice(0, 3).map((method, i) => (
-            <Fragment key={i}>
-              <Button
-                color="player-color"
-                style={{ margin: '3px' }}
-                size="sm"
-                onClick={() => {
-                  setOtherReason(method);
-                  setOpenModal('score');
-                }}
-              >
-                {method}
-              </Button>
-              <br />
-            </Fragment>
-          ))}
-          <Box>
-            <Button style={{ margin: '3px' }} color="gray" onClick={() => setMoreShown(!moreShown)}>
-              Show {moreShown ? 'Less' : 'More'}
-            </Button>
-
-            <Collapse in={moreShown}>
-              {GAME_CONFIG.scoreMethods.slice(3).map((method, i) => (
+          <Flex direction="row" justify="space-around" w="100%">
+            <Flex direction="column">
+              <Text m={5} fw={600} ta="center">
+                Common Methods
+              </Text>
+              {GAME_CONFIG.scoreMethods.slice(0, 3).map((method, i) => (
                 <Fragment key={i}>
                   <Button
+                    miw={160}
+                    mb={isVertical ? undefined : 10}
+                    color="player-color"
                     style={{ margin: '3px' }}
                     size="sm"
-                    color="player-color"
                     onClick={() => {
                       setOtherReason(method);
                       setOpenModal('score');
@@ -585,8 +626,30 @@ export function PlayerActionList({
                   <br />
                 </Fragment>
               ))}
-            </Collapse>
-          </Box>
+            </Flex>
+            <Flex direction="column">
+              <Text m={5} fw={600} ta="center">
+                Alternative Methods
+              </Text>
+              {GAME_CONFIG.scoreMethods.slice(3).map((method, i) => (
+                <Fragment key={i}>
+                  <Button
+                    miw={160}
+                    style={{ margin: '3px' }}
+                    mb={isVertical ? undefined : 10}
+                    size="sm"
+                    color="player-color"
+                    onClick={() => {
+                      setOtherReason(method);
+                      setOpenModal('score');
+                    }}
+                  >
+                    {method}
+                  </Button>
+                </Fragment>
+              ))}
+            </Flex>
+          </Flex>
         </>
       ),
     });
@@ -597,6 +660,7 @@ export function PlayerActionList({
         color: undefined,
         content: (
           <Button
+            miw={160}
             color="player-color"
             size="sm"
             style={{ margin: '3px' }}
@@ -617,20 +681,59 @@ export function PlayerActionList({
         color: undefined,
         content: (
           <>
+            {fullscreen && openModal === 'ace' && !isVertical && (
+              <Portal>
+                <Overlay
+                  pos="absolute"
+                  w="100lvw"
+                  h="100lvh"
+                  backgroundOpacity={0.35}
+                  top={0}
+                  left={0}
+                  center={true}
+                  onClick={() => setOpenModal(undefined)}
+                >
+                  <Paper shadow="xl" m="auto" onClick={(e) => e.stopPropagation()} p={30}>
+                    <Center>
+                      <SelectCourtLocation
+                        location={location}
+                        isAce
+                        setLocation={setLocation}
+                        leftSide={leftSide}
+                        reverse={game.teamOneIGA.get !== firstTeam}
+                      ></SelectCourtLocation>
+                      <br />
+                      <Button
+                        ml={15}
+                        onClick={() => {
+                          ace(game, location);
+                          close();
+                        }}
+                        disabled={!location.length}
+                      >
+                        Submit
+                      </Button>
+                    </Center>
+                  </Paper>
+                </Overlay>
+              </Portal>
+            )}
             <Modal
-              opened={openModal === 'ace'}
-              title="Location Picker"
+              opened={openModal === 'ace' && (isVertical || !fullscreen)}
+              fullScreen={fullscreenScoreSelector}
+              withCloseButton={!fullscreenScoreSelector}
+              title={!fullscreenScoreSelector ? <Title order={3}>Score Location</Title> : undefined}
               onClose={() => {
+                setOtherReason('');
                 setLocation([]);
                 setOpenModal(undefined);
               }}
             >
               <Stack>
-                <Title order={3}>Pick the location where the player scored.</Title>
                 <Center>
                   <SelectCourtLocation
-                    isAce
                     location={location}
+                    isAce
                     setLocation={setLocation}
                     leftSide={leftSide}
                     reverse={game.teamOneIGA.get !== firstTeam}
@@ -642,49 +745,75 @@ export function PlayerActionList({
                     ace(game, location);
                     close();
                   }}
-                  disabled={!location[0]}
+                  disabled={!location.length}
                 >
                   Submit
                 </Button>
               </Stack>
             </Modal>
-            <Button
-              color="player-color"
-              style={{ margin: '3px' }}
-              size="sm"
-              onClick={() => {
-                setOpenModal('ace');
-              }}
-            >
-              Ace
-            </Button>
-            <br />
-            <Button
-              color="player-color"
-              style={{ margin: '3px' }}
-              size="sm"
-              onClick={() => {
-                fault(game);
-                close();
-              }}
-            >
-              Fault
-            </Button>
+            <Flex direction="column">
+              <Button
+                color="player-color"
+                style={{ margin: '3px' }}
+                size="sm"
+                w={160}
+                mb={isVertical ? undefined : 10}
+                onClick={() => {
+                  setOpenModal('ace');
+                }}
+              >
+                Ace
+              </Button>
+              <Button
+                color="player-color"
+                style={{ margin: '3px' }}
+                size="sm"
+                mb={isVertical ? undefined : 10}
+                w={160}
+                onClick={() => {
+                  fault(game);
+                  close();
+                }}
+              >
+                Fault
+              </Button>
+            </Flex>
           </>
         ),
       });
     }
   }
+  if (isVertical) {
+    return (
+      <Accordion defaultValue={out[0].value}>
+        {out.map((item, i) => (
+          <Accordion.Item key={i} value={item.value}>
+            <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
+              {item.value}
+            </Accordion.Control>
+            <Accordion.Panel>{item.content}</Accordion.Panel>
+          </Accordion.Item>
+        ))}
+      </Accordion>
+    );
+  }
+
   return (
-    <Accordion defaultValue="Score" onChange={() => setMoreShown(false)}>
+    <Tabs orientation="vertical" w="100%" h="90%" defaultValue={out[0].value}>
+      <Tabs.List mr={10}>
+        {out.map((item, i) => (
+          <Tabs.Tab
+            leftSection={<item.Icon color={item.color} />}
+            key={i}
+            value={item.value}
+          ></Tabs.Tab>
+        ))}
+      </Tabs.List>
       {out.map((item, i) => (
-        <Accordion.Item key={i} value={item.value}>
-          <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
-            {item.value}
-          </Accordion.Control>
-          <Accordion.Panel>{item.content}</Accordion.Panel>
-        </Accordion.Item>
+        <Tabs.Panel key={i} value={item.value}>
+          <Center>{item.content}</Center>
+        </Tabs.Panel>
       ))}
-    </Accordion>
+    </Tabs>
   );
 }
