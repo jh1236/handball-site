@@ -30,7 +30,7 @@ export default function SelectCourtLocation({
   const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
   const [controlsRefs, setControlsRefs] = useState<Record<string, HTMLButtonElement | null>>({});
 
-  const isVertical = useScreenVertical() || gameState.ended.get;
+  const isVertical = useScreenVertical();
 
   const setControlRef = (name: string) => (node: HTMLButtonElement) => {
     controlsRefs[name] = node;
