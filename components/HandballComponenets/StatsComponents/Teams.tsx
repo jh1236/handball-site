@@ -16,6 +16,7 @@ import {
 } from '@mantine/core';
 import { getTeams, getWinningTeams } from '@/ServerActions/TeamActions';
 import { TeamStructure } from '@/ServerActions/types';
+import classes from './StatsComponentsStyles.module.css';
 
 //TODO: - Uniform Box Size
 
@@ -184,6 +185,7 @@ export default function Teams({ tournament }: TeamsProps) {
             <TeamBubble
               team={winningTeams[0]}
               tournament={tournament}
+              className={classes.glows}
               w={{ base: '46.5%', md: '30.5%', lg: '22%' }}
               style={{ boxShadow: '0 0 20px gold' }}
             ></TeamBubble>
