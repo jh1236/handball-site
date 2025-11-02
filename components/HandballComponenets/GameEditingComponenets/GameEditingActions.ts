@@ -10,6 +10,7 @@ import {
   endTimeoutLocal,
   faultLocal,
   forfeitLocal,
+  replayLocal,
   scoreLocal,
   startLocal,
   subLocal,
@@ -27,6 +28,7 @@ import {
   faultForGame,
   forfeitGame,
   meritForGame,
+  replayForGame,
   scoreForGame,
   startGame,
   substituteForGame,
@@ -111,6 +113,11 @@ export function forfeit(game: GameState, firstTeam: boolean) {
 export function abandon(game: GameState) {
   abandonLocal(game);
   abandonGame(game.id).catch(() => sync(game));
+}
+
+export function replay(game: GameState) {
+  replayLocal(game);
+  replayForGame(game.id).catch(() => sync(game));
 }
 
 export function endTimeout(game: GameState): void {

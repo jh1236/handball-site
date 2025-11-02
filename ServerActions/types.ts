@@ -158,6 +158,7 @@ export interface GameStructure {
   changeCode: number;
   firstTeamScoredLast: boolean;
   blitzGame: boolean;
+  replaysSinceScore: number;
   admin?: {
     notes?: string;
     cards: GameEventStructure[];
