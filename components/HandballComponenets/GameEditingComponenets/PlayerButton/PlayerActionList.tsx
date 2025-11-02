@@ -559,7 +559,11 @@ export function PlayerActionList({
                     <Button
                       ml={15}
                       onClick={() => {
-                        score(game, firstTeam, leftSide, otherReason, location);
+                        if (otherReason === 'ace') {
+                          ace(game, location);
+                        } else {
+                          score(game, firstTeam, leftSide, otherReason, location);
+                        }
                         close();
                       }}
                       disabled={!location.length}
@@ -594,7 +598,11 @@ export function PlayerActionList({
               <br />
               <Button
                 onClick={() => {
-                  score(game, firstTeam, leftSide, otherReason, location);
+                  if (otherReason === 'ace') {
+                    ace(game, location);
+                  } else {
+                    score(game, firstTeam, leftSide, otherReason, location);
+                  }
                   close();
                 }}
                 disabled={!location.length}
@@ -626,6 +634,20 @@ export function PlayerActionList({
                   <br />
                 </Fragment>
               ))}
+              <Button
+                miw={160}
+                mb={isVertical ? undefined : 10}
+                color="player-color"
+                style={{ margin: '3px' }}
+                size="sm"
+                disabled={!serving}
+                onClick={() => {
+                  setOtherReason('ace');
+                  setOpenModal('score');
+                }}
+              >
+                <i>Ace</i>
+              </Button>
             </Flex>
             <Flex direction="column">
               <Text m={5} fw={600} ta="center">
