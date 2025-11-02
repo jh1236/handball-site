@@ -4,7 +4,7 @@ import {
   cardLocal,
   endTimeoutLocal,
   faultLocal,
-  forfeitLocal,
+  forfeitLocal, replayLocal,
   scoreLocal,
   subLocal,
   timeoutLocal,
@@ -77,6 +77,10 @@ export interface GameState {
     set: (v: boolean) => void;
   };
   servingFromLeft: boolean;
+  replaysSinceScore: {
+    get: number;
+    set: (v: number) => void;
+  }
 }
 
 export type TeamState = {
@@ -138,6 +142,7 @@ export function useGameState(game?: GameStructure) {
   const [votes, setVotes] = React.useState<PlayerGameStatsStructure[]>([]);
   const [blitzGame, setBlitzGame] = React.useState<boolean>(false);
   const [badminton, setBadminton] = React.useState<boolean>(false);
+  const [replaysSincePoint, setReplaysSincePoint] = React.useState<number>(0);
 
   //team one state
   const [teamOneTimeouts, setTeamOneTimeouts] = React.useState<number>(0);
@@ -338,6 +343,10 @@ export function useGameState(game?: GameStructure) {
         get: firstTeamScoredLast,
         set: setFirstTeamScoredLast,
       },
+      replaysSinceScore: {
+        get: replaysSincePoint,
+        set: setReplaysSincePoint,
+      },
     }),
     [
       practice,
@@ -375,6 +384,7 @@ export function useGameState(game?: GameStructure) {
       teamTwoRight,
       teamTwoSub,
       firstTeamScoredLast,
+      replaysSincePoint,
     ]
   );
 
@@ -404,6 +414,7 @@ function setGameState(gameObj: GameStructure, state: GameState) {
   state.abandoned.set(gameObj.abandoned);
   state.firstTeamScoredLast.set(gameObj.firstTeamScoredLast);
   state.blitzGame.set(gameObj.blitzGame);
+  state.replaysSinceScore.set(gameObj.replaysSinceScore);
   //Team Specific
   state.teamOne.name.set(gameObj.teamOne.name);
   state.teamOne.timeouts.set(gameObj.teamOneTimeouts);
@@ -488,6 +499,9 @@ function addGameEventToGame(game: GameState, gameEvent: GameEventStructure) {
       break;
     case 'Substitute':
       subLocal(game, gameEvent.firstTeam!, leftPlayer);
+      break;
+    case 'Replay':
+      replayLocal(game);
       break;
     case 'End Game':
       game.ended.set(true);

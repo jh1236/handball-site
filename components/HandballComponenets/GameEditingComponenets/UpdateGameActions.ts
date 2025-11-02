@@ -15,6 +15,7 @@ function swapSides(team: TeamState) {
 }
 
 function nextPoint(game: GameState, firstTeamScored: boolean) {
+  game.replaysSinceScore.set(0);
   for (const i of [
     game.teamOne.left,
     game.teamOne.right,
@@ -166,6 +167,10 @@ export function subLocal(game: GameState, firstTeam: boolean, leftPlayer: boolea
   const temp = player.get;
   player.set(substitute.get);
   substitute.set(temp);
+}
+
+export function replayLocal(game: GameState): void {
+  game.replaysSinceScore.set(game.replaysSinceScore.get + 1);
 }
 
 export function warningLocal(

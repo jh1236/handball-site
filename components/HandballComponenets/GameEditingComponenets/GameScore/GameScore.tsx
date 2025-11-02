@@ -17,12 +17,12 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import {
   abandon,
-  begin,
+  begin, replay,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GameActionList } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
 import { useScreenVertical } from '@/components/hooks/useScreenVertical';
-import { replayForGame } from '@/ServerActions/GameActions';
+import { ReplayIcons } from '@/components/icons/ReplayIcons';
 import { OfficialStructure } from '@/ServerActions/types';
 
 interface GameScoreArgs {
@@ -63,6 +63,9 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
   );
   return (
     <>
+      <Box pos="absolute" m="auto" w={150} h={150} style={{ zIndex: -2 }}>
+        <ReplayIcons replays={game.replaysSinceScore.get} width={150} height={150} color="#444" />
+      </Box>
       <Modal
         opened={(isVertical || !fullscreen) && endGameOpen}
         centered
@@ -154,7 +157,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
                       size="lg"
                       color="gray"
                       onClick={() => {
-                        replayForGame(game.id);
+                        replay(game);
                         setOpenPopover(false);
                       }}
                     >
