@@ -4,7 +4,8 @@ import {
   cardLocal,
   endTimeoutLocal,
   faultLocal,
-  forfeitLocal, replayLocal,
+  forfeitLocal,
+  replayLocal,
   scoreLocal,
   subLocal,
   timeoutLocal,
@@ -80,7 +81,7 @@ export interface GameState {
   replaysSinceScore: {
     get: number;
     set: (v: number) => void;
-  }
+  };
 }
 
 export type TeamState = {

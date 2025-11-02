@@ -17,7 +17,8 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import {
   abandon,
-  begin, replay,
+  begin,
+  replay,
 } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GameActionList } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
