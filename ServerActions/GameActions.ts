@@ -395,10 +395,14 @@ export function aceForGame(gameId: number, location?: string[]): Promise<void> {
   });
 }
 
-export function faultForGame(gameId: number): Promise<void> {
+export function faultForGame(gameId: number, method?: string): Promise<void> {
   const body: any = {
     id: gameId,
   };
+
+  if (method !== undefined) {
+    body.reason = method;
+  }
 
   return tokenFetch('/api/games/update/fault', {
     method: 'POST',

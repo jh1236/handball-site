@@ -18,6 +18,7 @@ import {
   Box,
   Button,
   Center,
+  Divider,
   Flex,
   Modal,
   Overlay,
@@ -559,7 +560,11 @@ export function PlayerActionList({
                     <Button
                       ml={15}
                       onClick={() => {
-                        score(game, firstTeam, leftSide, otherReason, location);
+                        if (otherReason === 'ace') {
+                          ace(game, location);
+                        } else {
+                          score(game, firstTeam, leftSide, otherReason, location);
+                        }
                         close();
                       }}
                       disabled={!location.length}
@@ -594,7 +599,11 @@ export function PlayerActionList({
               <br />
               <Button
                 onClick={() => {
-                  score(game, firstTeam, leftSide, otherReason, location);
+                  if (otherReason === 'ace') {
+                    ace(game, location);
+                  } else {
+                    score(game, firstTeam, leftSide, otherReason, location);
+                  }
                   close();
                 }}
                 disabled={!location.length}
@@ -603,51 +612,70 @@ export function PlayerActionList({
               </Button>
             </Stack>
           </Modal>
-          <Flex direction="row" justify="space-around" w="100%">
-            <Flex direction="column">
-              <Text m={5} fw={600} ta="center">
-                Common Methods
-              </Text>
-              {GAME_CONFIG.scoreMethods.slice(0, 3).map((method, i) => (
-                <Fragment key={i}>
-                  <Button
-                    miw={160}
-                    mb={isVertical ? undefined : 10}
-                    color="player-color"
-                    style={{ margin: '3px' }}
-                    size="sm"
-                    onClick={() => {
-                      setOtherReason(method);
-                      setOpenModal('score');
-                    }}
-                  >
-                    {method}
-                  </Button>
-                  <br />
-                </Fragment>
-              ))}
-            </Flex>
-            <Flex direction="column">
-              <Text m={5} fw={600} ta="center">
-                Alternative Methods
-              </Text>
-              {GAME_CONFIG.scoreMethods.slice(3).map((method, i) => (
-                <Fragment key={i}>
-                  <Button
-                    miw={160}
-                    style={{ margin: '3px' }}
-                    mb={isVertical ? undefined : 10}
-                    size="sm"
-                    color="player-color"
-                    onClick={() => {
-                      setOtherReason(method);
-                      setOpenModal('score');
-                    }}
-                  >
-                    {method}
-                  </Button>
-                </Fragment>
-              ))}
+          <Flex direction="column">
+            {!isVertical && (
+              <>
+                <Title order={3}>Score Reason</Title>
+                <Divider m={5}></Divider>
+              </>
+            )}
+            <Flex direction="row" justify="space-around" w="100%">
+              <Flex direction="column">
+                <Text m={5} fw={600} ta="center">
+                  Common Methods
+                </Text>
+                {GAME_CONFIG.scoreMethods.slice(0, 3).map((method, i) => (
+                  <Fragment key={i}>
+                    <Button
+                      miw={160}
+                      m={isVertical ? 3 : 5}
+                      color="player-color"
+                      size="sm"
+                      onClick={() => {
+                        setOtherReason(method);
+                        setOpenModal('score');
+                      }}
+                    >
+                      {method}
+                    </Button>
+                    <br />
+                  </Fragment>
+                ))}
+                <Button
+                  miw={160}
+                  m={isVertical ? 3 : 5}
+                  color="player-color"
+                  size="sm"
+                  disabled={!serving}
+                  onClick={() => {
+                    setOtherReason('ace');
+                    setOpenModal('score');
+                  }}
+                >
+                  <i>Ace</i>
+                </Button>
+              </Flex>
+              <Flex direction="column">
+                <Text m={5} fw={600} ta="center">
+                  Alternative Methods
+                </Text>
+                {GAME_CONFIG.scoreMethods.slice(3).map((method, i) => (
+                  <Fragment key={i}>
+                    <Button
+                      miw={160}
+                      m={isVertical ? 3 : 5}
+                      size="sm"
+                      color="player-color"
+                      onClick={() => {
+                        setOtherReason(method);
+                        setOpenModal('score');
+                      }}
+                    >
+                      {method}
+                    </Button>
+                  </Fragment>
+                ))}
+              </Flex>
             </Flex>
           </Flex>
         </>
@@ -677,108 +705,56 @@ export function PlayerActionList({
     if (serving) {
       out.splice(1, 0, {
         Icon: IconPlayHandball,
-        value: 'Serving Actions',
+        value: 'Fault',
         color: undefined,
         content: (
-          <>
-            {fullscreen && openModal === 'ace' && !isVertical && (
-              <Portal>
-                <Overlay
-                  pos="absolute"
-                  w="100lvw"
-                  h="100lvh"
-                  backgroundOpacity={0.35}
-                  top={0}
-                  left={0}
-                  center={true}
-                  onClick={() => setOpenModal(undefined)}
-                >
-                  <Paper shadow="xl" m="auto" onClick={(e) => e.stopPropagation()} p={30}>
-                    <Center>
-                      <SelectCourtLocation
-                        location={location}
-                        isAce
-                        setLocation={setLocation}
-                        leftSide={leftSide}
-                        reverse={game.teamOneIGA.get !== firstTeam}
-                      ></SelectCourtLocation>
-                      <br />
-                      <Button
-                        ml={15}
-                        onClick={() => {
-                          ace(game, location);
-                          close();
-                        }}
-                        disabled={!location.length}
-                      >
-                        Submit
-                      </Button>
-                    </Center>
-                  </Paper>
-                </Overlay>
-              </Portal>
+          <Flex direction="column">
+            {!isVertical && (
+              <>
+                <Title order={3}>Fault Reason</Title>
+                <Divider m={5}></Divider>
+              </>
             )}
-            <Modal
-              opened={openModal === 'ace' && (isVertical || !fullscreen)}
-              fullScreen={fullscreenScoreSelector}
-              withCloseButton={!fullscreenScoreSelector}
-              title={!fullscreenScoreSelector ? <Title order={3}>Score Location</Title> : undefined}
-              onClose={() => {
-                setOtherReason('');
-                setLocation([]);
-                setOpenModal(undefined);
-              }}
-            >
-              <Stack>
-                <Center>
-                  <SelectCourtLocation
-                    location={location}
-                    isAce
-                    setLocation={setLocation}
-                    leftSide={leftSide}
-                    reverse={game.teamOneIGA.get !== firstTeam}
-                  ></SelectCourtLocation>
-                </Center>
-                <br />
-                <Button
-                  onClick={() => {
-                    ace(game, location);
-                    close();
-                  }}
-                  disabled={!location.length}
-                >
-                  Submit
-                </Button>
-              </Stack>
-            </Modal>
-            <Flex direction="column">
-              <Button
-                color="player-color"
-                style={{ margin: '3px' }}
-                size="sm"
-                w={160}
-                mb={isVertical ? undefined : 10}
-                onClick={() => {
-                  setOpenModal('ace');
-                }}
-              >
-                Ace
-              </Button>
-              <Button
-                color="player-color"
-                style={{ margin: '3px' }}
-                size="sm"
-                mb={isVertical ? undefined : 10}
-                w={160}
-                onClick={() => {
-                  fault(game);
-                  close();
-                }}
-              >
-                Fault
-              </Button>
+            <Flex direction="row" justify="space-around" w="100%">
+              <Flex direction="column">
+                <Text m={5} fw={600} ta="center">
+                  Common Methods
+                </Text>
+                {GAME_CONFIG.faultMethods.slice(0, 4).map((method, i) => (
+                  <Fragment key={i}>
+                    <Button
+                      miw={160}
+                      m={isVertical ? 3 : 5}
+                      color="player-color"
+                      size="sm"
+                      onClick={() => fault(game, method)}
+                    >
+                      {method}
+                    </Button>
+                    <br />
+                  </Fragment>
+                ))}
+              </Flex>
+              <Flex direction="column">
+                <Text m={5} fw={600} ta="center">
+                  Alternative Methods
+                </Text>
+                {GAME_CONFIG.faultMethods.slice(4).map((method, i) => (
+                  <Fragment key={i}>
+                    <Button
+                      miw={160}
+                      m={isVertical ? 3 : 5}
+                      size="sm"
+                      color="player-color"
+                      onClick={() => fault(game, method)}
+                    >
+                      {method}
+                    </Button>
+                  </Fragment>
+                ))}
+              </Flex>
             </Flex>
-          </>
+          </Flex>
         ),
       });
     }
