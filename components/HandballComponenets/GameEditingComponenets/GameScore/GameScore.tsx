@@ -99,11 +99,11 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
                   }}
                 >
                   <Title order={1}>
-                    {matchPoints > 0 ? <strong>{teamOne.score.get}*</strong> : teamOne.score.get}
+                    {matchPoints > 0 ? `${teamOne.score.get}*` : teamOne.score.get}
                   </Title>
                   <Title order={1}>-</Title>
                   <Title order={1}>
-                    {matchPoints < 0 ? <strong>{teamTwo.score.get}*</strong> : teamTwo.score.get}
+                    {matchPoints < 0 ? `${teamTwo.score.get}*` : teamTwo.score.get}
                   </Title>
                 </Box>
               </Popover.Target>
