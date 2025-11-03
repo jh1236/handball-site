@@ -17,6 +17,16 @@ export const GAME_CONFIG = {
     'Illegal Body Part',
     'Obstruction',
   ],
+  faultMethods: [
+    'Served Early',
+    "Didn't Go Diagonal",
+    'Out through BRA',
+    'Double Bounce',
+    'Straight',
+    'Foot Fault',
+    'Incorrect Side',
+    'Teammate in BRA',
+  ],
 
   cards: {
     warning: cardReasons,

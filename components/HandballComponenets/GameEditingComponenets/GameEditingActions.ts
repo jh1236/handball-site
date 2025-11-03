@@ -118,9 +118,9 @@ export function endTimeout(game: GameState): void {
   endTimeoutForGame(game.id).catch(() => sync(game));
 }
 
-export function fault(game: GameState): void {
+export function fault(game: GameState, method?: string): void {
   faultLocal(game);
-  faultForGame(game.id).catch(() => sync(game));
+  faultForGame(game.id, method).catch(() => sync(game));
 }
 
 export function sub(game: GameState, firstTeam: boolean, leftPlayer: boolean): void {
