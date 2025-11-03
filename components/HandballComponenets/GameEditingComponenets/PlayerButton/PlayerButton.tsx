@@ -98,7 +98,7 @@ export function PlayerButton({
   return (
     <>
       <Modal
-        opened={(isVertical || !fullscreen) && opened}
+        opened={!fullscreen && opened}
         fullScreen={fullscreen}
         centered
         onClose={close}
@@ -148,7 +148,7 @@ export function PlayerButton({
           }
         ></Progress>
       )}
-      {fullscreen && opened && !isVertical && (
+      {fullscreen && opened && (
         <Portal>
           <Overlay
             pos="absolute"
@@ -161,8 +161,16 @@ export function PlayerButton({
             center={true}
             onClick={close}
           >
-            <Paper p={20} w="70%" h="90%" m="auto" onClick={(e) => e.stopPropagation()}>
-              <Title order={3} mb={15}>
+            <Paper
+              p={isVertical ? 5 : 20}
+              pb={20}
+              pt={20}
+              w={isVertical ? '90%' : '70%'}
+              h={isVertical ? 'auto' : '90%'}
+              m="auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Title order={3} ml={isVertical ? 15 : undefined} mb={15}>
                 {player?.name ?? 'Loading...'}
               </Title>
               <PlayerActionList

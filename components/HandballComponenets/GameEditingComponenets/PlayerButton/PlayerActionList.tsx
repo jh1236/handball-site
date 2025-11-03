@@ -785,7 +785,7 @@ export function PlayerActionList({
   }
   if (isVertical) {
     return (
-      <Accordion defaultValue={out[0].value}>
+      <Accordion defaultValue={out[0].value} transitionDuration={0}>
         {out.map((item, i) => (
           <Accordion.Item key={i} value={item.value}>
             <Accordion.Control icon={<item.Icon color={item.color}></item.Icon>}>
