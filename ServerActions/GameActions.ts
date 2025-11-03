@@ -401,7 +401,7 @@ export function faultForGame(gameId: number, method?: string): Promise<void> {
   };
 
   if (method !== undefined) {
-    body.reason = method;
+    body.method = method;
   }
 
   return tokenFetch('/api/games/update/fault', {

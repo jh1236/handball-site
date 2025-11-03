@@ -727,7 +727,10 @@ export function PlayerActionList({
                       m={isVertical ? 3 : 5}
                       color="player-color"
                       size="sm"
-                      onClick={() => fault(game, method)}
+                      onClick={() => {
+                        fault(game, method);
+                        close();
+                      }}
                     >
                       {method}
                     </Button>
@@ -746,7 +749,10 @@ export function PlayerActionList({
                       m={isVertical ? 3 : 5}
                       size="sm"
                       color="player-color"
-                      onClick={() => fault(game, method)}
+                      onClick={() => {
+                        fault(game, method);
+                        close();
+                      }}
                     >
                       {method}
                     </Button>
