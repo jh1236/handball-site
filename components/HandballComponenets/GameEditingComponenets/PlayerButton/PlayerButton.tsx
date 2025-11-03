@@ -1,4 +1,5 @@
-import React, { ForwardRefExoticComponent, Fragment, useMemo } from 'react';
+import React, { ForwardRefExoticComponent, useMemo } from 'react';
+import useScreenOrientation from 'react-hook-screen-orientation';
 import {
   Box,
   Button,
@@ -34,9 +35,16 @@ export function PlayerButton({
   firstTeam: trueFirstTeam,
   leftSide: trueLeftSide,
 }: PlayerButtonProps) {
+  const screenOrientation = useScreenOrientation();
+
+  const shouldNotFlip = useMemo(
+    () => screenOrientation !== 'landscape-primary',
+    [screenOrientation]
+  );
+
   const firstTeam = useMemo(
-    () => trueFirstTeam === game.teamOneIGA.get,
-    [game.teamOneIGA.get, trueFirstTeam]
+    () => (trueFirstTeam === game.teamOneIGA.get) === shouldNotFlip,
+    [game.teamOneIGA.get, shouldNotFlip, trueFirstTeam]
   );
 
   const team = useMemo(

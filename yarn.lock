@@ -9778,6 +9778,7 @@ __metadata:
     react-dom: "npm:18.3.1"
     react-fitty: "npm:^1.0.1"
     react-google-recaptcha: "npm:^3.1.0"
+    react-hook-screen-orientation: "npm:^1.0.4"
     react-icons: "npm:^5.4.0"
     react-signature-canvas: "npm:^1.1.0-alpha.1"
     react-use-websocket: "npm:^4.13.0"
@@ -11397,6 +11398,15 @@ __metadata:
   peerDependencies:
     react: ">=16.4.1"
   checksum: 10c0/5ecaa6b88f238defd939012cb2671b4cbda59fe03f059158994b8c5215db482412e905eae6a67d23cef220d77cfe0430ab91ce7849d476515cda72f3a8a0a746
+  languageName: node
+  linkType: hard
+
+"react-hook-screen-orientation@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "react-hook-screen-orientation@npm:1.0.4"
+  peerDependencies:
+    react: ^16.8.0 || ^17 || ^18
+  checksum: 10c0/030f8034a00ff7af483756fc1146cf0a24f82fc383b3738086531abed95d6310e8f4469b1d9da63a92ac9d867095bb7414bd364d2be6b8c3c3d4f373777ba60f
   languageName: node
   linkType: hard
 
