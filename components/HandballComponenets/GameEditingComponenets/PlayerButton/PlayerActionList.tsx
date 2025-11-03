@@ -554,6 +554,7 @@ export function PlayerActionList({
                       location={location}
                       setLocation={setLocation}
                       leftSide={leftSide}
+                      isAce={otherReason === 'ace'}
                       reverse={game.teamOneIGA.get !== firstTeam}
                     ></SelectCourtLocation>
                     <br />
@@ -592,6 +593,7 @@ export function PlayerActionList({
                 <SelectCourtLocation
                   location={location}
                   setLocation={setLocation}
+                  isAce={otherReason === 'ace'}
                   leftSide={leftSide}
                   reverse={game.teamOneIGA.get !== firstTeam}
                 ></SelectCourtLocation>
