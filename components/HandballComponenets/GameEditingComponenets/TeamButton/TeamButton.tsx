@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { IconQuestionMark, IconTrophy } from '@tabler/icons-react';
+import useScreenOrientation from 'react-hook-screen-orientation';
 import { Button, Modal, Overlay, Paper, Portal, Text, Title, useMatches } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { TeamActionList } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamActionList';
@@ -26,7 +27,17 @@ export const FEEDBACK_TEXTS = [
 ];
 
 export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) {
-  const firstTeam = trueFirstTeam === game.teamOneIGA.get;
+  const screenOrientation = useScreenOrientation();
+
+  const shouldNotFlip = useMemo(
+    () => screenOrientation !== 'landscape-primary',
+    [screenOrientation]
+  );
+
+  const firstTeam = useMemo(
+    () => (trueFirstTeam === game.teamOneIGA.get) === shouldNotFlip,
+    [game.teamOneIGA.get, shouldNotFlip, trueFirstTeam]
+  );
   const team = useMemo(
     () => (firstTeam ? game.teamOne : game.teamTwo),
     [firstTeam, game.teamOne, game.teamTwo]
