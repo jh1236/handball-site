@@ -36,9 +36,10 @@ export const QUICK_GAME_END = false;
 
 export function GameScore({ game, official, scorer }: GameScoreArgs) {
   const isVertical = useScreenVertical();
-  const fullscreen = useMatches({ base: true, md: false });
+  const fullscreen = useMatches({ base: true, sm: false });
 
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
+  const [index, setIndex] = useState(0);
   const [openPopover, setOpenPopover] = useState(false);
   useEffect(() => {
     if (game.practice.get) {
@@ -68,12 +69,20 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
         <ReplayIcons replays={game.replaysSinceScore.get} width={150} height={150} color="#444" />
       </Box>
       <Modal
-        opened={(isVertical || !fullscreen) && endGameOpen}
+        opened={!fullscreen && endGameOpen}
         centered
         onClose={closeEndGame}
-        title={<Title> End Game</Title>}
+        size="auto"
+        withCloseButton={false}
       >
-        <GameActionList game={game} close={closeEndGame}></GameActionList>
+        <Box miw={400} w="40%">
+          <GameActionList
+            index={index}
+            setIndex={setIndex}
+            game={game}
+            close={closeEndGame}
+          ></GameActionList>
+        </Box>
       </Modal>
       {game.started.get ? (
         game.ended.get ? (
@@ -175,7 +184,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
           Start
         </Button>
       )}
-      {!isVertical && fullscreen && endGameOpen && (
+      {fullscreen && endGameOpen && (
         <Portal>
           <Overlay
             pos="absolute"
@@ -188,16 +197,35 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
             center={true}
             onClick={closeEndGame}
           >
-            <Paper p={20} maw="40%" m="auto" onClick={(e) => e.stopPropagation()}>
-              <Title order={3} mb={15} ta="center">
-                <IconRotate3d style={{ marginRight: 5 }} />
-                Rotate your device
-              </Title>
-              <Text>
-                This menu is not suitable for a horizontal mobile device. Please rotate your device
-                to fill out the data required.
-              </Text>
-            </Paper>
+            {isVertical ? (
+              <Paper
+                p={20}
+                pb={20}
+                pt={20}
+                w="90%"
+                // mih="50%"
+                m="auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <GameActionList
+                  index={index}
+                  setIndex={setIndex}
+                  game={game}
+                  close={closeEndGame}
+                ></GameActionList>
+              </Paper>
+            ) : (
+              <Paper p={20} maw="40%" m="auto" onClick={(e) => e.stopPropagation()}>
+                <Title order={3} mb={15} ta="center">
+                  <IconRotate3d style={{ marginRight: 5 }} />
+                  Rotate your device
+                </Title>
+                <Text>
+                  This menu is not suitable for a horizontal mobile device. Please rotate your
+                  device to fill out the data required.
+                </Text>
+              </Paper>
+            )}
           </Overlay>
         </Portal>
       )}

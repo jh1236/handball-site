@@ -120,7 +120,17 @@ export function TeamActionList({
         color: 'yellow',
         content: (
           <Textarea
+            label="Protest Reason"
+            error={
+              team.protest.get
+                ? team.protest.get.split(' ').filter((a) => a.length > 0).length < 3
+                  ? 'Protest must contain at least 3 words'
+                  : undefined
+                : undefined
+            }
             value={team.protest.get}
+            minRows={4}
+            autosize
             onChange={(v) => team.protest.set(v.currentTarget.value)}
           ></Textarea>
         ),
@@ -135,7 +145,18 @@ export function TeamActionList({
             <Rating value={team.rating.get} count={4} size="lg" onChange={team.rating.set}></Rating>
             {FEEDBACK_TEXTS[team.rating.get]}
             <Textarea
+              label="Notes"
               value={team.notes.get}
+              minRows={4}
+              autosize
+              error={
+                team.rating.get === 1 &&
+                team.notes.get.split(' ').filter((a) => a.length > 0).length < 3
+                  ? team.notes.get
+                    ? 'Notes must contain at least 3 words'
+                    : 'Notes must be provided if review required'
+                  : undefined
+              }
               onChange={(v) => team.notes.set(v.currentTarget.value)}
             ></Textarea>
           </>
