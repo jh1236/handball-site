@@ -9,7 +9,7 @@ interface GameBlockComfyParams {
 }
 
 export default function GameBlockComfy({ game }: GameBlockComfyParams) {
-  const default_color = '#0000';
+  const default_color = '#5555';
   const { colorScheme } = useMantineColorScheme();
   return (
     <Box>
@@ -36,7 +36,7 @@ export default function GameBlockComfy({ game }: GameBlockComfyParams) {
               textAlign: 'left',
             }}
             lineClamp={2}
-            pb={5}
+            pb={6}
             c="white"
           >
             {game.teamOne.name}
