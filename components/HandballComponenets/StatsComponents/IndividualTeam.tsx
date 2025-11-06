@@ -3,7 +3,7 @@
 /*
 He who is skilled in coding hides within the deepest recesses of the code. He who is skilled in gaming shoots forth from the heights of the game
  */
-import React, { Fragment, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import {
   IconAlertTriangle,
@@ -14,14 +14,15 @@ import {
 } from '@tabler/icons-react';
 import {
   Accordion,
-  Box,
-  Card,
+  Center,
   Container,
   Grid,
+  Group,
   HoverCard,
   Image,
   NumberInput,
   Rating,
+  Select,
   Table,
   Tabs,
   Text,
@@ -29,8 +30,8 @@ import {
   Title,
 } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
-import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import GameBlockComfy from '@/components/HandballComponenets/TeamBlock';
 import { getGames } from '@/ServerActions/GameActions';
 import { getTeam } from '@/ServerActions/TeamActions';
 import { GameEventStructure, GameStructure, TeamStructure } from '@/ServerActions/types';
@@ -67,7 +68,12 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
   const [cards, setCards] = React.useState<{ game: GameStructure; card: GameEventStructure }[]>([]);
   const [teamObj, setteamObj] = React.useState<TeamStructure | undefined>(undefined);
   const [gamesCount, setGamesCount] = React.useState<number>(20);
+  const [tournamentFilter, setTournamentFilter] = React.useState<string | undefined | null>();
+  const [filteredTournaments, setFilteredTournaments] = React.useState<string[]>();
   const { isUmpireManager } = useUserData();
+  if (tournament) {
+    setTournamentFilter(tournament);
+  }
   useEffect(() => {
     getTeam({
       team,
@@ -89,7 +95,10 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
         output = output.concat(
           (game.admin?.cards ?? [])
             .filter((card) => card.firstTeam === (game.teamOne.searchableName === team))
-            .map((c) => ({ game, card: c }))
+            .map((c) => ({
+              game,
+              card: c,
+            }))
         );
       }
       setCards(output);
@@ -97,6 +106,15 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
       setGames(g.games);
     });
   }, [gamesCount, team, tournament]);
+  useEffect(() => {
+    if (!tournament) {
+      setFilteredTournaments(
+        games
+          .map((g) => g.tournament.name)
+          .filter((value, index, array) => array.indexOf(value) === index)
+      );
+    }
+  }, [games, tournament, tournamentFilter]);
   if (!teamObj) {
     return <p>loading...</p>;
   }
@@ -149,93 +167,48 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
           </Tabs>
         </Tabs.Panel>
         <Tabs.Panel value="prevGames">
-          <NumberInput
-            label="Set Games Count"
-            min={1}
-            value={gamesCount}
-            onChange={(a) => setGamesCount(+a)}
-          />
-          <Grid>
-            {games
-              .filter((_, i) => i < gamesCount)
-              .map((game, k) => (
-                <Grid.Col
-                  span={{
-                    base: 6,
-                    sm: 4,
-                    md: 3,
-                  }}
-                >
-                  <Card
-                    shadow="sm"
-                    padding="xl"
-                    key={k}
-                    component="a"
-                    href={`/games/${game.id}`}
-                    className="hideLink"
+          <Center>
+            <Group mb={25} grow w="50%">
+              <NumberInput
+                label="Set Games Count"
+                min={1}
+                value={gamesCount}
+                onChange={(a) => setGamesCount(+a)}
+              />
+              {tournament ? (
+                <></>
+              ) : (
+                <Select
+                  label="Select Tournament"
+                  value={tournamentFilter}
+                  onChange={(a) => setTournamentFilter(a)}
+                  data={filteredTournaments}
+                  clearable
+                />
+              )}
+            </Group>
+          </Center>
+          <Center>
+            <Grid w="85%">
+              {games
+                .filter(
+                  (g) => g.tournament.name.includes(tournamentFilter ?? '') || !tournamentFilter
+                )
+                .filter((_, i) => i < gamesCount)
+                .map((game) => (
+                  <Grid.Col
+                    span={{
+                      base: 12,
+                      sm: 8,
+                      md: 6,
+                    }}
                   >
-                    <Card.Section h={160}>
-                      <Image
-                        src={
-                          game.teamOne.searchableName !== team
-                            ? game.teamOne.imageUrl
-                            : game.teamTwo.imageUrl
-                        }
-                        h={160}
-                        w={160}
-                        alt="logo for the other team"
-                      />
-                    </Card.Section>
-                    <Card.Section h={2000}>
-                      <Text fw={500} size="lg" mt="md">
-                        {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
-                        {game.teamTwoScore})
-                      </Text>
-                    </Card.Section>
-                    {isUmpireManager(tournament) && (
-                      <>
-                        <Text>
-                          <Box display="flex">
-                            <strong>Rating: </strong>{' '}
-                            <Rating
-                              count={4}
-                              w="auto"
-                              size="sm"
-                              value={
-                                (game.teamOne.searchableName === team
-                                  ? game?.admin!.teamOneRating
-                                  : game?.admin!.teamTwoRating) ?? 3
-                              }
-                              readOnly
-                            />
-                          </Box>
-                          {
-                            FEEDBACK_TEXTS[
-                              (game.teamOne.searchableName === team
-                                ? game?.admin!.teamOneRating
-                                : game?.admin!.teamTwoRating) ?? 3
-                            ]
-                          }
-                        </Text>
-                        <Text>
-                          <strong>Cards: </strong>
-                          {(game?.admin?.cards ?? [])
-                            .filter((c) => c.firstTeam === (game.teamOne.searchableName === team))
-                            .map((card, j) => (
-                              <HoverCard key={j}>
-                                <HoverCard.Target>{eventIcon(card)}</HoverCard.Target>
-                                <HoverCard.Dropdown>
-                                  <i>{card.notes}</i>
-                                </HoverCard.Dropdown>
-                              </HoverCard>
-                            ))}
-                        </Text>
-                      </>
-                    )}
-                  </Card>
-                </Grid.Col>
-              ))}
-          </Grid>
+                    <GameBlockComfy game={game}></GameBlockComfy>
+                    <Text>{game.tournament.name}</Text>
+                  </Grid.Col>
+                ))}
+            </Grid>
+          </Center>
         </Tabs.Panel>
 
         <Tabs.Panel value="charts">How did you even get here?</Tabs.Panel>
