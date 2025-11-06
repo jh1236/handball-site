@@ -17,13 +17,19 @@ interface TeamButtonProps {
 }
 
 export const FEEDBACK_TEXTS = [
-  <Text c="gray">
+  <Text display="inline" c="gray">
     <i>Unset</i>
   </Text>,
-  <Text c="red">Follow up Required</Text>,
-  <Text c="orange">Disrespectful Behaviour</Text>,
-  <Text>Acceptable Behaviour</Text>,
-  <Text c="green">Above and Beyond</Text>,
+  <Text display="inline" c="red">
+    Follow up Required
+  </Text>,
+  <Text display="inline" c="orange">
+    Disrespectful Behaviour
+  </Text>,
+  <Text display="inline">Acceptable Behaviour</Text>,
+  <Text display="inline" c="green">
+    Above and Beyond
+  </Text>,
 ];
 
 export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) {
@@ -51,43 +57,6 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
 
   const name = team ? team.name.get : 'Loading...';
   const isVertical = useScreenVertical();
-  if (isVertical) {
-    return (
-      <>
-        <Modal
-          opened={opened}
-          fullScreen={fullscreen}
-          centered
-          onClose={close}
-          title={<Title> {name}</Title>}
-        >
-          <TeamActionList
-            game={game}
-            firstTeam={firstTeam}
-            serving={serving}
-            close={close}
-          ></TeamActionList>
-        </Modal>
-        <Button
-          radius={0}
-          size="lg"
-          color={`${didWinGame(game, firstTeam) ? 'orange.5' : decidedOnCoinToss(game) ? 'green.9' : serving ? 'serving-color.5' : 'player-color.5'}`}
-          style={{
-            width: '100%',
-            height: '100%',
-            fontWeight: serving ? 'bold' : 'normal',
-          }}
-          onClick={open}
-        >
-          <b>
-            {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'}){' '}
-            {didWinGame(game, firstTeam) && <IconTrophy></IconTrophy>}
-            {decidedOnCoinToss(game) && <IconQuestionMark></IconQuestionMark>}
-          </b>
-        </Button>
-      </>
-    );
-  }
   return (
     <>
       <Modal opened={!fullscreen && opened} centered onClose={close} title={<Title> {name}</Title>}>
@@ -101,44 +70,43 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
       <Button
         radius={0}
         size="lg"
-        color={
-          didWinGame(game, firstTeam)
-            ? 'orange.5'
-            : decidedOnCoinToss(game)
-              ? 'green.9'
-              : serving
-                ? 'serving-color.5'
-                : 'player-color.5'
-        }
+        color={`${didWinGame(game, firstTeam) ? 'orange.5' : decidedOnCoinToss(game) ? 'green.9' : serving ? 'serving-color.5' : 'player-color.5'}`}
         style={{
           width: '100%',
           height: '100%',
-          position: 'relative',
-          overflow: 'visible',
+          fontWeight: serving ? 'bold' : 'normal',
         }}
         onClick={open}
       >
-        <span
-          style={{
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: firstTeam
-              ? 'translate(-50%, -50%) rotate(90deg)'
-              : 'translate(-50%, -50%) rotate(-90deg)',
-            transformOrigin: 'center center',
-            whiteSpace: 'nowrap',
-            fontWeight: serving ? 'bold' : 'normal',
-            textAlign: 'center',
-            pointerEvents: 'none',
-          }}
-        >
+        {isVertical ? (
           <b>
             {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'}){' '}
             {didWinGame(game, firstTeam) && <IconTrophy />}
             {decidedOnCoinToss(game) && <IconQuestionMark />}
           </b>
-        </span>
+        ) : (
+          <span
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: firstTeam
+                ? 'translate(-50%, -50%) rotate(90deg)'
+                : 'translate(-50%, -50%) rotate(-90deg)',
+              transformOrigin: 'center center',
+              whiteSpace: 'nowrap',
+              fontWeight: serving ? 'bold' : 'normal',
+              textAlign: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            <b>
+              {name} ({(game.teamOneIGA?.get ?? true) === firstTeam ? 'IGA' : 'Stairs'}){' '}
+              {didWinGame(game, firstTeam) && <IconTrophy />}
+              {decidedOnCoinToss(game) && <IconQuestionMark />}
+            </b>
+          </span>
+        )}
       </Button>
       {fullscreen && opened && (
         <Portal>
@@ -153,8 +121,16 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
             center={true}
             onClick={close}
           >
-            <Paper p={20} w="70%" h="90%" m="auto" onClick={(e) => e.stopPropagation()}>
-              <Title order={3} mb={15}>
+            <Paper
+              p={5}
+              pb={20}
+              pt={20}
+              mah={game.ended.get ? 500 : 350}
+              w={isVertical ? '90%' : '70%'}
+              h={isVertical ? 'auto' : '90%'}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Title order={3} ml={15} mb={15}>
                 {name}
               </Title>
               <TeamActionList

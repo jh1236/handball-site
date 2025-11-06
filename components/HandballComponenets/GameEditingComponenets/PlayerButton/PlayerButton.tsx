@@ -173,6 +173,7 @@ export function PlayerButton({
               p={isVertical ? 5 : 20}
               pb={20}
               pt={20}
+              mah={isVertical ? 600 : 400}
               w={isVertical ? '90%' : '70%'}
               h={isVertical ? 'auto' : '90%'}
               m="auto"
