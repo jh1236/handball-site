@@ -54,20 +54,6 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
   if (isVertical) {
     return (
       <>
-        <Modal
-          opened={opened}
-          fullScreen={fullscreen}
-          centered
-          onClose={close}
-          title={<Title> {name}</Title>}
-        >
-          <TeamActionList
-            game={game}
-            firstTeam={firstTeam}
-            serving={serving}
-            close={close}
-          ></TeamActionList>
-        </Modal>
         <Button
           radius={0}
           size="lg"
@@ -85,6 +71,40 @@ export function TeamButton({ game, firstTeam: trueFirstTeam }: TeamButtonProps) 
             {decidedOnCoinToss(game) && <IconQuestionMark></IconQuestionMark>}
           </b>
         </Button>
+        {fullscreen && opened && (
+          <Portal>
+            <Overlay
+              pos="absolute"
+              w="100lvw"
+              h="100lvh"
+              top={0}
+              backgroundOpacity={0.85}
+              blur={15}
+              left={0}
+              center={true}
+              onClick={close}
+            >
+              <Paper
+                p={5}
+                pb={20}
+                pt={20}
+                w="90%"
+                h="auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Title order={3} ml={15} mb={15}>
+                  {name}
+                </Title>
+                <TeamActionList
+                  game={game}
+                  firstTeam={firstTeam}
+                  serving={serving}
+                  close={close}
+                ></TeamActionList>
+              </Paper>
+            </Overlay>
+          </Portal>
+        )}
       </>
     );
   }
