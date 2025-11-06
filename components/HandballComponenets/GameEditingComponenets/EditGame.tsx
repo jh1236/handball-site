@@ -206,14 +206,10 @@ export function EditGame({ game }: { game: number }) {
                 : gameState.teamTwo.right.get && gameState.teamTwo.left.get
             ) ? (
               <>
-                <Box
-                  flex={1}
-                >
+                <Box flex={1}>
                   <PlayerButton game={gameState} firstTeam={true} leftSide={false}></PlayerButton>
                 </Box>
-                <Box
-                  flex={1}
-                >
+                <Box flex={1}>
                   <PlayerButton game={gameState} leftSide={true} firstTeam={true}></PlayerButton>
                 </Box>
               </>
@@ -226,91 +222,88 @@ export function EditGame({ game }: { game: number }) {
           <Box flex={1}>
             <TeamButton firstTeam={true} game={gameState}></TeamButton>
           </Box>
-          <Flex
-            flex={2}
-            direction={isVertical ? 'row' : 'column'}
-          >
-              <Center mih={0} flex={30}>
-                {gameState.started.get ? (
-                  <Button color="player-color" size="lg" onClick={() => sync(gameState)}>
-                    Sync
-                  </Button>
-                ) : (
-                  <Popover width={300} position="bottom" withArrow shadow="md">
-                    <Popover.Target>
-                      <Button size="lg" color="player-color">
-                        Officials
-                      </Button>
-                    </Popover.Target>
-                    <Popover.Dropdown>
-                      <Center>
-                        <Stack>
-                          <Select
-                            label="Official"
-                            searchable
-                            allowDeselect={false}
-                            placeholder="Pick value"
-                            data={officials.map((a) => ({
-                              value: a.searchableName,
-                              label: a.name,
-                            }))}
-                            value={official?.searchableName}
-                            onChange={(v) => {
-                              setOfficial(officials.find((a) => a.searchableName === v)!);
-                            }}
-                            comboboxProps={{ withinPortal: false }}
-                          />
+          <Flex flex={2} direction={isVertical ? 'row' : 'column'}>
+            <Center mih={0} flex={30}>
+              {gameState.started.get ? (
+                <Button color="player-color" size="lg" onClick={() => sync(gameState)}>
+                  Sync
+                </Button>
+              ) : (
+                <Popover width={300} position="bottom" withArrow shadow="md">
+                  <Popover.Target>
+                    <Button size="lg" color="player-color">
+                      Officials
+                    </Button>
+                  </Popover.Target>
+                  <Popover.Dropdown>
+                    <Center>
+                      <Stack>
+                        <Select
+                          label="Official"
+                          searchable
+                          allowDeselect={false}
+                          placeholder="Pick value"
+                          data={officials.map((a) => ({
+                            value: a.searchableName,
+                            label: a.name,
+                          }))}
+                          value={official?.searchableName}
+                          onChange={(v) => {
+                            setOfficial(officials.find((a) => a.searchableName === v)!);
+                          }}
+                          comboboxProps={{ withinPortal: false }}
+                        />
 
-                          <Select
-                            label="Scorer"
-                            allowDeselect={false}
-                            placeholder="Pick value"
-                            data={officials.map((a) => ({
-                              value: a.searchableName,
-                              label: a.name,
-                            }))}
-                            value={scorer?.searchableName}
-                            onChange={(v) => {
-                              setScorer(officials.find((a) => a.searchableName === v)!);
-                            }}
-                            comboboxProps={{ withinPortal: false }}
-                          />
-                        </Stack>
-                      </Center>
-                    </Popover.Dropdown>
-                  </Popover>
-                )}
-              </Center>
-              <Box
-                flex={30}
-                style={{
-                  margin: '0px auto',
-                  textAlign: 'center',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-evenly',
-                  alignItems: 'center',
-                  flex: '5',
+                        <Select
+                          label="Scorer"
+                          allowDeselect={false}
+                          placeholder="Pick value"
+                          data={officials.map((a) => ({
+                            value: a.searchableName,
+                            label: a.name,
+                          }))}
+                          value={scorer?.searchableName}
+                          onChange={(v) => {
+                            setScorer(officials.find((a) => a.searchableName === v)!);
+                          }}
+                          comboboxProps={{ withinPortal: false }}
+                        />
+                      </Stack>
+                    </Center>
+                  </Popover.Dropdown>
+                </Popover>
+              )}
+            </Center>
+            <Box
+              flex={30}
+              style={{
+                margin: '0px auto',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-evenly',
+                alignItems: 'center',
+                flex: '5',
+              }}
+            >
+              <GameScore game={gameState} official={official} scorer={scorer}></GameScore>
+            </Box>
+
+            <Center flex={30}>
+              <Button
+                size="lg"
+                color={gameState.started.get ? 'player-color' : 'red'}
+                onClick={() => {
+                  if (gameState.started.get) {
+                    undo(gameState);
+                  } else {
+                    del(gameState);
+                  }
                 }}
               >
-                <GameScore game={gameState} official={official} scorer={scorer}></GameScore>
-              </Box>
-
-              <Center flex={30}>
-                <Button
-                  size="lg"
-                  color={gameState.started.get ? 'player-color' : 'red'}
-                  onClick={() => {
-                    if (gameState.started.get) {
-                      undo(gameState);
-                    } else {
-                      del(gameState);
-                    }
-                  }}
-                >
-                  {gameState.started.get ? 'Undo' : 'Delete'}
-                </Button>
-              </Center>
+                {gameState.started.get ? 'Undo' : 'Delete'}
+              </Button>
+            </Center>
           </Flex>
           <Box flex={1} style={{ height: '100%', float: 'right' }}>
             <TeamButton firstTeam={false} game={gameState}></TeamButton>
