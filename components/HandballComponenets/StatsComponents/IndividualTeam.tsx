@@ -204,7 +204,6 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
                     }}
                   >
                     <GameBlockComfy game={game}></GameBlockComfy>
-                    <Text>{game.tournament.name}</Text>
                   </Grid.Col>
                 ))}
             </Grid>
