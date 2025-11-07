@@ -20,7 +20,7 @@ import {
   Group,
   HoverCard,
   Image,
-  NumberInput,
+  Pagination,
   Rating,
   Select,
   Table,
@@ -28,13 +28,20 @@ import {
   Text,
   Timeline,
   Title,
+  useMatches,
 } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
+import GameBlockComfy from '@/components/HandballComponenets/GameBlock';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
-import GameBlockComfy from '@/components/HandballComponenets/TeamBlock';
-import { getGames } from '@/ServerActions/GameActions';
+import { getGames, getGamesCount } from '@/ServerActions/GameActions';
 import { getTeam } from '@/ServerActions/TeamActions';
-import { GameEventStructure, GameStructure, TeamStructure } from '@/ServerActions/types';
+import { getTournaments } from '@/ServerActions/TournamentActions';
+import {
+  GameEventStructure,
+  GameStructure,
+  TeamStructure,
+  TournamentStructure,
+} from '@/ServerActions/types';
 import PlayerStatsTable from './PlayerStatsTable';
 
 interface TeamsProps {
@@ -59,37 +66,47 @@ interface TeamsProps {
 //   'Red Cards',
 //   'Timeouts Called',
 //   'Elo',
+
 // ];
 
 export default function IndividualTeam({ tournament, team }: TeamsProps) {
+  const gamesPerPage = useMatches({ base: 5, md: 10 });
   // const [sort, setSort] = React.useState<number>(-1);
-
   const [games, setGames] = React.useState<GameStructure[]>([]);
   const [cards, setCards] = React.useState<{ game: GameStructure; card: GameEventStructure }[]>([]);
-  const [teamObj, setteamObj] = React.useState<TeamStructure | undefined>(undefined);
-  const [gamesCount, setGamesCount] = React.useState<number>(20);
-  const [tournamentFilter, setTournamentFilter] = React.useState<string | undefined | null>();
-  const [filteredTournaments, setFilteredTournaments] = React.useState<string[]>();
+  const [teamObj, setTeamObj] = React.useState<TeamStructure | undefined>(undefined);
+  const [gamesMax, setGamesMax] = React.useState<number>(gamesPerPage);
+  const [tournamentFilter, setTournamentFilter] = React.useState<string | undefined>(tournament);
+  const [filteredTournaments, setFilteredTournaments] = React.useState<TournamentStructure[]>();
+  const [page, setPage] = React.useState(0);
   const { isUmpireManager } = useUserData();
-  if (tournament) {
-    setTournamentFilter(tournament);
-  }
+
+  useEffect(() => {
+    getGamesCount({
+      team: [team],
+      tournament: tournamentFilter,
+      includePlayerStats: true,
+    }).then((r) => setGamesMax(Math.ceil(r.games / gamesPerPage)));
+    getGames({
+      team: [team],
+      tournament: tournamentFilter,
+      includePlayerStats: true,
+      limit: gamesPerPage,
+      page,
+    }).then((g) => {
+      setGames(g.games);
+    });
+  }, [gamesPerPage, page, team, tournamentFilter]);
+
   useEffect(() => {
     getTeam({
       team,
       tournament,
       formatData: true,
     }).then((o) => {
-      setteamObj(o.team);
+      setTeamObj(o.team);
     });
-  }, [team, tournament]);
-  useEffect(() => {
-    setGames([]);
-    getGames({
-      team: [team],
-      tournament,
-      includePlayerStats: true,
-    }).then((g) => {
+    getGames({ team: [team], tournament, returnTournament: !!tournament }).then((g) => {
       let output: { game: GameStructure; card: GameEventStructure }[] = [];
       for (const game of g.games) {
         output = output.concat(
@@ -102,19 +119,16 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
         );
       }
       setCards(output);
-      g.games.reverse();
-      setGames(g.games);
+      if (tournament) {
+        setFilteredTournaments([g.tournament!]);
+      }
     });
-  }, [gamesCount, team, tournament]);
-  useEffect(() => {
+
     if (!tournament) {
-      setFilteredTournaments(
-        games
-          .map((g) => g.tournament.name)
-          .filter((value, index, array) => array.indexOf(value) === index)
-      );
+      getTournaments({ team: [team] }).then(setFilteredTournaments);
     }
-  }, [games, tournament, tournamentFilter]);
+  }, [team, tournament]);
+
   if (!teamObj) {
     return <p>loading...</p>;
   }
@@ -166,47 +180,52 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
             </Tabs.Panel>
           </Tabs>
         </Tabs.Panel>
-        <Tabs.Panel value="prevGames">
-          <Center>
-            <Group mb={25} grow w="50%">
-              <NumberInput
-                label="Set Games Count"
-                min={1}
-                value={gamesCount}
-                onChange={(a) => setGamesCount(+a)}
-              />
-              {tournament ? (
-                <></>
-              ) : (
+        <Tabs.Panel value="prevGames" w="100%">
+          {!tournament && (
+            <Center>
+              <Group mb={25} grow w="50%">
                 <Select
                   label="Select Tournament"
                   value={tournamentFilter}
-                  onChange={(a) => setTournamentFilter(a)}
-                  data={filteredTournaments}
+                  onChange={(a) => setTournamentFilter(a ?? undefined)}
+                  data={filteredTournaments?.map((t) => ({
+                    label: t.name,
+                    value: t.searchableName,
+                  }))}
                   clearable
                 />
-              )}
-            </Group>
-          </Center>
+              </Group>
+            </Center>
+          )}
           <Center>
             <Grid w="85%">
-              {games
-                .filter(
-                  (g) => g.tournament.name.includes(tournamentFilter ?? '') || !tournamentFilter
-                )
-                .filter((_, i) => i < gamesCount)
-                .map((game) => (
-                  <Grid.Col
-                    span={{
-                      base: 12,
-                      sm: 8,
-                      md: 6,
-                    }}
-                  >
-                    <GameBlockComfy game={game}></GameBlockComfy>
-                  </Grid.Col>
-                ))}
+              {games.map((game) => (
+                <Grid.Col
+                  span={{
+                    base: 12,
+                    sm: 8,
+                    md: 6,
+                  }}
+                >
+                  <GameBlockComfy
+                    game={game}
+                    tournament={
+                      game.tournament ??
+                      filteredTournaments?.find((t) => t.searchableName === tournamentFilter) ??
+                      filteredTournaments?.[0]
+                    }
+                  ></GameBlockComfy>
+                </Grid.Col>
+              ))}
             </Grid>
+          </Center>
+          <Center w="100%" m={10}>
+            <Pagination
+              m="auto"
+              total={gamesMax}
+              value={page + 1}
+              onChange={(p) => setPage(p - 1)}
+            ></Pagination>
           </Center>
         </Tabs.Panel>
 
