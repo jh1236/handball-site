@@ -7,7 +7,7 @@ import { TournamentStructure } from '@/ServerActions/types';
 export function TournamentList() {
   const [tournaments, setTournaments] = useState<TournamentStructure[]>();
   useEffect(() => {
-    getTournaments().then((t) => setTournaments(t.toReversed()));
+    getTournaments({}).then((t) => setTournaments(t.toReversed()));
   }, []);
 
   if (!tournaments) {

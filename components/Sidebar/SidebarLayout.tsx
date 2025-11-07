@@ -29,7 +29,7 @@ export default function SidebarLayout({
     [tournamentName, tournaments]
   );
   useEffect(() => {
-    getTournaments().then(setTournaments);
+    getTournaments({}).then(setTournaments);
   }, []);
   const theme = useMemo(
     () =>

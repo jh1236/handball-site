@@ -80,7 +80,7 @@ function SiteMap() {
 
 export async function getServerSideProps({ res }: { res: Http2ServerResponse }) {
   // We make an API call to gather the URLs for our site
-  const tournamentsReq = getTournaments();
+  const tournamentsReq = getTournaments({});
   const teamsReq = getTeams({});
   const playersReq = getPlayers({});
   const [tournaments, teams, players] = await Promise.all([tournamentsReq, teamsReq, playersReq]);

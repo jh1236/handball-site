@@ -89,6 +89,7 @@ interface GetGamesArgs {
   includePlayerStats?: boolean;
   returnTournament?: boolean;
   limit?: number;
+  page?: number;
   includeByes?: boolean;
 }
 
@@ -103,7 +104,8 @@ export function getGames({
   returnTournament = false,
   includeByes = false,
   limit = undefined,
-}: GetGamesArgs): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
+  page = undefined,
+}: GetGamesArgs): Promise<{ games: GameStructure[]; tournament?: TournamentStructure }> {
   const url = new URL('/api/games', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
@@ -131,6 +133,64 @@ export function getGames({
   }
   if (limit) {
     url.searchParams.set('limit', `${limit}`);
+  }
+  if (page) {
+    url.searchParams.set('page', `${page}`);
+  }
+  if (includeByes) {
+    url.searchParams.set('includeByes', 'true');
+  }
+  return tokenFetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return response.json();
+  });
+}
+
+export function getGamesCount({
+  tournament,
+  team = [],
+  player = [],
+  official = [],
+  court,
+  returnTournament = false,
+  includeByes = false,
+  limit = undefined,
+  page = undefined,
+}: GetGamesArgs): Promise<{ games: number; tournament?: TournamentStructure }> {
+  const url = new URL('/api/games/count', SERVER_ADDRESS);
+  if (tournament) {
+    url.searchParams.set('tournament', tournament);
+  }
+  for (const i of team) {
+    url.searchParams.append('team', i);
+  }
+  for (const i of player) {
+    url.searchParams.append('player', i);
+  }
+  for (const i of official) {
+    url.searchParams.append('official', i);
+  }
+  if (court) {
+    url.searchParams.set('court', `${court}`);
+  }
+  if (returnTournament) {
+    url.searchParams.set('returnTournament', 'true');
+  }
+  if (limit) {
+    url.searchParams.set('limit', `${limit}`);
+  }
+  if (page) {
+    url.searchParams.set('page', `${page}`);
   }
   if (includeByes) {
     url.searchParams.set('includeByes', 'true');
@@ -161,6 +221,7 @@ interface GetNoteableGamesArgs {
   includePlayerStats?: boolean;
   returnTournament?: boolean;
   limit?: number;
+  page?: number;
   includeByes?: boolean;
 }
 
@@ -169,7 +230,8 @@ export function getNoteableGames({
   includeGameEvents = false,
   includePlayerStats = false,
   returnTournament = false,
-  limit = 20,
+  limit,
+  page,
 }: GetNoteableGamesArgs): Promise<{
   games: GameStructure[];
   tournaments?: TournamentStructure;
@@ -189,6 +251,9 @@ export function getNoteableGames({
   }
   if (limit) {
     url.searchParams.set('limit', `${limit}`);
+  }
+  if (page) {
+    url.searchParams.set('page', `${page}`);
   }
   return tokenFetch(url, {
     method: 'GET',

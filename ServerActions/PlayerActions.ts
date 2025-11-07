@@ -13,6 +13,8 @@ interface GetPlayersArgs {
   includeStats?: boolean;
   formatData?: boolean;
   returnTournament?: boolean;
+  limit?: number;
+  page?: number;
 }
 
 export function getPlayers({
@@ -21,6 +23,8 @@ export function getPlayers({
   includeStats,
   formatData,
   returnTournament = false,
+  limit,
+  page,
 }: GetPlayersArgs): Promise<{
   players: PersonStructure[];
   tournament?: TournamentStructure;
@@ -40,6 +44,12 @@ export function getPlayers({
   }
   if (returnTournament) {
     url.searchParams.set('returnTournament', 'true');
+  }
+  if (page) {
+    url.searchParams.set('page', `${page}`);
+  }
+  if (limit) {
+    url.searchParams.set('limit', `${limit}`);
   }
   return tokenFetch(url, {
     method: 'GET',
