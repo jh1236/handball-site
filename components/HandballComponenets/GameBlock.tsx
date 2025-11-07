@@ -71,7 +71,7 @@ export default function GameBlockComfy({ game, tournament }: GameBlockComfyParam
                       w="auto"
                     ></Image>
                   </HoverCard.Target>
-                  <HoverCard.Dropdown>
+                  <HoverCard.Dropdown maw={300}>
                     <Checkbox
                       label="Marked For Review"
                       readOnly
