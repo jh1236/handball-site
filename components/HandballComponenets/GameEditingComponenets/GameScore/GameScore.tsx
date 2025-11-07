@@ -36,7 +36,7 @@ export const QUICK_GAME_END = false;
 
 export function GameScore({ game, official, scorer }: GameScoreArgs) {
   const isVertical = useScreenVertical();
-  const fullscreen = useMatches({ base: true, sm: false });
+  const fullscreen = useMatches({ base: true, md: false });
 
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
   const [index, setIndex] = useState(0);
