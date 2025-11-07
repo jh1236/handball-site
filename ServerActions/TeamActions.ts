@@ -8,6 +8,8 @@ interface GetTeamsArgs {
   includeStats?: boolean;
   formatData?: boolean;
   returnTournament?: boolean;
+  page?: number;
+  limit?: number;
 }
 
 export function getTeams({
@@ -16,6 +18,8 @@ export function getTeams({
   includeStats,
   formatData,
   returnTournament = false,
+  page,
+  limit,
 }: GetTeamsArgs): Promise<{
   teams: TeamStructure[];
   tournament?: TournamentStructure;
@@ -35,6 +39,12 @@ export function getTeams({
   }
   if (returnTournament) {
     url.searchParams.set('returnTournament', 'true');
+  }
+  if (limit) {
+    url.searchParams.set('limit', `${limit}`);
+  }
+  if (page) {
+    url.searchParams.set('page', `${page}`);
   }
   return tokenFetch(url, {
     method: 'GET',

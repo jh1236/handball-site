@@ -2,8 +2,38 @@ import { SERVER_ADDRESS } from '@/app/config';
 import { localLogout, tokenFetch } from '@/components/HandballComponenets/ServerActions';
 import { SearchableName, TournamentStructure } from '@/ServerActions/types';
 
-export function getTournaments(): Promise<TournamentStructure[]> {
+interface GetTournaments {
+  page?: number;
+  limit?: number;
+  player?: SearchableName[];
+  team?: SearchableName[];
+  official?: SearchableName[];
+}
+
+export function getTournaments({
+                                 page,
+                                 limit,
+                                 player = [],
+                                 team = [],
+                                 official = [],
+                               }: GetTournaments): Promise<TournamentStructure[]> {
   const url = new URL('/api/tournaments/', SERVER_ADDRESS);
+  for (const i of team) {
+    url.searchParams.append('team', i);
+  }
+  for (const i of player) {
+    url.searchParams.append('player', i);
+  }
+  for (const i of official) {
+    url.searchParams.append('official', i);
+  }
+  if (limit) {
+    url.searchParams.set('limit', `${limit}`);
+  }
+  if (page) {
+    url.searchParams.set('page', `${page}`);
+  }
+
   return tokenFetch(url, {
     method: 'GET',
   }).then((response) => {
@@ -16,7 +46,6 @@ export function getTournaments(): Promise<TournamentStructure[]> {
     return response.json().then((json: { tournaments: TournamentStructure[] }) => json.tournaments);
   });
 }
-
 export function getTournament(searchableName: SearchableName): Promise<TournamentStructure> {
   const url = new URL(`/api/tournaments/${searchableName}`, SERVER_ADDRESS);
   return tokenFetch(url, {

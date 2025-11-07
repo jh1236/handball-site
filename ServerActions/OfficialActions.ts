@@ -5,9 +5,16 @@ import { OfficialStructure, SearchableName, TournamentStructure } from '@/Server
 interface GetOfficialsArgs {
   tournament?: SearchableName;
   returnTournament?: boolean;
+  limit?: number;
+  page?: number;
 }
 
-export function getOfficials({ tournament, returnTournament = false }: GetOfficialsArgs): Promise<{
+export function getOfficials({
+  tournament,
+  returnTournament = false,
+  limit,
+  page,
+}: GetOfficialsArgs): Promise<{
   officials: OfficialStructure[];
   tournament?: TournamentStructure;
 }> {
@@ -17,6 +24,12 @@ export function getOfficials({ tournament, returnTournament = false }: GetOffici
   }
   if (returnTournament) {
     url.searchParams.set('returnTournament', 'true');
+  }
+  if (limit) {
+    url.searchParams.set('limit', `${limit}`);
+  }
+  if (page) {
+    url.searchParams.set('page', `${page}`);
   }
   return tokenFetch(url, {
     method: 'GET',
