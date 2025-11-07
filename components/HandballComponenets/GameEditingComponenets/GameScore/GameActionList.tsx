@@ -149,76 +149,81 @@ export function GameActionList({
     });
   }
 
-  out.push(
-    {
+  if (
+    (game.teamOne.left.get && game.teamOne.right.get) ||
+    (game.teamTwo.left.get && game.teamTwo.right.get)
+  ) {
+    // at least one team has two players; we need B&F Votes
+    out.push({
       Icon: IconTrophy,
       value: 'B&F Votes',
       color: undefined,
       content: <OrderPlayers game={game}></OrderPlayers>,
-    },
-    {
-      Icon: IconCloudUpload,
-      value: 'Finalise',
-      content: (
-        <>
-          <List>
-            <List.Item>
-              <strong>Winning Team: </strong>
-              {winningTeam.get}
-            </List.Item>
-            <List.Item>
-              <strong>Best Players</strong>
-              <strong>: </strong>
-              {game.votes.get.map((pgs: { name: string }) => pgs.name).join(', ')}
-            </List.Item>
-            <List.Item>
-              <strong>Review Required: </strong>
-              {reviewReqd ? 'Yes' : 'No'}
-            </List.Item>
-            <List.Item>
-              <strong>Notes:</strong>
-              {game.notes.get.trim() === '' ? <i>Unset</i> : game.notes.get}
-            </List.Item>
-            <List.Item>
-              <strong>Team One: </strong> {game.teamOne.name.get}
-              <List>
-                <List.Item>
-                  <strong>Protest Reason: </strong>
-                  {game.teamOne.protest.get ? game.teamOne.protest.get : <i>Unset</i>}
-                </List.Item>
-                <List.Item>
-                  <strong>Rating: </strong>
-                  {FEEDBACK_TEXTS[game.teamOne.rating.get ?? 0]}
-                </List.Item>
-                <List.Item>
-                  Notes
-                  <strong>: </strong>
-                  {game.teamOne.notes.get ? game.teamOne.notes.get : <i>Unset</i>}
-                </List.Item>
-              </List>
-            </List.Item>
-            <List.Item>
-              <strong>Team Two: </strong> {game.teamTwo.name.get}
-              <List>
-                <List.Item>
-                  <strong>Protest Reason: </strong>
-                  {game.teamTwo.protest.get ? game.teamTwo.protest.get : <i>Unset</i>}
-                </List.Item>
-                <List.Item>
-                  <strong>Rating: </strong>
-                  {FEEDBACK_TEXTS[game.teamTwo.rating.get ?? 0]}
-                </List.Item>
-                <List.Item>
-                  <strong>Notes: </strong>
-                  {game.teamTwo.notes.get ? game.teamTwo.notes.get : <i>Unset</i>}
-                </List.Item>
-              </List>
-            </List.Item>
-          </List>
-        </>
-      ),
-    }
-  );
+    });
+  }
+
+  out.push({
+    Icon: IconCloudUpload,
+    value: 'Finalise',
+    content: (
+      <>
+        <List>
+          <List.Item>
+            <strong>Winning Team: </strong>
+            {winningTeam.get}
+          </List.Item>
+          <List.Item>
+            <strong>Best Players</strong>
+            <strong>: </strong>
+            {game.votes.get.map((pgs: { name: string }) => pgs.name).join(', ')}
+          </List.Item>
+          <List.Item>
+            <strong>Review Required: </strong>
+            {reviewReqd ? 'Yes' : 'No'}
+          </List.Item>
+          <List.Item>
+            <strong>Notes:</strong>
+            {game.notes.get.trim() === '' ? <i>Unset</i> : game.notes.get}
+          </List.Item>
+          <List.Item>
+            <strong>Team One: </strong> {game.teamOne.name.get}
+            <List>
+              <List.Item>
+                <strong>Protest Reason: </strong>
+                {game.teamOne.protest.get ? game.teamOne.protest.get : <i>Unset</i>}
+              </List.Item>
+              <List.Item>
+                <strong>Rating: </strong>
+                {FEEDBACK_TEXTS[game.teamOne.rating.get ?? 0]}
+              </List.Item>
+              <List.Item>
+                Notes
+                <strong>: </strong>
+                {game.teamOne.notes.get ? game.teamOne.notes.get : <i>Unset</i>}
+              </List.Item>
+            </List>
+          </List.Item>
+          <List.Item>
+            <strong>Team Two: </strong> {game.teamTwo.name.get}
+            <List>
+              <List.Item>
+                <strong>Protest Reason: </strong>
+                {game.teamTwo.protest.get ? game.teamTwo.protest.get : <i>Unset</i>}
+              </List.Item>
+              <List.Item>
+                <strong>Rating: </strong>
+                {FEEDBACK_TEXTS[game.teamTwo.rating.get ?? 0]}
+              </List.Item>
+              <List.Item>
+                <strong>Notes: </strong>
+                {game.teamTwo.notes.get ? game.teamTwo.notes.get : <i>Unset</i>}
+              </List.Item>
+            </List>
+          </List.Item>
+        </List>
+      </>
+    ),
+  });
   return (
     <>
       <Flex w="100%" justify="space-between">
