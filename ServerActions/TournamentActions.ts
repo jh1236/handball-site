@@ -11,12 +11,12 @@ interface GetTournaments {
 }
 
 export function getTournaments({
-                                 page,
-                                 limit,
-                                 player = [],
-                                 team = [],
-                                 official = [],
-                               }: GetTournaments): Promise<TournamentStructure[]> {
+  page,
+  limit,
+  player = [],
+  team = [],
+  official = [],
+}: GetTournaments): Promise<TournamentStructure[]> {
   const url = new URL('/api/tournaments/', SERVER_ADDRESS);
   for (const i of team) {
     url.searchParams.append('team', i);
@@ -46,6 +46,7 @@ export function getTournaments({
     return response.json().then((json: { tournaments: TournamentStructure[] }) => json.tournaments);
   });
 }
+
 export function getTournament(searchableName: SearchableName): Promise<TournamentStructure> {
   const url = new URL(`/api/tournaments/${searchableName}`, SERVER_ADDRESS);
   return tokenFetch(url, {

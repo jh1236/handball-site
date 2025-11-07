@@ -105,7 +105,7 @@ export function getGames({
   includeByes = false,
   limit = undefined,
   page = undefined,
-}: GetGamesArgs): Promise<{ games: GameStructure[]; tournaments?: TournamentStructure }> {
+}: GetGamesArgs): Promise<{ games: GameStructure[]; tournament?: TournamentStructure }> {
   const url = new URL('/api/games', SERVER_ADDRESS);
   if (tournament) {
     url.searchParams.set('tournament', tournament);
