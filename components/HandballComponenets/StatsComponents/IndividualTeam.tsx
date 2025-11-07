@@ -94,7 +94,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
       limit: gamesPerPage,
       page,
     }).then((g) => {
-      setGames(g.games);
+      setGames(g.games.toReversed());
     });
   }, [gamesPerPage, page, team, tournamentFilter]);
 
@@ -125,7 +125,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
     });
 
     if (!tournament) {
-      getTournaments({ team: [team] }).then(setFilteredTournaments);
+      getTournaments({ team: [team] }).then(t => setFilteredTournaments(t.toReversed()));
     }
   }, [team, tournament]);
 
