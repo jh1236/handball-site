@@ -35,7 +35,7 @@ export function GameSettings({
 
   useEffect(() => {
     getOfficials({}).then((o) => setOfficials(o.officials));
-    getTournaments().then((t) => setTournaments(t.filter((t2) => t2.editable)));
+    getTournaments({}).then((t) => setTournaments(t.filter((t2) => t2.editable)));
   }, []);
 
   useEffect(() => {
