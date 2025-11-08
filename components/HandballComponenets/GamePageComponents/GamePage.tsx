@@ -91,7 +91,7 @@ export function GamePage({ gameID }: GamePageProps) {
                   .filter((_, i) => i < limit)
                   .map((prevGame, index) => (
                     <Grid.Col key={index} span={{ base: 12, md: 6 }}>
-                      <GameBlockComfy game={prevGame} />
+                      <GameBlockComfy game={prevGame} markWinner />
                     </Grid.Col>
                   ))}
               </Grid>

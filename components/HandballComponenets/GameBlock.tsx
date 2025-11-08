@@ -19,9 +19,14 @@ interface GameBlockComfyParams {
   game: GameStructure;
   showCards?: boolean;
   tournament?: TournamentStructure;
+  markWinner?: boolean;
 }
 
-export default function GameBlockComfy({ game, tournament }: GameBlockComfyParams) {
+export default function GameBlockComfy({
+  game,
+  tournament,
+  markWinner = false,
+}: GameBlockComfyParams) {
   const default_color = '#5555';
   const { colorScheme } = useMantineColorScheme();
   return (
@@ -118,7 +123,9 @@ export default function GameBlockComfy({ game, tournament }: GameBlockComfyParam
                     filter:
                       game.admin?.teamOneProtest || game.admin?.teamOneRating === 1
                         ? 'drop-shadow(0 0 10px red)'
-                        : undefined,
+                        : game.firstTeamWinning && game.someoneHasWon && markWinner
+                          ? 'drop-shadow(0 0 10px gold)'
+                          : undefined,
                     overflow: 'visible',
                   }}
                   h="100%"
@@ -153,7 +160,9 @@ export default function GameBlockComfy({ game, tournament }: GameBlockComfyParam
                     filter:
                       game.admin?.teamTwoProtest || game.admin?.teamTwoRating === 1
                         ? 'drop-shadow(0 0 10px red)'
-                        : undefined,
+                        : !game.firstTeamWinning && game.someoneHasWon && markWinner
+                          ? 'drop-shadow(0 0 10px gold)'
+                          : undefined,
                     overflow: 'visible',
                   }}
                   h="100%"
