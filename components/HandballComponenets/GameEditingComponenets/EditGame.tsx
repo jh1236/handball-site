@@ -214,7 +214,7 @@ export function EditGame({ game }: { game: number }) {
                 </Box>
               </>
             ) : (
-              <Box>
+              <Box flex={1}>
                 <PlayerButton game={gameState} firstTeam={true} leftSide={true}></PlayerButton>
               </Box>
             )}
@@ -323,7 +323,7 @@ export function EditGame({ game }: { game: number }) {
                 </Box>
               </>
             ) : (
-              <Box>
+              <Box flex={1}>
                 <PlayerButton game={gameState} leftSide={true} firstTeam={false}></PlayerButton>
               </Box>
             )}
