@@ -5,7 +5,7 @@
 }
 
 @property --team-one-col {
-  syntax: "<color>";
+    syntax: "<color>";
     inherits: false;
     initial-value: var(--fallback-team-col);
 }
@@ -50,6 +50,8 @@
         width: 100%;
         height: 300px;
         display: grid;
+        position: relative;
+        z-index: 0;
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
         grid-template-rows: 75px 175px 50px;
     }
@@ -62,7 +64,8 @@
         line-clamp: 2;
         grid-column: span 5;
         align-content: center;
-        padding: 5px
+        padding: 5px;
+        z-index: 20;
     }
 
     .teamLogos {
@@ -72,11 +75,15 @@
         margin: auto;
         object-fit: contain;
         padding: 5px;
+        position: relative;
+        z-index: 1;
     }
 
     .teamInfo {
         grid-column: span 2;
         grid-row: span 1;
+        position: relative;
+        z-index: 20;
     }
 
     .teamScores {
@@ -104,8 +111,10 @@
         width: 100%;
         height: 300px;
         display: grid;
+        position: relative;
         grid-auto-columns: 50fr 2fr 1fr 2fr 50fr;
         grid-template-rows: 50px 150px 50px 50px;
+        z-index: 0;
         grid-template-areas:
             'team1 team1  vers  team2 team2'
             'logo1 score1 dash score2 logo2'
@@ -113,12 +122,29 @@
             'offic offic  offic offic offic'
     }
 
-    .team1Name {grid-area: team1;}
-    .team2Name {grid-area: team2;}
-    .score1 {grid-area: score1;}
-    .score2 {grid-area: score2;}
-    .logo1 {grid-area: logo1;}
-    .logo2 {grid-area: logo2;}
+    .team1Name {
+        grid-area: team1;
+    }
+
+    .team2Name {
+        grid-area: team2;
+    }
+
+    .score1 {
+        grid-area: score1;
+    }
+
+    .score2 {
+        grid-area: score2;
+    }
+
+    .logo1 {
+        grid-area: logo1;
+    }
+
+    .logo2 {
+        grid-area: logo2;
+    }
 
     .teamNames {
         font-size: min(30px, 4vw);
@@ -126,13 +152,17 @@
         line-clamp: 2;
         align-content: center;
         padding: 5px;
+        position: relative;
+        z-index: 20;
     }
 
     .teamLogos {
         margin: auto;
         padding: 10px;
         height: 100%;
+        position: relative;
         overflow: visible;
+        z-index: 1;
     }
 
     .teamLogos * {
@@ -168,16 +198,16 @@
         position: relative;
     }
 
-    .gameOfficial * {
-        position: absolute;
-        width: 100%;
-        bottom: -10px;
+    .gameOfficial p {
+        transform: translateY(10px);
     }
 
     .info1 {
         grid-area: info1;
         margin-right: calc(30px + 1vw);
         margin-left: 10px;
+        position: relative;
+        z-index: 20;
     }
 
     .info1 * {
@@ -186,6 +216,8 @@
 
     .info2 {
         grid-area: info2;
+        position: relative;
+        z-index: 20;
         margin-right: 10px;
         margin-left: calc(40px + 1vw);
     }
