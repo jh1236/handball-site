@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  AspectRatio,
   Box,
   Center,
   Checkbox,
@@ -107,32 +108,33 @@ export default function GameBlockComfy({
         </Group>
         <Paper
           w="100%"
-          h="90px"
+          h="80px"
           className={classes.TeamGradient}
           style={{
             '--team-one-col': game.teamOne.teamColor ?? default_color,
             '--team-two-col': game.teamTwo.teamColor ?? default_color,
           }}
         >
-          <Group justify="space-between" wrap="nowrap" h="100%" style={{ overflow: 'visible' }}>
+          <Group justify="space-between" wrap="nowrap" h={110} pb={25} style={{ overflow: 'visible' }}>
             <HoverCard disabled={!game.admin}>
               <HoverCard.Target>
-                <Image
-                  src={game.teamOne.imageUrl}
-                  style={{
-                    filter:
-                      game.admin?.teamOneProtest || game.admin?.teamOneRating === 1
-                        ? 'drop-shadow(0 0 10px red)'
-                        : game.firstTeamWinning && game.someoneHasWon && markWinner
-                          ? 'drop-shadow(0 0 10px gold)'
-                          : undefined,
-                    overflow: 'visible',
-                  }}
-                  h="100%"
-                  w="auto"
-                  p={10}
-                  fit="cover"
-                />
+                <AspectRatio ratio={1} h={75} p={5}>
+                  <Image
+                    src={game.teamOne.imageUrl}
+                    style={{
+                      filter:
+                        game.admin?.teamOneProtest || game.admin?.teamOneRating === 1
+                          ? 'drop-shadow(0 0 10px red)'
+                          : game.firstTeamWinning && game.someoneHasWon && markWinner
+                            ? 'drop-shadow(0 0 10px gold)'
+                            : undefined,
+                      overflow: 'visible',
+                    }}
+                    fit="contain"
+                    h="100%"
+                    w="auto"
+                  />
+                </AspectRatio>
               </HoverCard.Target>
               <HoverCard.Dropdown maw={300}>
                 <Rating value={game.admin?.teamOneRating} count={4} size="lg" readOnly></Rating>
@@ -154,22 +156,23 @@ export default function GameBlockComfy({
             </Text>
             <HoverCard disabled={!game.admin}>
               <HoverCard.Target>
-                <Image
-                  src={game.teamTwo.imageUrl}
-                  style={{
-                    filter:
-                      game.admin?.teamTwoProtest || game.admin?.teamTwoRating === 1
-                        ? 'drop-shadow(0 0 10px red)'
-                        : !game.firstTeamWinning && game.someoneHasWon && markWinner
-                          ? 'drop-shadow(0 0 10px gold)'
-                          : undefined,
-                    overflow: 'visible',
-                  }}
-                  h="100%"
-                  w="auto"
-                  p={10}
-                  fit="cover"
-                />
+                <AspectRatio ratio={1} h={75} p={5}>
+                  <Image
+                    src={game.teamTwo.imageUrl}
+                    style={{
+                      filter:
+                        game.admin?.teamTwoProtest || game.admin?.teamTwoRating === 1
+                          ? 'drop-shadow(0 0 10px red)'
+                          : !game.firstTeamWinning && game.someoneHasWon && markWinner
+                            ? 'drop-shadow(0 0 10px gold)'
+                            : undefined,
+                      overflow: 'visible',
+                    }}
+                    fit="contain"
+                    h="100%"
+                    w="auto"
+                  />
+                </AspectRatio>
               </HoverCard.Target>
               <HoverCard.Dropdown maw={300}>
                 <Rating value={game.admin?.teamTwoRating} count={4} size="lg" readOnly></Rating>
