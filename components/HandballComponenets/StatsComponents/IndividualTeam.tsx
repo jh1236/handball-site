@@ -125,7 +125,7 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
     });
 
     if (!tournament) {
-      getTournaments({ team: [team] }).then(t => setFilteredTournaments(t.toReversed()));
+      getTournaments({ team: [team] }).then((t) => setFilteredTournaments(t.toReversed()));
     }
   }, [team, tournament]);
 

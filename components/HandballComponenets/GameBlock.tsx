@@ -115,7 +115,13 @@ export default function GameBlockComfy({
             '--team-two-col': game.teamTwo.teamColor ?? default_color,
           }}
         >
-          <Group justify="space-between" wrap="nowrap" h={110} pb={25} style={{ overflow: 'visible' }}>
+          <Group
+            justify="space-between"
+            wrap="nowrap"
+            h={110}
+            pb={25}
+            style={{ overflow: 'visible' }}
+          >
             <HoverCard disabled={!game.admin}>
               <HoverCard.Target>
                 <AspectRatio ratio={1} h={75} p={5}>
