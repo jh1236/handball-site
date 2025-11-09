@@ -1,0 +1,21 @@
+@property --fallback-team-col {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #b1f0ba;
+}
+
+@property --team-one-col {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: var(--fallback-team-col);
+}
+
+@property --team-two-col {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: var(--fallback-team-col);
+}
+
+.TeamGradient {
+    background: linear-gradient(90deg, var(--team-one-col), #FFF0, var(--team-two-col));
+}

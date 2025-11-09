@@ -3,7 +3,7 @@
 /*
 He who is skilled in coding hides within the deepest recesses of the code. He who is skilled in gaming shoots forth from the heights of the game
  */
-import React, { Fragment, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import {
   IconAlertTriangle,
@@ -14,26 +14,34 @@ import {
 } from '@tabler/icons-react';
 import {
   Accordion,
-  Box,
-  Card,
+  Center,
   Container,
   Grid,
+  Group,
   HoverCard,
   Image,
-  NumberInput,
+  Pagination,
   Rating,
+  Select,
   Table,
   Tabs,
   Text,
   Timeline,
   Title,
+  useMatches,
 } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
-import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
+import GameBlockComfy from '@/components/HandballComponenets/GameBlock';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
-import { getGames } from '@/ServerActions/GameActions';
+import { getGames, getGamesCount } from '@/ServerActions/GameActions';
 import { getTeam } from '@/ServerActions/TeamActions';
-import { GameEventStructure, GameStructure, TeamStructure } from '@/ServerActions/types';
+import { getTournaments } from '@/ServerActions/TournamentActions';
+import {
+  GameEventStructure,
+  GameStructure,
+  TeamStructure,
+  TournamentStructure,
+} from '@/ServerActions/types';
 import PlayerStatsTable from './PlayerStatsTable';
 
 interface TeamsProps {
@@ -58,45 +66,69 @@ interface TeamsProps {
 //   'Red Cards',
 //   'Timeouts Called',
 //   'Elo',
+
 // ];
 
 export default function IndividualTeam({ tournament, team }: TeamsProps) {
+  const gamesPerPage = useMatches({ base: 5, md: 10 });
   // const [sort, setSort] = React.useState<number>(-1);
-
   const [games, setGames] = React.useState<GameStructure[]>([]);
   const [cards, setCards] = React.useState<{ game: GameStructure; card: GameEventStructure }[]>([]);
-  const [teamObj, setteamObj] = React.useState<TeamStructure | undefined>(undefined);
-  const [gamesCount, setGamesCount] = React.useState<number>(20);
+  const [teamObj, setTeamObj] = React.useState<TeamStructure | undefined>(undefined);
+  const [gamesMax, setGamesMax] = React.useState<number>(gamesPerPage);
+  const [tournamentFilter, setTournamentFilter] = React.useState<string | undefined>(tournament);
+  const [filteredTournaments, setFilteredTournaments] = React.useState<TournamentStructure[]>();
+  const [page, setPage] = React.useState(0);
   const { isUmpireManager } = useUserData();
+
+  useEffect(() => {
+    getGamesCount({
+      team: [team],
+      tournament: tournamentFilter,
+      includePlayerStats: true,
+    }).then((r) => setGamesMax(Math.ceil(r.games / gamesPerPage)));
+    getGames({
+      team: [team],
+      tournament: tournamentFilter,
+      includePlayerStats: true,
+      limit: gamesPerPage,
+      page,
+    }).then((g) => {
+      setGames(g.games.toReversed());
+    });
+  }, [gamesPerPage, page, team, tournamentFilter]);
+
   useEffect(() => {
     getTeam({
       team,
       tournament,
       formatData: true,
     }).then((o) => {
-      setteamObj(o.team);
+      setTeamObj(o.team);
     });
-  }, [team, tournament]);
-  useEffect(() => {
-    setGames([]);
-    getGames({
-      team: [team],
-      tournament,
-      includePlayerStats: true,
-    }).then((g) => {
+    getGames({ team: [team], tournament, returnTournament: !!tournament }).then((g) => {
       let output: { game: GameStructure; card: GameEventStructure }[] = [];
       for (const game of g.games) {
         output = output.concat(
           (game.admin?.cards ?? [])
             .filter((card) => card.firstTeam === (game.teamOne.searchableName === team))
-            .map((c) => ({ game, card: c }))
+            .map((c) => ({
+              game,
+              card: c,
+            }))
         );
       }
       setCards(output);
-      g.games.reverse();
-      setGames(g.games);
+      if (tournament) {
+        setFilteredTournaments([g.tournament!]);
+      }
     });
-  }, [gamesCount, team, tournament]);
+
+    if (!tournament) {
+      getTournaments({ team: [team] }).then((t) => setFilteredTournaments(t.toReversed()));
+    }
+  }, [team, tournament]);
+
   if (!teamObj) {
     return <p>loading...</p>;
   }
@@ -148,94 +180,53 @@ export default function IndividualTeam({ tournament, team }: TeamsProps) {
             </Tabs.Panel>
           </Tabs>
         </Tabs.Panel>
-        <Tabs.Panel value="prevGames">
-          <NumberInput
-            label="Set Games Count"
-            min={1}
-            value={gamesCount}
-            onChange={(a) => setGamesCount(+a)}
-          />
-          <Grid>
-            {games
-              .filter((_, i) => i < gamesCount)
-              .map((game, k) => (
+        <Tabs.Panel value="prevGames" w="100%">
+          {!tournament && (
+            <Center>
+              <Group mb={25} grow w="50%">
+                <Select
+                  label="Select Tournament"
+                  value={tournamentFilter}
+                  onChange={(a) => setTournamentFilter(a ?? undefined)}
+                  data={filteredTournaments?.map((t) => ({
+                    label: t.name,
+                    value: t.searchableName,
+                  }))}
+                  clearable
+                />
+              </Group>
+            </Center>
+          )}
+          <Center>
+            <Grid w="85%">
+              {games.map((game) => (
                 <Grid.Col
                   span={{
-                    base: 6,
-                    sm: 4,
-                    md: 3,
+                    base: 12,
+                    sm: 8,
+                    md: 6,
                   }}
                 >
-                  <Card
-                    shadow="sm"
-                    padding="xl"
-                    key={k}
-                    component="a"
-                    href={`/games/${game.id}`}
-                    className="hideLink"
-                  >
-                    <Card.Section h={160}>
-                      <Image
-                        src={
-                          game.teamOne.searchableName !== team
-                            ? game.teamOne.imageUrl
-                            : game.teamTwo.imageUrl
-                        }
-                        h={160}
-                        w={160}
-                        alt="logo for the other team"
-                      />
-                    </Card.Section>
-                    <Card.Section h={2000}>
-                      <Text fw={500} size="lg" mt="md">
-                        {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
-                        {game.teamTwoScore})
-                      </Text>
-                    </Card.Section>
-                    {isUmpireManager(tournament) && (
-                      <>
-                        <Text>
-                          <Box display="flex">
-                            <strong>Rating: </strong>{' '}
-                            <Rating
-                              count={4}
-                              w="auto"
-                              size="sm"
-                              value={
-                                (game.teamOne.searchableName === team
-                                  ? game?.admin!.teamOneRating
-                                  : game?.admin!.teamTwoRating) ?? 3
-                              }
-                              readOnly
-                            />
-                          </Box>
-                          {
-                            FEEDBACK_TEXTS[
-                              (game.teamOne.searchableName === team
-                                ? game?.admin!.teamOneRating
-                                : game?.admin!.teamTwoRating) ?? 3
-                            ]
-                          }
-                        </Text>
-                        <Text>
-                          <strong>Cards: </strong>
-                          {(game?.admin?.cards ?? [])
-                            .filter((c) => c.firstTeam === (game.teamOne.searchableName === team))
-                            .map((card, j) => (
-                              <HoverCard key={j}>
-                                <HoverCard.Target>{eventIcon(card)}</HoverCard.Target>
-                                <HoverCard.Dropdown>
-                                  <i>{card.notes}</i>
-                                </HoverCard.Dropdown>
-                              </HoverCard>
-                            ))}
-                        </Text>
-                      </>
-                    )}
-                  </Card>
+                  <GameBlockComfy
+                    game={game}
+                    tournament={
+                      game.tournament ??
+                      filteredTournaments?.find((t) => t.searchableName === tournamentFilter) ??
+                      filteredTournaments?.[0]
+                    }
+                  ></GameBlockComfy>
                 </Grid.Col>
               ))}
-          </Grid>
+            </Grid>
+          </Center>
+          <Center w="100%" m={10}>
+            <Pagination
+              m="auto"
+              total={gamesMax}
+              value={page + 1}
+              onChange={(p) => setPage(p - 1)}
+            ></Pagination>
+          </Center>
         </Tabs.Panel>
 
         <Tabs.Panel value="charts">How did you even get here?</Tabs.Panel>

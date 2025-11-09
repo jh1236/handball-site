@@ -11,32 +11,35 @@ import {
 } from '@tabler/icons-react';
 import {
   Accordion,
-  Box,
-  Card,
+  Center,
   Container,
   Grid,
+  Group,
   HoverCard,
   Image,
-  List,
-  NumberInput,
+  Pagination,
   Rating,
+  Select,
   Table,
   Tabs,
   Text,
   Timeline,
   Title,
+  useMatches,
 } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
-import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
+import GameBlockComfy from '@/components/HandballComponenets/GameBlock';
 import { useUserData } from '@/components/HandballComponenets/ServerActions';
-import { getGames } from '@/ServerActions/GameActions';
+import { getGames, getGamesCount } from '@/ServerActions/GameActions';
 import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
+import { getTournaments } from '@/ServerActions/TournamentActions';
 import {
   GameEventStructure,
   GameStructure,
   GameTeamStructure,
   PersonStructure,
   PlayerGameStatsStructure,
+  TournamentStructure,
 } from '@/ServerActions/types';
 
 interface PlayersProps {
@@ -135,10 +138,12 @@ export function findPlayer(game: GameStructure, playerName: string): PlayerGameS
 }
 
 export default function IndividualPlayer({ tournament, player }: PlayersProps) {
-  // const [sort, setSort] = React.useState<number>(-1);
+  const gamesPerPage = useMatches({ base: 5, md: 10 });
   const [cards, setCards] = React.useState<{ game: GameStructure; card: GameEventStructure }[]>([]);
-
-  const [gamesCount, setGamesCount] = React.useState<number>(20);
+  const [gamesMax, setGamesMax] = React.useState<number>(gamesPerPage);
+  const [tournamentFilter, setTournamentFilter] = React.useState<string | undefined>(tournament);
+  const [filteredTournaments, setFilteredTournaments] = React.useState<TournamentStructure[]>();
+  const [page, setPage] = React.useState(0);
   const [games, setGames] = React.useState<GameStructure[]>([]);
   const [playerObj, setPlayerObj] = React.useState<PersonStructure | undefined>(undefined);
   const { isUmpireManager } = useUserData();
@@ -154,23 +159,46 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
       setAverageStats(o);
     });
   }, [player, tournament]);
+  useEffect(() => {
+    getGamesCount({
+      player: [player],
+      tournament: tournamentFilter,
+      includePlayerStats: true,
+    }).then((r) => setGamesMax(Math.ceil(r.games / gamesPerPage)));
+    getGames({
+      player: [player],
+      tournament: tournamentFilter,
+      includePlayerStats: true,
+      limit: gamesPerPage,
+      page,
+    }).then((g) => {
+      setGames(g.games.toReversed());
+    });
+  }, [gamesPerPage, page, player, tournamentFilter]);
 
   useEffect(() => {
-    getGames({ player: [player], tournament, includePlayerStats: true }).then((g) => {
-      g.games.reverse();
+    getGames({ player: [player], tournament, returnTournament: !!tournament }).then((g) => {
       let output: { game: GameStructure; card: GameEventStructure }[] = [];
       for (const game of g.games) {
         output = output.concat(
           (game.admin?.cards ?? [])
             .filter((card) => card.player?.searchableName === player)
-            .map((c) => ({ game, card: c }))
+            .map((c) => ({
+              game,
+              card: c,
+            }))
         );
       }
       setCards(output);
-      setGames(g.games);
+      if (tournament) {
+        setFilteredTournaments([g.tournament!]);
+      }
     });
-  }, [gamesCount, player, tournament]);
 
+    if (!tournament) {
+      getTournaments({ player: [player] }).then((t) => setFilteredTournaments(t.toReversed()));
+    }
+  }, [player, tournament]);
   return (
     <>
       <Container w="auto" p={20} mb={10} pos="relative" style={{ overflow: 'hidden' }}>
@@ -234,109 +262,53 @@ export default function IndividualPlayer({ tournament, player }: PlayersProps) {
             </Fragment>
           ))}
         </Tabs.Panel>
-        <Tabs.Panel value="prevGames">
-          <NumberInput
-            label="Set Games Count"
-            min={1}
-            value={gamesCount}
-            onChange={(a) => setGamesCount(+a)}
-          />
-          <Grid>
-            {games
-              .filter((_, i) => i < gamesCount)
-              .map((game, k) => (
-                <Grid.Col span={{ base: 6, sm: 4, md: 3 }}>
-                  <Card
-                    shadow="sm"
-                    padding="xl"
-                    key={k}
-                    component="a"
-                    href={`/games/${game.id}`}
-                    className="hideLink"
-                  >
-                    <Card.Section>
-                      <Image
-                        src={
-                          !playersOfSearchable(game.teamOne).includes(player)
-                            ? game.teamOne.imageUrl
-                            : game.teamTwo.imageUrl
-                        }
-                        h={160}
-                        alt="logo for the other team"
-                      />
-                    </Card.Section>
-
-                    <Text fw={500} size="lg" mt="md">
-                      {game.teamOne.name} vs {game.teamTwo.name} ({game.teamOneScore} -{' '}
-                      {game.teamTwoScore})
-                    </Text>
-
-                    <List mt="xs" c="dimmed" size="sm">
-                      <List.Item>
-                        <strong>Points Scored: </strong>{' '}
-                        {findPlayer(game, player)?.stats?.['Points Scored']}
-                      </List.Item>
-                      <List.Item>
-                        <strong>Aces Scored: </strong>{' '}
-                        {findPlayer(game, player)?.stats?.['Aces Scored']}
-                      </List.Item>
-                      <List.Item>
-                        <strong>Elo Delta: </strong>
-                        <strong
-                          style={{
-                            color:
-                              findPlayer(game, player).stats?.['Elo Delta'] >= 0 ? 'green' : 'red',
-                          }}
-                        >
-                          {findPlayer(game, player)?.stats?.['Elo Delta'] > 0 ? '+' : ''}
-                          {findPlayer(game, player)?.stats?.['Elo Delta']}
-                        </strong>
-                      </List.Item>
-                      {isUmpireManager(tournament) && (
-                        <>
-                          <List.Item>
-                            <Box display="flex">
-                              <strong>Rating: </strong>{' '}
-                              <Rating
-                                count={4}
-                                w="auto"
-                                size="sm"
-                                value={
-                                  (playersOfSearchable(game.teamOne).includes(player)
-                                    ? game?.admin!.teamOneRating
-                                    : game?.admin!.teamTwoRating) ?? 3
-                                }
-                                readOnly
-                              />
-                            </Box>
-                            {
-                              FEEDBACK_TEXTS[
-                                (playersOfSearchable(game.teamOne).includes(player)
-                                  ? game?.admin!.teamOneRating
-                                  : game?.admin!.teamTwoRating) ?? 3
-                              ]
-                            }
-                          </List.Item>
-                          <List.Item>
-                            <strong>Cards: </strong>
-                            {(game?.admin?.cards ?? [])
-                              .filter((c) => c.player?.searchableName === player)
-                              .map((card, j) => (
-                                <HoverCard key={j}>
-                                  <HoverCard.Target>{eventIcon(card)}</HoverCard.Target>
-                                  <HoverCard.Dropdown>
-                                    <i>{card.notes}</i>
-                                  </HoverCard.Dropdown>
-                                </HoverCard>
-                              ))}
-                          </List.Item>
-                        </>
-                      )}
-                    </List>
-                  </Card>
+        <Tabs.Panel value="prevGames" w="100%">
+          {!tournament && (
+            <Center>
+              <Group mb={25} grow w="50%">
+                <Select
+                  label="Select Tournament"
+                  value={tournamentFilter}
+                  onChange={(a) => setTournamentFilter(a ?? undefined)}
+                  data={filteredTournaments?.map((t) => ({
+                    label: t.name,
+                    value: t.searchableName,
+                  }))}
+                  clearable
+                />
+              </Group>
+            </Center>
+          )}
+          <Center>
+            <Grid w="85%">
+              {games.map((game) => (
+                <Grid.Col
+                  span={{
+                    base: 12,
+                    sm: 8,
+                    md: 6,
+                  }}
+                >
+                  <GameBlockComfy
+                    game={game}
+                    tournament={
+                      game.tournament ??
+                      filteredTournaments?.find((t) => t.searchableName === tournamentFilter) ??
+                      filteredTournaments?.[0]
+                    }
+                  ></GameBlockComfy>
                 </Grid.Col>
               ))}
-          </Grid>
+            </Grid>
+          </Center>
+          <Center w="100%" m={10}>
+            <Pagination
+              m="auto"
+              total={gamesMax}
+              value={page + 1}
+              onChange={(p) => setPage(p - 1)}
+            ></Pagination>
+          </Center>
         </Tabs.Panel>
 
         <Tabs.Panel value="charts">How did you even get here?</Tabs.Panel>

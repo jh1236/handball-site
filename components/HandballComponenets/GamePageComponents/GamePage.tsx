@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Box, Center, Divider, Paper, Tabs } from '@mantine/core';
+import { Box, Center, Divider, Grid, Paper, Tabs, useMatches } from '@mantine/core';
 import { AdminGamePanel } from '@/components/HandballComponenets/AdminGamePanel';
+import GameBlockComfy from '@/components/HandballComponenets/GameBlock';
 import { DisplayCourtLocation } from '@/components/HandballComponenets/GamePageComponents/DisplayCourtLocation';
 import { GamePlayerPointsGraph } from '@/components/HandballComponenets/GamePageComponents/GamePlayerPointsGraph';
 import { GamePointsMethodGraph } from '@/components/HandballComponenets/GamePageComponents/GamePointsMethodGraph';
@@ -11,7 +12,7 @@ import { GameTimelineLineGraph } from '@/components/HandballComponenets/GamePage
 import { ScoreGraphic } from '@/components/HandballComponenets/GamePageComponents/ScoreGraphic';
 import { localLogout, useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
-import { getGame } from '@/ServerActions/GameActions';
+import { getGame, getGames } from '@/ServerActions/GameActions';
 import { GameStructure } from '@/ServerActions/types';
 import { PlayerStats } from './PlayerStats';
 
@@ -25,7 +26,9 @@ export function GamePage({ gameID }: GamePageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isUmpireManager, isOfficial } = useUserData();
-
+  const [prevGames, setPrevGames] = React.useState<GameStructure[]>([]);
+  const limit = useMatches({ base: 4, md: 8 });
+  const defaultTab = useMemo(() => (game?.started ? 'stats' : 'headToHead'), [game]);
   useEffect(() => {
     getGame({
       gameID,
@@ -37,20 +40,25 @@ export function GamePage({ gameID }: GamePageProps) {
       if (isUmpireManager(g.tournament.searchableName) && g && !g.admin) {
         localLogout();
       }
+      if (!g.started) {
+        getGames({
+          team: [g.teamOne.searchableName, g.teamTwo.searchableName],
+          limit: 8,
+        }).then((g2) => setPrevGames(g2.games.toReversed()));
+      }
     });
   }, [gameID, isUmpireManager]);
-
   useEffect(() => {
-    if (activeTab !== 'stats') {
+    if (activeTab !== defaultTab) {
       router.replace(`${window.location.href.split('?')[0]}?tab=${activeTab}`);
     } else {
       router.replace(`${window.location.href.split('?')[0]}`);
     }
-  }, [activeTab, router]);
+  }, [activeTab, defaultTab, router]);
   useEffect(() => {
-    const tab = searchParams?.get('tab') ?? 'stats';
+    const tab = searchParams?.get('tab') ?? defaultTab;
     setActiveTab(tab);
-  }, [searchParams]);
+  }, [defaultTab, searchParams]);
   if (!game) {
     return <SidebarLayout>Loading...</SidebarLayout>;
   }
@@ -66,14 +74,27 @@ export function GamePage({ gameID }: GamePageProps) {
         <ScoreGraphic game={game} />
         <Divider></Divider>
         <Box pos="relative">
-          <Tabs value={activeTab} onChange={setActiveTab} defaultValue="stats">
+          <Tabs value={activeTab} onChange={setActiveTab} defaultValue={defaultTab}>
             <Paper component={Tabs.List} grow shadow="xs" justify="space-between">
-              <Tabs.Tab value="stats">Stats</Tabs.Tab>
-              <Tabs.Tab value="gameGraph">Game Overview</Tabs.Tab>
+              {game.started && <Tabs.Tab value="stats">Stats</Tabs.Tab>}
+              {!game.started && <Tabs.Tab value="headToHead">Head To Head</Tabs.Tab>}
+              {!game.started && <Tabs.Tab value="stats">Stats</Tabs.Tab>}
+              {game.started && <Tabs.Tab value="gameGraph">Game Overview</Tabs.Tab>}
               {game.admin && <Tabs.Tab value="admin"> Management </Tabs.Tab>}
             </Paper>
             <Tabs.Panel value="stats">
               <PlayerStats game={game}></PlayerStats>
+            </Tabs.Panel>
+            <Tabs.Panel value="headToHead">
+              <Grid>
+                {prevGames
+                  .filter((_, i) => i < limit)
+                  .map((prevGame, index) => (
+                    <Grid.Col key={index} span={{ base: 12, md: 6 }}>
+                      <GameBlockComfy game={prevGame} markWinner />
+                    </Grid.Col>
+                  ))}
+              </Grid>
             </Tabs.Panel>
             <Tabs.Panel value="gameGraph">
               <Tabs defaultValue="worm">
