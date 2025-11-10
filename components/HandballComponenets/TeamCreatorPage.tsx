@@ -737,14 +737,14 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
       setHasScorer(t.hasScorer);
       setBadmintonServes(t.usingBadmintonServes);
     });
-    getFixtureTypes().then((f) => {
-      setFixturesTypes(f.fixturesTypes);
-      setFinalsTypes(f.finalsTypes);
-    });
     getTeams({ tournament }).then((t) => setTeamsInTournament(t.teams));
     getOfficials({ tournament }).then((o) => setOfficialsInTournament(o.officials));
   }, [tournament]);
   useEffect(() => {
+    getFixtureTypes().then((f) => {
+      setFixturesTypes(f.fixturesTypes);
+      setFinalsTypes(f.finalsTypes);
+    });
     getPlayers({}).then((p) => setAllPlayers(p.players));
     getTeams({}).then((t) => setAllTeams(t.teams));
     getOfficials({}).then((o) => setAllOfficials(o.officials));
@@ -775,8 +775,11 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           alignItems: 'center',
         }}
       >
-        <Modal opened={openTournamentEdit} onClose={() => setOpenTournamentEdit(false)}>
-          <Title>Edit Tournament</Title>
+        <Modal
+          opened={openTournamentEdit}
+          onClose={() => setOpenTournamentEdit(false)}
+          title={<Title>Edit Tournament</Title>}
+        >
           <TextInput
             label="Name"
             value={newTournamentName}
@@ -800,16 +803,19 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           />
           <Checkbox
             label="Badminton Serves"
+            m={15}
             checked={badmintonServes}
             onChange={(e) => setBadmintonServes(e.target.checked)}
           ></Checkbox>
           <Checkbox
             label="Has Scorer"
+            m={15}
             checked={hasScorer}
             onChange={(e) => setHasScorer(e.target.checked)}
           ></Checkbox>
           <Checkbox
             label="Two Courts"
+            m={15}
             checked={twoCourts}
             onChange={(e) => setTwoCourts(e.target.checked)}
           ></Checkbox>

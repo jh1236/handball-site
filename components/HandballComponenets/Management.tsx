@@ -7,16 +7,21 @@ import {
   Box,
   Button,
   Checkbox,
+  ColorPicker,
   Container,
   Divider,
   Grid,
+  Group,
   HoverCard,
   Image,
+  Modal,
   Paper,
   Popover,
   Rating,
+  Select,
   Space,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
@@ -26,7 +31,12 @@ import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
 import { getNoteableGames, resolveGame } from '@/ServerActions/GameActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
-import { forceNextRoundFinalsTournament, getTournament } from '@/ServerActions/TournamentActions';
+import {
+  forceNextRoundFinalsTournament,
+  getFixtureTypes,
+  getTournament,
+  updateTournament,
+} from '@/ServerActions/TournamentActions';
 import { GameStructure, PersonStructure, TournamentStructure } from '@/ServerActions/types';
 
 interface ManagementArgs {
@@ -262,8 +272,18 @@ export function Management({ tournament }: ManagementArgs) {
   const [actionableGames, setActionableGames] = useState<GameStructure[]>([]);
   const [players, setPlayers] = useState<PersonStructure[] | null>(null);
   const [tournamentObj, setTournamentObj] = useState<TournamentStructure | undefined>();
+  const [hasScorer, setHasScorer] = useState<boolean>(true);
+  const [twoCourts, setTwoCourts] = useState<boolean>(true);
+  const [newTournamentName, setNewTournamentName] = useState<string>();
+  const [openTournamentEdit, setOpenTournamentEdit] = useState<boolean>(false);
+  const [fixturesType, setFixturesType] = useState<string>();
+  const [finalsType, setFinalsType] = useState<string>();
+  const [badmintonServes, setBadmintonServes] = useState<boolean>(true);
+  const [fixturesTypes, setFixturesTypes] = useState<string[]>([]);
+  const [finalsTypes, setFinalsTypes] = useState<string[]>([]);
+  const [tournamentColor, setTournamentColor] = useState<string>();
   const [noteableGames, setNoteableGames] = useState<GameStructure[]>([]);
-  const { isUmpireManager, loading } = useUserData();
+  const { isUmpireManager, isTournamentDirector, loading } = useUserData();
   const router = useRouter();
   const reload = () =>
     getNoteableGames({ tournament }).then((g) => {
@@ -284,15 +304,109 @@ export function Management({ tournament }: ManagementArgs) {
       formatData: true,
     }).then((g) => setPlayers(g.players.filter((v) => v.stats!['Penalty Points'] >= 12)));
     if (tournament) {
-      getTournament(tournament).then(setTournamentObj);
+      getTournament(tournament).then((t) => {
+        setTournamentObj(t);
+        setFixturesType(t.fixturesType);
+        setFinalsType(t.finalsType);
+        setNewTournamentName(t.name);
+        setTournamentColor(t.color);
+        setTwoCourts(t.twoCourts);
+        setHasScorer(t.hasScorer);
+        setBadmintonServes(t.usingBadmintonServes);
+      });
     }
     // adding the deps it wants will cause infinite page reloads
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, tournament]);
 
+  useEffect(() => {
+    getFixtureTypes().then((f) => {
+      setFixturesTypes(f.fixturesTypes);
+      setFinalsTypes(f.finalsTypes);
+    });
+  }, []);
+
   return (
     <>
       <br />
+      <Modal
+        opened={openTournamentEdit}
+        onClose={() => setOpenTournamentEdit(false)}
+        title={<Title>Edit Tournament</Title>}
+      >
+        <TextInput
+          label="Name"
+          value={newTournamentName}
+          onChange={(e) => setNewTournamentName(e.target.value)}
+        />
+        <Select
+          label="Fixtures Type"
+          placeholder="Pick value"
+          data={fixturesTypes}
+          value={fixturesType}
+          onChange={(v) => setFixturesType(v!)}
+          allowDeselect={false}
+        />
+        <Select
+          label="Finals Type"
+          placeholder="Pick value"
+          data={finalsTypes}
+          value={finalsType}
+          onChange={(v) => setFinalsType(v!)}
+          allowDeselect={false}
+        />
+        <Checkbox
+          label="Badminton Serves"
+          m={15}
+          checked={badmintonServes}
+          onChange={(e) => setBadmintonServes(e.target.checked)}
+        ></Checkbox>
+        <Checkbox
+          label="Has Scorer"
+          m={15}
+          checked={hasScorer}
+          onChange={(e) => setHasScorer(e.target.checked)}
+        ></Checkbox>
+        <Checkbox
+          label="Two Courts"
+          m={15}
+          checked={twoCourts}
+          onChange={(e) => setTwoCourts(e.target.checked)}
+        ></Checkbox>
+        <Box>
+          <TextInput
+            label="Tournament Color"
+            value={tournamentColor}
+            onChange={(e) => setTournamentColor(e.currentTarget.value)}
+            error={!/^#([0-9A-F]{3}){1,2}$/i.test(tournamentColor!)}
+          ></TextInput>
+          <ColorPicker
+            mt={5}
+            format="hex"
+            onChange={setTournamentColor}
+            value={tournamentColor}
+            fullWidth
+          ></ColorPicker>
+        </Box>
+        <Button
+          m={5}
+          color="green"
+          onClick={() =>
+            updateTournament({
+              tournament,
+              name: newTournamentName,
+              fixturesType,
+              finalsType,
+              color: tournamentColor,
+              hasScorer,
+              twoCourts,
+              badmintonServes,
+            }).then(() => setOpenTournamentEdit(false))
+          }
+        >
+          Submit
+        </Button>
+      </Modal>
       <Container
         w="auto"
         p={20}
@@ -311,32 +425,44 @@ export function Management({ tournament }: ManagementArgs) {
           w="100px"
           h="100px"
         ></Image>
-
         <Title ta="center">{tournamentObj?.name ?? 'SUSS Handball'}</Title>
-        {!(tournamentObj?.inFinals ?? true) && (
-          <Popover width={200} position="top" withArrow shadow="md">
-            <Popover.Target>
-              <Button m={10} size="md" color="green" variant="outline">
-                Force Finals
-              </Button>
-            </Popover.Target>
-            <Popover.Dropdown ta="center">
-              <Text m={5}>
-                Are you sure you want to force this tournament into finals?{' '}
-                <b>(This cannot be undone)</b>
-              </Text>
-              <Button
-                m={5}
-                color="green"
-                onClick={() => {
-                  forceNextRoundFinalsTournament(tournament);
-                }}
-              >
-                Confirm
-              </Button>
-            </Popover.Dropdown>
-          </Popover>
-        )}
+        <Group>
+          <Button
+            m={10}
+            size="md"
+            disabled={!isTournamentDirector(tournament)}
+            color="blue"
+            variant="outline"
+            onClick={() => setOpenTournamentEdit(true)}
+          >
+            Edit
+          </Button>
+
+          {!(tournamentObj?.inFinals ?? true) && (
+            <Popover width={200} position="top" withArrow shadow="md">
+              <Popover.Target>
+                <Button m={10} size="md" color="green" variant="outline">
+                  Force Finals
+                </Button>
+              </Popover.Target>
+              <Popover.Dropdown ta="center">
+                <Text m={5}>
+                  Are you sure you want to force this tournament into finals?{' '}
+                  <b>(This cannot be undone)</b>
+                </Text>
+                <Button
+                  m={5}
+                  color="green"
+                  onClick={() => {
+                    forceNextRoundFinalsTournament(tournament);
+                  }}
+                >
+                  Confirm
+                </Button>
+              </Popover.Dropdown>
+            </Popover>
+          )}
+        </Group>
       </Container>
       <Grid w="97.5%">
         <Grid.Col span={{ base: 12, md: 6 }}>
