@@ -39,6 +39,7 @@ export default function UniversalManagementPage() {
   const [validTournamentColor, setValidTournamentColor] = useState<boolean>(false);
   const [openCreateTournament, setOpenCreateTournament] = useState<boolean>(false);
   const [openBackup, setOpenBackup] = useState<boolean>(false);
+  const [badmintonServes, setBadmintonServes] = useState<boolean>(true);
   const [fixturesTypes, setFixturesTypes] = useState<string[]>([]);
   const [finalsTypes, setFinalsTypes] = useState<string[]>([]);
   const [openRestart, setOpenRestart] = useState<boolean>(false);
@@ -108,6 +109,11 @@ export default function UniversalManagementPage() {
           allowDeselect={false}
         />
         <Checkbox
+          label="Badminton Serves"
+          checked={badmintonServes}
+          onChange={(e) => setBadmintonServes(e.target.checked)}
+        ></Checkbox>
+        <Checkbox
           label="Has Scorer"
           checked={hasScorer}
           onChange={(e) => setHasScorer(e.target.checked)}
@@ -146,6 +152,7 @@ export default function UniversalManagementPage() {
               finalsType,
               twoCourts,
               hasScorer,
+              badmintonServes,
             }).then(() => setOpenCreateTournament(false));
           }}
         >

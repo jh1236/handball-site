@@ -712,6 +712,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [openTournamentEdit, setOpenTournamentEdit] = useState<boolean>(false);
   const [fixturesType, setFixturesType] = useState<string>();
   const [finalsType, setFinalsType] = useState<string>();
+  const [badmintonServes, setBadmintonServes] = useState<boolean>(true);
   const [fixturesTypes, setFixturesTypes] = useState<string[]>([]);
   const [finalsTypes, setFinalsTypes] = useState<string[]>([]);
   const [tournamentColor, setTournamentColor] = useState<string>();
@@ -734,6 +735,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
       setTournamentColor(t.color);
       setTwoCourts(t.twoCourts);
       setHasScorer(t.hasScorer);
+      setBadmintonServes(t.usingBadmintonServes);
     });
     getFixtureTypes().then((f) => {
       setFixturesTypes(f.fixturesTypes);
@@ -797,6 +799,11 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
             allowDeselect={false}
           />
           <Checkbox
+            label="Badminton Serves"
+            checked={badmintonServes}
+            onChange={(e) => setBadmintonServes(e.target.checked)}
+          ></Checkbox>
+          <Checkbox
             label="Has Scorer"
             checked={hasScorer}
             onChange={(e) => setHasScorer(e.target.checked)}
@@ -833,6 +840,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
                 color: tournamentColor,
                 hasScorer,
                 twoCourts,
+                badmintonServes,
               }).then(() => setOpenTournamentEdit(false))
             }
           >
