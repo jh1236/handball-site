@@ -141,8 +141,9 @@ export interface CreateTournament {
   color: string;
   fixturesType: string;
   finalsType: string;
-  twoCourts?: boolean;
-  hasScorer?: boolean;
+  twoCourts: boolean;
+  hasScorer: boolean;
+  badmintonServes: boolean;
 }
 
 export function createTournament(create: CreateTournament): Promise<void> {
@@ -172,6 +173,7 @@ export interface UpdateTournament {
   color?: string;
   twoCourts?: boolean;
   hasScorer?: boolean;
+  badmintonServes?: boolean;
 }
 
 export function updateTournament(update: UpdateTournament): Promise<void> {
