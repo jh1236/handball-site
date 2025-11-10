@@ -134,7 +134,7 @@ export function PlayerActionList({
 
   if (!currentPlayer?.get) return <></>;
 
-  let out: AccordionSettings[] = [
+  const out: AccordionSettings[] = [
     {
       Icon: IconHandballCards,
       value: 'Cards',
@@ -428,90 +428,12 @@ export function PlayerActionList({
       ),
       color: 'white',
     },
-    {
-      Icon: IconMasksTheater,
-      value: 'Other',
-      color: 'white',
-      content: (
-        <Tabs w="100%" defaultValue="Merit">
-          <Tabs.List grow>
-            <Tabs.Tab
-              size="sm"
-              color="#3262a8"
-              value="Merit"
-              leftSection={<IconStarFilled color="#3262a8" size={16} stroke={3} />}
-            >
-              Merit
-            </Tabs.Tab>
-            <Tabs.Tab
-              size="sm"
-              color="#C00000"
-              value="Demerit"
-              leftSection={<ImEvil color="#C00000" size={16} />}
-            >
-              Demerit
-            </Tabs.Tab>
-          </Tabs.List>
-          <Tabs.Panel value="Merit" m={10}>
-            <Autocomplete
-              label="Select Reason"
-              placeholder="Write something or pick from the list"
-              data={[
-                'Above and Beyond Effort',
-                'Cool Body Part',
-                'Good Sportsmanship',
-                'Trick Shot',
-                'Well Placed Ball',
-              ]}
-              onChange={setOtherReason}
-            ></Autocomplete>
-            <Button
-              onClick={() => {
-                merit(game, firstTeam, leftSide, otherReason);
-                close();
-              }}
-              m={5}
-              size="sm"
-              color="player-color"
-            >
-              Submit
-            </Button>
-          </Tabs.Panel>
-          <Tabs.Panel value="Demerit" m={10}>
-            <Autocomplete
-              label="Select Reason"
-              placeholder="Write something or pick from the list"
-              data={[
-                'Nefarious Laugh',
-                'Devious Joke',
-                'Sinister Rage Bait',
-                'Abominable Play',
-                'Conniving Conspiracy',
-                'Speaking in Tongues',
-              ]}
-              onChange={setOtherReason}
-            ></Autocomplete>
-            <Button
-              onClick={() => {
-                demerit(game, firstTeam, leftSide, otherReason);
-                close();
-              }}
-              m={5}
-              size="sm"
-              color="#C00000"
-            >
-              Submit
-            </Button>
-          </Tabs.Panel>
-        </Tabs>
-      ),
-    },
   ];
   if (!game.started.get) {
     const otherPlayers = players.filter(
       (a) => a.get && a.get.searchableName !== currentPlayer.get?.searchableName
     );
-    out = otherPlayers.map((a) => ({
+    out.splice(0, 0, ...otherPlayers.map((a) => ({
       Icon: IconArrowsUpDown,
       value: `Swap with ${a.get?.name}`,
       color: 'white',
@@ -528,7 +450,7 @@ export function PlayerActionList({
           Swap
         </Button>
       ),
-    }));
+    })));
   } else if (!game.ended.get) {
     out.splice(0, 0, {
       Icon: IconBallTennis,
@@ -681,6 +603,84 @@ export function PlayerActionList({
             </Flex>
           </Flex>
         </>
+      ),
+    });
+    out.push({
+      Icon: IconMasksTheater,
+      value: 'Other',
+      color: 'white',
+      content: (
+        <Tabs w="100%" defaultValue="Merit">
+          <Tabs.List grow>
+            <Tabs.Tab
+              size="sm"
+              color="#3262a8"
+              value="Merit"
+              leftSection={<IconStarFilled color="#3262a8" size={16} stroke={3} />}
+            >
+              Merit
+            </Tabs.Tab>
+            <Tabs.Tab
+              size="sm"
+              color="#C00000"
+              value="Demerit"
+              leftSection={<ImEvil color="#C00000" size={16} />}
+            >
+              Demerit
+            </Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value="Merit" m={10}>
+            <Autocomplete
+              label="Select Reason"
+              placeholder="Write something or pick from the list"
+              data={[
+                'Above and Beyond Effort',
+                'Cool Body Part',
+                'Good Sportsmanship',
+                'Trick Shot',
+                'Well Placed Ball',
+              ]}
+              onChange={setOtherReason}
+            ></Autocomplete>
+            <Button
+              onClick={() => {
+                merit(game, firstTeam, leftSide, otherReason);
+                close();
+              }}
+              m={5}
+              size="sm"
+              color="player-color"
+            >
+              Submit
+            </Button>
+          </Tabs.Panel>
+          <Tabs.Panel value="Demerit" m={10}>
+            <Autocomplete
+              label="Select Reason"
+              placeholder="Write something or pick from the list"
+              data={[
+                'Nefarious Laugh',
+                'Devious Joke',
+                'Sinister Rage Bait',
+                'Abominable Play',
+                'Conniving Conspiracy',
+                'Speaking in Tongues',
+              ]}
+              onChange={setOtherReason}
+            ></Autocomplete>
+            <Button
+              onClick={() => {
+                demerit(game, firstTeam, leftSide, otherReason);
+                close();
+              }}
+              m={5}
+              size="sm"
+              color="#C00000"
+            >
+              Submit
+            </Button>
+          </Tabs.Panel>
+        </Tabs>
       ),
     });
     if (team.sub.get && game.teamOne.score.get + game.teamTwo.score.get < subsAllowedScore) {
