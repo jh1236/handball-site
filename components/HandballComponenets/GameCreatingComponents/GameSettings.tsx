@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Center, Checkbox, Group, Popover, Select, Stack } from '@mantine/core';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { createGameWithPlayers } from '@/ServerActions/GameActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { getTournaments } from '@/ServerActions/TournamentActions';
 import { OfficialStructure, TournamentStructure } from '@/ServerActions/types';
+import { useUserData } from '@/components/hooks/userData';
 
 interface GameSettingsArgs {
   playersOne: string[];

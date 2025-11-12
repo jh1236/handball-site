@@ -15,11 +15,7 @@ import {
   useMatches,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import {
-  abandon,
-  begin,
-  replay,
-} from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { useEditGameActions } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GameActionList } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
 import { useScreenVertical } from '@/components/hooks/useScreenVertical';
@@ -37,7 +33,7 @@ export const QUICK_GAME_END = false;
 export function GameScore({ game, official, scorer }: GameScoreArgs) {
   const isVertical = useScreenVertical();
   const fullscreen = useMatches({ base: true, md: false });
-
+  const { abandon, begin, replay } = useEditGameActions(game);
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
   const [index, setIndex] = useState(0);
   const [openPopover, setOpenPopover] = useState(false);
@@ -154,7 +150,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
                           m={5}
                           color="red"
                           onClick={() => {
-                            abandon(game);
+                            abandon();
                             setOpenPopover(false);
                           }}
                         >
@@ -167,7 +163,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
                       size="lg"
                       color="gray"
                       onClick={() => {
-                        replay(game);
+                        replay();
                         setOpenPopover(false);
                       }}
                     >
@@ -180,7 +176,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
           </>
         )
       ) : (
-        <Button color="player-color" size="lg" onClick={() => begin(game, official, scorer)}>
+        <Button color="player-color" size="lg" onClick={() => begin(official, scorer)}>
           Start
         </Button>
       )}

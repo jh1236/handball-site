@@ -17,7 +17,6 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import {
   getLog,
@@ -26,6 +25,7 @@ import {
   requestServerUpdate,
 } from '@/ServerActions/AdminActions';
 import { createTournament, getFixtureTypes } from '@/ServerActions/TournamentActions';
+import { useUserData } from '@/components/hooks/userData';
 
 export default function UniversalManagementPage() {
   const { isAdmin, loading } = useUserData();

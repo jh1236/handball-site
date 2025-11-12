@@ -32,18 +32,7 @@ import {
   useMatches,
 } from '@mantine/core';
 import { VerticalSlider } from '@/components/basic/VerticalSlider';
-import {
-  ace,
-  demerit,
-  fault,
-  greenCard,
-  merit,
-  redCard,
-  score,
-  sub,
-  warning,
-  yellowCard,
-} from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { useEditGameActions } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GAME_CONFIG } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingConfig';
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
 import SelectCourtLocation from '@/components/HandballComponenets/GameEditingComponenets/SelectCourtLocation';
@@ -52,7 +41,11 @@ import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 import { IconHandballCards } from '@/components/icons/IconCards';
 import { PlayerGameStatsStructure } from '@/ServerActions/types';
 
-function buttonEnabledFor(player: PlayerGameStatsStructure, reason: string, type: string): boolean {
+export function playerCanReceiveCard(
+  player: PlayerGameStatsStructure,
+  reason: string,
+  type: string
+): boolean {
   if (!player) return true;
   const cards = player.prevCards!;
   const prevCard = cards.find(
@@ -89,7 +82,8 @@ export function PlayerActionList({
   close: _close,
 }: PlayerActionListParams): React.ReactElement {
   const isVertical = useScreenVertical();
-
+  const { ace, demerit, fault, greenCard, merit, redCard, score, sub, warning, yellowCard } =
+    useEditGameActions(game);
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const [cardTime, setCardTime] = React.useState<number>(
     Math.max(1, 6 - (game.blitzGame.get ? 3 : 0) - (team.isSolo ? 3 : 0))
@@ -195,10 +189,11 @@ export function PlayerActionList({
                   miw={160}
                   color="gray.6"
                   disabled={
-                    !game.practice.get && !buttonEnabledFor(currentPlayer.get!, reason, 'Warning')
+                    !game.practice.get &&
+                    !playerCanReceiveCard(currentPlayer.get!, reason, 'Warning')
                   }
                   onClick={() => {
-                    warning(game, firstTeam, leftSide, reason);
+                    warning(firstTeam, leftSide, reason);
                     close();
                   }}
                 >
@@ -230,7 +225,7 @@ export function PlayerActionList({
               ></TextInput>
               <Button
                 onClick={() => {
-                  warning(game, firstTeam, leftSide, otherReason);
+                  warning(firstTeam, leftSide, otherReason);
                   close();
                 }}
                 style={{ margin: '3px' }}
@@ -251,11 +246,11 @@ export function PlayerActionList({
                   miw={160}
                   disabled={
                     !game.practice.get &&
-                    !buttonEnabledFor(currentPlayer.get!, reason, 'Green Card')
+                    !playerCanReceiveCard(currentPlayer.get!, reason, 'Green Card')
                   }
                   color="green"
                   onClick={() => {
-                    greenCard(game, firstTeam, leftSide, reason);
+                    greenCard(firstTeam, leftSide, reason);
                     close();
                   }}
                 >
@@ -287,7 +282,7 @@ export function PlayerActionList({
               ></TextInput>
               <Button
                 onClick={() => {
-                  greenCard(game, firstTeam, leftSide, otherReason);
+                  greenCard(firstTeam, leftSide, otherReason);
                   close();
                 }}
                 style={{ margin: '3px' }}
@@ -310,11 +305,11 @@ export function PlayerActionList({
                       size="xs"
                       disabled={
                         !game.practice.get &&
-                        !buttonEnabledFor(currentPlayer.get!, reason, 'Yellow Card')
+                        !playerCanReceiveCard(currentPlayer.get!, reason, 'Yellow Card')
                       }
                       color="orange"
                       onClick={() => {
-                        yellowCard(game, firstTeam, leftSide, reason, cardTime);
+                        yellowCard(firstTeam, leftSide, reason, cardTime);
                         close();
                       }}
                     >
@@ -360,7 +355,7 @@ export function PlayerActionList({
               ></TextInput>
               <Button
                 onClick={() => {
-                  yellowCard(game, firstTeam, leftSide, otherReason, cardTime);
+                  yellowCard(firstTeam, leftSide, otherReason, cardTime);
                   close();
                 }}
                 style={{ margin: '3px' }}
@@ -381,7 +376,7 @@ export function PlayerActionList({
                   size="xs"
                   color="red"
                   onClick={() => {
-                    redCard(game, firstTeam, leftSide, reason);
+                    redCard(firstTeam, leftSide, reason);
                     close();
                   }}
                 >
@@ -412,7 +407,7 @@ export function PlayerActionList({
               ></TextInput>
               <Button
                 onClick={() => {
-                  redCard(game, firstTeam, leftSide, otherReason);
+                  redCard(firstTeam, leftSide, otherReason);
                   close();
                 }}
                 style={{ margin: '3px' }}
@@ -467,7 +462,7 @@ export function PlayerActionList({
             ></Autocomplete>
             <Button
               onClick={() => {
-                merit(game, firstTeam, leftSide, otherReason);
+                merit(firstTeam, leftSide, otherReason);
                 close();
               }}
               m={5}
@@ -493,7 +488,7 @@ export function PlayerActionList({
             ></Autocomplete>
             <Button
               onClick={() => {
-                demerit(game, firstTeam, leftSide, otherReason);
+                demerit(firstTeam, leftSide, otherReason);
                 close();
               }}
               m={5}
@@ -562,9 +557,9 @@ export function PlayerActionList({
                       ml={15}
                       onClick={() => {
                         if (otherReason === 'ace') {
-                          ace(game, location);
+                          ace(location);
                         } else {
-                          score(game, firstTeam, leftSide, otherReason, location);
+                          score(firstTeam, leftSide, otherReason, location);
                         }
                         close();
                       }}
@@ -602,9 +597,9 @@ export function PlayerActionList({
               <Button
                 onClick={() => {
                   if (otherReason === 'ace') {
-                    ace(game, location);
+                    ace(location);
                   } else {
-                    score(game, firstTeam, leftSide, otherReason, location);
+                    score(firstTeam, leftSide, otherReason, location);
                   }
                   close();
                 }}
@@ -695,7 +690,7 @@ export function PlayerActionList({
             size="sm"
             style={{ margin: '3px' }}
             onClick={() => {
-              sub(game, firstTeam, leftSide);
+              sub(firstTeam, leftSide);
               close();
             }}
           >
@@ -730,7 +725,7 @@ export function PlayerActionList({
                       color="player-color"
                       size="sm"
                       onClick={() => {
-                        fault(game, method);
+                        fault(method);
                         close();
                       }}
                     >
@@ -752,7 +747,7 @@ export function PlayerActionList({
                       size="sm"
                       color="player-color"
                       onClick={() => {
-                        fault(game, method);
+                        fault(method);
                         close();
                       }}
                     >

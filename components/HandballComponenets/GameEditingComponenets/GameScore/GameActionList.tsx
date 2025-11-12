@@ -15,7 +15,7 @@ import {
   Textarea,
   Title,
 } from '@mantine/core';
-import { end } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { useEditGameActions } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { OrderPlayers } from '@/components/HandballComponenets/GameEditingComponenets/OrderPlayers';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { decidedOnCoinToss } from '@/components/HandballComponenets/GameEditingComponenets/UpdateGameActions';
@@ -23,7 +23,7 @@ import { GameState } from '@/components/HandballComponenets/GameState';
 
 interface GameActionListParams {
   game: GameState;
-  close: () => void;
+  close?: () => void;
   index: number;
   setIndex: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -45,6 +45,7 @@ export function GameActionList({
 }: GameActionListParams): React.ReactElement {
   const router = useRouter();
   const [reviewReqd, setReviewReqd] = useState<boolean>(false);
+  const { end } = useEditGameActions(game);
   const winningTeam =
     game.teamTwo.score.get > game.teamOne.score.get ? game.teamTwo.name : game.teamOne.name;
   const [protest, setProtest] = useState<boolean>(false);
@@ -230,7 +231,7 @@ export function GameActionList({
         <Title order={1} m={5}>
           {out[index].title ?? out[index].value}
         </Title>
-        <CloseButton onClick={close}></CloseButton>
+        {close && <CloseButton onClick={close}></CloseButton>}
       </Flex>
       <Stepper
         defaultValue="Notes"
@@ -251,8 +252,14 @@ export function GameActionList({
                 <Button
                   m={10}
                   maw={100}
-                  disabled={index < 1}
-                  onClick={() => setIndex((a) => a - 1)}
+                  disabled={!close && index < 1}
+                  onClick={() => {
+                    if (index === 0) {
+                      close && close();
+                    } else {
+                      setIndex((a) => a - 1);
+                    }
+                  }}
                 >
                   Back
                 </Button>
@@ -281,8 +288,8 @@ export function GameActionList({
                         (reviewReqd && !game.notes.get))
                     }
                     onClick={() => {
-                      end(game, reviewReqd).then(() => router.push('/games/create'));
-                      close();
+                      end(reviewReqd).then(() => router.push('/games/create'));
+                      close && close();
                     }}
                   >
                     Submit
@@ -316,8 +323,8 @@ export function GameActionList({
                         size="lg"
                         color="red"
                         onClick={() => {
-                          end(game, reviewReqd).then(() => router.push('/games/create'));
-                          close();
+                          end(reviewReqd).then(() => router.push('/games/create'));
+                          close && close();
                         }}
                       >
                         I Understand

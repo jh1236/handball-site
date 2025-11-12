@@ -22,12 +22,12 @@ import {
 import { SERVER_ADDRESS } from '@/app/config';
 import { eventIcon, RESOLVED_STATUSES } from '@/components/HandballComponenets/AdminGamePanel';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import Players from '@/components/HandballComponenets/StatsComponents/Players';
 import { getNoteableGames, resolveGame } from '@/ServerActions/GameActions';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { forceNextRoundFinalsTournament, getTournament } from '@/ServerActions/TournamentActions';
 import { GameStructure, PersonStructure, TournamentStructure } from '@/ServerActions/types';
+import { useUserData } from '@/components/hooks/userData';
 
 interface ManagementArgs {
   tournament: string;

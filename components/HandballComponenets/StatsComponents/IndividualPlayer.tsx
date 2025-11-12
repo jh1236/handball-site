@@ -29,7 +29,6 @@ import {
 } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import GameBlockComfy from '@/components/HandballComponenets/GameBlock';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getGames, getGamesCount } from '@/ServerActions/GameActions';
 import { getAveragePlayerStats, getPlayer } from '@/ServerActions/PlayerActions';
 import { getTournaments } from '@/ServerActions/TournamentActions';
@@ -41,6 +40,7 @@ import {
   PlayerGameStatsStructure,
   TournamentStructure,
 } from '@/ServerActions/types';
+import { useUserData } from '@/components/hooks/userData';
 
 interface PlayersProps {
   tournament?: string;

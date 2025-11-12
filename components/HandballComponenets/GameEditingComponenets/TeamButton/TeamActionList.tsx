@@ -11,10 +11,7 @@ import {
 } from '@tabler/icons-react';
 import { Accordion, Button, List, Popover, Rating, Text, Textarea } from '@mantine/core';
 import { markIfReqd } from '@/components/HandballComponenets/AdminGamePanel';
-import {
-  forfeit,
-  timeout,
-} from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { useEditGameActions } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { AccordionSettings } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { GameState } from '@/components/HandballComponenets/GameState';
@@ -34,6 +31,7 @@ export function TeamActionList({
   close,
 }: TeamActionListParams): React.ReactElement {
   const team = firstTeam ? game.teamOne : game.teamTwo;
+  const { forfeit, timeout } = useEditGameActions(game);
   const players = [team.left.get, team.right.get, team.sub.get].filter(
     (a) => typeof a !== 'undefined'
   );
@@ -179,7 +177,7 @@ export function TeamActionList({
               timeoutsRemaining > 0 ? 'player-color' : timeoutsRemaining === 0 ? 'grey' : 'red'
             }
             onClick={() => {
-              timeout(game, firstTeam);
+              timeout(firstTeam);
               close();
             }}
           >
@@ -204,7 +202,7 @@ export function TeamActionList({
                 m={5}
                 color="red"
                 onClick={() => {
-                  forfeit(game, firstTeam);
+                  forfeit(firstTeam);
                   close();
                 }}
               >

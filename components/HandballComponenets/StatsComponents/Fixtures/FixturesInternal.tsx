@@ -4,9 +4,9 @@ import React, { Fragment, useEffect } from 'react';
 import Link from 'next/link';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { Skeleton, Table, Text, Title, useMantineTheme } from '@mantine/core';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
 import { getFixtures } from '@/ServerActions/GameActions';
 import { GameStructure, TournamentStructure } from '@/ServerActions/types';
+import { useUserData } from '@/components/hooks/userData';
 
 interface FixturesProps {
   maxRounds?: number;

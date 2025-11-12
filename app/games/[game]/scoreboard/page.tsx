@@ -3,6 +3,6 @@ import { GamePageArgs } from '@/app/types';
 import { Scoreboard } from '@/components/HandballComponenets/GamePageComponents/Scoreboard';
 
 export default async function GamesPage({ params }: GamePageArgs) {
-  const { game } = await params;
+  const { game } = params;
   return <Scoreboard gameID={+game} />;
 }
