@@ -33,8 +33,7 @@ import { GameState, TeamState, useGameState } from '@/components/HandballCompone
 import { useUserData } from '@/components/hooks/userData';
 import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 import { getGame } from '@/ServerActions/GameActions';
-import { getOfficials } from '@/ServerActions/OfficialActions';
-import { GameStructure, OfficialStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
+import { GameStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
 
 interface ClassicEditGameParams {
   game: number;
@@ -273,7 +272,12 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
             <Title order={2}>{teamTwo.name.get}</Title>
           </Grid.Col>
           <Grid.Col ta="center" span={5}>
-            <Image maw={250} m="auto" w="80%" src={swapped ? gameObj?.teamTwo.imageUrl : gameObj?.teamOne.imageUrl}></Image>
+            <Image
+              maw={250}
+              m="auto"
+              w="80%"
+              src={swapped ? gameObj?.teamTwo.imageUrl : gameObj?.teamOne.imageUrl}
+            ></Image>
           </Grid.Col>
           <Grid.Col ta="center" span={2}>
             <Center h="100%">
@@ -283,7 +287,12 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
             </Center>
           </Grid.Col>
           <Grid.Col ta="center" span={5}>
-            <Image maw={250} m="auto" w="80%" src={swapped ? gameObj?.teamOne.imageUrl : gameObj?.teamTwo.imageUrl}></Image>
+            <Image
+              maw={250}
+              m="auto"
+              w="80%"
+              src={swapped ? gameObj?.teamOne.imageUrl : gameObj?.teamTwo.imageUrl}
+            ></Image>
           </Grid.Col>
           <Grid.Col ta="center" span={6}>
             <Center>
@@ -362,7 +371,12 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
             <Title order={2}>{teamTwo.name.get}</Title>
           </Grid.Col>
           <Grid.Col ta="center" span={5}>
-            <Image maw={250} m="auto" w="80%" src={swapped ? gameObj?.teamTwo.imageUrl : gameObj?.teamOne.imageUrl}></Image>
+            <Image
+              maw={250}
+              m="auto"
+              w="80%"
+              src={swapped ? gameObj?.teamTwo.imageUrl : gameObj?.teamOne.imageUrl}
+            ></Image>
           </Grid.Col>
           <Grid.Col ta="center" span={2}>
             <Center h="100%">
@@ -372,7 +386,12 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
             </Center>
           </Grid.Col>
           <Grid.Col ta="center" span={5}>
-            <Image maw={250} m="auto" w="80%" src={swapped ? gameObj?.teamOne.imageUrl : gameObj?.teamTwo.imageUrl}></Image>
+            <Image
+              maw={250}
+              m="auto"
+              w="80%"
+              src={swapped ? gameObj?.teamOne.imageUrl : gameObj?.teamTwo.imageUrl}
+            ></Image>
           </Grid.Col>
         </Grid>
         <Box p={20}>
@@ -629,7 +648,12 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
         </Grid.Col>
 
         <Grid.Col ta="center" span={5}>
-          <Image maw={250} m="auto" w="80%" src={swapped ? gameObj?.teamTwo.imageUrl : gameObj?.teamOne.imageUrl}></Image>
+          <Image
+            maw={250}
+            m="auto"
+            w="80%"
+            src={swapped ? gameObj?.teamTwo.imageUrl : gameObj?.teamOne.imageUrl}
+          ></Image>
         </Grid.Col>
         <Grid.Col ta="center" span={2}>
           <Center h="100%">
@@ -639,7 +663,12 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           </Center>
         </Grid.Col>
         <Grid.Col ta="center" span={5}>
-          <Image maw={250} m="auto" w="80%" src={swapped ? gameObj?.teamOne.imageUrl : gameObj?.teamTwo.imageUrl}></Image>
+          <Image
+            maw={250}
+            m="auto"
+            w="80%"
+            src={swapped ? gameObj?.teamOne.imageUrl : gameObj?.teamTwo.imageUrl}
+          ></Image>
         </Grid.Col>
         <Grid.Col ta="center" span={6} pl={20} pr={20}>
           {teamOneCardTimeRemaining !== 0 && !gameState.ended.get && (
