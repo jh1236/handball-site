@@ -164,7 +164,19 @@ export function EditGame({ game }: { game: number }) {
           'player-color': gameState.blitzGame.get
             ? DEFAULT_THEME.colors.teal
             : DEFAULT_THEME.colors.blue,
-          'libero-color': DEFAULT_THEME.colors.violet,
+          'libero-color': [
+            '#FAF5EB',
+            '#F5ECD7',
+            '#F0E3C4',
+            '#EAD9B0',
+            '#E4D09D',
+            '#DEC78A',
+            '#D7BE77',
+            '#D0B564',
+            '#C9AC50',
+            '#C2A43B',
+            '#BA9B22',
+          ],
         },
       }),
     [gameState.blitzGame.get]

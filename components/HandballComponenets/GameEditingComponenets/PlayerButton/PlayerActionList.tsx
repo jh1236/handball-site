@@ -535,6 +535,9 @@ export function PlayerActionList({
               size="lg"
               onClick={() => {
                 const me = currentPlayer.get!;
+                otherPlayers.forEach((pgs) =>
+                  pgs.set(pgs.get ? { ...pgs.get, isLibero: false } : undefined)
+                );
                 me.isLibero = true;
                 currentPlayer.set(me);
                 close();

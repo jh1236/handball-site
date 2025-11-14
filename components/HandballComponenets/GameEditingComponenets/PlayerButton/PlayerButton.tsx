@@ -117,7 +117,7 @@ export function PlayerButton({
       <Button
         size="lg"
         radius={0}
-        color={`${player?.isLibero ? 'libero-color' : serving ? servingColor : defaultColor}.${trueLeftSide ? 7 : 9}`}
+        color={`${serving ? servingColor : player?.isLibero ? 'libero-color' : defaultColor}.${trueLeftSide ? 7 : 9}`}
         style={{
           width: '100%',
           height: (player?.cardTimeRemaining ?? 0) !== 0 && !game.ended.get ? '95%' : '100%',
@@ -134,7 +134,6 @@ export function PlayerButton({
           name
         )}{' '}
         {(!team.left.get || !team.right.get) && `(${player?.actingSideOfCourt ?? '?'})`}
-        {player?.actingSideOfCourt} vs {player?.sideOfCourt}
       </Button>
       <br />
       {player?.cardTimeRemaining !== 0 && player && !game.ended.get && (

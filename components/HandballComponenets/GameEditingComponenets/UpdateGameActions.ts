@@ -25,7 +25,7 @@ function nextPoint(game: GameState, firstTeamScored: boolean) {
     } else {
       //the team who did not serve scored
       // eslint-disable-next-line no-lonely-if
-      if (!team.left.get || !team.right.get) {
+      if (!left || !right) {
         //we are playing a solo game
         if (!team.servingFromLeft.get) {
           //I think this is inverted because it isn't properly updated yet
@@ -83,7 +83,6 @@ function fixCourtPositions(
 
   if (receiver) receiver.actingSideOfCourt = servingFromLeft ? 'Left' : 'Right';
   if (nonReceiver) nonReceiver.actingSideOfCourt = servingFromLeft ? 'Right' : 'Left';
-
   if (
     receiver?.cardTimeRemaining !== 0 ||
     (nonReceiver?.cardTimeRemaining === 0 && nonReceiver?.isLibero)
