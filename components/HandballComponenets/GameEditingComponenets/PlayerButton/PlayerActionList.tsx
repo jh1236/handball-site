@@ -7,6 +7,7 @@ import {
   IconExclamationMark,
   IconMasksTheater,
   IconPlayHandball,
+  IconShield,
   IconSquareFilled,
   IconStarFilled,
   IconTriangleInvertedFilled,
@@ -128,7 +129,7 @@ export function PlayerActionList({
 
   if (!currentPlayer?.get) return <></>;
 
-  let out: AccordionSettings[] = [
+  const out: AccordionSettings[] = [
     {
       Icon: IconHandballCards,
       value: 'Cards',
@@ -506,24 +507,63 @@ export function PlayerActionList({
     const otherPlayers = players.filter(
       (a) => a.get && a.get.searchableName !== currentPlayer.get?.searchableName
     );
-    out = otherPlayers.map((a) => ({
-      Icon: IconArrowsUpDown,
-      value: `Swap with ${a.get?.name}`,
-      color: 'white',
+    out.push({
+      Icon: IconShield,
+      value: 'Set as Libero',
+      color: 'orange',
       content: (
-        <Button
-          size="lg"
-          onClick={() => {
-            const temp = a.get!;
-            a.set(currentPlayer.get!);
-            currentPlayer.set(temp);
-            close();
-          }}
-        >
-          Swap
-        </Button>
+        <>
+          {currentPlayer.get.isLibero ? (
+            <Button
+              size="lg"
+              onClick={() => {
+                const me = currentPlayer.get!;
+                me.isLibero = false;
+                currentPlayer.set(me);
+                close();
+              }}
+            >
+              Set Not Libero
+            </Button>
+          ) : (
+            <Button
+              size="lg"
+              onClick={() => {
+                const me = currentPlayer.get!;
+                otherPlayers.forEach((pgs) =>
+                  pgs.set(pgs.get ? { ...pgs.get, isLibero: false } : undefined)
+                );
+                me.isLibero = true;
+                currentPlayer.set(me);
+                close();
+              }}
+            >
+              Set Libero
+            </Button>
+          )}
+        </>
       ),
-    }));
+    });
+    out.push(
+      ...otherPlayers.map((a) => ({
+        Icon: IconArrowsUpDown,
+        value: `Swap with ${a.get?.name}`,
+        color: 'white',
+        content: (
+          <Button
+            size="lg"
+            onClick={() => {
+              const temp = a.get!;
+              a.set(currentPlayer.get!);
+              currentPlayer.set(temp);
+              close();
+            }}
+          >
+            Swap
+          </Button>
+        ),
+      }))
+    );
   } else if (!game.ended.get) {
     out.splice(0, 0, {
       Icon: IconBallTennis,

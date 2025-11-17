@@ -147,6 +147,19 @@ export function EditGame({ game }: { game: number }) {
           'player-color': gameState.blitzGame.get
             ? DEFAULT_THEME.colors.teal
             : DEFAULT_THEME.colors.blue,
+          'libero-color': [
+            '#FAF5EB',
+            '#F5ECD7',
+            '#F0E3C4',
+            '#EAD9B0',
+            '#E4D09D',
+            '#DEC78A',
+            '#D7BE77',
+            '#D0B564',
+            '#C9AC50',
+            '#C2A43B',
+            '#BA9B22',
+          ],
         },
       }),
     [gameState.blitzGame.get]
@@ -182,7 +195,7 @@ export function EditGame({ game }: { game: number }) {
         />
 
         <Flex direction={isVertical ? 'column' : 'row'} h="100lvh">
-          <Flex direction={isVertical ? 'row' : 'column'} flex={4}>
+          <Flex direction={isVertical ? 'row' : 'column-reverse'} flex={4}>
             {(
               gameState.teamOneIGA.get
                 ? gameState.teamOne.right.get && gameState.teamOne.left.get
@@ -299,7 +312,7 @@ export function EditGame({ game }: { game: number }) {
           <Box flex={1} style={{ height: '100%', float: 'right' }}>
             <TeamButton firstTeam={false} game={gameState}></TeamButton>
           </Box>
-          <Flex direction={isVertical ? 'row' : 'column'} flex={4}>
+          <Flex direction={isVertical ? 'row' : 'column-reverse'} flex={4}>
             {(
               gameState.teamOneIGA.get
                 ? gameState.teamTwo.right.get && gameState.teamTwo.left.get

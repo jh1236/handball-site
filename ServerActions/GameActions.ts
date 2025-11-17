@@ -356,6 +356,8 @@ export function startGame(
   teamOneIGA: boolean,
   teamOne?: SearchableName[],
   teamTwo?: SearchableName[],
+  teamOneLibero?: SearchableName,
+  teamTwoLibero?: SearchableName,
   official?: SearchableName,
   scorer?: SearchableName
 ): Promise<void> {
@@ -375,6 +377,12 @@ export function startGame(
   }
   if (scorer) {
     body.scorer = scorer;
+  }
+  if (teamOneLibero) {
+    body.teamOneLibero = teamOneLibero;
+  }
+  if (teamTwoLibero) {
+    body.teamTwoLibero = teamTwoLibero;
   }
 
   return tokenFetch('/api/games/update/start', {

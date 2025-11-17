@@ -75,10 +75,12 @@ export interface PlayerGameStatsStructure extends PersonStructure {
   game?: GameStructure;
   isBestPlayer: boolean;
   isCaptain: boolean;
+  isLibero: boolean;
   cardTime: number;
   cardTimeRemaining: number;
   startSide: 'Left' | 'Right' | 'Substitute';
   sideOfCourt: 'Left' | 'Right' | 'Substitute';
+  actingSideOfCourt: 'Left' | 'Right' | 'Substitute';
   rating: number;
   prevCards?: GameEventStructure[];
   stats: { [key: string]: any };

@@ -76,26 +76,17 @@ export function PlayerButton({
     if (team.left.get === undefined) {
       return team.right.get;
     }
-    if (game.ended.get) {
+    if (game.ended.get || !game.started.get) {
       return trueLeftSide ? team.left.get : team.right.get;
     }
-    const cardedTeammates = [team.left.get, team.right.get].filter(
-      (a) => a?.cardTimeRemaining !== 0
+    return [team.right.get, team.left.get].find(
+      (pgs) => pgs.actingSideOfCourt === (trueLeftSide ? 'Left' : 'Right')
     );
-    const uncardedTeammates = [team.left.get, team.right.get].filter(
-      (a) => a?.cardTimeRemaining === 0
-    );
-    if (cardedTeammates.length !== 0) {
-      if (game.servingFromLeft === trueLeftSide) {
-        return uncardedTeammates[0];
-      }
-      return cardedTeammates[0];
-    }
-    return trueLeftSide ? team.left.get : team.right.get;
-  }, [team.right.get, team.left.get, game.ended.get, game.servingFromLeft, trueLeftSide]);
+  }, [team.right.get, team.left.get, game.ended.get, game.started.get, trueLeftSide]);
+
   const leftSide = useMemo(
-    () => (game.ended.get ? trueLeftSide : player?.sideOfCourt === 'Left'),
-    [game.ended.get, player?.sideOfCourt, trueLeftSide]
+    () => (game.ended.get || !game.started.get ? trueLeftSide : player?.sideOfCourt === 'Left'),
+    [game.ended.get, game.started.get, player?.sideOfCourt, trueLeftSide]
   );
   const [opened, { open, close }] = useDisclosure(false);
   const isVertical = useScreenVertical();
@@ -126,7 +117,7 @@ export function PlayerButton({
       <Button
         size="lg"
         radius={0}
-        color={`${player?.isBestPlayer && game.ended.get ? 'yellow' : serving ? servingColor : defaultColor}.${trueLeftSide ? 7 : 9}`}
+        color={`${serving ? servingColor : player?.isLibero ? 'libero-color' : defaultColor}.${trueLeftSide ? 7 : 9}`}
         style={{
           width: '100%',
           height: (player?.cardTimeRemaining ?? 0) !== 0 && !game.ended.get ? '95%' : '100%',
@@ -142,7 +133,7 @@ export function PlayerButton({
         ) : (
           name
         )}{' '}
-        {(!team.left.get || !team.right.get) && `(${player?.sideOfCourt ?? '?'})`}
+        {(!team.left.get || !team.right.get) && `(${player?.actingSideOfCourt ?? '?'})`}
       </Button>
       <br />
       {player?.cardTimeRemaining !== 0 && player && !game.ended.get && (
