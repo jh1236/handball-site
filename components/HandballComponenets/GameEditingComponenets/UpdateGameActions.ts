@@ -216,10 +216,14 @@ export function faultLocal(game: GameState): void {
 export function subLocal(game: GameState, firstTeam: boolean, leftPlayer: boolean): void {
   const team = firstTeam ? game.teamOne : game.teamTwo;
   const player = leftPlayer ? team.left : team.right;
-  const substitute = team.sub;
-  const temp = player.get;
-  player.set(substitute.get);
-  substitute.set(temp);
+  const side = leftPlayer ? 'Left' : 'Right';
+  const temp = {
+    ...player.get!,
+    sideOfCourt: 'Substitute' as const,
+    actingSideOfCourt: 'Substitute' as const,
+  };
+  player.set({ ...team.sub.get!, sideOfCourt: side, actingSideOfCourt: side });
+  team.sub.set(temp);
 }
 
 export function replayLocal(game: GameState): void {

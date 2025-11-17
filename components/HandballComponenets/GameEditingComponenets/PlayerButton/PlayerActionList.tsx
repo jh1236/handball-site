@@ -732,7 +732,11 @@ export function PlayerActionList({
         </>
       ),
     });
-    if (team.sub.get && game.teamOne.score.get + game.teamTwo.score.get < subsAllowedScore) {
+    if (
+      team.sub.get &&
+      game.teamOne.score.get + game.teamTwo.score.get < subsAllowedScore &&
+      team.sub.get.startSide === 'Substitute'
+    ) {
       out.splice(1, 0, {
         Icon: IconArrowsLeftRight,
         value: `Substitute (${subsAllowedScore - (game.teamOne.score.get + game.teamTwo.score.get)} points remaining)`,
