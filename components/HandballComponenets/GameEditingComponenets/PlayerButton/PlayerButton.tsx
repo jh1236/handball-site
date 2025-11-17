@@ -85,7 +85,7 @@ export function PlayerButton({
   }, [team.right.get, team.left.get, game.ended.get, game.started.get, trueLeftSide]);
 
   const leftSide = useMemo(
-    () => ((game.ended.get || !game.started.get) ? trueLeftSide : player?.sideOfCourt === 'Left'),
+    () => (game.ended.get || !game.started.get ? trueLeftSide : player?.sideOfCourt === 'Left'),
     [game.ended.get, game.started.get, player?.sideOfCourt, trueLeftSide]
   );
   const [opened, { open, close }] = useDisclosure(false);
