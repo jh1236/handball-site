@@ -550,17 +550,20 @@ export function PlayerActionList({
         value: `Swap with ${a.get?.name}`,
         color: 'white',
         content: (
-          <Button
-            size="lg"
-            onClick={() => {
-              const temp = a.get!;
-              a.set(currentPlayer.get!);
-              currentPlayer.set(temp);
-              close();
-            }}
-          >
-            Swap
-          </Button>
+          <>
+            {!isVertical && <Title order={3}>Swap with {a.get?.name}</Title>}
+            <Button
+              size="lg"
+              onClick={() => {
+                const temp = a.get!;
+                a.set(currentPlayer.get!);
+                currentPlayer.set(temp);
+                close();
+              }}
+            >
+              Swap
+            </Button>
+          </>
         ),
       }))
     );
