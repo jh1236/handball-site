@@ -556,7 +556,12 @@ export function PlayerActionList({
         color: 'white',
         content: (
           <>
-            {!isVertical && <Title order={3}>Swap with {a.get?.name}</Title>}
+            {!isVertical && (
+              <>
+                <Title order={3}>Swap with {a.get?.name}</Title>
+                <br />
+              </>
+            )}
             <Button
               size="lg"
               onClick={() => {
