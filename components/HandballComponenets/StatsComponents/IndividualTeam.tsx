@@ -32,7 +32,7 @@ import {
 } from '@mantine/core';
 import { eventIcon } from '@/components/HandballComponenets/AdminGamePanel';
 import GameBlockComfy from '@/components/HandballComponenets/GameBlock';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/hooks/userData';
 import { getGames, getGamesCount } from '@/ServerActions/GameActions';
 import { getTeam } from '@/ServerActions/TeamActions';
 import { getTournaments } from '@/ServerActions/TournamentActions';

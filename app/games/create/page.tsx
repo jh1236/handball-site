@@ -13,7 +13,7 @@ import {
 import { CreatePlayerButton } from '@/components/HandballComponenets/GameCreatingComponents/CreatePlayerButton';
 import { CreateTeamButton } from '@/components/HandballComponenets/GameCreatingComponents/CreateTeamButton';
 import { GameSettings } from '@/components/HandballComponenets/GameCreatingComponents/GameSettings';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/hooks/userData';
 import { getPlayers } from '@/ServerActions/PlayerActions';
 import { getTeams } from '@/ServerActions/TeamActions';
 import { PersonStructure, TeamStructure } from '@/ServerActions/types';

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Center, Checkbox, Group, Popover, Select, Stack } from '@mantine/core';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/hooks/userData';
 import { createGameWithPlayers } from '@/ServerActions/GameActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { getTournaments } from '@/ServerActions/TournamentActions';

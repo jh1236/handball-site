@@ -17,7 +17,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/hooks/userData';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import {
   getLog,

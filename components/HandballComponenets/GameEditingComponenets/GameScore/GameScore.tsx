@@ -15,11 +15,7 @@ import {
   useMatches,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import {
-  abandon,
-  begin,
-  replay,
-} from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { useEditGameActions } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GameActionList } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameActionList';
 import { GameState } from '@/components/HandballComponenets/GameState';
 import { useScreenVertical } from '@/components/hooks/useScreenVertical';
@@ -37,7 +33,7 @@ export const QUICK_GAME_END = false;
 export function GameScore({ game, official, scorer }: GameScoreArgs) {
   const isVertical = useScreenVertical();
   const fullscreen = useMatches({ base: true, md: false });
-
+  const { abandon, begin, replay } = useEditGameActions(game);
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
   const [warningText, setWarningText] = useState<string | undefined>(undefined);
   const [index, setIndex] = useState(0);
@@ -76,7 +72,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
         title={<Title> Warning!</Title>}
       >
         <Text display="block">{warningText}</Text>
-        <Button m={15} onClick={() => begin(game, official, scorer)}>
+        <Button m={15} onClick={() => begin(official, scorer)}>
           Start Anyway
         </Button>
       </Modal>
@@ -166,7 +162,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
                           m={5}
                           color="red"
                           onClick={() => {
-                            abandon(game);
+                            abandon();
                             setOpenPopover(false);
                           }}
                         >
@@ -179,7 +175,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
                       size="lg"
                       color="gray"
                       onClick={() => {
-                        replay(game);
+                        replay();
                         setOpenPopover(false);
                       }}
                     >
@@ -197,7 +193,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
           size="lg"
           onClick={() => {
             if (game.badminton.get) {
-              begin(game, official, scorer);
+              begin(official, scorer);
             } else {
               setWarningText(
                 'This game has badminton serving set! Please ensure that this is what you want to do!'

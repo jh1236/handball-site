@@ -17,26 +17,16 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import {
-  del,
-  endTimeout,
-  sync,
-  undo,
-} from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
+import { useEditGameActions } from '@/components/HandballComponenets/GameEditingComponenets/GameEditingActions';
 import { GameScore } from '@/components/HandballComponenets/GameEditingComponenets/GameScore/GameScore';
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useGameState } from '@/components/HandballComponenets/GameState';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/hooks/userData';
 import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 import { getGame } from '@/ServerActions/GameActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { GameStructure, OfficialStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
-
-let setGameFn: (game: GameStructure) => void;
-//necessary to reveal the state from the React component
-// eslint-disable-next-line import/no-mutable-exports
-export let startLoading: () => void;
 
 export function playersFromGame(game: GameStructure): PlayerGameStatsStructure[] {
   return [
@@ -49,12 +39,6 @@ export function playersFromGame(game: GameStructure): PlayerGameStatsStructure[]
   ].filter((pgs) => pgs !== null && pgs !== undefined);
 }
 
-export function reloadGame(gameID: number) {
-  getGame({ gameID }).then((gameIn) => {
-    setGameFn(gameIn);
-  });
-}
-
 export function EditGame({ game }: { game: number }) {
   const { isUmpireManager, isOfficial, loading } = useUserData();
   const [officials, setOfficials] = useState<OfficialStructure[]>([]);
@@ -62,13 +46,12 @@ export function EditGame({ game }: { game: number }) {
   const [official, setOfficial] = useState<OfficialStructure>();
 
   const [gameObj, setGameObj] = React.useState<GameStructure | null>(null);
-  setGameFn = setGameObj;
   const [visibleLoading, { open: openLoading, close: closeLoading }] = useDisclosure(false);
   const [editOfficialGame, { close: iKnowWhatImDoing }] = useDisclosure(true);
-  startLoading = openLoading;
   const [visibleTimeout, { open: openTimeout, close: closeTimeout }] = useDisclosure(false);
   const [currentTime, setCurrentTime] = React.useState<number>(300);
   const { gameState, setGameForState } = useGameState(gameObj || undefined);
+  const { del, sync, endTimeout, undo } = useEditGameActions(gameState);
 
   const isVertical = useScreenVertical();
 
@@ -86,7 +69,7 @@ export function EditGame({ game }: { game: number }) {
   }, []);
 
   useEffect(() => {
-    reloadGame(game);
+    getGame({ gameID: game }).then(setGameObj);
   }, [game]);
 
   useEffect(() => {
@@ -118,7 +101,7 @@ export function EditGame({ game }: { game: number }) {
       </Title>
       <br />
       <br />
-      <Button size="lg" onClick={() => endTimeout(gameState)}>
+      <Button size="lg" onClick={() => endTimeout()}>
         End Timeout
       </Button>
     </>
@@ -238,7 +221,14 @@ export function EditGame({ game }: { game: number }) {
           <Flex flex={2} direction={isVertical ? 'row' : 'column'}>
             <Center mih={0} flex={30}>
               {gameState.started.get ? (
-                <Button color="player-color" size="lg" onClick={() => sync(gameState)}>
+                <Button
+                  color="player-color"
+                  size="lg"
+                  onClick={() => {
+                    openLoading();
+                    sync().then(closeLoading);
+                  }}
+                >
                   Sync
                 </Button>
               ) : (
@@ -308,9 +298,10 @@ export function EditGame({ game }: { game: number }) {
                 color={gameState.started.get ? 'player-color' : 'red'}
                 onClick={() => {
                   if (gameState.started.get) {
-                    undo(gameState);
+                    openLoading();
+                    undo().then(closeLoading);
                   } else {
-                    del(gameState);
+                    del();
                   }
                 }}
               >

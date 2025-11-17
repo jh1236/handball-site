@@ -25,7 +25,7 @@ import {
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/hooks/userData';
 import {
   uploadPlayerImage,
   uploadTeamImage,

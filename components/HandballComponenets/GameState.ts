@@ -402,7 +402,7 @@ export function useGameState(game?: GameStructure) {
   };
 }
 
-function setGameState(gameObj: GameStructure, state: GameState) {
+export function setGameState(gameObj: GameStructure, state: GameState) {
   state.firstTeamServes.set(gameObj.firstTeamToServe);
   state.faulted.set(gameObj.faulted);
   state.teamOneIGA.set(gameObj.firstTeamIga ?? true);

@@ -12,6 +12,7 @@ import {
   IconLayoutSidebarLeftExpand,
   IconMoon,
   IconNote,
+  IconSettings,
   IconSun,
   IconUser,
   IconUsers,
@@ -32,7 +33,7 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
-import { useUserData } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/hooks/userData';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import buttonClasses from '@/components/Sidebar/NavbarLinksGroup.module.css';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
@@ -55,7 +56,7 @@ export function NavbarNested({
   mobile = false,
 }: NavbarNestedProps) {
   const [openUserActions, setOpenUserActions] = React.useState<boolean>(false);
-  const { isOfficial, isAdmin, username, isUmpireManager } = useUserData();
+  const { isOfficial, isAdmin, username, isUmpireManager, isLoggedIn } = useUserData();
   const [mounted, setMounted] = React.useState<boolean>(false);
 
   useEffect(() => {
@@ -121,6 +122,9 @@ export function NavbarNested({
       out.push({ label: 'Admin', icon: IconAdjustments, link: '/admin' });
     }
     out.push({ label: 'About us', icon: IconUsers, link: '/about' });
+    if (isLoggedIn()) {
+      out.push({ label: 'Settings', icon: IconSettings, link: '/settings' });
+    }
     return out;
   }
 
