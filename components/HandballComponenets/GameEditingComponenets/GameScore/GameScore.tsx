@@ -72,7 +72,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
         title={<Title> Warning!</Title>}
       >
         <Text display="block">{warningText}</Text>
-        <Button m={15} onClick={() => begin(game, official, scorer)}>
+        <Button m={15} onClick={() => begin(official, scorer)}>
           Start Anyway
         </Button>
       </Modal>

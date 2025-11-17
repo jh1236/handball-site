@@ -1,7 +1,12 @@
 'use client';
 
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
-import { IconBallVolleyball, IconShoppingCartFilled, IconTransfer } from '@tabler/icons-react';
+import {
+  IconBallVolleyball,
+  IconShield,
+  IconShoppingCartFilled,
+  IconTransfer,
+} from '@tabler/icons-react';
 import {
   ActionIcon,
   Box,
@@ -16,6 +21,7 @@ import {
   Modal,
   Popover,
   Progress,
+  Select,
   Stack,
   Text,
   Title,
@@ -201,6 +207,8 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
   const [firstTeam, setFirstTeam] = useState(false);
   const [location, setLocation] = React.useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [teamOneLibero, setTeamOneLibero] = useState<string | null>(null);
+  const [teamTwoLibero, setTeamTwoLibero] = useState<string | null>(null);
   const [playerLeft, setPlayerLeft] = useState(false);
   const [faultOpen, setFaultOpen] = useState<boolean>(false);
   const [endIndex, setEndIndex] = useState<number>(0);
@@ -244,6 +252,19 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
     }
   }, [closeTimeout, openTimeout, gameState.timeoutExpirationTime.get]);
   if (!loading && !isOfficial(gameObj?.tournament.searchableName)) return <></>;
+
+  function NameCard({ leftSide, isTeamOne }: { leftSide: boolean; isTeamOne: boolean }) {
+    const player = getPlayerFromPositionRespectingCards(gameState, isTeamOne, leftSide);
+    const serving = isPlayerServing(gameState, isTeamOne, leftSide);
+    return (
+      <Text fs={!serving ? 'italic' : undefined} fw={serving ? 700 : undefined}>
+        {player?.name} [{leftSide ? 'L' : 'R'}]{' '}
+        {serving
+          ? gameState.faulted.get && '*'
+          : player?.isLibero && <IconShield size={16} color="orange"></IconShield>}
+      </Text>
+    );
+  }
 
   const teamOneCardTime = cardTimeForTeam(teamOne);
   const teamOneCardTimeRemaining = cardTimeRemainingForTeam(teamOne);
@@ -333,6 +354,34 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           </Grid.Col>
           <Grid.Col ta="center" span={6}>
             {teamOne.left.get && teamOne.right.get && (
+              <Select
+                label={`Pick ${teamOne.name.get}'s libero`}
+                w="70%"
+                m="auto"
+                value={teamOneLibero}
+                onChange={setTeamOneLibero}
+                data={[teamOne.left.get, teamOne.right.get, teamOne.sub.get]
+                  .filter((a) => typeof a !== 'undefined')
+                  .map((a) => ({ label: a?.name, value: a.searchableName }))}
+              ></Select>
+            )}
+          </Grid.Col>
+          <Grid.Col ta="center" span={6}>
+            {teamTwo.left.get && teamTwo.right.get && (
+              <Select
+                label={`Pick ${teamTwo.name.get}'s libero`}
+                w="70%"
+                m="auto"
+                value={teamTwoLibero}
+                onChange={setTeamTwoLibero}
+                data={[teamTwo.left.get, teamTwo.right.get, teamTwo.sub.get]
+                  .filter((a) => typeof a !== 'undefined')
+                  .map((a) => ({ label: a?.name, value: a.searchableName }))}
+              ></Select>
+            )}
+          </Grid.Col>
+          <Grid.Col ta="center" span={6}>
+            {teamOne.left.get && teamOne.right.get && (
               <PlacePlayersGameStart team={teamOne}></PlacePlayersGameStart>
             )}
           </Grid.Col>
@@ -342,7 +391,27 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
             )}
           </Grid.Col>
           <Grid.Col ta="center" span={12}>
-            <Button onClick={() => edit.begin()}>Start</Button>
+            <Button
+              onClick={() => {
+                [teamOne.left, teamOne.right, teamOne.sub].forEach((a) => {
+                  const temp = a.get;
+                  if (temp) {
+                    temp.isLibero = temp.searchableName === teamOneLibero;
+                    a.set(temp);
+                  }
+                });
+                [teamTwo.left, teamTwo.right, teamTwo.sub].forEach((a) => {
+                  const temp = a.get;
+                  if (temp) {
+                    temp.isLibero = temp.searchableName === teamTwoLibero;
+                    a.set(temp);
+                  }
+                });
+                edit.begin();
+              }}
+            >
+              Start
+            </Button>
           </Grid.Col>
         </Grid>
       </Box>
@@ -714,18 +783,8 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           )}
         </Grid.Col>
         <Grid.Col ta="center" span={5}>
-          {teamOne.left.get && (
-            <Text fs="italic" fw={isPlayerServing(gameState, !swapped, true) ? 700 : undefined}>
-              {getPlayerFromPositionRespectingCards(gameState, !swapped, true)?.name} [L]{' '}
-              {isPlayerServing(gameState, !swapped, true) && gameState.faulted.get && '*'}
-            </Text>
-          )}
-          {teamOne.right.get && (
-            <Text fs="italic" fw={isPlayerServing(gameState, !swapped, false) ? 700 : undefined}>
-              {getPlayerFromPositionRespectingCards(gameState, !swapped, false)?.name} [R]{' '}
-              {isPlayerServing(gameState, !swapped, false) && gameState.faulted.get && '*'}
-            </Text>
-          )}
+          {teamOne.left.get && <NameCard leftSide={true} isTeamOne={!swapped} />}
+          {teamOne.right.get && <NameCard leftSide={false} isTeamOne={!swapped} />}
         </Grid.Col>
         <Grid.Col ta="center" span={2}>
           <Title order={1}>
@@ -733,18 +792,8 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           </Title>
         </Grid.Col>
         <Grid.Col ta="center" span={5}>
-          {teamTwo.left.get && (
-            <Text fs="italic" fw={isPlayerServing(gameState, swapped, true) ? 700 : undefined}>
-              {getPlayerFromPositionRespectingCards(gameState, swapped, true)?.name} [L]{' '}
-              {isPlayerServing(gameState, swapped, true) && gameState.faulted.get && '*'}
-            </Text>
-          )}
-          {teamTwo.right.get && (
-            <Text fs="italic" fw={isPlayerServing(gameState, swapped, false) ? 700 : undefined}>
-              {getPlayerFromPositionRespectingCards(gameState, swapped, false)?.name} [R]{' '}
-              {isPlayerServing(gameState, swapped, false) && gameState.faulted.get && '*'}
-            </Text>
-          )}
+          {teamTwo.left.get && <NameCard leftSide={true} isTeamOne={swapped} />}
+          {teamTwo.right.get && <NameCard leftSide={false} isTeamOne={swapped} />}
         </Grid.Col>
         <Grid.Col ta="center" span={6}>
           <PlayersPopover
