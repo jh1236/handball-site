@@ -550,7 +550,7 @@ export function PlayerActionList({
         value: `Swap with ${a.get?.name}`,
         color: 'white',
         content: (
-          <>
+          <Box ta="center">
             {!isVertical && (
               <>
                 <Title order={3}>Swap with {a.get?.name}</Title>
@@ -558,6 +558,7 @@ export function PlayerActionList({
               </>
             )}
             <Button
+              m="auto"
               size="lg"
               onClick={() => {
                 const temp = a.get!;
@@ -568,7 +569,7 @@ export function PlayerActionList({
             >
               Swap
             </Button>
-          </>
+          </Box>
         ),
       }))
     );
@@ -726,7 +727,11 @@ export function PlayerActionList({
         </>
       ),
     });
-    if (team.sub.get && game.teamOne.score.get + game.teamTwo.score.get < subsAllowedScore) {
+    if (
+      team.sub.get &&
+      game.teamOne.score.get + game.teamTwo.score.get < subsAllowedScore &&
+      team.sub.get.startSide === 'Substitute'
+    ) {
       out.splice(1, 0, {
         Icon: IconArrowsLeftRight,
         value: `Substitute (${subsAllowedScore - (game.teamOne.score.get + game.teamTwo.score.get)} points remaining)`,

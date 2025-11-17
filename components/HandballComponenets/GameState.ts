@@ -436,7 +436,7 @@ export function setGameState(gameObj: GameStructure, state: GameState) {
           state.teamOne.right.set(pgs);
           break;
         case 'Substitute':
-          state.teamOne.substitute.set(pgs);
+          state.teamOne.sub.set(pgs);
           break;
       }
     }
@@ -464,7 +464,7 @@ export function setGameState(gameObj: GameStructure, state: GameState) {
           state.teamTwo.right.set(pgs);
           break;
         case 'Substitute':
-          state.teamTwo.substitute.set(pgs);
+          state.teamTwo.sub.set(pgs);
           break;
       }
     }
