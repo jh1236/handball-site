@@ -39,20 +39,16 @@ import { OfficialStructure } from '@/ServerActions/types';
 
 export function begin(game: GameState, official?: OfficialStructure, scorer?: OfficialStructure) {
   startLocal(game);
+  const teamOnePlayers = [game.teamOne.left.get, game.teamOne.right.get, game.teamOne.sub.get];
+  const teamTwoPlayers = [game.teamTwo.left.get, game.teamTwo.right.get, game.teamTwo.sub.get];
   startGame(
     game.id,
     !game.firstTeamServes.get,
     game.teamOneIGA.get,
-    [
-      game.teamOne.left.get?.searchableName,
-      game.teamOne.right.get?.searchableName,
-      game.teamOne.sub.get?.searchableName,
-    ].filter((a) => typeof a === 'string'),
-    [
-      game.teamTwo.left.get?.searchableName,
-      game.teamTwo.right.get?.searchableName,
-      game.teamTwo.sub.get?.searchableName,
-    ].filter((a) => typeof a === 'string'),
+    teamOnePlayers.filter((a) => typeof a !== 'undefined').map((a) => a?.searchableName),
+    teamTwoPlayers.filter((a) => typeof a !== 'undefined').map((a) => a?.searchableName),
+    teamOnePlayers.find((a) => a && a.isLibero)?.searchableName,
+    teamTwoPlayers.find((a) => a && a.isLibero)?.searchableName,
     official?.searchableName,
     scorer?.searchableName
   );
