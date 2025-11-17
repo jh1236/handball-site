@@ -66,16 +66,14 @@ function PlayersPopover({
     return (
       <Button
         size="compact-md"
-        w={160}
-        mih={50}
+        w={140}
+        mih={40}
         {...buttonProps}
         onClick={() => {
           onClick((team.left.get || team.right.get)!);
         }}
       >
-        <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>
-          {buttonText} for {team.name.get}
-        </Text>
+        <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>{buttonText}</Text>
       </Button>
     );
   }
@@ -84,17 +82,15 @@ function PlayersPopover({
       <Popover.Target>
         <Button
           size="compact-md"
-          w={160}
-          mih={50}
+          w={140}
+          mih={40}
           {...buttonProps}
           onClick={(e) => {
             setOpen(true);
             e.stopPropagation();
           }}
         >
-          <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>
-            {buttonText} for {team.name.get}
-          </Text>
+          <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>{buttonText}</Text>
         </Button>
       </Popover.Target>
       <Popover.Dropdown>
@@ -285,7 +281,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           </Grid.Col>
           <Grid.Col ta="center" span={5}>
             <Image
-              maw={250}
+              maw={240}
               m="auto"
               w="80%"
               src={swapped ? gameObj?.teamTwo.imageUrl : gameObj?.teamOne.imageUrl}
@@ -300,7 +296,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           </Grid.Col>
           <Grid.Col ta="center" span={5}>
             <Image
-              maw={250}
+              maw={240}
               m="auto"
               w="80%"
               src={swapped ? gameObj?.teamOne.imageUrl : gameObj?.teamTwo.imageUrl}
@@ -443,7 +439,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           </Grid.Col>
           <Grid.Col ta="center" span={5}>
             <Image
-              maw={250}
+              maw={240}
               m="auto"
               w="80%"
               src={swapped ? gameObj?.teamTwo.imageUrl : gameObj?.teamOne.imageUrl}
@@ -458,7 +454,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           </Grid.Col>
           <Grid.Col ta="center" span={5}>
             <Image
-              maw={250}
+              maw={240}
               m="auto"
               w="80%"
               src={swapped ? gameObj?.teamOne.imageUrl : gameObj?.teamTwo.imageUrl}
@@ -494,7 +490,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
   );
   const colorOfCard = (cardColor ?? 'Warning').toLowerCase().replace(' card', '') as CardColor;
   return (
-    <Box w="97vw" h="98lvh" m="auto" maw={800} pt={10}>
+    <Box w="96vw" h="98lvh" m="auto" maw={800} pt={10}>
       <LoadingOverlay visible={visibleTimeout} loaderProps={{ children: timeoutKids }} />
       <LoadingOverlay
         visible={loading}
@@ -515,7 +511,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
               {GAME_CONFIG.scoreMethods.slice(0, 3).map((method, i) => (
                 <Fragment key={i}>
                   <Button
-                    miw={160}
+                    miw={140}
                     m={isVertical ? 3 : 5}
                     color="player-color"
                     size="sm"
@@ -530,7 +526,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
                 </Fragment>
               ))}
               <Button
-                miw={160}
+                miw={140}
                 m={isVertical ? 3 : 5}
                 color="player-color"
                 size="sm"
@@ -553,7 +549,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
               {GAME_CONFIG.scoreMethods.slice(3).map((method, i) => (
                 <Fragment key={i}>
                   <Button
-                    miw={160}
+                    miw={140}
                     m={isVertical ? 3 : 5}
                     size="sm"
                     color="player-color"
@@ -610,7 +606,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
                 key={i}
                 ml="auto"
                 mr="auto"
-                w={160}
+                w={140}
                 h={40}
                 mb={0}
                 mt={0}
@@ -668,7 +664,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
               {GAME_CONFIG.faultMethods.slice(0, 4).map((method, i) => (
                 <Fragment key={i}>
                   <Button
-                    miw={160}
+                    miw={140}
                     m={isVertical ? 3 : 5}
                     color="player-color"
                     size="sm"
@@ -690,7 +686,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
               {GAME_CONFIG.faultMethods.slice(4).map((method, i) => (
                 <Fragment key={i}>
                   <Button
-                    miw={160}
+                    miw={140}
                     m={isVertical ? 3 : 5}
                     size="sm"
                     color="player-color"
@@ -718,35 +714,39 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           <Title order={2}>{teamTwo.name.get}</Title>
         </Grid.Col>
         <Grid.Col ta="center" span={5}>
-          {teamOne.score.get + teamTwo.score.get <= 9 && !!teamOne.sub.get && (
-            <PlayersPopover
-              onClick={() => edit.sub(firstTeam, playerLeft)}
-              gameState={gameState}
-              teamOne={!swapped}
-              setFirstTeam={setFirstTeam}
-              setPlayerLeft={setPlayerLeft}
-              buttonText="Substitute"
-              buttonProps={{ mah: 40, mih: 40, w: 190, m: 'auto', color: '#1111bb' }}
-            ></PlayersPopover>
-          )}
+          {teamOne.score.get + teamTwo.score.get <= 9 &&
+            !!teamOne.sub.get &&
+            teamOne.sub.get.startSide === 'Substitute' && (
+              <PlayersPopover
+                onClick={() => edit.sub(!swapped, playerLeft)}
+                gameState={gameState}
+                teamOne={!swapped}
+                setFirstTeam={setFirstTeam}
+                setPlayerLeft={setPlayerLeft}
+                buttonText="Substitute"
+                buttonProps={{ mah: 20, mih: 20, m: 'auto', color: '#1111bb' }}
+              ></PlayersPopover>
+            )}
         </Grid.Col>
         <Grid.Col ta="center" span={2}></Grid.Col>
         <Grid.Col ta="center" span={5}>
-          {teamOne.score.get + teamTwo.score.get <= 9 && teamTwo.sub.get && (
-            <PlayersPopover
-              onClick={() => edit.sub(firstTeam, playerLeft)}
-              gameState={gameState}
-              teamOne={swapped}
-              setFirstTeam={setFirstTeam}
-              setPlayerLeft={setPlayerLeft}
-              buttonText="Substitute"
-              buttonProps={{ mah: 40, mih: 40, w: 190, m: 'auto', color: '#1111bb' }}
-            ></PlayersPopover>
-          )}
+          {teamOne.score.get + teamTwo.score.get <= 9 &&
+            teamTwo.sub.get &&
+            teamTwo.sub.get.startSide === 'Substitute' && (
+              <PlayersPopover
+                onClick={() => edit.sub(swapped, playerLeft)}
+                gameState={gameState}
+                teamOne={swapped}
+                setFirstTeam={setFirstTeam}
+                setPlayerLeft={setPlayerLeft}
+                buttonText="Substitute"
+                buttonProps={{ mah: 20, mih: 20, m: 'auto', color: '#1111bb' }}
+              ></PlayersPopover>
+            )}
         </Grid.Col>
         <Grid.Col ta="center" span={5}>
           <Image
-            maw={250}
+            maw={240}
             m="auto"
             w="80%"
             src={swapped ? gameObj?.teamTwo.imageUrl : gameObj?.teamOne.imageUrl}
@@ -761,7 +761,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
         </Grid.Col>
         <Grid.Col ta="center" span={5}>
           <Image
-            maw={250}
+            maw={240}
             m="auto"
             w="80%"
             src={swapped ? gameObj?.teamOne.imageUrl : gameObj?.teamTwo.imageUrl}
@@ -798,7 +798,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
           {teamOne.right.get && <NameCard leftSide={false} isTeamOne={!swapped} />}
         </Grid.Col>
         <Grid.Col ta="center" span={2}>
-          <Title order={1}>
+          <Title order={2}>
             {teamOne.score.get}-{teamTwo.score.get}
           </Title>
         </Grid.Col>
@@ -829,27 +829,23 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
         <Grid.Col ta="center" span={6} mt={25}>
           <Button
             size="compact-md"
-            w={160}
-            mih={50}
+            w={140}
+            mih={40}
             onClick={() => edit.timeout(!swapped)}
             disabled={!!teamOne.timeouts.get}
           >
-            <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>
-              Timeout for {teamOne.name.get}
-            </Text>
+            <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>Timeout</Text>
           </Button>
         </Grid.Col>
         <Grid.Col ta="center" span={6} mt={25}>
           <Button
             size="compact-md"
-            w={160}
-            mih={50}
+            w={140}
+            mih={40}
             onClick={() => edit.timeout(swapped)}
             disabled={!!teamTwo.timeouts.get}
           >
-            <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>
-              Timeout for {teamTwo.name.get}
-            </Text>
+            <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>Timeout</Text>
           </Button>
         </Grid.Col>
         <Grid.Col ta="center" span={6}>
@@ -945,7 +941,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
       <Flex direction="row" justify="space-around" w="70%" m="auto" mt={20}>
         <Popover>
           <Popover.Target>
-            <Button size="compact-md" w={100} mih={50} color="red">
+            <Button size="compact-md" w={100} mih={40} color="red">
               <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>Abandon</Text>
             </Button>
           </Popover.Target>
@@ -959,7 +955,7 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
 
         <Popover>
           <Popover.Target>
-            <Button size="compact-md" w={100} mih={50} color="red">
+            <Button size="compact-md" w={100} mih={40} color="red">
               <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>Forfeit</Text>
             </Button>
           </Popover.Target>
@@ -977,14 +973,22 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
         </Popover>
       </Flex>
       <Flex direction="row" justify="space-around" w="70%" m="auto" mt={20}>
-        <Button size="compact-md" w={100} mih={50} color="blue" onClick={() => setFaultOpen(true)}>
+        <Button
+          size="compact-md"
+          w={100}
+          m={5}
+          mih={40}
+          color="blue"
+          onClick={() => setFaultOpen(true)}
+        >
           <Text style={{ overflow: 'wrap', textWrap: 'wrap' }}>Fault</Text>
         </Button>
 
         <Button
           size="compact-md"
           w={100}
-          mih={50}
+          mih={40}
+          m={5}
           color="blue"
           onClick={() => {
             setLoading(true);
@@ -996,7 +1000,8 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
         <Button
           size="compact-md"
           w={100}
-          mih={50}
+          mih={40}
+          m={5}
           color="#000044"
           onClick={() => {
             setLoading(true);
