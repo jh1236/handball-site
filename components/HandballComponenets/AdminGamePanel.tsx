@@ -47,9 +47,9 @@ import {
   Title,
 } from '@mantine/core';
 import { FEEDBACK_TEXTS } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
+import { useUserData } from '@/components/hooks/userData';
 import { alertGame, deleteGame, resolveGame } from '@/ServerActions/GameActions';
 import { GameEventStructure, GameStructure } from '@/ServerActions/types';
-import { useUserData } from '@/components/hooks/userData';
 
 interface AdminGamePanelProps {
   game: GameStructure;

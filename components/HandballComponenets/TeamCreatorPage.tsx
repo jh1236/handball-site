@@ -25,6 +25,7 @@ import {
   Title,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
+import { useUserData } from '@/components/hooks/userData';
 import {
   uploadPlayerImage,
   uploadTeamImage,
@@ -57,7 +58,6 @@ import {
   TournamentStructure,
 } from '@/ServerActions/types';
 import classes from './TeamCreatorPage.module.css';
-import { useUserData } from '@/components/hooks/userData';
 
 interface TeamCreatorPageArgs {
   tournament: SearchableName;

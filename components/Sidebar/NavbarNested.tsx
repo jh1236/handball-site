@@ -33,12 +33,12 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import { SERVER_ADDRESS } from '@/app/config';
+import { useUserData } from '@/components/hooks/userData';
 import { LinksGroup } from '@/components/Sidebar/NavbarLinksGroup';
 import buttonClasses from '@/components/Sidebar/NavbarLinksGroup.module.css';
 import classes from '@/components/Sidebar/NavbarNested.module.css';
 import { logoutAction } from '@/ServerActions/LoginActions';
 import { TournamentStructure } from '@/ServerActions/types';
-import { useUserData } from '@/components/hooks/userData';
 
 interface NavbarNestedProps {
   sidebarVisible?: boolean;

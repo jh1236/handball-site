@@ -22,11 +22,11 @@ import { GameScore } from '@/components/HandballComponenets/GameEditingComponene
 import { PlayerButton } from '@/components/HandballComponenets/GameEditingComponenets/PlayerButton/PlayerButton';
 import { TeamButton } from '@/components/HandballComponenets/GameEditingComponenets/TeamButton/TeamButton';
 import { useGameState } from '@/components/HandballComponenets/GameState';
+import { useUserData } from '@/components/hooks/userData';
 import { useScreenVertical } from '@/components/hooks/useScreenVertical';
 import { getGame } from '@/ServerActions/GameActions';
 import { getOfficials } from '@/ServerActions/OfficialActions';
 import { GameStructure, OfficialStructure, PlayerGameStatsStructure } from '@/ServerActions/types';
-import { useUserData } from '@/components/hooks/userData';
 
 export function playersFromGame(game: GameStructure): PlayerGameStatsStructure[] {
   return [

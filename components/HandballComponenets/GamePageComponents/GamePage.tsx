@@ -11,11 +11,11 @@ import { GamePointsMethodGraph } from '@/components/HandballComponenets/GamePage
 import { GameTimelineLineGraph } from '@/components/HandballComponenets/GamePageComponents/GameTimelineLineGraph';
 import { ScoreGraphic } from '@/components/HandballComponenets/GamePageComponents/ScoreGraphic';
 import { localLogout } from '@/components/HandballComponenets/ServerActions';
+import { useUserData } from '@/components/hooks/userData';
 import SidebarLayout from '@/components/Sidebar/SidebarLayout';
 import { getGame, getGames } from '@/ServerActions/GameActions';
 import { GameStructure } from '@/ServerActions/types';
 import { PlayerStats } from './PlayerStats';
-import { useUserData } from '@/components/hooks/userData';
 
 interface GamePageProps {
   gameID: number;
