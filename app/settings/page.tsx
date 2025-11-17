@@ -11,6 +11,7 @@ export default function SettingsPage() {
       <Title>Settings</Title>
       <i>Settings are stored per device, not per account</i>
       <Checkbox
+        m={20}
         label="Use Classic scorer"
         checked={settings.useClassicScorer}
         onChange={() => settings.setUseClassicScorer(!settings.useClassicScorer)}

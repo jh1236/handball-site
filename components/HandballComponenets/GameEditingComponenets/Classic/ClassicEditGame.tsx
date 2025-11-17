@@ -413,6 +413,17 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
               Start
             </Button>
           </Grid.Col>
+          <Grid.Col ta="center" span={12}>
+            <Button
+              size="lg"
+              color="red"
+              onClick={() => {
+                edit.del();
+              }}
+            >
+              Delete{' '}
+            </Button>
+          </Grid.Col>
         </Grid>
       </Box>
     );
