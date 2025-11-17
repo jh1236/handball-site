@@ -1,7 +1,6 @@
 'use client';
 
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
-import { IconButton } from '@storybook/core/components';
 import { IconBallVolleyball, IconShoppingCartFilled, IconTransfer } from '@tabler/icons-react';
 import {
   ActionIcon,
@@ -146,17 +145,9 @@ function getPlayerFromPositionRespectingCards(
   if (gameState.ended.get) {
     return leftPlayer ? team.left.get : team.right.get;
   }
-  const cardedTeammates = [team.left.get, team.right.get].filter((a) => a?.cardTimeRemaining !== 0);
-  const uncardedTeammates = [team.left.get, team.right.get].filter(
-    (a) => a?.cardTimeRemaining === 0
+  return [team.right.get, team.left.get].find(
+    (pgs) => pgs.actingSideOfCourt === (leftPlayer ? 'Left' : 'Right')
   );
-  if (cardedTeammates.length !== 0) {
-    if (gameState.servingFromLeft === leftPlayer) {
-      return uncardedTeammates[0];
-    }
-    return cardedTeammates[0];
-  }
-  return leftPlayer ? team.left.get : team.right.get;
 }
 
 function isPlayerServing(gameState: GameState, firstTeam: boolean, leftPlayer: boolean) {
@@ -646,7 +637,33 @@ export function ClassicEditGame({ game: gameID }: ClassicEditGameParams) {
         <Grid.Col ta="center" span={5}>
           <Title order={2}>{teamTwo.name.get}</Title>
         </Grid.Col>
-
+        <Grid.Col ta="center" span={5}>
+          {teamOne.score.get + teamTwo.score.get <= 9 && !!teamOne.sub.get && (
+            <PlayersPopover
+              onClick={() => edit.sub(firstTeam, playerLeft)}
+              gameState={gameState}
+              teamOne={!swapped}
+              setFirstTeam={setFirstTeam}
+              setPlayerLeft={setPlayerLeft}
+              buttonText="Substitute"
+              buttonProps={{ mah: 40, mih: 40, w: 190, m: 'auto', color: '#1111bb' }}
+            ></PlayersPopover>
+          )}
+        </Grid.Col>
+        <Grid.Col ta="center" span={2}></Grid.Col>
+        <Grid.Col ta="center" span={5}>
+          {teamOne.score.get + teamTwo.score.get <= 9 && teamTwo.sub.get && (
+            <PlayersPopover
+              onClick={() => edit.sub(firstTeam, playerLeft)}
+              gameState={gameState}
+              teamOne={swapped}
+              setFirstTeam={setFirstTeam}
+              setPlayerLeft={setPlayerLeft}
+              buttonText="Substitute"
+              buttonProps={{ mah: 40, mih: 40, w: 190, m: 'auto', color: '#1111bb' }}
+            ></PlayersPopover>
+          )}
+        </Grid.Col>
         <Grid.Col ta="center" span={5}>
           <Image
             maw={250}
