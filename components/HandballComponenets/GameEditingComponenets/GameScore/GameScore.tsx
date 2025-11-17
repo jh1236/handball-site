@@ -35,6 +35,7 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
   const fullscreen = useMatches({ base: true, md: false });
   const { abandon, begin, replay } = useEditGameActions(game);
   const [endGameOpen, { open: openEndGame, close: closeEndGame }] = useDisclosure(false);
+  const [warningText, setWarningText] = useState<string | undefined>(undefined);
   const [index, setIndex] = useState(0);
   const [openPopover, setOpenPopover] = useState(false);
   useEffect(() => {
@@ -64,6 +65,17 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
       <Box pos="absolute" m="auto" w={150} h={150} style={{ zIndex: -2 }}>
         <ReplayIcons replays={game.replaysSinceScore.get} width={150} height={150} color="#444" />
       </Box>
+      <Modal
+        opened={warningText !== undefined}
+        onClose={() => setWarningText(undefined)}
+        centered
+        title={<Title> Warning!</Title>}
+      >
+        <Text display="block">{warningText}</Text>
+        <Button m={15} onClick={() => begin(game, official, scorer)}>
+          Start Anyway
+        </Button>
+      </Modal>
       <Modal
         opened={!fullscreen && endGameOpen}
         centered
@@ -176,7 +188,19 @@ export function GameScore({ game, official, scorer }: GameScoreArgs) {
           </>
         )
       ) : (
-        <Button color="player-color" size="lg" onClick={() => begin(official, scorer)}>
+        <Button
+          color="player-color"
+          size="lg"
+          onClick={() => {
+            if (game.badminton.get) {
+              begin(official, scorer);
+            } else {
+              setWarningText(
+                'This game has badminton serving set! Please ensure that this is what you want to do!'
+              );
+            }
+          }}
+        >
           Start
         </Button>
       )}

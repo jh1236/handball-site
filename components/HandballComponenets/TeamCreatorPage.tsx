@@ -712,6 +712,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
   const [openTournamentEdit, setOpenTournamentEdit] = useState<boolean>(false);
   const [fixturesType, setFixturesType] = useState<string>();
   const [finalsType, setFinalsType] = useState<string>();
+  const [badmintonServes, setBadmintonServes] = useState<boolean>(true);
   const [fixturesTypes, setFixturesTypes] = useState<string[]>([]);
   const [finalsTypes, setFinalsTypes] = useState<string[]>([]);
   const [tournamentColor, setTournamentColor] = useState<string>();
@@ -734,15 +735,16 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
       setTournamentColor(t.color);
       setTwoCourts(t.twoCourts);
       setHasScorer(t.hasScorer);
-    });
-    getFixtureTypes().then((f) => {
-      setFixturesTypes(f.fixturesTypes);
-      setFinalsTypes(f.finalsTypes);
+      setBadmintonServes(t.usingBadmintonServes);
     });
     getTeams({ tournament }).then((t) => setTeamsInTournament(t.teams));
     getOfficials({ tournament }).then((o) => setOfficialsInTournament(o.officials));
   }, [tournament]);
   useEffect(() => {
+    getFixtureTypes().then((f) => {
+      setFixturesTypes(f.fixturesTypes);
+      setFinalsTypes(f.finalsTypes);
+    });
     getPlayers({}).then((p) => setAllPlayers(p.players));
     getTeams({}).then((t) => setAllTeams(t.teams));
     getOfficials({}).then((o) => setAllOfficials(o.officials));
@@ -773,8 +775,11 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
           alignItems: 'center',
         }}
       >
-        <Modal opened={openTournamentEdit} onClose={() => setOpenTournamentEdit(false)}>
-          <Title>Edit Tournament</Title>
+        <Modal
+          opened={openTournamentEdit}
+          onClose={() => setOpenTournamentEdit(false)}
+          title={<Title>Edit Tournament</Title>}
+        >
           <TextInput
             label="Name"
             value={newTournamentName}
@@ -797,12 +802,20 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
             allowDeselect={false}
           />
           <Checkbox
+            label="Badminton Serves"
+            m={15}
+            checked={badmintonServes}
+            onChange={(e) => setBadmintonServes(e.target.checked)}
+          ></Checkbox>
+          <Checkbox
             label="Has Scorer"
+            m={15}
             checked={hasScorer}
             onChange={(e) => setHasScorer(e.target.checked)}
           ></Checkbox>
           <Checkbox
             label="Two Courts"
+            m={15}
             checked={twoCourts}
             onChange={(e) => setTwoCourts(e.target.checked)}
           ></Checkbox>
@@ -833,6 +846,7 @@ export function TeamCreatorPage({ tournament }: TeamCreatorPageArgs) {
                 color: tournamentColor,
                 hasScorer,
                 twoCourts,
+                badmintonServes,
               }).then(() => setOpenTournamentEdit(false))
             }
           >
