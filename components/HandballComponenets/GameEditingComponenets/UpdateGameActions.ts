@@ -75,6 +75,11 @@ function fixCourtPositions(
   const opponentLeft = receivingTeamPlayers.find((a) => a?.sideOfCourt === 'Left');
   const opponentRight = receivingTeamPlayers.find((a) => a?.sideOfCourt === 'Right');
 
+  if (left) left.actingSideOfCourt = 'Left';
+  if (right) right.actingSideOfCourt = 'Right';
+  if (opponentLeft) opponentLeft.actingSideOfCourt = 'Left';
+  if (opponentRight) opponentRight.actingSideOfCourt = 'Right';
+
   const receiver = servingFromLeft
     ? receivingTeamPlayers.find((p) => p?.isLibero && p.cardTimeRemaining === 0) || opponentLeft
     : receivingTeamPlayers.find((p) => p?.isLibero && p.cardTimeRemaining === 0) || opponentRight;
