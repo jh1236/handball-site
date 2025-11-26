@@ -109,7 +109,7 @@ export function TournamentList() {
               <List>
                 {tournaments
                   ?.filter((a) => a.finished)
-                  .splice(5, 10)
+                  .slice(5, 10)
                   .map((a, i) => (
                     <List.Item
                       key={i}
