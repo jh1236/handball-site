@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import {
   Box,
+  Button,
   Center,
   Image,
   LoadingOverlay,
@@ -15,6 +16,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { WEBSOCKET_ADDRESS } from '@/app/config';
 import { TeamState, useGameState } from '@/components/HandballComponenets/GameState';
+import { getNextGame } from '@/ServerActions/GameActions';
 import { EventMessage, Message, UpdateMessage } from '@/ServerActions/SocketTypes';
 import { GameEventStructure, PlayerGameStatsStructure, TeamStructure } from '@/ServerActions/types';
 import classes from './Scoreboard.module.css';
@@ -80,6 +82,12 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       sendMessage('update');
     }
   }, [readyState, sendMessage]);
+  function loadNextGame() {
+    getNextGame(gameID).then((gid) => {
+      window.location.href = `/games/${gid}/scoreboard`;
+    });
+  }
+
   useEffect(() => {
     const message = lastJsonMessage as Message;
     if (message?.type === 'update') {
@@ -116,6 +124,7 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       addGameEventToState(event);
       if (event.eventType === 'End Game') {
         setTime(Date.now() - time);
+        loadNextGame();
       }
     }
     // disabling here so the same json message isn't reprocessed
@@ -267,6 +276,16 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
       </Text>
     </>
   );
+
+  const endKids = (
+    <>
+      <Box ta="center" fz="20vh" fw="semi-bold">
+        <Button m="auto" onClick={loadNextGame}>
+          Next Game
+        </Button>
+      </Box>
+    </>
+  );
   const timeoutKids = (
     <Stack>
       <RingProgress
@@ -314,8 +333,10 @@ export function Scoreboard({ gameID }: ScoreboardProps) {
   return (
     <Box style={generateBackground()} h="100vh" w="100vw">
       <LoadingOverlay
-        visible={!gameState.started.get || isTimeoutOpen}
-        loaderProps={{ children: gameState.started.get ? timeoutKids : startKids }}
+        visible={gameState.ended.get || !gameState.started.get || isTimeoutOpen}
+        loaderProps={{
+          children: gameState.ended.get ? endKids : gameState.started.get ? timeoutKids : startKids,
+        }}
         overlayProps={{
           radius: 'sm',
           blur: gameState.started.get ? 10 : 1,

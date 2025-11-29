@@ -271,6 +271,26 @@ export function getNoteableGames({
   });
 }
 
+export function getNextGame(gameId: number): Promise<number> {
+  const url = new URL('/api/games/next', SERVER_ADDRESS);
+  url.searchParams.set('id', String(gameId));
+
+  return tokenFetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 401) {
+        localLogout();
+      }
+      return Promise.reject(response.text());
+    }
+    return response.json().then((j) => j.nextGameId);
+  });
+}
+
 interface GetFixturesArgs {
   tournament?: SearchableName;
   team?: SearchableName;
