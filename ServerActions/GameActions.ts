@@ -287,7 +287,7 @@ export function getNextGame(gameId: number): Promise<number> {
       }
       return Promise.reject(response.text());
     }
-    return response.json().then(j => j.nextGameId);
+    return response.json().then((j) => j.nextGameId);
   });
 }
 
